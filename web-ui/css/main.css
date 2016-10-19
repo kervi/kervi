@@ -1,0 +1,329 @@
+/* 
+Custom CSS for...
+'Modern Business' HTML Theme by Start Bootstrap
+
+All Start Bootstrap themes are licensed under Apache 2.0. 
+For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap.com!
+*/
+
+/* Global Styles */
+
+html, body {
+    
+}
+
+body {
+    
+}
+
+.navbar-collapse.collapse.off {
+    display: block!important;
+}
+.navbar-collapse.collapse.off ul {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-nav.no-collapse>li,
+.navbar-nav.no-collapse {
+    float: left !important;
+}
+
+.navbar-right.no-collapse {
+    float: right!important;
+}
+
+.navbar{
+    min-height:inherit;
+}
+
+.navbar-nav > li > a{
+    padding-bottom:2px;
+    padding-top:2px;
+}
+
+.dropdown {
+    cursor:pointer;
+}
+
+.dropdown-menu > li > a {
+  padding: 3px 5px;
+  
+}
+
+
+.img-home-portfolio,
+.img-customer,
+.portfolio-item {
+    margin-bottom: 30px;
+}
+
+.tab-pane {
+    margin-top: 15px;
+}
+
+/* Page Sections */
+.section,
+.section-colored {
+    padding: 50px 0;
+}
+
+.section-colored {
+    background-color: #e1e1e1;
+    /* change this to change the background color of a colored section */
+}
+
+ .camboard .navbar{
+	margin-bottom:0;
+	in-height:50px;
+	background:rgba(255,255,255,.5);
+	eight:20px;
+}
+
+.sidebar {
+    margin-top: 40px;
+}
+
+.sidebar ul {
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #cccccc;
+}
+
+/* Half Page Height Carousel Customization */
+.carousel {
+    height: 50%;
+}
+
+.item,
+.active,
+.carousel-inner {
+    height: 100%;
+}
+
+.fill {
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-size: cover;
+}
+
+/* Social Icons Styles */
+.list-social-icons {
+    margin-bottom: 45px;
+}
+
+.tooltip-social a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.facebook-link a:hover {
+    color: #3b5998;
+}
+
+.linkedin-link a:hover {
+    color: #007fb1;
+}
+
+.twitter-link a:hover {
+    color: #39a9e0;
+}
+
+.google-plus-link a:hover {
+    color: #d14836;
+}
+
+/* Service Page Styles */
+.service-icon {
+    font-size: 50px;
+}
+
+/* 404 Page Styles */
+.error-404 {
+    font-size: 8em;
+}
+
+/* Pricing Page Styles */
+.price {
+    font-size: 4em;
+}
+
+.price-cents {
+    vertical-align: super;
+    font-size: 50%;
+}
+
+.price-month {
+    font-size: 35%;
+    font-style: italic;
+}
+
+/* Footer Styles */
+footer {
+    margin-top: -25px;
+	height:25px;
+	background:rgba(255,255,255,.5);
+}
+
+
+#video-viewer{
+	margin-top:-20px;
+}
+.cam-pad-area{
+	z-index: 1200;
+	vertical-align: middle; 
+	width: 200px; 
+	display: inline-block; 
+	position: absolute; 
+	left: 389px; 
+	top: 132px;
+	color:white;
+}
+
+
+.ctrl-tabs{
+	background:rgba(255,255,255,.5);
+}
+
+.ctrl-tabs a{
+	//color:#ffffff;
+	font-weight:bold;
+}
+
+.ctrl-tabs a:hover{
+	color:#000000;
+}
+
+.axis-pad{
+	display:inline-block;
+	float:left;
+	margin-right:25px;
+	color:#ffffff;
+    margin-bottom:25px;
+}
+
+.dashboard .axis-pad{
+	display:inline-block;
+	float:left;
+	margin-right:25px;
+	color:#000000;
+    margin-bottom:25px;
+}
+
+.axis-pad fieldset{
+	margin-top:0 !important;
+}
+
+#slide-panel-controllers {
+	width:350px;
+	height:300px;
+	padding:10px;
+	background:rgba(0,0,0,.1);
+	margin-left:-350px;
+	//margin-top:75px;
+	z-index:1100;
+	position:fixed;
+	top:150px;
+	left:0px;
+}
+
+
+#slide-panel-controllers-right {
+	width:300px;
+	height:400px;
+	padding:10px;
+	background:rgba(0,0,0,.1);
+	margin-right:-300px;
+	//margin-top:75px;
+	z-index:1100;
+	position:fixed;
+	top:150px;
+	right:0px;
+}
+
+#opener {
+	float:right;
+	margin:-10px -50px 0px 0px;
+	border-radius:0;
+}
+
+
+//pulse on change directive
+.pulse {
+  animation: pulse 1s infinite;
+  animation-duration: 1s;
+  animation-play-state: running;
+  animation-iteration-count: 1;
+}
+
+
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px;
+    border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+    display: block;
+}
+
+.dropdown-submenu>a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+
+.dropdown-submenu:hover>a:after {
+    border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+    left: -100%;
+    margin-left: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale3d(1, 1, 1);
+  }
+  50% {
+    transform: scale3d(1.25, 1.25, 1.25);
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+/* Responsive Styles */
+@media (max-width: 767px) {
+
+    .carousel {
+        height: 70%;
+        /* increases the carousel height so it looks good on phones */
+    }
+}

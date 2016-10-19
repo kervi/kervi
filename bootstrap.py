@@ -7,7 +7,7 @@ import thread
 from kervi.utility.processSpine import ProcessSpine
 import sys
 import kervi.kerviLogging as logging
-
+import kervi.utility.webserver as webserver
 
 class KerviSensors(process.KerviProcess):
     def InitProcess(self):
@@ -73,6 +73,10 @@ class Application(object):
         
         time.sleep(2)
         self.p3=process.startProcess("IPC", self.settings, self.settings["network"]["IPCBasePort"]+3, KerviSocketIPC)
+        
+        time.sleep(2)
+        print "start web ui on:",self.settings["web-ui"]["address"]
+        webserver.start(self.settings["web-ui"]["address"])
     
     def input_thread(self,list):
         try:
@@ -94,8 +98,10 @@ class Application(object):
         except KeyboardInterrupt:
             pass
 
-
+        
         print "stopping processes"
+        
+        webserver.stop()
         process.stopProcesses()
         time.sleep(2)
         process.stopRootSpine()
@@ -118,6 +124,8 @@ class ApplicationModule(object):
         self.spine.sendCommand("startThreads")
         time.sleep(2)
         self.spine.triggerEvent("moduleStarted",self.name)
+        time.sleep(2)
+
         
     
     def input_thread(self,list):

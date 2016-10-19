@@ -1,0 +1,21 @@
+<div class="dashboard charts">
+    <div ng-include='"templates/headerDashboard.html?v=3"'></div>
+    <ul class="ctrl-tab nav nav-tabs ctrl-tabs">
+        <li>
+            <a  class="dropdown-toggle" data-toggle="dropdown" data-toggle="tab" role="button" aria-haspopup="true" aria-expanded="false" >
+                {{currentChartSensor.name}} ({{currentChartSensorType}})<span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu multi-level">
+                <li  ng-repeat="sensorType in sensorTypes">
+                    <b>{{sensorType.capitalizeFirstLetter()}}</b>
+                    <ul class="dropdown-submenu">
+                        <li ng-repeat="sensor in sensors[sensorType]">
+                            <a showtab="" data-toggle="tab" ng-click="selectChart(sensor,sensorType)" data-sensortype="{{sensorType}}"  data-sensorid="{{sensor.id}}"  >{{sensor.name}}</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <canvas id="sensorChartCanvas"></canvas>
+</div>

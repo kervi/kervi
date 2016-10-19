@@ -1,0 +1,28 @@
+ <span ng-repeat="(sensorType,sensorTypeSensors) in ctrl.sensors"> 
+	<span ng-if="ctrl.sensors[sensorType].length > 1">
+		<a class="dropdown-toggle" data-toggle="dropdown">
+			<span class="sensor-value">
+				<b>{{ctrl.sensors[sensorType][0].name}}:</b>
+				<sparkline-directive sensor-id="{{ctrl.sensors[sensorType][0].id}}" data="{{ctrl.sensors[sensorType][0].sparkline}}"></sparkline-directive>
+				{{ctrl.sensors[sensorType][0].value}} {{ctrl.sensors[sensorType][0].unit}}
+			</span>
+			<b class="caret"></b>
+		</a>
+		<ul class="dropdown-menu">
+			<span ng-repeat="sensor in ctrl.sensors[sensorType]" ng-if="$index > 0">
+				<li>
+					<span class="sensor-value"><b>{{sensor.name}}:</b>
+						<sparkline-directive sensorId="{{sensor.id}}" data="{{sensor.sparkline}}"></sparkline-directive> {{sensor.value}} {{sensor.unit}}
+					</span>
+				</li>
+			</span>	
+		</ul>
+	</span>
+	
+	<span ng-if="ctrl.sensors[sensorType].length == 1">
+		<span ng-repeat="sensor in ctrl.sensors[sensorType]" class="sensor-value">
+			<b>{{ctrl.sensors[sensorType][0].name}}:</b>
+			<sparkline-directive sensorId="{{sensor.id}}" data="{{sensor.sparkline}}"></sparkline-directive> {{sensor.value}} {{sensor.unit}}
+		</span>
+	</span>
+ </span>

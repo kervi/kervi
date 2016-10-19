@@ -24,7 +24,7 @@ class SensorThread(KerviThread):
         self.oldVal = None
         self.lastReading = None
         self.sparkline = []
-        self.location = ["global"]
+        self.dashboards = ["global"]
 	
     def handleGetSensorInfo(self, *args, **kwargs):
         return {
@@ -41,7 +41,7 @@ class SensorThread(KerviThread):
             "lowerWarningLimit":self.lowerWarningLimit,
             "lowerFatalLimit":self.lowerFatalLimit,
             "sparkline":self.sparkline,
-            "location":self.location
+            "dashboards":self.dashboards
         }
 
     def step(self):

@@ -1,0 +1,32 @@
+ 
+ <div ng-if="ctrllocation=='left'">
+	 <div ng-switch="kervictrl.id">
+		<div ng-switch-when="manualSteeringx">
+			fsdf
+		</div>
+		<div ng-switch-default>
+			<div ng-repeat="axis in kervictrl.axes">
+				<controller-axis-directive boardtype="{{boardType}}" ng-if="axis.orientation=='vertical' " axis="axis" value="{{axis.value}}"></controller-axis-directive>
+			</div>
+			<div ng-repeat="axis in kervictrl.axes">
+				<controller-axis-directive boardtype="{{boardType}}" ng-if="axis.orientation=='horizontal' " axis="axis" value="{{axis.value}}"></controller-axis-directive>
+			</div>
+		</div>
+	 
+	 </div>
+</div>
+
+<div ng-if="ctrllocation=='right'">
+	 x ctrl-right:{{kervictrl.name}}
+	 <div ng-switch="kervictrl.id">
+		<div ng-switch-when="manualSteeringx">
+			fsdf
+		</div>
+		<div ng-switch-default>
+			<div ng-repeat="button in kervictrl.buttons">
+				<controller-button-directive button="button" state="{{button.state}}" ></controller-button-directive>
+			</div>
+		</div>
+	 
+	 </div>
+</div>	 

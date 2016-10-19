@@ -1,0 +1,8 @@
+<svg ng-class="{'filled': filled}" ng-attr-height="{{dimensions.height}}" ng-attr-width="{{dimensions.width}}" class="sparky">
+  <rect ng-if="rangeTop" x="0" ng-attr-y="{{range.top}}" ng-attr-height="{{range.height}}" ng-attr-width="{{range.width}}" class="range"></rect>
+  <g ng-repeat="line in lines" ng-class="&quot;line-&quot; + line.index">
+    <polyline ng-attr-points="{{line.polyline}}"></polyline>
+    <circle r="2" ng-attr-cx="{{line.circle.x}}" ng-attr-cy="{{line.circle.y}}"></circle>
+  </g>
+  <rect ng-repeat="bar in bars" ng-attr-x="{{bar.x}}" ng-attr-y="{{bar.y}}" ng-attr-width="{{barsWidth}}" ng-attr-height="{{bar.height}}" ng-class="bar.class" class="bar"></rect>
+</svg>

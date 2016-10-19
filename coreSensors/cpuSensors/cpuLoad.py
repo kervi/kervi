@@ -12,7 +12,7 @@ class CPULoadSensor (SensorThread):
         self.min = 0
         self.unit = "%"
         self.storeSettings["active"] = False
-        self.location = ["cpu"]
+        self.dashboards = ["cpu"]
         psutil.cpu_percent()
 
     def sensorStep(self):

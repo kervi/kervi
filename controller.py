@@ -6,7 +6,10 @@ class ControllerButton(object):
         self.spine = Spine()
         self.controller = controller
         self.state = False
-        
+        self.onCommand = self.controller.id + "." + self.id + ".on"
+        self.offCommand = self.controller.id + "." + self.id + ".off" 
+        self.clickCommand = self.controller.id + "." + self.id + ".click" 
+
         if self.type == "switch":
             self.spine.registerCommandHandler(self.onCommand, self.onOnHandler)
             self.spine.registerCommandHandler(self.offCommand, self.onOffHandler)
@@ -39,9 +42,10 @@ class ControllerButton(object):
 class ControllerAxis(object):
     def __init__(self, controller):
         self.spine = Spine()
-        self.spine.registerCommandHandler(self.command, self.setValue)
         self.controller = controller
-		
+        self.command = self.controller.id + "." + self.id + ".setValue"
+        self.spine.registerCommandHandler(self.command, self.setValue)
+        
     def setValue(self, nvalue, **kwargs):
         if (self.value != nvalue):
             self.spine.log.debug("value change on axis:{0}/{1} value:{2}", self.controller.id, self.id,nvalue)
@@ -72,4 +76,4 @@ class Controller(object):
             for button in self.buttons:
                 buttons += [button.getInfo()]
 
-        return {"type":self.type, "name":self.name, "id":self.id, "parameters":self.parameters, "axes":axes, "buttons": buttons, "location":self.location }
+            return {"type":self.type, "name":self.name, "id":self.id, "parameters":self.parameters, "axes":axes, "buttons": buttons, "dashboards":self.dashboards }

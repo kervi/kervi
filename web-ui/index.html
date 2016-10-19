@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html class="no-js"> <!--<![endif]-->
+<head>
+
+    <title>Kervi</title>
+    <meta charset="utf-8">
+    <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+    <meta http-equiv="CACHE-CONTROL" content="NO-STORE"> 
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="description" content="ACME Inc.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="css/bootstrap-switch.css">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/main.css">
+
+</head>
+<body ng-app="KerviWebApp">
+
+<!-- Our Website Content Goes Here -->
+
+<div ng-view></div>
+<div ng-include='"templates/footer.html"'></div>
+
+<!-- Vendor: Javascripts -->
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/chart-bundle.js"></script>
+<script src="js/bootstrap-switch.js"></script>
+<script src="js/kervi.js"></script>
+<script src="js/jquery.dynameter.js"></script>
+<script src="js/jquery.sparkline.min.js"></script>
+<script src="js/jquery.kontrol.js"></script>
+
+	
+<!-- Vendor: Angular, followed by our custom Javascripts -->
+<script src="js/angular.min.js"></script>
+<script src="js/angular-route.min.js"></script>
+<!--<script src="js/angular-chart.js"></script>-->
+<!-- Our Website Javascripts -->
+
+<script src="js/main.js"></script>
+<script src="js/kerviService.js"></script>
+<!--<script src="js/directives/switch.js"></script>-->
+<script src="js/directives/kervi.sparkline.js"></script>
+<script src="js/directives/kervi.heartbeat.js"></script>
+<script src="js/directives/kervi.sensorChart.js"></script>
+<script src="js/directives/kervi.sensors.js"></script>
+<script src="js/directives/kervi.CamViewer.js"></script>
+<script src="js/directives/kervi.controllers.js"></script>
+<script src="js/directives/kervi.controller.js"></script>
+<script src="js/directives/kervi.controllerAxis.js"></script>
+<script src="js/directives/kervi.controllerButton.js"></script>
+
+
+<script src="js/pageCtrl.js"></script>
+<!--<script src="js/RovCtrl.js"></script>-->
+<!--<script src="js/SensorCtrl.js"></script>-->
+<script src="js/ConnectCtrl.js"></script>
+<script src="js/chartsCtrl.js"></script>
+
+</body>
+</html>

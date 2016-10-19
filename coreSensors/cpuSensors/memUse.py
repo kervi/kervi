@@ -13,7 +13,7 @@ class MemUseSensor (SensorThread):
         self.unit = "%"
         self.storeSettings["active"] = False
         self.storeSettings["delta"] = 0.01
-        self.location = ["cpu"]
+        self.dashboards = ["cpu"]
 
         try:
             percent = psutil.virtual_memory().percent

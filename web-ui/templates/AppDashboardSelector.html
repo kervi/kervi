@@ -1,0 +1,17 @@
+
+    <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown">{{currentPageTitle}}<b class="caret"></b></a>
+            <ul class="dropdown-menu  multi-level ul.nav.navbar-nav.no-collapse">
+                <li ">
+                    Dashboards
+                    <ul class="dropdown-submenu">
+                        <li ng-repeat="(dashboardId,dashboard) in application.dashboards">
+                            <a href="#/{{dashboard.type}}/{{dashboardId}}">{{dashboard.name}}</a>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="#/charts">Charts</a></li>
+                <li><a href="#/about">About</a></li>
+                <li><a href="#/settings">Settings</a></li>
+            </ul>
+    </li>
