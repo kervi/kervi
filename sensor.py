@@ -4,11 +4,9 @@ from datetime import datetime
 import time
 
 
-class SensorThread(KerviThread):
+class Sensor(object):
     def __init__(self):
-        KerviThread.__init__(self)
         self.spine=Spine()
-        self.spine.registerCommandHandler("startThreads", self.startCommand)
         self.spine.registerQueryHandler("getSensorInfo", self.handleGetSensorInfo)
         self.id = "not set"
         self.type = None
@@ -44,10 +42,6 @@ class SensorThread(KerviThread):
             "dashboards":self.dashboards
         }
 
-    def step(self):
-        self.sensorStep()
-        time.sleep(self.readingInterval)
-
     def deltaExceeded(self,value):
         if value is None:
             return False
@@ -76,7 +70,42 @@ class SensorThread(KerviThread):
                 self.sparkline.pop(0)
             self.sparkline+=[value]	
             self.lastReading=time.clock()
+    
+    def readSensor(self):
+        pass
 
+    def startCommand(self, *args, **kwargs):
+        if not self.isAlive():
+            super(KerviThread, self).start()
+
+    def stopCommand(self):
+        self.stop()
+
+class SensorThread(KerviThread):
+    def __init__(self,sensors,readingInterval=1):
+        KerviThread.__init__(self)
+        self.spine=Spine()
+        self.readingInterval=readingInterval
+        if hasattr(sensors, "__len__"):
+            self.sensors=sensors
+        else:
+            self.sensors=[sensors]
+        self.spine.registerCommandHandler("startThreads", self.startCommand)
+
+
+    def newSensorReading(self,value,sensorIdx=0):
+        self.sensors[sensorIdx].newSensorReading(value)
+
+    def step(self):
+        for s in self.sensors:
+            s.readSensor()
+
+        self.sensorStep()
+        time.sleep(self.readingInterval)
+
+    def sensorStep(self):
+        pass
+        
     def startCommand(self, *args, **kwargs):
         if not self.isAlive():
             super(KerviThread, self).start()
