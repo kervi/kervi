@@ -45,6 +45,11 @@ angular.module('KerviWebApp').service('KerviService', ['$q', '$rootScope', funct
 		scope.$on('$destroy', handler);
 	}
 
+	this.onPointOfInterestChange=function(scope,callback){
+		var handler = $rootScope.$on('poi-event', callback);
+		scope.$on('$destroy', handler);
+	}
+
     this.notifyConnect= function() {
 		$rootScope.$emit('connect-kerviservice-event');
 	}
@@ -71,6 +76,10 @@ angular.module('KerviWebApp').service('KerviService', ['$q', '$rootScope', funct
 
 	this.notifyButtonStateChange= function() {
 		$rootScope.$emit('controllersbutton-event');
+	}
+
+	this.notifyPointOfInterestChange= function() {
+		$rootScope.$emit('poi-event');
 	}
 
 	this.getHost=function(){
@@ -125,6 +134,11 @@ angular.module('KerviWebApp').service('KerviService', ['$q', '$rootScope', funct
 			
 			onAxisChange:function(){
 				self.safeApply($rootScope);
+			},
+			
+			onPointOfInterestChange:function(){
+				//self.safeApply($rootScope);
+				self.notifyPointOfInterestChange(this);
 			}
 		});
 		console.log("self.rs init done");
@@ -139,7 +153,7 @@ angular.module('KerviWebApp').service('KerviService', ['$q', '$rootScope', funct
 				var subResult=[];
 				for (var sensoridx in self.kervi.sensors[sensorType]){
 					var sensor=self.kervi.sensors[sensorType][sensoridx];
-					if (sensor.dashboards.indexOf(dashboard)>=0)
+					if (sensor.dashboards && sensor.dashboards.indexOf(dashboard)>=0)
 						subResult.push(sensor);
 				}
 				if (subResult.length>0)
@@ -158,6 +172,22 @@ angular.module('KerviWebApp').service('KerviService', ['$q', '$rootScope', funct
 		else 
 			return null;
 	}
+
+	this.getPointOfInterests = function(cameraId=null) {
+		if (self.kervi && cameraId==null)
+			return self.kervi.pointOfInterests;
+		else if (self.kervi){
+			var result=[]
+			for (var i in self.kervi.pointOfInterests){
+				var poi=self.kervi.pointOfInterests[i];
+				if (poi.cameraId==cameraId){
+					result.push(poi);
+				}
+			}
+			return result;
+		}else 
+			return null;
+	}
 	
 	this.getControllers = function(dashboard) {
 		if (self.kervi && !location)
@@ -168,7 +198,7 @@ angular.module('KerviWebApp').service('KerviService', ['$q', '$rootScope', funct
 				var subResult=[];
 				for (var controlleridx in self.kervi.controllers[controllerType]){
 					var controller=self.kervi.controllers[controllerType][controlleridx];
-					if (controller.dashboards.indexOf(dashboard)>=0)
+					if (controller.dashboards && controller.dashboards.indexOf(dashboard)>=0)
 						subResult.push(controller);
 				}
 				if (subResult.length>0)

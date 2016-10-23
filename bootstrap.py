@@ -121,12 +121,10 @@ class ApplicationModule(object):
     def start(self):
         
         self.started=True
-        self.spine.sendCommand("startThreads")
-        time.sleep(2)
-        self.spine.triggerEvent("moduleStarted",self.name)
-        time.sleep(2)
-
         
+        time.sleep(2)
+        self.spine.triggerEvent("applicationModuleStarted",self.name)
+        time.sleep(2)
     
     def input_thread(self,list):
         try:
@@ -139,7 +137,7 @@ class ApplicationModule(object):
         
         if not self.started:
             self.start()
-
+        self.spine.sendCommand("startThreads")
         time.sleep(1)    
         try:
             list = []

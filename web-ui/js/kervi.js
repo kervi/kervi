@@ -10,6 +10,7 @@ var Kervi=function(options){
 		onSensorReading:null,
 		onButtonStateChange:null,
 		onAxisValueChange:null,
+		onPointOfInterestChange:null,
 		autoConnect:true,
 	}
 	this.isConnected=false;
@@ -94,6 +95,7 @@ Kervi.prototype.connect=function(){
 	this.controllers={};
 	this.sensorTypes=[];
 	this.controllerTypes=[];
+	this.pointOfInterests=[];
 	this.application=null;
 	
 	this.websocket = new WebSocket(this.options.address);
@@ -181,6 +183,39 @@ Kervi.prototype.onOpen=function(evt){
 		}
 		else if (self.options.onHeartbeat)
 			self.options.onHeartbeat.call();
+	});
+
+	this.addEventHandler("pointOfInterestChange","",function(){
+		//console.log("poi change",this);
+		if (this.action=="add"){
+			self.pointOfInterests.push(this.pointOfInterest)
+		} else if (this.action=="update"){
+			for (var i=0;(self.pointOfInterests.length);i++){
+				var poi=self.pointOfInterests[i];
+				if (poi.id==this.pointOfInterest.id){
+					self.pointOfInterests[i]=this.pointOfInterest;
+					break;			
+				}
+			}
+		} else if (this.action=="delete"){
+			for (var i=0;(self.pointOfInterests.length);i++){
+				var poi=self.pointOfInterests[i];
+				if (poi.id==this.pointOfInterest.id){
+					self.pointOfInterests.splice(i,1)
+					break;			
+				}
+			}
+		} else if (this.action=="clear"){
+			for (var i=0;(self.pointOfInterests.length);i++){
+				var poi=self.pointOfInterests[i];
+				if (poi.cameraId==this.cameraId && poi.visionId==this.visionId){
+					self.pointOfInterests.splice(i,1)
+				}
+			}
+		}
+		
+		if (self.options.onPointOfInterestChange)
+			self.options.onPointOfInterestChange.call(this);
 	});
 	
 	var appInfoDeferred = new $.Deferred();
@@ -287,7 +322,7 @@ Kervi.prototype.onOpen=function(evt){
 						self.options.onSensorsReady.call(self);
 				});
 
-				self.sendQuery("getControllerInfo",function(message){
+				self.sendQuery("getControllerInfo",null,function(message){
 					console.log("controller info response",message);
 					self.controllers={};
 					self.updateControllers(message);
