@@ -1,0 +1,23 @@
+<nav class="navbar navbar-fixed-to navbar-light bg-faded">
+  <ul class="nav navbar-nav">
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" data-toggle="dropdown">{{currentPageTitle}}<b class="caret"></b></a>
+      <div class="dropdown-menu  multi-level ul.nav.navbar-nav.no-collapse">
+        <li>
+          Dashboards
+          <ul class="dropdown-submenu">
+            <li *ngFor="let dashboard of dashboards">
+                <a class="dropdown-item" [routerLink]="['/'+dashboard.type, dashboard.id]">{{dashboard.name}}</a>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#/charts">Charts</a></li>
+        <li><a href="#/about">About</a></li>
+        <li><a href="#/settings">Settings</a></li>
+      </div>
+    </li>
+    <li>
+      <core-sensors></core-sensors>
+    </li>
+  </ul>
+</nav>
