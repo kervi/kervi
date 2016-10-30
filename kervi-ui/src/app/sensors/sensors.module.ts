@@ -4,6 +4,7 @@ import { SensorsComponent } from './sensors.component';
 import { SensorComponent } from './sensor/sensor.component';
 import { CoreSensorsComponent } from './core-sensors/core-sensors.component'
 import { SensorsService } from './sensors.service';
+import { SparklineComponent } from './sparkline/sparkline.component'
 @NgModule({
   imports: [
     CommonModule
@@ -13,6 +14,6 @@ import { SensorsService } from './sensors.service';
     CoreSensorsComponent
   ],
   providers: [SensorsService],
-  declarations: [SensorsComponent, SensorComponent, CoreSensorsComponent]
+  declarations: [SensorsComponent, SensorComponent, CoreSensorsComponent, SparklineComponent]
 })
 export class SensorsModule { }

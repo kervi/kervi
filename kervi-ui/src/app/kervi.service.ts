@@ -6,21 +6,21 @@ import {BehaviorSubject, Subject} from 'rxjs/Rx';
 @Injectable()
 export class KerviService {
   spine: KerviSpine = null;
-  public  Application = null;
+  public  application$: BehaviorSubject<any>;
   
-  Connected: BehaviorSubject<Boolean> ;
+  connected$: BehaviorSubject<Boolean> ;
   
 
   constructor() 
   { 
     console.log("kervi service constructor");
     
-    this.Connected = new BehaviorSubject<Boolean>(false);
-    
+    this.connected$ = new BehaviorSubject<Boolean>(false);
+    this.application$= new BehaviorSubject<any>(null);
     
   }
 
-  public Connect(){
+  public connect(){
     this.spine = new KerviSpine({
       //address:"ws://"+window.location.hostname+":9000",
       address:"ws://192.168.0.125:9000",
@@ -34,18 +34,18 @@ export class KerviService {
 
   private onOpen(){
     console.log("kervice service on open",this);
-    
+    var self=this;
     this.spine.sendQuery("GetApplicationInfo",function(message){
 		  console.log("appinfo",message);
-		  this.Application=message;
-      this.Connected.next(true);
+		  self.application$.next(message);
+      self.connected$.next(true);
 	  });
 
     
   }
 
   private onClose(){
-    this.Connected.next(false);
+    this.connected$.next(false);
   }
 
   private onHeartbeat(){

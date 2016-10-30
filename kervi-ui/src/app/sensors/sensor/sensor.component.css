@@ -1,0 +1,13 @@
+.sensor-inline{
+    margin-right:5px;
+    display: inline-block;
+}
+
+.sensor-value{
+    display:inline-block;
+}
+
+.sensor-type-percentage, .sensor-type-cpu .sensor-value{
+    min-width:40px;
+    
+}

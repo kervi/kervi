@@ -1,4 +1,3 @@
-x
-<span *ngFor="let sensor of (sensors() | async)">
-    {{sensor.name}}:{{sensor.value}}
+<span *ngFor="let sensor of (_sensors$ | async)"  >
+   <sensor [sensor]="sensor" [style]="inline"></sensor>
 <span>

@@ -9,8 +9,8 @@ export class ConnectedService {
   constructor(private kerviService:KerviService, private router:Router, private route:ActivatedRoute) { 
     console.log("connected service c");
     var self=this;
-    this.kerviService.Connect();
-    var s=this.kerviService.Connected.subscribe(function(connectedValue){
+    this.kerviService.connect();
+    var s=this.kerviService.connected$.subscribe(function(connectedValue){
        console.log("connected service sub",connectedValue, self.isConnected, self);
       if (connectedValue){
         self.isConnected=true;
@@ -18,12 +18,16 @@ export class ConnectedService {
         if (self.currentPage)
           self.router.navigate([self.currentPage]);
         else {
-          var defaultDashboard=self.kerviService.Application.dashboards.filter(function(v){return v.default;});
-          console.log("df",defaultDashboard);
-          if (defaultDashboard){
-            self.router.navigate(['/'+defaultDashboard[0].type+'/'+defaultDashboard[0].id]);  
-          } else
-            self.router.navigate(['/camboard/main']);
+          self.kerviService.application$.subscribe(function(v){
+            if (v){
+              var defaultDashboard=v.dashboards.filter(function(v){ return v.default; });
+              console.log("df",defaultDashboard);
+              if (defaultDashboard){
+                self.router.navigate(['/'+defaultDashboard[0].type+'/'+defaultDashboard[0].id]);  
+              } else
+                self.router.navigate(['/camboard/main']);
+            }
+          })
         }
       } else if (!connectedValue) {
         if (self.isConnected){

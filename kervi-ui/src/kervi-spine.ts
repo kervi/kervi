@@ -20,8 +20,6 @@ export class  KerviSpine{
 	private options=  {
 			address:null,
 			onOpen:null,
-			//onConnect:null,
-			onHeartbeat:null,
 			onClose:null,
 			autoConnect:true,
 			targetScope:null
@@ -37,7 +35,6 @@ export class  KerviSpine{
 
 	private extend(...p:any[])
 	{
-		console.log("p",p);
 		for(var i=1; i<p.length; i++)
 			for(var key in p[i])
 				if(p[i].hasOwnProperty(key))
@@ -60,7 +57,6 @@ export class  KerviSpine{
 	}
 
 	private handleEvent(message){
-		//console.log("he",message);
 		var eventName=message.event;
 		var id=message.id;
 		
@@ -129,11 +125,6 @@ export class  KerviSpine{
 		
 		var self=this
 		this.isConnected=true;
-			
-		this.addEventHandler("NewSensorReading","",function(){
-			if (this.sensor=="AliveSensor" && self.options.onHeartbeat)
-				self.options.onHeartbeat();
-		});
 		
 		if (this.options.onOpen)
 			this.options.onOpen.call(this.options.targetScope,evt);

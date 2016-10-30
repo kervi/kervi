@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { KerviService } from '../kervi.service';
+import {BehaviorSubject, Subject} from 'rxjs/Rx';
 
 @Component({
   selector: 'app-page-header',
@@ -7,14 +8,20 @@ import { KerviService } from '../kervi.service';
   styleUrls: ['./page-header.component.css'],
   
 })
+
 export class PageHeaderComponent implements OnInit {
-  public dashboards = null
+  public dashboards$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   constructor(private kerviService:KerviService) {
-    this.dashboards=this.kerviService.Application.dashboards;
-    console.log("ph d",this.dashboards);
+    
   }
 
   ngOnInit() {
+    var self=this;
+    this.kerviService.application$.subscribe(function(v){
+      if (v){
+        self.dashboards$.next(v.dashboards);
+      }
+    });
   }
 
 }

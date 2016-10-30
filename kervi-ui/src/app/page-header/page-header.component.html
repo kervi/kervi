@@ -6,7 +6,7 @@
         <li>
           Dashboards
           <ul class="dropdown-submenu">
-            <li *ngFor="let dashboard of dashboards">
+            <li *ngFor="let dashboard of (dashboards$ | async)">
                 <a class="dropdown-item" [routerLink]="['/'+dashboard.type, dashboard.id]">{{dashboard.name}}</a>
             </li>
           </ul>
@@ -16,7 +16,7 @@
         <li><a href="#/settings">Settings</a></li>
       </div>
     </li>
-    <li>
+    <li class="core-sensors">
       <core-sensors></core-sensors>
     </li>
   </ul>

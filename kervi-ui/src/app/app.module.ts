@@ -16,7 +16,8 @@ import { KerviService} from "./kervi.service";
 import { ConnectedService} from "./connected.service"
 import { CamBoardComponent } from './cam-board/cam-board.component';
 
-import { SensorsService} from './sensors/sensors.service'
+import { SensorsService} from './sensors/sensors.service';
+
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { SensorsService} from './sensors/sensors.service'
     PageHeaderComponent,
     ConnectComponent,
     CamBoardComponent,
+    
     
     
   ],

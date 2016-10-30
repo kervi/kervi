@@ -1,3 +1,5 @@
-<p>
-  sensor works!
-</p>
+<div  class="sensor-inline sensor-type-{{sensor.type}}">
+  {{sensor.name}}: 
+  <sensor-sparkline [sensor]="sensor" ></sensor-sparkline> 
+  <span class="sensor-value">{{(sensor.value$ | async)}}{{sensor.unit}}</span>
+</div>
