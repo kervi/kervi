@@ -10,37 +10,40 @@ export class SensorsService {
     
     constructor (private kerviService:KerviService){
         var self=this;
-        if (this.kerviService.connected$.value){
-            this.kerviService.spine.sendQuery("getSensorInfo",function(message){
-                console.log("sensor info",message);
-                self.updateSensors.call(self,message);
-                self._sensors$.next(self.sensors);
-            });
-        } else {
+        
             var s=this.kerviService.connected$.subscribe(function(connectedValue){
                 if (connectedValue){
                     self.kerviService.spine.sendQuery("getSensorInfo",function(message){
                         console.log("sensor info",message);
                         self.updateSensors.call(self,message);
                         self._sensors$.next(self.sensors);
-                    });    
+                    });
+
+                    self.kerviService.spine.addEventHandler("NewSensorReading","",function(){
+                        for (let sensor of self.sensors){
+                            if (sensor.id==this.sensor){
+                                sensor.value$.next(this.value);
+                                var spl=sensor.sparkline$.value;
+                                spl.push(this.value);
+                                if (spl.length>10)
+                                    spl.shift();
+                                sensor.sparkline$.next(spl);
+                            }
+                        }
+                    });
+
+
+
+
+                } else {
+                    self.sensors=[];
+                    self._sensors$.next(self.sensors);
                 }
             });
-        } 
+         
 
-        this.kerviService.spine.addEventHandler("NewSensorReading","",function(){
-            for (let sensor of self.sensors){
-                if (sensor.id==this.sensor){
-                    sensor.value$.next(this.value);
-                    var spl=sensor.sparkline$.value;
-                    spl.push(this.value);
-                    if (spl.length>10)
-                        spl.shift();
-                    sensor.sparkline$.next(spl);
-                }
-            }
-        });
-    }
+        
+        }
 
     public getSensors$(){
         return this._sensors$.asObservable()

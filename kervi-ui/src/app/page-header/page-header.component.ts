@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { KerviService } from '../kervi.service';
-import {BehaviorSubject, Subject} from 'rxjs/Rx';
+import {BehaviorSubject, Subject, Observable} from 'rxjs/Rx';
 
 @Component({
   selector: 'app-page-header',
@@ -9,19 +9,24 @@ import {BehaviorSubject, Subject} from 'rxjs/Rx';
   
 })
 
-export class PageHeaderComponent implements OnInit {
+export class PageHeaderComponent implements OnInit, OnDestroy {
   public dashboards$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
+  private appSubscription:any;
   constructor(private kerviService:KerviService) {
     
   }
 
   ngOnInit() {
     var self=this;
-    this.kerviService.application$.subscribe(function(v){
+    this.appSubscription=this.kerviService.application$.subscribe(function(v){
       if (v){
         self.dashboards$.next(v.dashboards);
       }
     });
+  }
+
+  ngOnDestroy(){
+    this.appSubscription.unsubscribe();
   }
 
 }

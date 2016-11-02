@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SensorsService } from '../sensors.service';
 import {BehaviorSubject, Subject} from 'rxjs/Rx';
 import { SensorModel } from '../models/sensor.model';
@@ -11,8 +11,9 @@ import { SensorModel } from '../models/sensor.model';
   styleUrls: ['./core-sensors.component.css'],
   
 })
-export class CoreSensorsComponent implements OnInit {
+export class CoreSensorsComponent implements OnInit, OnDestroy {
    _sensors$ : BehaviorSubject<SensorModel[]>;
+   private sensorSubscription:any;
   constructor(private sensorsService:SensorsService) {
     var self=this;
     this._sensors$= new BehaviorSubject<SensorModel[]>([]);
@@ -26,11 +27,16 @@ export class CoreSensorsComponent implements OnInit {
 
   ngOnInit() {
     var self=this;
-    this.sensorsService.getSensors$().subscribe(function(v){
+    this.sensorSubscription=this.sensorsService.getSensors$().subscribe(function(v){
       console.log("core sensors ready",v);
       self._sensors$.next(self.sensorsService.getDashboardSensors("cpu"));
       
-    })
+    });
+
+  }
+
+  ngOnDestroy(){
+    this.sensorSubscription.unsubscribe();
   }
 
 }
