@@ -37,7 +37,6 @@ class ControllerButton(object):
             self.state = True
             self.on()
             self.spine.triggerEvent("controllerButtonStateChange", self.buttonId, {"button":self.buttonId, "state":self.state})
-        
 
     def on(self):
         print "abstract on reached"
