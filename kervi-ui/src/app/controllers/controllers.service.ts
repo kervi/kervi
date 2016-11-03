@@ -59,11 +59,12 @@ export class ControllersService {
     private setEventHandlers(){
       var self=this;
       this.kerviService.spine.addEventHandler("controllerButtonStateChange","",function(id,value){
-			    for(let controller of self.controllers)
+			    console.log("bsc",this,id,value);
+                for(let controller of self.controllers)
 				  {
 				    for( let button of controller.buttons){
-						  if (button.id==id){
-							  button.state.next(value);
+						  if (button.id==value.button){
+							  button.state$.next(value.state);
 						  }
 					  }
 				  }
@@ -74,8 +75,8 @@ export class ControllersService {
           for(let controller of self.controllers)
 				  {
 				    for( let axis of controller.axes){
-						  if (axis.id==id){
-							  axis.value$.next(value);
+						  if (axis.id==value.axis){
+							  axis.value$.next(value.value);
 						  }
 					  }
 				  }

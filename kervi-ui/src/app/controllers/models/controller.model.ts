@@ -31,18 +31,18 @@ export class ControllerButtonModel{
     public onCommand: string;
     public offCommand: string;
     public clickCommand: string;
-    public state: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public state$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     constructor (message){
         this.id=message.id;
         this.name=message.name;
         this.type=message.type;
-        if (this.type="switch"){
+        if (this.type=="switch"){
             this.onCommand=message.onCommand;
             this.offCommand=message.offCommand;
-            this.state.next(message.state);
+            this.state$.next(message.state);
         } else {
-            this.clickCommand=message.clickCommand;
+            this.clickCommand=message.onClick;
         }
     }
 }

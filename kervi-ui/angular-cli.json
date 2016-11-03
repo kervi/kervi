@@ -26,7 +26,9 @@
         "../node_modules/tether/dist/js/tether.js",
         "../node_modules/bootstrap/dist/js/bootstrap.js",
         "../lib/jquery.sparkline.js",
-        "../lib/jquery.kontrol.js"
+        "../lib/jquery.kontrol.js",
+        "../lib/bootstrap-toggle.js"
+
       ],
       "environments": {
         "source": "environments/environment.ts",

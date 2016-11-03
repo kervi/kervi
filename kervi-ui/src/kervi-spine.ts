@@ -182,17 +182,27 @@ export class  KerviSpine{
 		this.websocket.send(JSON.stringify(cmd));
 	};
 
-	public sendCommand(command:string,callback){
+	public sendCommand(command:string,...p:any[]){
 		console.log("sec",arguments);
 		var args=[];
-		if (arguments.length>1){
+		
+		var callback=null;
+
+		for (var i=0;(i<p.length);i++){
+			if (p[i] instanceof Function)
+				callback=p[i];
+			else
+				args.push(p[i]);
+		}
+		
+		/*if (p.length>1){
 			var argOffset=1;
 			if ( callback && callback instanceof Function )
 				argOffset+=1;
 			for (var i=argOffset;(i<arguments.length);i++){
 				args.push(arguments[i]);
 			}
-		}
+		}*/
 		var cmd={id:this.messageId++,"messageType":"command","command":command,"args":args};
 		if (callback && callback instanceof Function)
 			this.addRPCCallback(cmd.id.toString(),callback);

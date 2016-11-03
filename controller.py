@@ -33,9 +33,11 @@ class ControllerButton(object):
 
     def onOnHandler(self, *args, **kwargs):
         self.spine.log.debug("controller button on:{0}/{1}", self.controller.controllerId, self.buttonId)
-        self.state = True
-        self.on()
-        self.spine.triggerEvent("controllerButtonStateChange", self.buttonId, {"button":self.buttonId, "state":self.state})
+        if not self.state:
+            self.state = True
+            self.on()
+            self.spine.triggerEvent("controllerButtonStateChange", self.buttonId, {"button":self.buttonId, "state":self.state})
+        
 
     def on(self):
         print "abstract on reached"
@@ -43,9 +45,10 @@ class ControllerButton(object):
 
     def onOffHandler(self, *args, **kwargs):
         self.spine.log.debug("controller button off:{0}/{1}", self.controller.controllerId, self.buttonId)
-        self.state = False
-        self.off()
-        self.spine.triggerEvent("controllerButtonStateChange", self.buttonId, {"button":self.buttonId, "state":self.state})
+        if self.state:
+            self.state = False
+            self.off()
+            self.spine.triggerEvent("controllerButtonStateChange", self.buttonId, {"button":self.buttonId, "state":self.state})
 
     def off(self):
         print "abstract off reached"

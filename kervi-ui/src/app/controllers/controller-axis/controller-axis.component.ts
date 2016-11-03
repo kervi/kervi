@@ -36,7 +36,14 @@ export class ControllerAxisComponent implements OnInit {
 					}
 				}
 			})
-			.css({'border':'2px solid '+color})
+			.css({'border':'2px solid '+color});
+
+      self.axis.value$.subscribe(function(v){
+        if (self.axis.orientation=="vertical")
+          jQuery("input[name='y']",self.elementRef.nativeElement).val(v).change();
+        else
+          jQuery("input[name='x']",self.elementRef.nativeElement).val(v).change();
+      });
 			/*setTimeout(function(){
 				
 				if ($scope.axis.orientation=="vertical")
