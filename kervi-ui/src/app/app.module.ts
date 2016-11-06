@@ -20,8 +20,10 @@ import { SensorsService} from './sensors/sensors.service';
 import { ControllersComponent } from './controllers/controllers/controllers.component';
 import { ControllerComponent } from './controllers/controller/controller.component';
 import { ControllersService } from './controllers/controllers.service';
-import { ControllerAxisComponent } from './controllers/controller-axis/controller-axis.component';
+import { ControllerInputComponent } from './controllers/controller-input/controller-input.component';
 import { ControllerButtonComponent } from './controllers/controller-button/controller-button.component';
+import { ControllerSwitchButtonComponent } from './controllers/controller-switchbutton/controller-switchbutton.component';
+
 import { CamViewerComponent } from './controllers/cam-viewer/cam-viewer.component'
 
 @NgModule({
@@ -34,8 +36,9 @@ import { CamViewerComponent } from './controllers/cam-viewer/cam-viewer.componen
     CamBoardComponent,
     ControllersComponent,
     ControllerComponent,
-    ControllerAxisComponent,
+    ControllerInputComponent,
     ControllerButtonComponent,
+    ControllerSwitchButtonComponent,
     CamViewerComponent,
     
     

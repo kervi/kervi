@@ -2,9 +2,6 @@
 </app-page-header>
 <kervi-cam-viewer [dashboard]="dashboard"></kervi-cam-viewer>
 <kervi-controllers [dashboardType]="'camboard'" [dashboard]="dashboard"></kervi-controllers>
-<div style="color:#000000" >xyz</div>
 <footer class="footer">
-      <div class="container">
-        <span class="text-mute">Place sticky footer content here.</span>
-      </div>
-    </footer>
+    <kervi-sensors [dashboard]="dashboard"></kervi-sensors>      
+</footer>

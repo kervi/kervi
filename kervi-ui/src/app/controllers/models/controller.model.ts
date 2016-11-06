@@ -1,6 +1,12 @@
 import {BehaviorSubject} from 'rxjs/Rx';
 
-export class ControllerAxisModel{
+
+interface IControllerComponent{
+    id:string;
+    type:string;
+}
+
+export class ControllerInputModel implements IControllerComponent{
     public name:string;
     public type:string ;
     public orientation:string; 
@@ -10,10 +16,14 @@ export class ControllerAxisModel{
     public minValue: number;
     public command: string;
     public id:string;
+    public ui={
+        type:"",
+        orientation:""
+    }
 
     constructor(message:any){
         this.name=message.name;
-        this.type=message.type;
+        this.type=message.componentType;
         this.orientation=message.orientation;
         this.unit=message.unit;
         this.value$.next(message.value);
@@ -21,10 +31,15 @@ export class ControllerAxisModel{
         this.minValue=message.minValue;
         this.command=message.command;
         this.id=message.id;
+
+        for (var prop in message.ui){
+            if (this.ui[prop]!=undefined)
+                this.ui[prop]=message.ui[prop];
+        }
     }
 }
 
-export class ControllerButtonModel{
+export class ControllerSwitchButtonModel implements IControllerComponent{
     public id:string;
     public name: string;
     public type: string;
@@ -36,14 +51,29 @@ export class ControllerButtonModel{
     constructor (message){
         this.id=message.id;
         this.name=message.name;
-        this.type=message.type;
-        if (this.type=="switch"){
-            this.onCommand=message.onCommand;
-            this.offCommand=message.offCommand;
-            this.state$.next(message.state);
-        } else {
-            this.clickCommand=message.onClick;
-        }
+        this.type=message.componentType;
+        this.onCommand=message.onCommand;
+        this.offCommand=message.offCommand;
+        this.state$.next(message.state);
+        
+    }
+}
+
+export class ControllerButtonModel implements IControllerComponent{
+    public id:string;
+    public name: string;
+    public type: string;
+    public onCommand: string;
+    public offCommand: string;
+    public clickCommand: string;
+    public state$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+    constructor (message){
+        this.id=message.id;
+        this.name=message.name;
+        this.type=message.componentType;
+        this.clickCommand=message.onClick;
+        
     }
 }
 
@@ -52,8 +82,7 @@ export class ControllerModel{
     public name: string;
     public id: string; 
     public parameters: any;
-    public axes: ControllerAxisModel[]=[];
-    public buttons: ControllerButtonModel[]=[];
+    public components: IControllerComponent[]=[];
     public dashboards: string[];
 
     constructor(message:any){
@@ -63,13 +92,16 @@ export class ControllerModel{
         this.dashboards=message.dashboards;
         this.parameters=message.parameters;
         
-        for (let b of message.buttons){
-              var button=new ControllerButtonModel(b)
-              this.buttons.push(button);
+        for (let c of message.components){
+            var component=null;
+            if (c.componentType=="button")
+                component=new ControllerButtonModel(c)
+            else if (c.componentType=="switchButton")
+                component=new ControllerSwitchButtonModel(c)
+            else if (c.componentType=="input")
+                component=new ControllerInputModel(c)
+            if (component)
+                this.components.push(component);
         }
-        for (let a of message.axes){
-              var axis=new ControllerAxisModel(a)
-              this.axes.push(axis);
-        }   
     }
 }

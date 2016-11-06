@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ControllerModel, ControllerButtonModel, ControllerAxisModel } from './models/controller.model'
+import { ControllerModel, ControllerButtonModel, ControllerSwitchButtonModel, ControllerInputModel } from './models/controller.model'
 import {KerviService} from "../kervi.service";
 import {BehaviorSubject, Subject} from 'rxjs/Rx';
 
@@ -56,7 +56,7 @@ export class ControllersService {
     }
 
     public getDashboardControllers(dashboard:string, type:string=""){
-        //console.log("gdc",dashboard,type);
+        //console.log("gdc",dashboard,type,this.controllers.length);
 
         var result=[];
         for (let controller of this.controllers){
@@ -64,7 +64,9 @@ export class ControllersService {
                 if (type=="" || controller.type==type)
                   result.push(controller);
         }
+        //console.log("gdce",result);
         return result;
+        
     }
 
     public getDashboardCameras(dashboard:string){
@@ -93,21 +95,23 @@ export class ControllersService {
 			    console.log("bsc",this,id,value);
                 for(let controller of self.controllers)
 				  {
-				    for( let button of controller.buttons){
-						  if (button.id==value.button){
-							  button.state$.next(value.state);
+				    for( let component of controller.components){
+						  if (component.id==value.button){
+							  var button= component as ControllerSwitchButtonModel;
+                              button.state$.next(value.state);
 						  }
 					  }
 				  }
-			  });
+    });
 
-		    this.kerviService.spine.addEventHandler("changeControllerAxisValue","",function(id,value){
-			    
+    this.kerviService.spine.addEventHandler("changeControllerInputValue","",function(id,value){
+        console.log("isc",this,id,value);
           for(let controller of self.controllers)
 				  {
-				    for( let axis of controller.axes){
-						  if (axis.id==value.axis){
-							  axis.value$.next(value.value);
+				    for( let component of controller.components){
+						  if (component.id==value.input){
+							  var input= component as ControllerInputModel;
+                              input.value$.next(value.value);
 						  }
 					  }
 				  }
@@ -119,7 +123,7 @@ export class ControllersService {
     private updateCameraControllers(){
         var result=[];
         for (let controller of this.controllers){
-            if (controller.type=="cam")
+            if (controller.type=="camera")
                 result.push(controller);
         }
         this.cameraControllers=result;
@@ -135,6 +139,7 @@ export class ControllersService {
             }	
         } else {
             var controller=new ControllerModel(message);
+            console.log("uc",message,controller);
             this.controllers.push(controller);
             if (this.controllerTypes.indexOf(controller.type)==-1){
               this.controllerTypes.push(controller.type);

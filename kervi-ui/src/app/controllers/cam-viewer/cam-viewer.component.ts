@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ElementRef } from '@angular/core';
-import { ControllerModel } from '../models/controller.model';
+import { ControllerModel, ControllerInputModel } from '../models/controller.model';
 import { KerviService } from '../../kervi.service';
 import { ControllersService } from '../controllers.service';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
@@ -18,7 +18,7 @@ export class CamViewerComponent implements OnInit {
   private currentCamSubscription:any;
   private panSubscription:any=null;
   private tiltSubscription:any=null;
-
+  private moveDelayTimer=null;
   constructor(private kerviService:KerviService,private controllersService:ControllersService, private elementRef:ElementRef) { }
 
   ngOnInit() {
@@ -39,12 +39,15 @@ export class CamViewerComponent implements OnInit {
         self.camera$.next(v);
         if (v){
           self.cameraSource$.next(v.parameters.source);
-          self.panSubscription=v.axes[0].value$.subscribe(function(v){
-            jQuery("input[name='x']",self.elementRef.nativeElement).val(v).change();
+          var pan=v.components[0] as ControllerInputModel;
+          var tilt=v.components[1] as ControllerInputModel;
+          self.panSubscription=pan.value$.subscribe(function(v){
+            jQuery("input[name='x']",self.elementRef.nativeElement).val(pan.value$.value).change();
           });
-
-          self.tiltSubscription=v.axes[1].value$.subscribe(function(v){
-            jQuery("input[name='y']",self.elementRef.nativeElement).val(v).change();
+          
+          
+          self.tiltSubscription=tilt.value$.subscribe(function(v){
+            jQuery("input[name='y']",self.elementRef.nativeElement).val(tilt.value$.value).change();
           });
         } else {
           self.cameraSource$.next("");
@@ -54,17 +57,34 @@ export class CamViewerComponent implements OnInit {
 			var color="#ffffff";
       var p=jQuery('fieldset',this.elementRef.nativeElement).xy({
 				displayPrevious:false
-				, min : 100
+				, min : -100
 				, max : 100
 				, width: 180
 				, height: 180
 				, fgColor:color
 				, bgColor:color
 				, change : function (value) {
-						  self.kerviService.spine.sendCommand(self.camera$.value.axes[0].command,value[0]);
-              self.kerviService.spine.sendCommand(self.camera$.value.axes[1].command,value[1]);
-					}
+            if (self.moveDelayTimer){
+              clearTimeout(self.moveDelayTimer);
+            }
+            self.moveDelayTimer=setTimeout(function(){
+            var pan=self.camera$.value.components[0] as ControllerInputModel;
+            var tilt=self.camera$.value.components[1] as ControllerInputModel;
+						  self.kerviService.spine.sendCommand(pan.command,value[0]);
+              self.kerviService.spine.sendCommand(tilt.command,value[1]);
+					},200);
+        }
 				})
 			.css({'border':'2px solid '+color});
+      var h=jQuery(window).height();
+		  var w=jQuery(window).width();
+		  jQuery(".cam-pad-area").css({top: h/2-100, left: w/2-100});
+
+      jQuery(window).bind('resize', function(){
+          //jQuery('#video-viewer').height(jQuery(window).height());
+          var h=jQuery(window).height();
+		      var w=jQuery(window).width();
+		      jQuery(".cam-pad-area").css({top: h/2-100, left: w/2-100});
+        });
   }
 }

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SensorsComponent } from './sensors.component';
+import { SensorsComponent } from './sensors/sensors.component';
 import { SensorComponent } from './sensor/sensor.component';
 import { CoreSensorsComponent } from './core-sensors/core-sensors.component'
 import { SensorsService } from './sensors.service';
@@ -11,7 +11,8 @@ import { SparklineComponent } from './sparkline/sparkline.component'
   ],
   exports:[
     SensorComponent,
-    CoreSensorsComponent
+    CoreSensorsComponent,
+    SensorsComponent
   ],
   providers: [SensorsService],
   declarations: [SensorsComponent, SensorComponent, CoreSensorsComponent, SparklineComponent]

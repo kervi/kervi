@@ -1,0 +1,14 @@
+app-page-header{
+    position:relative;
+    z-index:2000;
+    color:#ffffff;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.3) none repeat scroll 0 0;
+  bottom: 0;
+  color: #ffffff;
+  position: fixed;
+  width: 100%;
+}
+

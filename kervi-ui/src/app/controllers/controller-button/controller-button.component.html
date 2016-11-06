@@ -1,2 +1,1 @@
-<input *ngIf="button.type!='button'" type="checkbox"  [attr.checked]="(button.state$ | async) ? '' : null" data-toggle="toggle">
-<a *ngIf="button.type=='button'" class="btn btn-default" (click)="clickButton()" >{{button.name}}</a>
+<a class="btn btn-default" (click)="clickButton()" >{{button.name}}</a>

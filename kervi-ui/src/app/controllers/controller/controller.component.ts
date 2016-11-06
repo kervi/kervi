@@ -6,7 +6,7 @@ import { ControllerModel }  from '../models/controller.model'
   styleUrls: ['./controller.component.css']
 })
 export class ControllerComponent implements OnInit {
-  @Input() controller:ControllerModel = null;
+  @Input() controller:ControllerModel ;
   @Input() section:string = "left";
   @Input() dashboardType:string;
   constructor() { }
