@@ -22,8 +22,8 @@ export class KerviService {
 
   public connect(){
     this.spine = new KerviSpine({
-      //address:"ws://"+window.location.hostname+":9000",
-      address:"ws://192.168.0.144:9000",
+      address:"ws://"+window.location.hostname+":9000",
+      //address:"ws://192.168.0.144:9000",
       onOpen: this.onOpen,
       onClose:this.onClose,
       targetScope:this,

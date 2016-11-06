@@ -82,3 +82,85 @@
 .toggle-on.btn-xs { padding-right: 12px; }
 .toggle-off.btn-xs { padding-left: 12px; }
 
+
+#video-viewer{
+	margin-top:-20px;
+}
+.cam-pad-area{
+	z-index: 1200;
+	vertical-align: middle; 
+	width: 200px; 
+	display: inline-block; 
+	position: absolute; 
+	left: 389px; 
+	top: 132px;
+	color:white;
+}
+
+
+.ctrl-tabs{
+	background:rgba(255,255,255,.5);
+}
+
+.ctrl-tabs a{
+	//color:#ffffff;
+	font-weight:bold;
+}
+
+.ctrl-tabs a:hover{
+	color:#000000;
+}
+
+.axis-pad{
+	display:inline-block;
+	float:left;
+	margin-right:25px;
+	color:#ffffff;
+    margin-bottom:25px;
+}
+
+.dashboard .axis-pad{
+	display:inline-block;
+	float:left;
+	margin-right:25px;
+	color:#000000;
+    margin-bottom:25px;
+}
+
+.axis-pad fieldset{
+	margin-top:0 !important;
+}
+
+.controllers-left-section {
+	width:350px;
+	height:300px;
+	padding:10px;
+	background:rgba(0,0,0,.1);
+	margin-left:-350px;
+	//margin-top:75px;
+	z-index:1100;
+	position:fixed;
+	top:150px;
+	left:0px;
+}
+
+
+.controllers-right-section {
+	width:300px;
+	height:400px;
+	padding:10px;
+	background:rgba(0,0,0,.1);
+	margin-right:-300px;
+	
+	z-index:1100;
+	position:fixed;
+	top:150px;
+	right:0px;
+}
+
+#opener {
+	float:right;
+	margin:-10px -50px 0px 0px;
+	border-radius:0;
+}
+

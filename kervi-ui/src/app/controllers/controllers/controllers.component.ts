@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ControllerModel } from '../models/controller.model'
 import { ControllersService } from '../controllers.service'
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
+declare var jQuery:any;
+
 @Component({
   selector: 'kervi-controllers',
   templateUrl: './controllers.component.html',
@@ -11,12 +13,15 @@ export class ControllersComponent implements OnInit, OnDestroy {
   @Input() dashboard:string;
   @Input() dashboardType:string;
   controllerTypes$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+
   private ctSubscription:any;
   constructor(private controllersService:ControllersService) { 
     
     
 
   }
+
+
 
   public getControllers(type){
     return this.controllersService.getDashboardControllers(this.dashboard,type);
@@ -34,6 +39,18 @@ export class ControllersComponent implements OnInit, OnDestroy {
         }
       }
       self.controllerTypes$.next(r);
+    });
+
+
+    setTimeout(function(){
+      jQuery(".controllers-left-section").on('shown.bs.tab', function (event) {
+					console.log("spc c",event);
+					var rightId = event.target.dataset.idright;
+          var panelRight = jQuery('.controllers-right-section');
+          	console.log("spc d",rightId,panelRight);
+					jQuery(".tab-pane", '.controllers-right-section').removeClass("active");
+          jQuery(rightId).addClass("active");
+				});
     });
   }
 

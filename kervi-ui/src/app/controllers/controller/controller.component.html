@@ -10,13 +10,14 @@
       <div *ngFor="let axis of controller.axes">
 				<kervi-controller-axis [dashboardType]="dashboardType" *ngIf="axis.orientation=='horizontal' " [axis]="axis" ></kervi-controller-axis>
 			</div>
-      <div *ngFor="let button of controller.buttons">
-        <kervi-controller-button [dashboardType]="dashboardType"  [button]="button"></kervi-controller-button>
-			</div>
+      
 			
 		</template>
 	 
 	 </div>
 </div>
 <div *ngIf="section=='right'" >
+  <div *ngFor="let button of controller.buttons">
+        <kervi-controller-button [dashboardType]="dashboardType"  [button]="button"></kervi-controller-button>
+			</div>
 </div>

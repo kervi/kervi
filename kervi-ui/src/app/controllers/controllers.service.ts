@@ -7,9 +7,12 @@ import {BehaviorSubject, Subject} from 'rxjs/Rx';
 export class ControllersService {
     private controllers: ControllerModel[] = [];
     private controllerTypes:string[] = [];
+    private currentCameraController:ControllerModel = null;
+    private cameraControllers:ControllerModel[] =[];
     private _controllers$: BehaviorSubject<ControllerModel[]> = new BehaviorSubject<ControllerModel[]>([]);
     private _controllerTypes$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
-    
+    private _cameraControllers$: BehaviorSubject<ControllerModel[]>= new BehaviorSubject<ControllerModel[]>([]);
+    private _currentCameraController$: BehaviorSubject<ControllerModel>= new BehaviorSubject<ControllerModel>(null);
     constructor (private kerviService:KerviService){
         var self=this;
         
@@ -20,6 +23,7 @@ export class ControllersService {
                         self.updateControllers.call(self,message);
                         self._controllers$.next(self.controllers);
                         self._controllerTypes$.next(self.controllerTypes);
+                        self.updateCameraControllers();
                         self.setEventHandlers();
                         console.log("ciu",self.controllers);
                     });    
@@ -35,13 +39,20 @@ export class ControllersService {
         
     }
 
-
-
     public getControllers$(){
-        return this._controllers$.asObservable()
+        return this._controllers$.asObservable();
     }
+
     public getControllerTypes$(){
-        return this._controllerTypes$.asObservable()
+        return this._controllerTypes$.asObservable();
+    }
+
+    public getCurrentCameraController$(){
+        return this._currentCameraController$.asObservable();
+    }
+
+    public getCameraControllers$(){
+        return this._cameraControllers$.asObservable();
     }
 
     public getDashboardControllers(dashboard:string, type:string=""){
@@ -54,6 +65,26 @@ export class ControllersService {
                   result.push(controller);
         }
         return result;
+    }
+
+    public getDashboardCameras(dashboard:string){
+        //console.log("gdc",dashboard,type);
+
+        var result=[];
+        for (let controller of this.cameraControllers){
+            if (controller.dashboards && controller.dashboards.indexOf(dashboard)>=0)
+                result.push(controller);
+        }
+        return result;
+    }
+
+    public setCurrentCamera(cameraId:string){
+        for (let controller of this.cameraControllers){
+            if (controller.id == cameraId){
+                this.currentCameraController=controller;
+                this._currentCameraController$.next(this.currentCameraController);
+            }
+        }
     }
 
     private setEventHandlers(){
@@ -83,6 +114,18 @@ export class ControllersService {
 			  });
 
 
+    }
+
+    private updateCameraControllers(){
+        var result=[];
+        for (let controller of this.controllers){
+            if (controller.type=="cam")
+                result.push(controller);
+        }
+        this.cameraControllers=result;
+        this._cameraControllers$.next(this.cameraControllers);
+        if (this.cameraControllers.length>0)
+            this.setCurrentCamera(this.cameraControllers[0].id);
     }
 
     private updateControllers=function(message){

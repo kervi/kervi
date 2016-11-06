@@ -5,7 +5,7 @@ class CPULoadSensor (Sensor):
     def __init__(self ):
         Sensor.__init__(self)
         self.id = "CPULoadSensor"
-        self.name = "CPU Load"
+        self.name = "CPU"
         self.type = "cpu"
         self.readingInterval = 1
         self.max = 1000000
@@ -22,7 +22,7 @@ class MemUseSensor (Sensor):
     def __init__(self ):
         Sensor.__init__(self)
         self.id = "MemUse"
-        self.name = "Memory use"
+        self.name = "Memory"
         self.type = "memory"
         self.readingInterval = 1
         self.max = 1000000

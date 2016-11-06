@@ -4,14 +4,14 @@
     <li *ngFor="let controllerType of (controllerTypes$ | async)" class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{controllerType}}</a>
       <div class="dropdown-menu">
-        <a *ngFor="let controller of getControllers(controllerType)" class="dropdown-item" data-toggle="tab" href="#controller-left-tab-{{controller.id}}" role="tab">{{controller.name}}</a>
+        <a *ngFor="let controller of getControllers(controllerType)" class="dropdown-item" data-toggle="tab" href="#controller-left-tab-{{controller.id}}" attr.data-idright="#controller-right-tab-{{controller.id}}" role="tab">{{controller.name}}</a>
       </div>
     </li>
   </ul>
 
   
   <div *ngFor="let controllerType of (controllerTypes$ | async)" class="tab-content">
-      <div  *ngFor="let controller of getControllers(controllerType)" class="tab-pane" id="controller-left-tab-{{controller.id}}" role="tabpanel">
+      <div  *ngFor="let controller of getControllers(controllerType)" class="tab-pane" id="controller-left-tab-{{controller.id}}"  role="tabpanel">
         <kervi-controller [dashboardType]='dashboardType' [section]="'left'" [controller]="controller"></kervi-controller>
     </div>
   
@@ -21,7 +21,7 @@
 <div class="controllers-right-section">
   <div *ngFor="let controllerType of (controllerTypes$ | async)" class="tab-content">
       <div  *ngFor="let controller of getControllers(controllerType)" class="tab-pane" id="controller-right-tab-{{controller.id}}" role="tabpanel">
-        <p>{{controller.name}}
+        <kervi-controller [dashboardType]='dashboardType' [section]="'right'" [controller]="controller"></kervi-controller>
     </div>
   
   </div>

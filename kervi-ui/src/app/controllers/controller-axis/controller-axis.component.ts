@@ -44,25 +44,7 @@ export class ControllerAxisComponent implements OnInit {
         else
           jQuery("input[name='x']",self.elementRef.nativeElement).val(v).change();
       });
-			/*setTimeout(function(){
-				
-				if ($scope.axis.orientation=="vertical")
-				{
-					$("input[name='y']",$element).val($scope.axis.value).change();
-					$("input[name='x']",$element).hide();
-
-					$attrs.$observe("value", function (newValue) {
-						$("input[name='y']",$element).val(newValue).change();
-					});
-				} else{
-					$("input[name='x']",$element).val($scope.axis.value).change();
-					$("input[name='y']",$element).hide();
-
-					$attrs.$observe("value", function (newValue) {
-						$("input[name='x']",$element).val(newValue).change();
-					});
-				}
-			},0);*/
+			
 		
 
 
