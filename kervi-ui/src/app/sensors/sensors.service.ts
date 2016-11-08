@@ -6,18 +6,15 @@ import { SensorModel } from './models/sensor.model'
 @Injectable()
 export class SensorsService {
     private sensors: SensorModel[] = [];
+    private sensorTypes: string[]=[];
     private _sensors$: BehaviorSubject<SensorModel[]> = new BehaviorSubject<SensorModel[]>([]);
-    
+    private _sensorTypes$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
     constructor (private kerviService:KerviService){
         var self=this;
         
             var s=this.kerviService.connected$.subscribe(function(connectedValue){
                 if (connectedValue){
-                    self.kerviService.spine.sendQuery("getSensorInfo",function(message){
-                        console.log("sensor info",message);
-                        self.updateSensors.call(self,message);
-                        self._sensors$.next(self.sensors);
-                    });
+                    self.refreshSensors();
 
                     self.kerviService.spine.addEventHandler("NewSensorReading","",function(){
                         for (let sensor of self.sensors){
@@ -32,18 +29,50 @@ export class SensorsService {
                         }
                     });
 
+                    self.kerviService.spine.addEventHandler("moduleStarted","",function(id,value){
+                        console.log("module started");
+                        self.refreshSensors()
+                    });
+
+                    self.kerviService.spine.addEventHandler("moduleStopped","",function(id,value){
+                        console.log("module stopped");
+                        setTimeout(function(){
+                            self.refreshSensors();
+                        },3000);
+                    })
+
+
 
 
 
                 } else {
                     self.sensors=[];
+                    self.sensorTypes=[];
                     self._sensors$.next(self.sensors);
+                    self._sensorTypes$.next(self.sensorTypes);
                 }
             });
          
+            
+
 
         
-        }
+    }
+
+    private refreshSensors(){
+        var self=this;
+        this.sensors=[];
+        this.sensorTypes=[];
+        
+        self.kerviService.spine.sendQuery("getSensorInfo",function(message){
+            console.log("sensor info",message);
+            
+            self.updateSensors.call(self,message);
+            self._sensors$.next(self.sensors);
+            self._sensorTypes$.next(self.sensorTypes);
+            
+        });
+    }
 
     public getSensors$(){
         return this._sensors$.asObservable()
@@ -53,6 +82,19 @@ export class SensorsService {
         var result=[];
         for (let sensor of this.sensors){
             if (sensor.dashboards && sensor.dashboards.indexOf(dashboard)>=0)
+                result.push(sensor);
+        }
+        return result;
+    }
+
+    public getSensorTypes$(){
+        return this._sensorTypes$.asObservable();
+    }
+
+    public getSensorsOfType(type:string){
+        var result=[];
+        for (let sensor of this.sensors){
+            if (sensor.type==type)
                 result.push(sensor);
         }
         return result;
@@ -75,6 +117,8 @@ export class SensorsService {
             sensor.value$.next(message.value);
             sensor.sparkline$.next(message.sparkline);
             this.sensors.push(sensor);
+            if (this.sensorTypes.indexOf(sensor.type)==-1)
+                this.sensorTypes.push(sensor.type);
         }
     }
 }

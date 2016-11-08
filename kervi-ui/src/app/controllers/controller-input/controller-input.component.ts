@@ -18,7 +18,6 @@ export class ControllerInputComponent implements OnInit {
   ngOnInit() {
       var self=this;
 			var color="#ffffff";
-      console.log("dta",this)
       if (this.dashboardType=="dashboard")
         color="#000000";
 			var p=jQuery('fieldset',this.elementRef.nativeElement).xy({

@@ -18,7 +18,7 @@ class KerviSensors(process.KerviProcess):
         except:
             self.spine.log.exception("load sensors")
             pass
-        #import kervi.utility.storage
+        import kervi.utility.storage
         self.spine.sendCommand("startThreads")
 
     def TerminateProcess(self):     
@@ -123,7 +123,7 @@ class ApplicationModule(object):
         self.started=True
         
         time.sleep(2)
-        self.spine.triggerEvent("applicationModuleStarted",self.name)
+        self.spine.triggerEvent("moduleStarted",self.name)
         time.sleep(2)
     
     def input_thread(self,list):

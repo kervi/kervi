@@ -36,6 +36,7 @@ class VisionModule(ModuleThread):
             self.linkToCamera(cameraId)
     
     def linkToCamera(self,cameraId):
+        print cameraId
         cam = self.spine.sendQuery("getObjectInfo", cameraId)
         if cam:
             self.cameraInfo = cam

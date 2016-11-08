@@ -15,7 +15,7 @@ export const routes: Routes = [
   { path: 'connect', component: ConnectComponent },
   { path: 'camboard/:name', component: CamBoardComponent },
   { path: 'dashboard/:name', component: DashboardComponent },
-  { path: 'charts/:name', component: ChartsComponent }
+  { path: 'charts', component: ChartsComponent }
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forRoot(routes);

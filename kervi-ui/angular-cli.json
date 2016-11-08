@@ -27,7 +27,8 @@
         "../node_modules/bootstrap/dist/js/bootstrap.js",
         "../lib/jquery.sparkline.js",
         "../lib/jquery.kontrol.js",
-        "../lib/bootstrap-toggle.js"
+        "../lib/bootstrap-toggle.js",
+        "../lib/chart-bundle.js"
 
       ],
       "environments": {

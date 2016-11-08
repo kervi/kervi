@@ -19,7 +19,6 @@ export class ControllerButtonComponent implements OnInit {
   }
   ngOnInit() {
     var self=this;
-    console.log("bt",this.button,this.elementRef.nativeElement);
     
   }
 

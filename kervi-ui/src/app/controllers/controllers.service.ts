@@ -13,20 +13,24 @@ export class ControllersService {
     private _controllerTypes$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
     private _cameraControllers$: BehaviorSubject<ControllerModel[]>= new BehaviorSubject<ControllerModel[]>([]);
     private _currentCameraController$: BehaviorSubject<ControllerModel>= new BehaviorSubject<ControllerModel>(null);
+    
     constructor (private kerviService:KerviService){
         var self=this;
         
             var s=this.kerviService.connected$.subscribe(function(connectedValue){
                 if (connectedValue){
-                    self.kerviService.spine.sendQuery("getControllerInfo",null,function(message){
-                        console.log("controller info",message);
-                        self.updateControllers.call(self,message);
-                        self._controllers$.next(self.controllers);
-                        self._controllerTypes$.next(self.controllerTypes);
-                        self.updateCameraControllers();
-                        self.setEventHandlers();
-                        console.log("ciu",self.controllers);
-                    });    
+                    self.refreshControllers();
+                    self.kerviService.spine.addEventHandler("moduleStarted","",function(id,value){
+			            console.log("controllers module started");
+                        self.refreshControllers()
+		            });
+
+                    self.kerviService.spine.addEventHandler("moduleStopped","",function(id,value){
+                        console.log("module stopped");
+                        setTimeout(function(){
+                            self.refreshControllers();
+                        },3000);
+                    })
                 } else {
                   self.controllers=[];
                   self.controllerTypes=[];
@@ -34,9 +38,24 @@ export class ControllersService {
                   self._controllerTypes$.next(self.controllerTypes);
                 }
             });
-         
+    }
 
-        
+    private refreshControllers(){
+        var self=this;
+        self.controllers = [];
+        self.controllerTypes = [];
+        self.currentCameraController = null;
+        self.cameraControllers =[];
+    
+        self.kerviService.spine.sendQuery("getControllerInfo",null,function(message){
+            console.log("controller info",message);
+            self.updateControllers.call(self,message);
+            self._controllers$.next(self.controllers);
+            self._controllerTypes$.next(self.controllerTypes);
+            self.updateCameraControllers();
+            self.setEventHandlers();
+            //console.log("ciu",self.controllers);
+        });
     }
 
     public getControllers$(){
@@ -139,7 +158,6 @@ export class ControllersService {
             }	
         } else {
             var controller=new ControllerModel(message);
-            console.log("uc",message,controller);
             this.controllers.push(controller);
             if (this.controllerTypes.indexOf(controller.type)==-1){
               this.controllerTypes.push(controller.type);

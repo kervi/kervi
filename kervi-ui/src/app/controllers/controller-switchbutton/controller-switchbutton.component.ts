@@ -16,7 +16,6 @@ export class ControllerSwitchButtonComponent implements OnInit {
 
   ngOnInit() {
     var self=this;
-    console.log("bt",this.button,this.elementRef.nativeElement);
       self.valueSubscription=self.button.state$.subscribe(function(v){
         jQuery('input',self.elementRef.nativeElement).bootstrapToggle(v ? 'on' : 'off',true);
       });
