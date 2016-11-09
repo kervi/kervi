@@ -10,7 +10,7 @@ server=None
 def start(address):
     global server
     kervipath = os.path.dirname(kervi.__file__)
-    docpath = os.path.join(kervipath,"web-ui")
+    docpath = os.path.join(kervipath,"kervi-ui/dist")
     print "dp",docpath
     cwd = os.getcwd()
     os.chdir(docpath)

@@ -11,9 +11,9 @@ describe('ControllerInputComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ControllerInputComponent ]
+      declarations: [ControllerInputComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

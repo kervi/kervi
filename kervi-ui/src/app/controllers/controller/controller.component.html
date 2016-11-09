@@ -1,28 +1,28 @@
 <div *ngIf="section=='left'">
-  <div [ngSwitch]="controller.id">
+	<div [ngSwitch]="controller.id">
 		<template ngSwitchWhen="manualSteeringx">
 			fsdf
 		</template>
 		<template ngSwitchDefault>
 			<div *ngFor="let component of controller.components">
-        <div [ngSwitch]="component.type">
-          <template ngSwitchCase="input">
-            <kervi-controller-input [dashboardType]="dashboardType"  [input]="component"></kervi-controller-input>
-          </template>
-          <template ngSwitchCase="button">
-            <kervi-controller-button [dashboardType]="dashboardType"  [button]="component"></kervi-controller-button>
-          </template>
-          <template ngSwitchCase="switchButton">
-            <kervi-controller-switchbutton [dashboardType]="dashboardType"  [button]="component"></kervi-controller-switchbutton>
-          </template>
-        </div>
-      </div>
-      
-			
+				<div [ngSwitch]="component.type">
+					<template ngSwitchCase="input">
+						<kervi-controller-input [dashboardType]="dashboardType" [input]="component"></kervi-controller-input>
+					</template>
+					<template ngSwitchCase="button">
+						<kervi-controller-button [dashboardType]="dashboardType" [button]="component"></kervi-controller-button>
+					</template>
+					<template ngSwitchCase="switchButton">
+						<kervi-controller-switchbutton [dashboardType]="dashboardType" [button]="component"></kervi-controller-switchbutton>
+					</template>
+				</div>
+			</div>
+
+
 		</template>
-	 
-	 </div>
+
+	</div>
 </div>
-<div *ngIf="section=='right'" >
-  
+<div *ngIf="section=='right'">
+
 </div>

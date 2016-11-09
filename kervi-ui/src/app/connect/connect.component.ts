@@ -9,29 +9,29 @@ import { Router, ActivatedRoute } from '@angular/router';
   styleUrls: ['./connect.component.css']
 })
 export class ConnectComponent implements OnInit {
-  private isConnected:boolean = false;
-  private currentPage=null;
-  private ts=new Date()
-  constructor(private kerviService:KerviService, private router:Router, private route:ActivatedRoute) {
+  private isConnected: boolean = false;
+  private currentPage = null;
+  private ts = new Date()
+  constructor(private kerviService: KerviService, private router: Router, private route: ActivatedRoute) {
     console.log("cc c", this.ts);
-    var self=this;
-
-    
+    var self = this;
 
 
-   }
 
 
-   private onConnectedChange(v){
-     
-   }
+  }
+
+
+  private onConnectedChange(v) {
+
+  }
 
   ngOnInit() {
     console.log("cc i");
-    
+
   }
 
-  ngOnDestroy(){
+  ngOnDestroy() {
     console.log("cc d", this);
     //this.kerviService.Connected.unsubscribe()    
   }

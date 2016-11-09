@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { SensorsService } from '../sensors.service';
-import {BehaviorSubject, Subject} from 'rxjs/Rx';
+import { BehaviorSubject, Subject } from 'rxjs/Rx';
 import { SensorModel } from '../models/sensor.model';
 
 @Component({
@@ -9,31 +9,31 @@ import { SensorModel } from '../models/sensor.model';
   styleUrls: ['./sensors.component.css']
 })
 export class SensorsComponent implements OnInit {
-  @Input() dashboard:string;
-  _sensors$ : BehaviorSubject<SensorModel[]>;
-   private sensorSubscription:any;
-  constructor(private sensorsService:SensorsService) {
-    var self=this;
-    this._sensors$= new BehaviorSubject<SensorModel[]>([]);
-    
-    //var sensors=kerviService.Sensors("core");
-   }
+  @Input() dashboard: string;
+  _sensors$: BehaviorSubject<SensorModel[]>;
+  private sensorSubscription: any;
+  constructor(private sensorsService: SensorsService) {
+    var self = this;
+    this._sensors$ = new BehaviorSubject<SensorModel[]>([]);
 
-   public sensors$(){
-     return this._sensors$.asObservable();
-   }
+    //var sensors=kerviService.Sensors("core");
+  }
+
+  public sensors$() {
+    return this._sensors$.asObservable();
+  }
 
   ngOnInit() {
-    var self=this;
-    this.sensorSubscription=this.sensorsService.getSensors$().subscribe(function(v){
-      console.log("core sensors ready",v);
+    var self = this;
+    this.sensorSubscription = this.sensorsService.getSensors$().subscribe(function (v) {
+      console.log("core sensors ready", v);
       self._sensors$.next(self.sensorsService.getDashboardSensors(self.dashboard));
-      
+
     });
 
   }
 
-  ngOnDestroy(){
+  ngOnDestroy() {
     this.sensorSubscription.unsubscribe();
   }
 

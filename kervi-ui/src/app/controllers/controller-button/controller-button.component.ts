@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ElementRef } from '@angular/core';
 import { ControllerButtonModel } from '../models/controller.model'
 import { KerviService } from '../../kervi.service'
-declare var jQuery:any;
+declare var jQuery: any;
 
 @Component({
   selector: 'kervi-controller-button',
@@ -10,16 +10,16 @@ declare var jQuery:any;
 })
 export class ControllerButtonComponent implements OnInit {
   @Input() button: ControllerButtonModel;
-  @Input() dashboardType:string;
-  constructor(private kerviService:KerviService, private elementRef:ElementRef) { }
+  @Input() dashboardType: string;
+  constructor(private kerviService: KerviService, private elementRef: ElementRef) { }
 
 
-  public clickButton(){
+  public clickButton() {
     this.kerviService.spine.sendCommand(this.button.clickCommand);
   }
   ngOnInit() {
-    var self=this;
-    
+    var self = this;
+
   }
 
 }
