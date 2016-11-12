@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs/Rx';
 
 
-interface IControllerComponent {
+export interface IControllerComponent {
     id: string;
     type: string;
 }
@@ -84,14 +84,14 @@ export class ControllerModel {
     public parameters: any;
     public components: IControllerComponent[] = [];
     public dashboards: string[];
-
+    public template:string;
     constructor(message: any) {
         this.id = message.id;
         this.name = message.name;
         this.type = message.type;
         this.dashboards = message.dashboards;
         this.parameters = message.parameters;
-
+        this.template=message.template;
         for (let c of message.components) {
             var component = null;
             if (c.componentType == "button")

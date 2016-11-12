@@ -111,23 +111,35 @@ class Controller(object):
         spine.registerQueryHandler("getObjectInfo", self.onGetObjectInfo)
         self.controllerId = controllerId
         self.name = name
-        self.components =[]
+        self.components = []
 
-    def addComponents(self,*args):
+    def addComponents(self, *args):
         for component in args:
-            self.components+=[component]
-    
-    def onGetObjectInfo(self,id,*args,**kwargs):
-        print "goi",id
-        if self.controllerId==id:
+            self.components += [component]
+
+    def onGetObjectInfo(self, id, *args, **kwargs):
+        print "goi", id
+        if self.controllerId == id:
             return self.onGetInfo(None)
-            
+
     def onGetInfo(self, controllerType, **kwargs):
         print "ci:", self.controllerId
-        if controllerType==None or controllerType==self.type:
-            
-            components=[]
+        if controllerType == None or controllerType == self.type:
+
+            components = []
             for component in self.components:
                 components += [component.getInfo()]
 
-            return {"type":self.type, "name":self.name, "id":self.controllerId, "parameters":self.parameters, "components":components, "dashboards":self.dashboards }
+            template = None
+            import os.path
+            import sys
+            modulepath = os.path.dirname(sys.modules[self.__class__.__module__].__file__)
+            className = self.__class__.__name__
+            cpath = os.path.join(modulepath, className + ".tmpl.html")
+            if os.path.isfile(cpath):
+                file = open(cpath, 'r')
+                template = file.read()
+            #processClass.__name__
+
+
+            return {"type":self.type, "name":self.name, "id":self.controllerId, "parameters":self.parameters, "components":components, "dashboards":self.dashboards , "template" : template}

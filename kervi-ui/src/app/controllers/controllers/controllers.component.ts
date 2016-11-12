@@ -13,7 +13,7 @@ export class ControllersComponent implements OnInit, OnDestroy {
   @Input() dashboard: string;
   @Input() dashboardType: string;
   controllerTypes$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
-
+  controllers$: BehaviorSubject<ControllerModel[]> =new BehaviorSubject<ControllerModel[]>([])
   private ctSubscription: any;
   constructor(private controllersService: ControllersService) {
 
@@ -42,6 +42,11 @@ export class ControllersComponent implements OnInit, OnDestroy {
     });
 
 
+    this.controllersService.getControllers$().subscribe(function(v){
+        self.controllers$.next(self.controllersService.getDashboardControllers(self.dashboard));
+    });
+
+
     setTimeout(function () {
       jQuery(".controllers-left-section").on('shown.bs.tab', function (event) {
         console.log("spc c", event);
@@ -50,6 +55,12 @@ export class ControllersComponent implements OnInit, OnDestroy {
         console.log("spc d", rightId, panelRight);
         jQuery(".tab-pane", '.controllers-right-section').removeClass("active");
         jQuery(rightId).addClass("active");
+
+        /*workaround for bug in BST 4 */
+        if (event.relatedTarget) {
+            jQuery(event.relatedTarget).removeClass('active');
+        }
+
       });
     });
   }

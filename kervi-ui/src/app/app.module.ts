@@ -5,6 +5,7 @@ import { HttpModule } from '@angular/http';
 import { LocationStrategy, HashLocationStrategy} from '@angular/common';
 
 import { SensorsModule } from './sensors/sensors.module';
+import { ControllersModule } from './controllers/controllers.module';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -16,15 +17,7 @@ import { KerviService} from "./kervi.service";
 import { ConnectedService} from "./connected.service"
 import { CamBoardComponent } from './cam-board/cam-board.component';
 
-import { SensorsService} from './sensors/sensors.service';
-import { ControllersComponent } from './controllers/controllers/controllers.component';
-import { ControllerComponent } from './controllers/controller/controller.component';
-import { ControllersService } from './controllers/controllers.service';
-import { ControllerInputComponent } from './controllers/controller-input/controller-input.component';
-import { ControllerButtonComponent } from './controllers/controller-button/controller-button.component';
-import { ControllerSwitchButtonComponent } from './controllers/controller-switchbutton/controller-switchbutton.component';
 
-import { CamViewerComponent } from './controllers/cam-viewer/cam-viewer.component'
 
 @NgModule({
   declarations: [
@@ -34,13 +27,6 @@ import { CamViewerComponent } from './controllers/cam-viewer/cam-viewer.componen
     PageHeaderComponent,
     ConnectComponent,
     CamBoardComponent,
-    ControllersComponent,
-    ControllerComponent,
-    ControllerInputComponent,
-    ControllerButtonComponent,
-    ControllerSwitchButtonComponent,
-    CamViewerComponent,
-    
     
     
   ],
@@ -49,9 +35,10 @@ import { CamViewerComponent } from './controllers/cam-viewer/cam-viewer.componen
     FormsModule,
     HttpModule,
     routing,
-    SensorsModule
+    SensorsModule,
+    ControllersModule
   ],
-  providers:[KerviService,ConnectedService,SensorsService,ControllersService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
+  providers:[KerviService,ConnectedService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent]
 })
 export class AppModule {
