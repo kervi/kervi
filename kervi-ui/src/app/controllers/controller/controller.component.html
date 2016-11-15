@@ -1,8 +1,8 @@
-<div *ngIf="controller.template!=null">
+<div *ngIf="controller.template">
   <controller-layout [controller]="controller"></controller-layout>
 </div>
 
-<div *ngIf="controller.template==null">
+<div *ngIf="!controller.template">
 	<div [ngSwitch]="controller.id">
 		<template ngSwitchWhen="manualSteeringx">
 			fsdf

@@ -17,6 +17,7 @@ import { KerviService} from "./kervi.service";
 import { ConnectedService} from "./connected.service"
 import { CamBoardComponent } from './cam-board/cam-board.component';
 
+ 
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import { CamBoardComponent } from './cam-board/cam-board.component';
     HttpModule,
     routing,
     SensorsModule,
-    ControllersModule
+    ControllersModule,
+    
   ],
   providers:[KerviService,ConnectedService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent]

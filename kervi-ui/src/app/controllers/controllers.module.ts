@@ -9,6 +9,9 @@ import { ControllerSwitchButtonComponent } from './controller-switchbutton/contr
 import { ControllerLayout} from './controller-layout/controller-layout.component'
 import { LayoutControllerComponent} from './controller-layout/layout-controller-component.component';
 import { CamViewerComponent } from './cam-viewer/cam-viewer.component'
+import { DynamicTypeBuilder} from './controller-layout/type.builder';
+import { COMPILER_PROVIDERS } from '@angular/compiler';
+
 @NgModule({
   imports: [
     CommonModule
@@ -23,7 +26,7 @@ import { CamViewerComponent } from './cam-viewer/cam-viewer.component'
     LayoutControllerComponent,
     CamViewerComponent
   ],
-  providers: [ControllersService],
+  providers: [ControllersService, DynamicTypeBuilder,COMPILER_PROVIDERS],
   declarations: [
     ControllersComponent,
     ControllerComponent,

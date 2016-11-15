@@ -13,11 +13,16 @@ export class LayoutControllerComponent implements OnInit {
   @Input() dashboardType: string;
   component:IControllerComponent;
   constructor(private controllersService:ControllersService) {
-
+      console.log("lcc constructor",this.id);
+      
    }
 
   ngOnInit() {
-    this.component=this.controllersService.getControllerComponent(this.id);
+    console.log('lcc',this.id);
+    if (this.id){
+      this.component=this.controllersService.getControllerComponent(this.id);
+      console.log("lcc c",this.component);
+    }
   }
 
 

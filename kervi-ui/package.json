@@ -21,9 +21,12 @@
     "@angular/platform-browser-dynamic": "~2.1.0",
     "@angular/router": "~3.1.0",
     "@ng-bootstrap/ng-bootstrap": "^1.0.0-alpha.9",
+    "@types/lodash": "^4.14.39",
     "core-js": "^2.4.1",
+    "lodash": "^4.17.1",
     "rxjs": "5.0.0-beta.12",
     "ts-helpers": "^1.1.1",
+    "underscore": "^1.8.3",
     "zone.js": "^0.6.23"
   },
   "devDependencies": {

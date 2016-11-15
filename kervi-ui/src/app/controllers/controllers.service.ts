@@ -91,11 +91,13 @@ export class ControllersService {
     public getControllerComponent(id) {
         //console.log("gdc",dashboard,type,this.controllers.length);
 
-        var result = [];
         for (let controller of this.controllers) {
-            for (let component of controller.components)
-            if (component.id==id)
-                return component
+            console.log("gccp",controller);
+            for (let component of controller.components){
+                console.log("gccp b",component);
+                if (component.id==id)
+                    return component
+            }
         }
         //console.log("gdce",result);
         return null;
