@@ -113,7 +113,6 @@
 
 .axis-pad{
 	display:inline-block;
-	float:left;
 	margin-right:25px;
 	color:#ffffff;
     margin-bottom:25px;
@@ -121,7 +120,6 @@
 
 .dashboard .axis-pad{
 	display:inline-block;
-	float:left;
 	margin-right:25px;
 	color:#000000;
     margin-bottom:25px;
@@ -137,7 +135,6 @@
 	padding:10px;
 	background:rgba(0,0,0,.1);
 	margin-left:-350px;
-	//margin-top:75px;
 	z-index:1100;
 	position:fixed;
 	top:150px;

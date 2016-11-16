@@ -78,15 +78,15 @@ class ControllerNumberInput(object):
         self.controller = controller
         self.command = self.inputId + ".setValue"
         self.spine.registerCommandHandler(self.command, self.setValue)
-        self.componentType="input"
-        self.inputType="number"
+        self.componentType = "input"
+        self.inputType = "number"
         #self.ui={"orientation":"vertical","type":"gauge"}
         if not  hasattr(self, 'inputId'):
-            self.inputId=None
+            self.inputId = None
 
         if not  hasattr(self, 'name'):
             self.name = None
-        
+
     def setValue(self, nvalue, **kwargs):
         if (self.value != nvalue):
             self.spine.log.debug("value change on input:{0}/{1} value:{2}", self.controller.controllerId, self.inputId,nvalue)
@@ -123,7 +123,7 @@ class Controller(object):
             return self.onGetInfo(None)
 
     def onGetInfo(self, controllerType, **kwargs):
-        print "ci:", self.controllerId
+        #print "ci:", self.controllerId
         if controllerType == None or controllerType == self.type:
 
             components = []
