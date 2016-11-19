@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { KerviService } from '../kervi.service';
 import { BehaviorSubject, Subject, Observable } from 'rxjs/Rx';
+import { DashboardModel } from '../dashboards/models/dashboard.model'
+import { DashboardsService } from '../dashboards/dashboards.service'
 declare var jQuery: any;
 
 @Component({
@@ -13,16 +15,15 @@ declare var jQuery: any;
 export class PageHeaderComponent implements OnInit, OnDestroy {
   public dashboards$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   private appSubscription: any;
-  constructor(private kerviService: KerviService) {
+  constructor(private dashboardsService: DashboardsService) {
 
   }
 
   ngOnInit() {
     var self = this;
-    this.appSubscription = this.kerviService.application$.subscribe(function (v) {
-      if (v) {
-        self.dashboards$.next(v.dashboards);
-      }
+    this.appSubscription = this.dashboardsService.getDashboards$().subscribe(function (v) {
+        self.dashboards$.next(v);
+      
     });
   }
 

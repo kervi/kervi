@@ -12,7 +12,8 @@ import { SparklineComponent } from './sparkline/sparkline.component'
   exports:[
     SensorComponent,
     CoreSensorsComponent,
-    SensorsComponent
+    SensorsComponent,
+    CommonModule
   ],
   providers: [SensorsService],
   declarations: [SensorsComponent, SensorComponent, CoreSensorsComponent, SparklineComponent]

@@ -4,7 +4,7 @@ import { ControllersService } from '../controllers.service'
 declare var jQuery: any;
 
 @Component({
-  selector: 'controller-componentx',
+  selector: 'controller-component',
   templateUrl: './controller-component.component.html',
   styleUrls: []
 })

@@ -1,5 +1,5 @@
 import { Component, Provider } from '@angular/core';
-import { PageHeaderComponent } from './page-header/page-header.component';
+//import { PageHeaderComponent } from './page-header/page-header.component';
 import { ConnectedService } from './connected.service'
 
 @Component({

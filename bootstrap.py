@@ -62,6 +62,13 @@ class Application(object):
         s.registerQueryHandler("GetApplicationInfo", self.onGetApplicationInfo)
         s.sendCommand("startThreads")
         
+        try:
+            import dashboards
+        except:
+            self.spine.log.exception("load sensors")
+            pass
+
+
         for module in self.settings["modules"]:
             if module=="sensors":
                 time.sleep(2)

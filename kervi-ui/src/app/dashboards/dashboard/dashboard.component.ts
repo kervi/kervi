@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { KerviService } from "../kervi.service"
+import { KerviService } from "../../kervi.service"
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
