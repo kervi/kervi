@@ -25,8 +25,7 @@ export class ConnectedService {
               console.log("df",v,defaultDashboard);
               if (defaultDashboard.length>0){
                 self.router.navigate(['/'+defaultDashboard[0].type+'/'+defaultDashboard[0].id]);  
-              } else
-                self.router.navigate(['/camboard/front']);
+              } 
             }
           });
         }

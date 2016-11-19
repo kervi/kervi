@@ -4,7 +4,7 @@ import {BehaviorSubject, Subject} from 'rxjs/Rx';
 import { DashboardModel } from './models/dashboard.model'
 @Injectable()
 export class DashboardsService {
-    dashboards:DashboardModel[]
+    dashboards:DashboardModel[] = [];
     private _dashboards$: BehaviorSubject<DashboardModel[]> = new BehaviorSubject<DashboardModel[]>([]);
 
     constructor(private kerviService:KerviService){
@@ -64,5 +64,13 @@ export class DashboardsService {
 
     public getDashboards$(){
         return this._dashboards$.asObservable()
+    }
+
+    public getDashboardById(id:string){
+        for (let dashboard of this.dashboards) {
+            if (dashboard.id==id)
+                return dashboard
+        }
+        return null;
     }
 }

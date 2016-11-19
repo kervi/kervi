@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { KerviService } from "../../kervi.service"
+import { KerviService } from "../../kervi.service";
+import { DashboardsService } from "../dashboards.service";
 import { Router, ActivatedRoute } from '@angular/router';
-
+import { DashboardModel } from '../models/dashboard.model'
 @Component({
   selector: 'app-dashboard',
   //providers: [ KerviService ],
@@ -9,10 +10,11 @@ import { Router, ActivatedRoute } from '@angular/router';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  public dashboard:string;
+  public dashboardId:string;
+  public dashboard:DashboardModel;
   private routeSubscription;
   
-  constructor(private kerviService:KerviService, private router:Router, private activatedRoute:ActivatedRoute) {
+  constructor(private kerviService:KerviService, private dashboardsService:DashboardsService, private router:Router, private activatedRoute:ActivatedRoute) {
       console.log("db c");
    }
 
@@ -20,11 +22,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     console.log("db nginit");
     this.routeSubscription = this.activatedRoute.params.subscribe(params => {
        console.log("cb,rp",params);
-       this.dashboard = params['name']; // (+) converts string 'id' to a number
-
-       // In a real app: dispatch action to load the details here.
+       this.dashboardId = params['name']; 
+       this.dashboard=this.dashboardsService.getDashboardById(this.dashboardId);
     });
-   
   }
 
   ngOnDestroy(){

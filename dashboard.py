@@ -15,10 +15,10 @@ class Dashboard(object):
         import os.path
         import sys
         modulepath = os.path.dirname(sys.modules[self.__class__.__module__].__file__)
-        className = self.__class__.__name__
-        cpath = os.path.join(modulepath, className + ".tmpl.html")
+        cpath = os.path.join(modulepath, self.dashboardId + ".tmpl.html")
+        print "cp", cpath
         if os.path.isfile(cpath):
             template_file = open(cpath, 'r')
             template = template_file.read()
 
-        return {"type":self.type, "name":self.name, "id":self.dashboardId, "idDefault": self.isDefault, "template" : template}    
+        return {"type":self.type, "name":self.name, "id":self.dashboardId, "isDefault": self.isDefault, "template" : template}    

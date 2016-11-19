@@ -88,6 +88,15 @@ export class ControllersService {
 
     }
 
+    public getControllerById(id: string) {
+        for (let controller of this.controllers) {
+            if (controller.id==id)
+                return controller;
+        }
+        return null;
+
+    }
+
     public getControllerComponent(id) {
         //console.log("gdc",dashboard,type,this.controllers.length);
 

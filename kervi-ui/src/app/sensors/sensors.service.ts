@@ -100,6 +100,14 @@ export class SensorsService {
         return result;
     }
 
+    public getSensorById(id:string){
+        for (let sensor of this.sensors){
+            if (sensor.id==id)
+                return sensor;
+        }
+        return null;
+    }
+
     private updateSensors=function(message){
         if (Array.isArray(message)){
             for (var i=0;(i<message.length);i++){

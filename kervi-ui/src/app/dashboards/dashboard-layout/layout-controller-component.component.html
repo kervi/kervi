@@ -1,0 +1,11 @@
+<div [ngSwitch]="component.type">
+    <template ngSwitchCase="input">
+        <kervi-controller-input [dashboardType]="dashboardType" [input]="component"></kervi-controller-input>
+    </template>
+    <template ngSwitchCase="button">
+        <kervi-controller-button [dashboardType]="dashboardType" [button]="component"></kervi-controller-button>
+    </template>
+    <template ngSwitchCase="switchButton">
+        <kervi-controller-switchbutton [dashboardType]="dashboardType" [button]="component"></kervi-controller-switchbutton>
+    </template>
+</div>

@@ -2,19 +2,19 @@ import { Input, Component, ComponentRef,ViewChild,ViewContainerRef}   from '@ang
 import { AfterViewInit,OnInit,OnDestroy}          from '@angular/core';
 import { OnChanges,SimpleChange,ComponentFactory} from '@angular/core';
 
-import { IHaveDynamicData, DynamicTypeBuilder } from './type.builder';
+import { IHaveDynamicData, DashboardDynamicTypeBuilder } from './dashboard-type.builder';
 //import { DynamicTemplateBuilder }               from '../../dynamic/template.builder';
-import {ControllerModel} from '../models/controller.model'
+import {DashboardModel} from '../models/dashboard.model'
 
 @Component({
-  selector: 'controller-layout',
+  selector: 'dashboard-layout',
   template: `
   <div #dynamicContentPlaceHolder></div>
 `,
 })
-export class ControllerLayout implements AfterViewInit, OnChanges, OnDestroy
+export class DashboardLayout implements AfterViewInit, OnChanges, OnDestroy
 { 
-    @Input() controller:ControllerModel;
+    @Input() dashboard:DashboardModel;
     // reference for a <div> with #dynamicContentPlaceHolder
     @ViewChild('dynamicContentPlaceHolder', {read: ViewContainerRef}) 
     protected dynamicComponentTarget: ViewContainerRef;
@@ -30,13 +30,13 @@ export class ControllerLayout implements AfterViewInit, OnChanges, OnDestroy
 
     // wee need Dynamic component builder
     constructor(
-        protected typeBuilder: DynamicTypeBuilder,        
+        protected typeBuilder: DashboardDynamicTypeBuilder,        
     ) {}
 
    /** Get a Factory and create a component */ 
     
     protected refreshContent(){
-      if (!this.controller.template)
+      if (!this.dashboard.template)
         return;
 
       if (this.componentRef) {
@@ -44,7 +44,7 @@ export class ControllerLayout implements AfterViewInit, OnChanges, OnDestroy
       }
       
       // here we get a TEMPLATE with dynamic content === TODO
-      var template = this.controller.template;
+      var template = this.dashboard.template;
 console.log("ccf",template);
       // here we get Factory (just compiled or from cache)
       this.typeBuilder
@@ -71,7 +71,7 @@ console.log("ccf",template);
     {
         this.wasViewInitialized = true; 
 
-        //this.refreshContent();
+        this.refreshContent();
     }
     // wasViewInitialized is an IMPORTANT switch 
     // when this component would have its own changing @Input()
