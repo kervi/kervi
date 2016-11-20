@@ -24,7 +24,7 @@ class Sensor(object):
         self.sparkline = []
         self.dashboards = ["global"]
 	
-    def handleGetSensorInfo(self, *args, **kwargs):
+    def handleGetSensorInfo(self):
         return {
             "name":self.name,
             "id":self.id,
@@ -74,7 +74,7 @@ class Sensor(object):
     def readSensor(self):
         pass
 
-    def startCommand(self, *args, **kwargs):
+    def startCommand(self):
         if not self.isAlive():
             super(KerviThread, self).start()
 
@@ -106,7 +106,7 @@ class SensorThread(KerviThread):
     def sensorStep(self):
         pass
         
-    def startCommand(self, *args, **kwargs):
+    def startCommand(self):
         if not self.isAlive():
             super(KerviThread, self).start()
 

@@ -6,6 +6,7 @@ import { ControllersService } from './controllers.service';
 import { ControllerInputComponent } from './controller-input/controller-input.component';
 import { ControllerButtonComponent } from './controller-button/controller-button.component';
 import { ControllerSwitchButtonComponent } from './controller-switchbutton/controller-switchbutton.component';
+import { ControllerSelectComponent } from './controller-select/controller-select.component'
 import { ControllerLayout} from './controller-layout/controller-layout.component'
 import { LayoutControllerComponent} from './controller-layout/layout-controller-component.component';
 import { CamViewerComponent } from './cam-viewer/cam-viewer.component'
@@ -22,6 +23,7 @@ import { COMPILER_PROVIDERS } from '@angular/compiler';
     ControllerInputComponent,
     ControllerButtonComponent,
     ControllerSwitchButtonComponent,
+    ControllerSelectComponent,
     ControllerLayout,
     LayoutControllerComponent,
     CamViewerComponent
@@ -33,6 +35,7 @@ import { COMPILER_PROVIDERS } from '@angular/compiler';
     ControllerInputComponent,
     ControllerButtonComponent,
     ControllerSwitchButtonComponent,
+    ControllerSelectComponent,
     ControllerLayout,
     LayoutControllerComponent,
     CamViewerComponent

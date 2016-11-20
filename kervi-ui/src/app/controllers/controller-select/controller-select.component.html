@@ -1,0 +1,5 @@
+<select (change)="onChange($event.target.value)" >
+    <option *ngFor="let option of select.options"  [attr.value]="option.value" [attr.selected]="(option.selected$ | async) ? '' : null">
+        {{option.text}}
+    </option>
+</select>

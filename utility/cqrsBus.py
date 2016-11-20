@@ -6,6 +6,7 @@ import sys, traceback
 import time
 import Queue
 from  kervi.kerviLogging import KerviLog
+import inspect
 
 class QueryThread (threading.Thread):
     def __init__(self,handler,query,args,**kwargs):
@@ -134,7 +135,11 @@ class CQRSBus(object):
         if funcList:
             for funcHandler in funcList:
                 try:
-                    funcHandler(*queueItem['args'],injected=queueItem["injected"])
+                    argspec = inspect.getargspec(funcHandler)
+                    if not argspec.keywords:
+                        funcHandler(*queueItem['args'])
+                    else:
+                        funcHandler(*queueItem['args'],injected=queueItem["injected"])
                 except:
                     self.log.exception("commandQueueHandler error:"+queueItem['command'])
 
@@ -155,10 +160,15 @@ class CQRSBus(object):
         result=[]
         if funcList:
             for func in funcList:
-                subResult=func(*args,injected=injected)
-                if subResult:
-                    result+=[func(*args,injected=injected)]
-
+                argspec = inspect.getargspec(func)
+                if not argspec.keywords:
+                    subResult=func(*args)
+                    if subResult:
+                        result+=[func(*args)]
+                else:
+                    subResult=func(*args,injected=injected)
+                    if subResult:
+                        result+=[func(*args,injected=injected)]
         if len(result)==1:
             return result[0]
 
@@ -173,12 +183,20 @@ class CQRSBus(object):
         funcList=self.eventHandlers.getListData(queueItem['event'])
         if funcList:
             for func in funcList:
-                func(None,*queueItem['args'],injected=queueItem["injected"])
+                argspec = inspect.getargspec(func)
+                if not argspec.keywords:
+                    func(None,*queueItem['args'])
+                else:
+                    func(None,*queueItem['args'],injected=queueItem["injected"])
         if (queueItem["id"]):
             funcList=self.eventHandlers.getListData(queueItem['event']+"/"+queueItem['id'])
             if funcList:
                 for func in funcList:
-                    func(queueItem["id"],*queueItem['args'],injected=queueItem["injected"])
+                    argspec = inspect.getargspec(func)
+                    if not argspec.keywords:
+                        func(queueItem["id"],*queueItem['args'])
+                    else:
+                        func(queueItem["id"],*queueItem['args'],injected=queueItem["injected"])
 
     def getCommands(self):
         return self.cmdHandlers.getListNames()

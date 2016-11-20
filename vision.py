@@ -55,7 +55,7 @@ class VisionModule(ModuleThread):
     def visionStep(self):
         print "abstract visionStep reached"
         
-    def getROIList(self, cameraId, *args, **kwargs):
+    def getROIList(self, cameraId):
         if self.cameraInfo and cameraId == self.cameraInfo["id"]:
             return self.ROIList
     

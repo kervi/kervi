@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ControllerModel, ControllerButtonModel, ControllerSwitchButtonModel, ControllerInputModel } from './models/controller.model'
+import { ControllerModel, ControllerButtonModel, ControllerSwitchButtonModel, ControllerInputModel, ControllerSelectModel } from './models/controller.model'
 import { KerviService } from "../kervi.service";
 import { BehaviorSubject, Subject } from 'rxjs/Rx';
 
@@ -154,6 +154,19 @@ export class ControllersService {
                     if (component.id == value.input) {
                         var input = component as ControllerInputModel;
                         input.value$.next(value.value);
+                    }
+                }
+            }
+        });
+
+        this.kerviService.spine.addEventHandler("controllerSelectChange", "", function (id, value) {
+            console.log("isc", this, id, value);
+            for (let controller of self.controllers) {
+                for (let component of controller.components) {
+                    if (component.id == value.select) {
+                        var select = component as ControllerSelectModel;
+                        select.selectOptions(value.value)
+                        
                     }
                 }
             }

@@ -1,5 +1,5 @@
 
-from kervi.controller import Controller, ControllerNumberInput, ControllerSwitchButton, ControllerButton
+from kervi.controller import Controller, ControllerNumberInput, ControllerSwitchButton, ControllerButton, ControllerSelect
 
 class CameraPanInput(ControllerNumberInput):
     def __init__(self,controller):
@@ -31,6 +31,18 @@ class CameraTiltInput(ControllerNumberInput):
     def valueChanged(self,newValue,oldValue):
         print "cam tilt set value:",newValue
 
+
+class CameraFrameRate(ControllerSelect):
+    def __init__(self, controller):
+        ControllerSelect.__init__(self, controller.controllerId+".framerate", "Framerate" , controller)
+        self.addOption("5", "5 / sec")
+        self.addOption("10", "10 / sec")
+        self.addOption("15", "15 / sec", True)
+        
+
+    def change(self, selectedOptions):
+        print "cameraFrameRate change", selectedOptions
+
 class CameraRecordButton(ControllerSwitchButton):
     def __init__(self,controller):
         self.name="Record"
@@ -61,7 +73,7 @@ class CameraBase(Controller):
         if not hasattr(self, 'parameters'):
             self.parameters = None
 
-        self.addComponents(CameraPanInput(self), CameraTiltInput(self), CameraRecordButton(self),CameraPictureButton(self))
+        self.addComponents(CameraPanInput(self), CameraTiltInput(self), CameraRecordButton(self),CameraPictureButton(self), CameraFrameRate(self))
         
         if not hasattr(self, 'dashboards'): 
            self.dashboards=None

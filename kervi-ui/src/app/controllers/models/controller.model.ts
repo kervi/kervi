@@ -6,6 +6,54 @@ export interface IControllerComponent {
     type: string;
 }
 
+export class ControllerSelectOptionModel{
+    public value:string;
+    public text:string;
+    public selected$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+    constructor(messageOption:any){
+        this.value = messageOption.value;
+        this.text = messageOption.text;
+        this.selected$.next(messageOption.selected);
+    }
+}
+
+export class ControllerSelectModel implements IControllerComponent{
+    public name: string;
+    public id: string;
+    public type:string;
+    public command:string;
+    public options:ControllerSelectOptionModel[] = [];
+    
+    constructor (message:any){
+        this.name =message.name;
+        this.id = message.id;
+        this.type = message.componentType;
+        this.command = message.onSelect;
+        this.options = []
+        for (let option of message.options){
+            this.options.push( new ControllerSelectOptionModel(option)); 
+        }
+    }
+
+    public selectOptions(selectedOptions:any){
+        for (let option of this.options){
+            option.selected$.next(false);
+        }
+        for (let selectedOption of selectedOptions){
+            if (selectedOption.selected){
+                for(let option of this.options){
+                    if (option.value == selectedOption.value){
+                        option.selected$.next(true);
+                        console.log("os",option.selected$.value);
+                    }
+
+                }
+            }
+        }
+    }
+}
+
 export class ControllerInputModel implements IControllerComponent {
     public name: string;
     public type: string;
@@ -95,11 +143,13 @@ export class ControllerModel {
         for (let c of message.components) {
             var component = null;
             if (c.componentType == "button")
-                component = new ControllerButtonModel(c)
+                component = new ControllerButtonModel(c);
             else if (c.componentType == "switchButton")
-                component = new ControllerSwitchButtonModel(c)
+                component = new ControllerSwitchButtonModel(c);
             else if (c.componentType == "input")
-                component = new ControllerInputModel(c)
+                component = new ControllerInputModel(c);
+            else if (c.componentType == "select")
+                component = new ControllerSelectModel(c);
             if (component)
                 this.components.push(component);
         }
