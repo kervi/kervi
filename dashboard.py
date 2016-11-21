@@ -9,14 +9,12 @@ class Dashboard(object):
         self.type = dashboardType
         self.isDefault = isDefault
 
-
-    def onGetInfo(self,  **kwargs):
+    def onGetInfo(self):
         template = None
         import os.path
         import sys
         modulepath = os.path.dirname(sys.modules[self.__class__.__module__].__file__)
         cpath = os.path.join(modulepath, self.dashboardId + ".tmpl.html")
-        print "cp", cpath
         if os.path.isfile(cpath):
             template_file = open(cpath, 'r')
             template = template_file.read()

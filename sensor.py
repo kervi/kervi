@@ -5,10 +5,11 @@ import time
 
 
 class Sensor(object):
-    def __init__(self):
+    def __init__(self, sensorId, name):
         self.spine=Spine()
         self.spine.registerQueryHandler("getSensorInfo", self.handleGetSensorInfo)
-        self.id = "not set"
+        self.sensorId= sensorId
+        self.name = name
         self.type = None
         self.max = None
         self.min = None
@@ -27,7 +28,7 @@ class Sensor(object):
     def handleGetSensorInfo(self):
         return {
             "name":self.name,
-            "id":self.id,
+            "id":self.sensorId,
             "type":self.type,
             "max":self.max,
             "min":self.min,
@@ -56,21 +57,21 @@ class Sensor(object):
 
     def newSensorReading(self,value):
         if (self.deltaExceeded(value)):
-            if not  self.id == "AliveSensor":
-                self.spine.log.debug("delta exceeded:{0} value:{1}, old value:{2}",self.id, value, self.oldVal)
+            if not  self.sensorId == "AliveSensor":
+                self.spine.log.debug("delta exceeded:{0} value:{1}, old value:{2}",self.sensorId, value, self.oldVal)
             timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
-            v={"sensor":self.id,"value":value,"timestamp":timestamp}
+            v={"sensor":self.sensorId,"value":value,"timestamp":timestamp}
             if self.storeSettings["active"]:
                 self.spine.sendCommand("StoreSensorValue",v)
-            self.spine.triggerEvent("NewSensorReading",self.id,v)	
-            self.oldVal=value
-            if len(self.sparkline)==0:
-                self.sparkline+=[value]
-            elif len(self.sparkline)>=10:
+            self.spine.triggerEvent("NewSensorReading", self.sensorId, v)
+            self.oldVal = value
+            if len(self.sparkline) == 0:
+                self.sparkline += [value]
+            elif len(self.sparkline) >= 10:
                 self.sparkline.pop(0)
-            self.sparkline+=[value]	
-            self.lastReading=time.clock()
-    
+            self.sparkline += [value]
+            self.lastReading = time.clock()
+
     def readSensor(self):
         pass
 
@@ -84,16 +85,16 @@ class Sensor(object):
 class SensorThread(KerviThread):
     def __init__(self,sensors,readingInterval=1):
         KerviThread.__init__(self)
-        self.spine=Spine()
-        self.readingInterval=readingInterval
+        self.spine = Spine()
+        self.readingInterval = readingInterval
         if hasattr(sensors, "__len__"):
-            self.sensors=sensors
+            self.sensors = sensors
         else:
-            self.sensors=[sensors]
+            self.sensors = [sensors]
         self.spine.registerCommandHandler("startThreads", self.startCommand)
 
 
-    def newSensorReading(self,value,sensorIdx=0):
+    def newSensorReading(self, value, sensorIdx=0):
         self.sensors[sensorIdx].newSensorReading(value)
 
     def step(self):
@@ -105,7 +106,7 @@ class SensorThread(KerviThread):
 
     def sensorStep(self):
         pass
-        
+
     def startCommand(self):
         if not self.isAlive():
             super(KerviThread, self).start()

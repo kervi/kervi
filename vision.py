@@ -31,7 +31,7 @@ class VisionModule(ModuleThread):
 
         return {"id":self.moduleId, "camera":camId, "name":self.name}
 
-    def linkToCameraCommand(self,cameraId,visionId):
+    def linkToCameraCommand(self, cameraId, visionId):
         if visionId == self.moduleId:
             self.linkToCamera(cameraId)
     

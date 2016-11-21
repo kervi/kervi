@@ -3,9 +3,7 @@ import psutil
 
 class CPULoadSensor (Sensor):
     def __init__(self ):
-        Sensor.__init__(self)
-        self.id = "CPULoadSensor"
-        self.name = "CPU"
+        Sensor.__init__(self, "CPULoadSensor", "CPU" )
         self.type = "cpu"
         self.readingInterval = 1
         self.max = 1000000
@@ -20,9 +18,7 @@ class CPULoadSensor (Sensor):
 
 class MemUseSensor (Sensor):
     def __init__(self ):
-        Sensor.__init__(self)
-        self.id = "MemUse"
-        self.name = "Memory"
+        Sensor.__init__(self, "MemUse", "Memory")
         self.type = "memory"
         self.readingInterval = 1
         self.max = 1000000

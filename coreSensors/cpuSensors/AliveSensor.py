@@ -4,9 +4,7 @@ import time
 
 class AliveSensor (Sensor):
     def __init__(self ):
-        Sensor.__init__(self)
-        self.id = "AliveSensor"
-        self.name="Alive sensor"
+        Sensor.__init__(self, "AliveSensor", "Alive sensor")
         self.type = "counter"
         self.max = 1000000
         self.min = 0
