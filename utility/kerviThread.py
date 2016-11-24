@@ -1,14 +1,12 @@
 import threading
 import logging
 
-
 class KerviThread(threading.Thread):
-    def __init__(self ):
+    def __init__(self):
         threading.Thread.__init__(self)
         self.daemon = True
         self.terminate = False
         
-
     def stop(self):
         self.terminate = True
 
@@ -17,9 +15,8 @@ class KerviThread(threading.Thread):
             try:
                 self.step()
             except:
-                l=logging.getLogger()
-                l.exception("kervi thread")       
-                
+                log = logging.getLogger()
+                log.exception("kervi thread")
 
     def step(self):
         return

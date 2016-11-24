@@ -19,4 +19,10 @@ class Dashboard(object):
             template_file = open(cpath, 'r')
             template = template_file.read()
 
-        return {"type":self.type, "name":self.name, "id":self.dashboardId, "isDefault": self.isDefault, "template" : template}    
+        return {
+            "type":self.type,
+            "name":self.name,
+            "id":self.dashboardId,
+            "isDefault": self.isDefault,
+            "template" : template
+        }

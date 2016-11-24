@@ -125,6 +125,24 @@ export class ControllerButtonModel implements IControllerComponent {
     }
 }
 
+export class ControllerDateTimeModel implements IControllerComponent {
+    public id: string;
+    public name: string;
+    public type: string;
+    public subType: string;
+    public changeCommand: string;
+    public value$: BehaviorSubject<Date> = new BehaviorSubject<Date>(null);
+
+    constructor(message) {
+        this.id = message.id;
+        this.name = message.name;
+        this.type = message.componentType;
+        this.subType = message.inputType;
+        this.value$.next(message.value);
+        this.changeCommand = message.onChange;
+    }
+}
+
 export class ControllerModel {
     public type: string;
     public name: string;
@@ -146,10 +164,14 @@ export class ControllerModel {
                 component = new ControllerButtonModel(c);
             else if (c.componentType == "switchButton")
                 component = new ControllerSwitchButtonModel(c);
-            else if (c.componentType == "input")
+            else if (c.componentType == "number-input")
+                component = new ControllerInputModel(c);
+            else if (c.componentType == "text-input")
                 component = new ControllerInputModel(c);
             else if (c.componentType == "select")
                 component = new ControllerSelectModel(c);
+            else if (c.componentType == "datetime-input")
+                component = new ControllerDateTimeModel(c);
             if (component)
                 this.components.push(component);
         }

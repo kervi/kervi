@@ -1,6 +1,9 @@
 <div [ngSwitch]="component.type">
-    <template ngSwitchCase="input">
-        <kervi-controller-input [dashboardType]="dashboardType" [input]="component"></kervi-controller-input>
+    <template ngSwitchCase="number-input">
+        <kervi-controller-number-input [dashboardType]="dashboardType" [input]="component"></kervi-controller-number-input>
+    </template>
+    <template ngSwitchCase="text-input">
+        <kervi-controller-text-input [dashboardType]="dashboardType" [input]="component"></kervi-controller-text-input>
     </template>
     <template ngSwitchCase="button">
         <kervi-controller-button [dashboardType]="dashboardType" [button]="component"></kervi-controller-button>
@@ -10,5 +13,8 @@
     </template>
     <template ngSwitchCase="select">
         <kervi-controller-select [dashboardType]="dashboardType" [select]="component"></kervi-controller-select>
+    </template>
+    <template ngSwitchCase="datetime-input">
+        <kervi-controller-datetime [dashboardType]="dashboardType" [datetime]="component"></kervi-controller-datetime>
     </template>
 </div>

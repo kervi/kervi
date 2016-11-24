@@ -10,9 +10,9 @@ class ModuleThread(KerviThread):
     def step(self):
         self.moduleStep()
 
-    def startCommand(self, *args, **kwargs):
+    def startCommand(self):
         if not self.isAlive():
             super(KerviThread, self).start()
-        
+
     def stopCommand(self):
         self.stop()

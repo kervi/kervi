@@ -5,38 +5,31 @@ class BraceMessage(object):
     def __init__(self, fmt, *args):
         self.fmt = fmt
         self.args = args
-        #self.kwargs = kwargs
 
     def __str__(self):
         return self.fmt.format(*self.args)
 
 class KerviLog(object):
-    def __init__(self,name):
-        self.logger=logging.getLogger(name)
-    
-    def info(self,message,*args):
-        self.logger.debug(BraceMessage(message, *args))
-        
+    def __init__(self, name):
+        self.logger = logging.getLogger(name)
 
-    def debug(self,message,*args):
-        if (args):
+    def info(self, message, *args):
+        self.logger.debug(BraceMessage(message, *args))
+
+    def debug(self, message, *args):
+        if args:
             self.logger.debug(BraceMessage(message, *args))
         else:
             self.logger.debug(message)
-        
 
-    def error(self,message,*args):
+    def error(self, message, *args):
         self.logger.error(BraceMessage(message, *args))
-        
 
-    def exception(self,message,*args):
+    def exception(self, message, *args):
         self.logger.exception(BraceMessage(message, *args))
-        
 
-    def fatal(self,message,*args):
+    def fatal(self, message, *args):
         self.logger.fatal(BraceMessage(message, *args))
-        
-
 
 def initProcessLogging(processName,resetLog=False):
     logger = logging.getLogger()
@@ -55,4 +48,3 @@ def initProcessLogging(processName,resetLog=False):
     ch.setFormatter(formatter)
     logger.addHandler(fh)
     logger.addHandler(ch)
-

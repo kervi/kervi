@@ -20,6 +20,7 @@
       "styles": [
         "../node_modules/bootstrap/dist/css/bootstrap.css",
         "../node_modules/font-awesome/css/font-awesome.css",
+        "../bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css",
         "styles.css"
       ],
       "scripts": [
@@ -29,8 +30,9 @@
         "../lib/jquery.sparkline.js",
         "../lib/jquery.kontrol.js",
         "../lib/bootstrap-toggle.js",
-        "../lib/chart-bundle.js"
-
+        "../lib/chart-bundle.js",
+        
+        "../bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js"  
       ],
       "environments": {
         "source": "environments/environment.ts",

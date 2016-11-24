@@ -1,19 +1,16 @@
 from kervi.utility.cqrsBus import CQRSBus
 
-
 class SpineX(CQRSBus): 
     def version(self):
-        return 1.0 
+        return 1.0
 
-s=None
+S = None
 def initSpine(spineName="roboSys"):
-    global s
-    print "init spine:"+spineName
-    s=SpineX()
-    s.setLog(spineName)
-    s.reset()
-    s.startQueues()
+    global S
+    S = SpineX()
+    S.setLog(spineName)
+    S.reset()
+    S.startQueues()
 
 def Spine():
-    global s
-    return s
+    return S

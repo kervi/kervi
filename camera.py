@@ -11,7 +11,7 @@ class CameraPanInput(ControllerNumberInput):
         self.ui = {"orientation":"horizontal", "type":"gauge"}
 
     def valueChanged(self, newValue, oldValue):
-        print "front cam pan:", self.value
+        self.controller.panChanged(newValue)
 
 class CameraTiltInput(ControllerNumberInput):
     def __init__(self, controller):
@@ -23,7 +23,7 @@ class CameraTiltInput(ControllerNumberInput):
         self.ui = {"orientation":"vertical", "type":"gauge"}
 
     def valueChanged(self, newValue, oldValue):
-        print "cam tilt set value:", newValue
+        self.controller.tiltChanged(newValue)
 
 
 class CameraFrameRate(ControllerSelect):
@@ -34,24 +34,24 @@ class CameraFrameRate(ControllerSelect):
         self.addOption("15", "15 / sec", True)
 
     def change(self, selectedOptions):
-        print "cameraFrameRate change", selectedOptions
+        self.controller.framerateChanged(selectedOptions)
 
 class CameraRecordButton(ControllerSwitchButton):
     def __init__(self,controller):
         ControllerSwitchButton.__init__(self, controller.controllerId+".record", "Record", controller)
 
     def on(self):
-        print "cam record on"
+        self.controller.startRecord()
 
     def off(self):
-        print "cam record off"
+        self.controller.stopRecord()
 
 class CameraPictureButton(ControllerButton):
     def __init__(self,controller):
-        ControllerButton.__init__(self, controller.controllerId+".savePicture", "Take picture", controller) 
+        ControllerButton.__init__(self, controller.controllerId+".savePicture", "Take picture", controller)
 
     def click(self):
-        print "cam save picture"
+        self.controller.savePicture()
 
 class CameraBase(Controller):
     def __init__(self, cameraId, name):
@@ -65,6 +65,30 @@ class CameraBase(Controller):
             CameraPictureButton(self),
             CameraFrameRate(self))
         self.dashboards = None
+
+    def panChanged(self,panValue):
+        print "panChanged", panValue
+        pass
+
+    def tiltChanged(self,tiltValue):
+        print "tiltChanged", tiltValue
+        pass
+
+    def framerateChanged(self,framerate):
+        print "framerateChanged", framerate
+        pass
+
+    def savePicture(self):
+        print "save picture"
+        pass
+
+    def startRecord(self):
+        print "start record"
+        pass
+
+    def stopRecord(self):
+        print "stop record"
+        pass
 
 class Camera(CameraBase):
     def __init__(self, cameraId, name, dashboards, source):

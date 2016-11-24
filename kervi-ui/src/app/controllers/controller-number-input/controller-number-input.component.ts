@@ -4,11 +4,11 @@ import { KerviService } from '../../kervi.service'
 declare var jQuery: any;
 
 @Component({
-	selector: 'kervi-controller-input',
-	templateUrl: './controller-input.component.html',
-	styleUrls: ['./controller-input.component.css']
+	selector: 'kervi-controller-number-input',
+	templateUrl: './controller-number-input.component.html',
+	styleUrls: ['./controller-number-input.component.css']
 })
-export class ControllerInputComponent implements OnInit {
+export class ControllerNumberInputComponent implements OnInit {
 	@Input() input: ControllerInputModel;
 	@Input() dashboardType: string;
 	private moveDelayTimer = null;
