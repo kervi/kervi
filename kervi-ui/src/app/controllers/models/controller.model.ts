@@ -139,7 +139,7 @@ export class ControllerDateTimeModel implements IControllerComponent {
         this.type = message.componentType;
         this.subType = message.inputType;
         this.value$.next(message.value);
-        this.changeCommand = message.onChange;
+        this.changeCommand = message.command;
     }
 }
 

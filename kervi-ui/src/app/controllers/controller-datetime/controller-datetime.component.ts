@@ -16,18 +16,30 @@ export class ControllerDateTimeComponent implements OnInit {
 
   ngOnInit() {
     var self = this;
-    self.valueSubscription = self.datetime.value$.subscribe(function (v) {
-      jQuery('input', self.elementRef.nativeElement).bootstrapToggle(v ? 'on' : 'off', true);
-    });
+    
 
     setTimeout(function () {
-      jQuery('input', self.elementRef.nativeElement).bootstrapToggle();
-      jQuery('input', self.elementRef.nativeElement).change(function () {
-        var value = jQuery('input', self.elementRef.nativeElement).value();
-        console.log("dt", value);
-        self.kerviService.spine.sendCommand(self.datetime.changeCommand,value);
+      
+      jQuery(function () {
+            jQuery('.datetimepicker',self.elementRef.nativeElement).datetimepicker({
+                //inline: true,
+                //sideBySide: false,
+                format: self.datetime.subType=="time" ? 'LT' : false,
+                locale: 'da',
+                icons: {
+                    time: "fa fa-clock-o",
+                    date: "fa fa-calendar",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                }
+            });
+        });
         
-      });
+        jQuery('input', self.elementRef.nativeElement).change(function (e,v) {
+          console.log("dv",e,v);
+          self.kerviService.spine.sendCommand(self.datetime.changeCommand,jQuery(e.currentTarget).val());
+        });
+      
     }, 0);
   }
 
