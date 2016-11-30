@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';

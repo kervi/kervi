@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { KerviService } from "../../kervi.service"
 import { Router, ActivatedRoute } from '@angular/router';

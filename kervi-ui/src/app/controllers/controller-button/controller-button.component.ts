@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, OnInit, Input, ElementRef } from '@angular/core';
 import { ControllerButtonModel } from '../models/controller.model'
 import { KerviService } from '../../kervi.service'

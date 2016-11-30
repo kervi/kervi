@@ -1,3 +1,8 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+""" Web socket ipc """
+
 from kervi.spine import Spine
 from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
@@ -136,8 +141,6 @@ class SpineProtocol(WebSocketServerProtocol):
 			self.spine.log.exception("WS onMessage exception")
 			#res={"execptionType":exc_type,"value":exc_value,"traceback":exc_traceback}
 			#self.sendResponse(res,"exception")
-			
- 		return
 
 terminateSocket=False
 def start(settings):
@@ -154,7 +157,7 @@ def start(settings):
 	factory.protocol = SpineProtocol
 
 	loop = asyncio.get_event_loop()
-	print "web socket ip:",nethelper.getIPAddress(), "port:",settings["network"]["WebSocketPort"]
+	print ("web socket ip:",nethelper.getIPAddress(), "port:",settings["network"]["WebSocketPort"])
 	
 	Spine().log.debug("start websocket on:{0}, port:{1}",nethelper.getIPAddress(),settings["network"]["WebSocketPort"])
 	coro = loop.create_server(factory, nethelper.getIPAddress(), settings["network"]["WebSocketPort"])

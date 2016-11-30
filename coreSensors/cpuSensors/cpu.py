@@ -1,3 +1,6 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
 from kervi.sensor import Sensor, SensorThread
 import psutil
 

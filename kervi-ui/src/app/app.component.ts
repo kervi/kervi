@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, Provider } from '@angular/core';
 //import { PageHeaderComponent } from './page-header/page-header.component';
 import { ConnectedService } from './connected.service'

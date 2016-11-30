@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ControllerModel } from '../models/controller.model'
 import { ControllersService } from '../controllers.service'

@@ -1,3 +1,13 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+"""
+Module that holds log functionality. 
+In general you dont need to include this in your kervi code as the spine class holds a refference
+to a fully configured log. 
+
+"""
+
 import logging
 import os
 

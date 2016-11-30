@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Injectable } from '@angular/core';
 import { ControllerModel, ControllerButtonModel, ControllerSwitchButtonModel, ControllerInputModel, ControllerSelectModel } from './models/controller.model'
 import { KerviService } from "../kervi.service";

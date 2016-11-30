@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 import { SensorModel } from '../models/sensor.model'
 @Component({

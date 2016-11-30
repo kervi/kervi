@@ -1,3 +1,8 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+""" Named lists are lists that are located by name """
+
 class NamedLists(object):
 	def __init__(self):
 		self.data={}

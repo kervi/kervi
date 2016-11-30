@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { SensorsService } from '../sensors.service';
 import { BehaviorSubject, Subject } from 'rxjs/Rx';

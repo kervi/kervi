@@ -1,3 +1,7 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+
 from roboSys.spine import Spine
 from roboSys.utility.namedLists import NamedLists
 

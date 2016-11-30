@@ -1,3 +1,8 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+""" CQRS handles in process communication """
+
 from kervi.sensor import Sensor, SensorThread
 import threading
 import time

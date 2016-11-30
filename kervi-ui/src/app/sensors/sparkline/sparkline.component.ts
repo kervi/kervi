@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, Input, OnInit, ElementRef,ChangeDetectionStrategy } from '@angular/core';
 import { SensorModel} from '../models/sensor.model'
 declare var jQuery:any;

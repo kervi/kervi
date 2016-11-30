@@ -1,3 +1,5 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
 
 from kervi.controller import Controller, ControllerNumberInput, ControllerSwitchButton, ControllerButton, ControllerSelect
 
@@ -27,8 +29,14 @@ class CameraTiltInput(ControllerNumberInput):
 
 
 class CameraFrameRate(ControllerSelect):
+    """ Framerate selector """
     def __init__(self, controller):
-        ControllerSelect.__init__(self, controller.controllerId+".framerate", "Framerate" , controller)
+        ControllerSelect.__init__(
+            self,
+            controller.controllerId + ".framerate",
+            "Framerate",
+            controller
+        )
         self.addOption("5", "5 / sec")
         self.addOption("10", "10 / sec")
         self.addOption("15", "15 / sec", True)
@@ -67,27 +75,27 @@ class CameraBase(Controller):
         self.dashboards = None
 
     def panChanged(self,panValue):
-        print "panChanged", panValue
+        print ("panChanged", panValue)
         pass
 
     def tiltChanged(self,tiltValue):
-        print "tiltChanged", tiltValue
+        print ("tiltChanged", tiltValue)
         pass
 
     def framerateChanged(self,framerate):
-        print "framerateChanged", framerate
+        print ("framerateChanged", framerate)
         pass
 
     def savePicture(self):
-        print "save picture"
+        print ("save picture")
         pass
 
     def startRecord(self):
-        print "start record"
+        print ("start record")
         pass
 
     def stopRecord(self):
-        print "stop record"
+        print ("stop record")
         pass
 
 class Camera(CameraBase):

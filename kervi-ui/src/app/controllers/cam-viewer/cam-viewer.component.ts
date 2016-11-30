@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, Input, OnInit, ElementRef } from '@angular/core';
 import { ControllerModel, ControllerInputModel } from '../models/controller.model';
 import { KerviService } from '../../kervi.service';

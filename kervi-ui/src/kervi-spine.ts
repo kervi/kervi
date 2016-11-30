@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 export class  KerviSpine{
 
 	public isConnected: Boolean = false;

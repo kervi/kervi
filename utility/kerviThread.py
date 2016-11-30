@@ -1,3 +1,8 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+""" Class for basic thread functionality """
+
 import threading
 import logging
 

@@ -1,8 +1,25 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+
 from kervi.spine import Spine
 from kervi.utility.kerviThread import KerviThread
 
 class ControllerSelect(object):
-    """Doc string"""
+    """
+    Select component for Kervi controller
+    Usage:
+    class CameraFrameRate(ControllerSelect):
+        def __init__(self, controller):
+        ControllerSelect.__init__(self, controller.controllerId+".framerate", "Framerate" , controller)
+        self.addOption("5", "5 / sec")
+        self.addOption("10", "10 / sec")
+        self.addOption("15", "15 / sec", True)
+
+    def change(self, selectedOptions):
+        print ("Frame rate changed", selectedOptions)
+
+    """
     def __init__(self, selectId, name, controller):
         self.spine = Spine()
         self.controller = controller

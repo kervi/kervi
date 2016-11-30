@@ -1,11 +1,11 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppModule } from '../../app.module'
 import { ControllersModule} from '../controllers.module'
 
-// parts module
-
-// detail stuff
 import { ControllerLayout }          from './controller-layout.component';
 import { DynamicTypeBuilder }     from './type.builder';
 
@@ -21,7 +21,7 @@ export class DynamicModule {
     {
         return {
             ngModule: DynamicModule,
-            providers: [ // singletons accross the whole app
+            providers: [
               DynamicTypeBuilder
             ], 
         };

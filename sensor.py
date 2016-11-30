@@ -1,3 +1,6 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
 from kervi.utility.kerviThread import KerviThread
 from kervi.spine import Spine
 from datetime import datetime

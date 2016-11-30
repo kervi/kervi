@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { BehaviorSubject } from 'rxjs/Rx';
 
 export class SensorModel {

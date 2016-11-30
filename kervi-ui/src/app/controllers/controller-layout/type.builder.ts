@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import {Component, ComponentFactory, NgModule, Input, Injectable} from '@angular/core';
 import {RuntimeCompiler} from '@angular/compiler';
 import { AppModule } from '../../app.module'
@@ -11,12 +14,10 @@ export interface IHaveDynamicData {
 @Injectable()
 export class DynamicTypeBuilder {
 
-  // wee need Dynamic component builder
   constructor(
     protected compiler: RuntimeCompiler
   ) {}
     
-  // this object is singleton - so we can use this as a cache
   private _cacheOfFactories: {[templateKey: string]: ComponentFactory<IHaveDynamicData>} = {};
   
   public createComponentFactory(template: string)
@@ -32,7 +33,6 @@ export class DynamicTypeBuilder {
         });
     }
     
-    // unknown template ... let's create a Type for it
     let type   = this.createNewComponent(template);
     let module = this.createComponentModule(type);
     
@@ -58,7 +58,6 @@ export class DynamicTypeBuilder {
       class CustomDynamicComponent  implements IHaveDynamicData {
           @Input()  public entity: any;
       };
-      // a component for this particular template
       return CustomDynamicComponent;
   }
   protected createComponentModule (componentType: any) {
@@ -74,7 +73,6 @@ export class DynamicTypeBuilder {
       class RuntimeComponentModule
       {
       }
-      // a module for just this Type
       return RuntimeComponentModule;
   }
 }

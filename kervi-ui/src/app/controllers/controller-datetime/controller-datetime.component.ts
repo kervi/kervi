@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, OnInit, Input, ElementRef } from '@angular/core';
 import { ControllerDateTimeModel } from '../models/controller.model'
 import { KerviService } from '../../kervi.service'
@@ -35,9 +38,9 @@ export class ControllerDateTimeComponent implements OnInit {
             });
         });
         
-        jQuery('input', self.elementRef.nativeElement).change(function (e,v) {
+        jQuery(self.elementRef.nativeElement).on('dp.hide',function (e,v) {
           console.log("dv",e,v);
-          self.kerviService.spine.sendCommand(self.datetime.changeCommand,jQuery(e.currentTarget).val());
+          self.kerviService.spine.sendCommand(self.datetime.changeCommand,e);
         });
       
     }, 0);

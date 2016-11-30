@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardsService } from './dashboards.service'

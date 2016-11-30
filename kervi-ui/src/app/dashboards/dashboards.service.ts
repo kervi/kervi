@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Injectable , EventEmitter} from '@angular/core';
 import {KerviService} from "../kervi.service";
 import {BehaviorSubject, Subject} from 'rxjs/Rx';

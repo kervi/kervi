@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, OnInit, Input, ElementRef } from '@angular/core';
 import { ControllerModel, IControllerComponent } from '../models/controller.model'
 import { ControllersService } from '../controllers.service'
@@ -13,8 +16,7 @@ export class LayoutControllerComponent implements OnInit {
   @Input() dashboardType: string;
   component:IControllerComponent;
   constructor(private controllersService:ControllersService) {
-      console.log("lcc constructor",this.id);
-      
+      console.log("lcc constructor",this.id);   
    }
 
   ngOnInit() {
@@ -24,6 +26,4 @@ export class LayoutControllerComponent implements OnInit {
       console.log("lcc c",this.component);
     }
   }
-
-
 }

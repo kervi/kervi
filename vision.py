@@ -1,3 +1,13 @@
+
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+"""
+Module that holds classes that asists in vision handling in kervi.
+Based on your vision analasis you may present POI on screen or let other parts of your app
+respond to your code.
+"""
+
 from kervi.moduleThread import  ModuleThread
 
 class VisionModule(ModuleThread):

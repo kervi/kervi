@@ -1,3 +1,8 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+""" IPC between processes  """
+
 from multiprocessing.connection import Listener, Client
 import time
 import threading
@@ -154,12 +159,12 @@ class ProcessSpine(object):
         conn=None
         while conn==None:
             try:
-                print "Try to connect to root"
+                print ("Try to connect to root")
                 conn = Client(self.settings["network"]["IPCRoot"], authkey=self.settings["network"]["IPCSecret"])
             except IOError:
-                print "root not found"
+                print ("root not found")
                 time.sleep(1)
-        print "root found and connected"
+        print ("root found and connected")
         conn.send({"messageType":"registerProcess","address":self.address})
         self.addProcessConnection(conn,self.settings["network"]["IPCRoot"],True)
 
@@ -174,7 +179,7 @@ class ProcessSpine(object):
                     self.addProcessConnection(conn,p)  
                 except:
                     
-                    print "error connection to:",p
+                    print ("error connection to:",p)
 
     def connectionTerminated(self,connection):
         

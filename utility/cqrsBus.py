@@ -1,10 +1,18 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+""" CQRS handles in process communication """
+
 from kervi.utility.namedLists import NamedLists
 from collections import deque
 from kervi.utility.kerviThread import KerviThread
 import threading
 import sys, traceback
 import time
-import Queue
+try:
+    import Queue
+except:
+    import queue as Queue
 from  kervi.kerviLogging import KerviLog
 import inspect
 

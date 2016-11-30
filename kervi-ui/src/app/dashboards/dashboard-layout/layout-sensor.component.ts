@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, OnInit, Input, ElementRef } from '@angular/core';
 import { SensorModel } from '../../sensors/models/sensor.model'
 import { SensorsService } from '../../sensors/sensors.service'

@@ -1,3 +1,8 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
+
+""" general DB handling in Kervi, store sensor values  """
+
 import sqlite3 as lite
 import kervi.spine as spine
 from datetime import datetime, timedelta
@@ -64,20 +69,17 @@ def getSensorData(sensor, dateFrom=None, dateTo=None, **kwargs):
 	
         all_rows = cur.fetchall()
         result=[]
-        for row in all_rows:
-            print row
-
+        
         result+=[{"value":row[2],"ts": datetime.fromtimestamp(row[3]).strftime('%Y-%m-%dT%H:%M:%SZ')  }]
-        print "gsd:",result
         return result
     except lite.Error as er:
         s.log.error('error get sensordata:{0}', er.message)
 
 def storeLogItem(id,logItem,**kwargs):
-    print "store log entry"
+    print ("store log entry")
 
 def getLogItems(dateFrom,dateTo,**kwargs):
-    print "getLogItems"
+    print ("getLogItems")
 
 s.registerQueryHandler("getSensorData", getSensorData)
 s.registerQueryHandler("getLogItems", getLogItems)
