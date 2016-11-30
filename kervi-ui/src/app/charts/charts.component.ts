@@ -1,3 +1,6 @@
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, OnInit } from '@angular/core';
 import { KerviService } from '../kervi.service';
 import { SensorModel } from '../sensors/models/sensor.model';
