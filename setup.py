@@ -5,8 +5,8 @@ import os
 
 setup(
     name='kervi',
-    packages=['.', 'utility', 'coreSensors', 'coreSensors/cpuSensors','kervi-ui/dist'],
-    version='0.1',
+    packages=['kervi', 'kervi/utility', 'kervi/coreSensors', 'kervi/coreSensors/cpuSensors'],
+    version='0.5.4',
     description='A python framework for creating robotic and automation applications on raspberypi (and other platforms).',
     author='Tim Wentzlau',
     author_email='tim.wentzlau@gmail.com',
@@ -16,7 +16,18 @@ setup(
     classifiers=[],
     include_package_data=True,
     package_data={
-        '': ['*.html', '*.js', '*.css', '*.map', '*.ico', '*.eot', '*.svg', '*.woff', '*.woff2', '*.ttf'],
+        'kervi': [
+            'kervi-ui/dist/*.html',
+            'kervi-ui/dist/*.js',
+            'kervi-ui/dist/*.css',
+            'kervi-ui/dist/*.map',
+            'kervi-ui/dist/*.ico',
+            'kervi-ui/dist/*.eot',
+            'kervi-ui/dist/*.svg',
+            'kervi-ui/dist/*.woff',
+            'kervi-ui/dist/*.woff2',
+            'kervi-ui/dist/*.ttf'
+            ],
     },
 )
 
