@@ -3,4 +3,7 @@ Kervi is a Python/web framework that makes it very easy to create robotic and au
 It is written primarly for Raspberry PI, but it runs on all platforms that supports Python. 
 
 
-This is a initial release, pip packages and other tools are comming in the weeks to come.
+To use Kervi install it via pip:
+```
+pip install kervi
+```
