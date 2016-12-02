@@ -18,21 +18,21 @@
       "prefix": "app",
       "mobile": false,
       "styles": [
-        "../node_modules/bootstrap/dist/css/bootstrap.css",
+        "../node_modules/bootstrap-v4-dev/dist/css/bootstrap.css",
         "../node_modules/font-awesome/css/font-awesome.css",
-        "../bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css",
+        "../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css",
         "styles.css"
       ],
       "scripts": [
         "../node_modules/jquery/dist/jquery.js",
         "../node_modules/tether/dist/js/tether.js",
-        "../node_modules/bootstrap/dist/js/bootstrap.js",
+        "../node_modules/bootstrap-v4-dev/dist/js/bootstrap.js",
         "../lib/jquery.sparkline.js",
         "../lib/jquery.kontrol.js",
         "../lib/bootstrap-toggle.js",
         "../lib/chart-bundle.js",
-        "../bower_components/moment/min/moment-with-locales.js",
-        "../bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js"  
+        "../node_modules/moment/min/moment-with-locales.js",
+        "../node_modules/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js"  
       ],
       "environments": {
         "source": "environments/environment.ts",
