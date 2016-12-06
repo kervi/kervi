@@ -18,7 +18,7 @@ import kervi.utility.webserver as webserver
 
 class KerviSensors(process.KerviProcess):
     """ Private class that starts a seperate process that loads sensors in the Kervi application """
-    def InitProcess(self):
+    def init_process(self):
         print ("init mp sensors")
         import kervi.coreSensors.cpuSensors
         try:
@@ -27,33 +27,33 @@ class KerviSensors(process.KerviProcess):
             self.spine.log.exception("load sensors")
             pass
         import kervi.utility.storage
-        self.spine.sendCommand("startThreads")
+        self.spine.send_command("startThreads")
 
-    def TerminateProcess(self):
+    def terminate_process(self):
         pass
 
 class KerviControllers(process.KerviProcess):
     """ Private class that starts a seperate process that loads controllers in the Kervi application """
-    def InitProcess(self):
+    def init_process(self):
         print ("load controllers")
         try:
             import controllers
         except:
             self.spine.log.exception("load controllers")
-        self.spine.sendCommand("startThreads")
+        self.spine.send_command("startThreads")
 
-    def terminateProcess(self):
+    def terminate_process(self):
         pass
 
 class KerviSocketIPC(process.KerviProcess):
     """ Private class that starts a seperate process for IPC communication in the Kervi application """
     
-    def InitProcess(self):
+    def init_process(self):
         print ("init IPC")
         import kervi.utility.socketSpine as socketSpine
         socketSpine.start(self.settings)
 
-    def TerminateProcess(self):
+    def terminate_process(self):
         import kervi.utility.socketSpine as socketSpine
         socketSpine.stop()
 
@@ -93,17 +93,17 @@ class Application(object):
         """
         self.settings = settings
         self.started = False
+        self.spine = spine.Spine()
 
-    def onGetApplicationInfo(self):
+    def get_application_info(self):
         return self.settings["info"]
 
     def start(self):
-
         self.started = True
-        process.startRootSpine(self.settings, True)
-        s = spine.Spine()
-        s.registerQueryHandler("GetApplicationInfo", self.onGetApplicationInfo)
-        s.sendCommand("startThreads")
+        process.start_root_spine(self.settings, True)
+        self.spine = spine.Spine()
+        self.spine.register_query_handler("GetApplicationInfo", self.get_application_info)
+        self.spine.send_command("startThreads")
 
         try:
             import dashboards
@@ -115,7 +115,7 @@ class Application(object):
         for module in self.settings["modules"]:
             if module == "sensors":
                 time.sleep(2)
-                self.p1 = process.startProcess(
+                self.p1 = process.start_process(
                     "sensors",
                     self.settings,
                     self.settings["network"]["IPCBasePort"]+1,
@@ -124,7 +124,7 @@ class Application(object):
 
             elif module == "controllers":
                 time.sleep(2)
-                self.p2 = process.startProcess(
+                self.p2 = process.start_process(
                     "Controllers",
                     self.settings,
                     self.settings["network"]["IPCBasePort"]+2,
@@ -132,7 +132,7 @@ class Application(object):
                 )
 
         time.sleep(2)
-        self.p3 = process.startProcess(
+        self.p3 = process.start_process(
             "IPC",
             self.settings,
             self.settings["network"]["IPCBasePort"]+3,
@@ -166,9 +166,9 @@ class Application(object):
 
         print ("stopping processes")
         webserver.stop()
-        process.stopProcesses()
+        process.stop_processes()
         time.sleep(2)
-        process.stopRootSpine()
+        process.stop_root_spine()
         time.sleep(2)
 
 class ApplicationModule(object):
@@ -194,14 +194,14 @@ class ApplicationModule(object):
         self.name = name
         logging.initProcessLogging("kervimodule-"+name)
         logging.KerviLog(name)
-        spine.initSpine("module-"+name)
+        spine.init_spine("module-"+name)
         ProcessSpine(settings["network"]["IPCPort"], settings)
         self.spine = spine.Spine()
 
     def start(self):
         self.started = True
         time.sleep(2)
-        self.spine.triggerEvent("moduleStarted", self.name)
+        self.spine.trigger_event("moduleStarted", self.name)
         time.sleep(2)
 
     def input_thread(self, list):
@@ -215,7 +215,7 @@ class ApplicationModule(object):
 
         if not self.started:
             self.start()
-        self.spine.sendCommand("startThreads")
+        self.spine.send_command("startThreads")
         time.sleep(1)
         try:
             list = []
@@ -228,5 +228,5 @@ class ApplicationModule(object):
 
 
         print ("stopping module")
-        self.spine.triggerEvent("moduleStopped", self.name)
+        self.spine.trigger_event("moduleStopped", self.name)
         time.sleep(1)

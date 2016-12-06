@@ -5,27 +5,27 @@ from kervi.controller import Controller, ControllerNumberInput, ControllerSwitch
 
 class CameraPanInput(ControllerNumberInput):
     def __init__(self, controller):
-        ControllerNumberInput.__init__(self, controller.controllerId+".pan", "Pan", controller)
+        ControllerNumberInput.__init__(self, controller.controller_id+".pan", "Pan", controller)
         self.unit = "degree"
         self.value = 0
-        self.maxValue = 90
-        self.minValue = -90
+        self.max_value = 90
+        self.min_value = -90
         self.ui = {"orientation":"horizontal", "type":"gauge"}
 
-    def valueChanged(self, newValue, oldValue):
-        self.controller.panChanged(newValue)
+    def value_changed(self, newValue, oldValue):
+        self.controller.pan_changed(newValue)
 
 class CameraTiltInput(ControllerNumberInput):
     def __init__(self, controller):
-        ControllerNumberInput.__init__(self, controller.controllerId+".tilt", "Tilt", controller)
+        ControllerNumberInput.__init__(self, controller.controller_id+".tilt", "Tilt", controller)
         self.unit = "degree"
         self.value = 0
-        self.maxValue = 90
-        self.minValue = -90
+        self.max_value = 90
+        self.min_value = -90
         self.ui = {"orientation":"vertical", "type":"gauge"}
 
-    def valueChanged(self, newValue, oldValue):
-        self.controller.tiltChanged(newValue)
+    def value_changed(self, newValue, oldValue):
+        self.controller.tilt_changed(newValue)
 
 
 class CameraFrameRate(ControllerSelect):
@@ -33,40 +33,48 @@ class CameraFrameRate(ControllerSelect):
     def __init__(self, controller):
         ControllerSelect.__init__(
             self,
-            controller.controllerId + ".framerate",
+            controller.controller_id + ".framerate",
             "Framerate",
             controller
         )
-        self.addOption("5", "5 / sec")
-        self.addOption("10", "10 / sec")
-        self.addOption("15", "15 / sec", True)
+        self.add_option("5", "5 / sec")
+        self.add_option("10", "10 / sec")
+        self.add_option("15", "15 / sec", True)
 
-    def change(self, selectedOptions):
-        self.controller.framerateChanged(selectedOptions)
+    def change(self, selected_options):
+        self.controller.framerate_changed(selected_options)
 
 class CameraRecordButton(ControllerSwitchButton):
-    def __init__(self,controller):
-        ControllerSwitchButton.__init__(self, controller.controllerId+".record", "Record", controller)
+    def __init__(self, controller):
+        ControllerSwitchButton.__init__(
+            self, controller.controller_id+".record",
+            "Record",
+            controller)
 
     def on(self):
-        self.controller.startRecord()
+        self.controller.start_record()
 
     def off(self):
-        self.controller.stopRecord()
+        self.controller.stop_record()
 
 class CameraPictureButton(ControllerButton):
-    def __init__(self,controller):
-        ControllerButton.__init__(self, controller.controllerId+".savePicture", "Take picture", controller)
+    def __init__(self, controller):
+        ControllerButton.__init__(
+            self,
+            controller.controller_id+".savePicture",
+            "Take picture",
+            controller
+        )
 
     def click(self):
-        self.controller.savePicture()
+        self.controller.save_picture()
 
 class CameraBase(Controller):
-    def __init__(self, cameraId, name):
-        Controller.__init__(self, cameraId, name)
+    def __init__(self, camera_id, name):
+        Controller.__init__(self, camera_id, name)
         self.type = "camera"
         self.parameters = None
-        self.addComponents(
+        self.add_components(
             CameraPanInput(self),
             CameraTiltInput(self),
             CameraRecordButton(self),
@@ -74,32 +82,32 @@ class CameraBase(Controller):
             CameraFrameRate(self))
         self.dashboards = None
 
-    def panChanged(self,panValue):
+    def pan_changed(self, panValue):
         print ("panChanged", panValue)
         pass
 
-    def tiltChanged(self,tiltValue):
+    def tilt_changed(self, tiltValue):
         print ("tiltChanged", tiltValue)
         pass
 
-    def framerateChanged(self,framerate):
+    def framerate_changed(self, framerate):
         print ("framerateChanged", framerate)
         pass
 
-    def savePicture(self):
+    def save_picture(self):
         print ("save picture")
         pass
 
-    def startRecord(self):
+    def start_record(self):
         print ("start record")
         pass
 
-    def stopRecord(self):
+    def stop_record(self):
         print ("stop record")
         pass
 
 class Camera(CameraBase):
-    def __init__(self, cameraId, name, dashboards, source):
-        CameraBase.__init__(self, cameraId, name)
+    def __init__(self, camera_id, name, dashboards, source):
+        CameraBase.__init__(self, camera_id, name)
         self.parameters = {"height":480, "width":640, "source":source}
         self.dashboards = dashboards

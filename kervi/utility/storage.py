@@ -9,79 +9,87 @@ from datetime import datetime, timedelta
 import traceback
 import os
 
-s=spine.Spine()
+SPINE=spine.Spine()
 
-def initDB():
-    global s
+def init_db():
     con = lite.connect('kervi.db')
     cursor = con.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    tablesExists=False
+    tables_exists = False
     tables = cursor.fetchall()
-    for tbl in tables:
-        tablesExists=True
+    for table in tables:
+        tables_exists = True
         break
 
-    if (not tablesExists):
-        sqlFile=os.path.join(os.path.dirname(__file__), 'db.sql')
-        fd = open(sqlFile, 'r')
-        sqlFile = fd.read()
-        fd.close()
+    if not tables_exists:
+        sql_file = os.path.join(os.path.dirname(__file__), 'db.sql')
+        db_file = open(sql_file, 'r')
+        sql_file = db_file.read()
+        db_file.close()
 
-        sqlCommands = sqlFile.split(';')
+        sql_commands = sql_file.split(';')
 
-        for command in sqlCommands:
+        for command in sql_commands:
             try:
                 con.execute(command)
             except OperationalError, msg:
-                s.log.error("Command skipped: {0}", msg)
+                SPINE.log.error("Command skipped: {0}", msg)
 
-initDB()
-TSStart=datetime.utcnow()
+init_db()
+TS_START = datetime.utcnow()
 
-def storeSensorReading(id, sensorValue, **kwargs):
-    global s
+def store_sensor_reading(sensor_id, sensor_value):
     try:
-        if not sensorValue["sensor"] == "AliveSensor":
+        if not sensor_value["sensor"] == "AliveSensor":
             con = lite.connect('kervi.db')
             cur = con.cursor()
-            cur.execute("INSERT INTO sensorData ('sensor','value','timeStamp')  VALUES (?, ?, ?)", (sensorValue["sensor"],sensorValue["value"],sensorValue["timestamp"]))
+            cur.execute(
+                "INSERT INTO sensorData ('sensor','value','timeStamp')  VALUES (?, ?, ?)",
+                (sensor_value["sensor"], sensor_value["value"], sensor_value["timestamp"])
+            )
             con.commit()
     except lite.Error as er:
-        s.log.error('error store sensordata:{0}', er.message)
+        SPINE.log.error('error store sensordata:{0}', er.message)
 
-def getSensorData(sensor, dateFrom=None, dateTo=None, **kwargs):
-    global s
-    s.log.debug("getSensorData sensor:{0}, from {1} to {2}",sensor,dateFrom, dateTo)
-    if dateFrom is None:
-        dateFrom= TSStart
+def get_sensor_data(sensor, date_from=None, date_to=None):
+    SPINE.log.debug("getSensorData sensor:{0}, from {1} to {2}", sensor, date_from, date_to)
+    if date_from is None:
+        date_from = TS_START
 
-    if dateTo is None:
-        dateTo= datetime.utcnow()
-	
-    dateFromTS=(dateFrom - datetime(1970, 1, 1)).total_seconds()
-    dateToTS=(dateTo - datetime(1970, 1, 1)).total_seconds()
+    if date_to is None:
+        date_to = datetime.utcnow()
+
+    date_from_ts = (date_from - datetime(1970, 1, 1)).total_seconds()
+    date_to_ts = (date_to - datetime(1970, 1, 1)).total_seconds()
 
     try:
         con = lite.connect('kervi.db')
         cur = con.cursor()
-        cur.execute("select * from sensorData where sensor=? and timestamp > ? and timestamp < ?", (sensor,dateFromTS,dateToTS))
-	
+        cur.execute(
+            "select * from sensorData where sensor=? and timestamp > ? and timestamp < ?",
+            (sensor, date_from_ts, date_to_ts)
+        )
+
         all_rows = cur.fetchall()
-        result=[]
-        
-        result+=[{"value":row[2],"ts": datetime.fromtimestamp(row[3]).strftime('%Y-%m-%dT%H:%M:%SZ')  }]
+        result = []
+        for row in all_rows:
+            result += [
+                {
+                    "value":row[2],
+                    "ts": datetime.fromtimestamp(row[3]).strftime('%Y-%m-%dT%H:%M:%SZ')
+                }
+            ]
         return result
     except lite.Error as er:
-        s.log.error('error get sensordata:{0}', er.message)
+        SPINE.log.error('error get sensordata:{0}', er.message)
 
-def storeLogItem(id,logItem,**kwargs):
+def store_log_item(id, log_item):
     print ("store log entry")
 
-def getLogItems(dateFrom,dateTo,**kwargs):
+def get_log_items(date_from, date_to):
     print ("getLogItems")
 
-s.registerQueryHandler("getSensorData", getSensorData)
-s.registerQueryHandler("getLogItems", getLogItems)
-s.registerEventHandler("NewSensorReading", storeSensorReading)
-s.registerEventHandler("newLogItem", storeLogItem)
+SPINE.register_query_handler("getSensorData", get_sensor_data)
+SPINE.register_query_handler("getLogItems", get_log_items)
+SPINE.register_event_handler("NewSensorReading", store_sensor_reading)
+SPINE.register_event_handler("newLogItem", store_log_item)

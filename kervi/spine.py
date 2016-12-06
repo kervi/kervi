@@ -21,12 +21,12 @@ class SpineX(CQRSBus):
         return 1.0
 
 S = None
-def initSpine(spineName="roboSys"):
+def init_spine(spineName="roboSys"):
     global S
     S = SpineX()
-    S.setLog(spineName)
+    S.set_log(spineName)
     S.reset()
-    S.startQueues()
+    S.start_queues()
 
 def Spine():
     """

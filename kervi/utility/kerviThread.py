@@ -11,7 +11,7 @@ class KerviThread(threading.Thread):
         threading.Thread.__init__(self)
         self.daemon = True
         self.terminate = False
-        
+
     def stop(self):
         self.terminate = True
 

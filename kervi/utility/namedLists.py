@@ -4,31 +4,31 @@
 """ Named lists are lists that are located by name """
 
 class NamedLists(object):
-	def __init__(self):
-		self.data={}
-		
-	def add(self,listName,object):
-		if listName in self.data:
-			self.data[listName]+=[object]
-		else:
-			self.data[listName]=[object]
+    def __init__(self):
+        self.data = {}
 
-	def getListNames(self):
-		result=[]
-		for key in self.data:
-			result+=[key]
-		return result
-	
-	def getListData(self,listName):
-		if listName in self.data:
-			return self.data[listName]
-		return None
-		
-	def getListDataWithPartialKey(self,listName):
-		items=any(key.startswith(listName) for key in self.data)
-		result={}
-		for item in items:
-			result[item]=self.data[item];
-			
-		return result	
+    def add(self, list_name, object):
+        if list_name in self.data:
+            self.data[list_name] += [object]
+        else:
+            self.data[list_name] = [object]
+
+    def get_list_names(self):
+        result = []
+        for key in self.data:
+            result += [key]
+        return result
+
+    def get_list_data(self, list_name):
+        if list_name in self.data:
+            return self.data[list_name]
+        return None
+
+    def get_list_data_with_partial_key(self, list_name):
+        items = any(key.startswith(list_name) for key in self.data)
+        result = {}
+        for item in items:
+            result[item] = self.data[item]
+
+        return result
 		

@@ -2,215 +2,222 @@
 # Licensed under MIT
 
 """ CQRS handles in process communication """
-
-from kervi.utility.namedLists import NamedLists
-from collections import deque
-from kervi.utility.kerviThread import KerviThread
+#import sys
+#import traceback
+#import time
 import threading
-import sys, traceback
-import time
+import inspect
+from kervi.utility.namedLists import NamedLists
+from kervi.utility.kerviThread import KerviThread
+
 try:
     import Queue
 except:
     import queue as Queue
 from  kervi.kerviLogging import KerviLog
-import inspect
 
-class QueryThread (threading.Thread):
-    def __init__(self,handler,query,args,**kwargs):
+class QueryThread(threading.Thread):
+    def __init__(self, handler, query, args, **kwargs):
         threading.Thread.__init__(self)
-        injected=kwargs.get("injected","")
+        injected = kwargs.get("injected", "")
         self.daemon = True
-        self.handler=handler
-        self.query=query
-        self.args=args
-        self.result=[]
-        self.injected=injected
+        self.handler = handler
+        self.query = query
+        self.args = args
+        self.result = []
+        self.injected = injected
     def run(self):
-        self.result=self.handler(self.query,self.args,injected=self.injected)
-		
+        self.result = self.handler(self.query, self.args, injected=self.injected)
+
 class CQRSQueue(KerviThread):
-	
-	
-    def __init__(self,name):
+    def __init__(self, name):
         KerviThread.__init__(self)
-        self.queues=[ Queue.Queue(), Queue.Queue(), Queue.Queue()]
-        self.name=name
+        self.queues = [Queue.Queue(), Queue.Queue(), Queue.Queue()]
+        self.name = name
 
-    def getInfo(self):
-        queueSize=[]
+    def get_info(self):
+        queueSize = []
         for queue in self.queues:
-            queueSize+=[len(queue)]
+            queueSize += [len(queue)]
 
-        info={"queueSize":queueSize}
+        info = {"queueSize":queueSize}
         return info
 
-    def setQueuehandler(self,handler):
-        self.queueHandler=handler
-        super(KerviThread,self).start()
+    def set_queue_handler(self, handler):
+        self.queue_handler = handler
+        super(KerviThread, self).start()
 
-    def add(self,item,priorty=0):
+    def add(self, item, priorty=0):
         self.queues[0].put_nowait(item)
 
     def step(self):
-        item=self.queues[0].get()
-        self.queueHandler(item)
+        item = self.queues[0].get()
+        self.queue_handler(item)
 
 class CQRSBus(object):
-    applicationId=""
-    cmdHandlers=NamedLists()
-    eventHandlers=NamedLists()
-    queryHandlers=NamedLists()
+    applicationId = ""
+    cmd_handlers = NamedLists()
+    event_handlers = NamedLists()
+    query_handlers = NamedLists()
 
-    cmdQueue=CQRSQueue("cmd")
-    queryQueue=CQRSQueue("query")
-    eventQueue=None #CQRSQueue("event")
+    cmd_queue = CQRSQueue("cmd")
+    query_queue = CQRSQueue("query")
+    event_queue = None #CQRSQueue("event")
 
-    linkedSpines=[]
-    log=None
+    linked_spines = []
+    log = None
 
 
     def __init__(self):
         return
-	
+
     def stop(self):
-        self.cmdQueue.stop()
-        self.queryQueue.stop()
-        self.eventQueue.stop()
+        self.cmd_queue.stop()
+        self.query_queue.stop()
+        self.event_queue.stop()
 
     def reset(self):
-        self.cmdHandlers=NamedLists()
-        self.eventHandlers=NamedLists()
-        self.queryHandlers=NamedLists()
-        self.cmdQueue.stop()
-        self.queryQueue.stop()
+        self.cmd_handlers = NamedLists()
+        self.event_handlers = NamedLists()
+        self.query_handlers = NamedLists()
+        self.cmd_queue.stop()
+        self.query_queue.stop()
         #self.eventQueue.stop()
 
-        self.cmdQueue=CQRSQueue("cmd")
-        self.queryQueue=CQRSQueue("query")
-        self.eventQueue=CQRSQueue("event")
+        self.cmd_queue = CQRSQueue("cmd")
+        self.query_queue = CQRSQueue("query")
+        self.event_queue = CQRSQueue("event")
 
-        self.linkedSpines=[]
-	
-    def setLog(self,logName):
-        self.log=KerviLog(logName)
+        self.linked_spines = []
 
-    def addLinkedSpine(self,ls):
-        self.linkedSpines+=[ls]
-	
-    def getQueueInfo(self):
-        info={"cmd":self.cmdQueue.getInfo(),"queryQueue":self.queryQueue.getInfo(),"event":self.eventQueue.getInfo()}
-        return info;
+    def set_log(self, logName):
+        self.log = KerviLog(logName)
 
-    def startQueues(self):
-        self.cmdQueue.setQueuehandler(self.commandQueueHandler)
-        self.eventQueue.setQueuehandler(self.eventQueueHandler)
+    def add_linked_spine(self, linkedspine):
+        self.linked_spines += [linkedspine]
 
-    def registerCommandHandler(self,name,func,**kwargs):
-        injected=kwargs.get("injected","")
-        self.log.debug("register command handler, command:{0} injected:{1}",name,injected)
-        self.cmdHandlers.add(name,func)
-        for ls in self.linkedSpines:
-            ls.addLinkedCommandHandler(name,injected=injected)
-	
-    def registerEventHandler(self, name,func,id=None,**kwargs):
-        injected=kwargs.get("injected","")
-        self.log.debug("register event handler event:{0} id:{1} injected:{2}",name,id,injected)
+    def get_queue_info(self):
+        info = {
+            "cmd":self.cmd_queue.get_info(),
+            "queryQueue":self.query_queue.get_info(),
+            "event":self.event_queue.get_info()
+        }
+        return info
+
+    def start_queues(self):
+        self.cmd_queue.set_queue_handler(self.command_queue_handler)
+        self.event_queue.set_queue_handler(self.event_queue_handler)
+
+    def register_command_handler(self, name, func, **kwargs):
+        injected = kwargs.get("injected", "")
+        self.log.debug("register command handler, command:{0} injected:{1}", name, injected)
+        self.cmd_handlers.add(name, func)
+        for linked_spine in self.linked_spines:
+            linked_spine.add_linked_command_handler(name, injected=injected)
+
+    def register_event_handler(self, name, func, id=None, **kwargs):
+        injected = kwargs.get("injected", "")
+        self.log.debug("register event handler event:{0} id:{1} injected:{2}", name, id, injected)
         if id:
-            self.eventHandlers.add(name+"/"+id,func)
+            self.event_handlers.add(name+"/"+id, func)
         else:
-            self.eventHandlers.add(name,func)
+            self.event_handlers.add(name, func)
 
-        for ls in self.linkedSpines:
-            ls.addLinkedEventHandler(name,id,injected=injected)
+        for linkedspine in self.linked_spines:
+            linkedspine.add_linked_event_handler(name, id, injected=injected)
 
         return func
 
-    def registerQueryHandler(self, name,func,**kwargs):
-        injected=kwargs.get("injected","")
-        self.log.debug("register query handler query:{0} injected:{1}",name,injected)
-        self.queryHandlers.add(name,func)
-        for ls in self.linkedSpines:
-            ls.addLinkedQueryHandler(name,injected=injected)
-	
-    def sendCommand(self,command,*args,**kwargs):
-        injected=kwargs.get("injected","")
-        self.log.debug("sendcommand:{0} injected:{1}",command,injected)
-        self.cmdQueue.add({"command":command,"args":args,"injected":injected},kwargs.get("priority",2))
-			
-    def commandQueueHandler(self,queueItem):
-        funcList=self.cmdHandlers.getListData(queueItem['command'])
-        if funcList:
-            for funcHandler in funcList:
+    def register_query_handler(self, name, func, **kwargs):
+        injected = kwargs.get("injected", "")
+        self.log.debug("register query handler query:{0} injected:{1}", name, injected)
+        self.query_handlers.add(name, func)
+        for linked_spine in self.linked_spines:
+            linked_spine.add_linked_query_handler(name, injected=injected)
+
+    def send_command(self, command, *args, **kwargs):
+        injected = kwargs.get("injected", "")
+        self.log.debug("sendcommand:{0} injected:{1}", command, injected)
+        self.cmd_queue.add(
+            {"command":command, "args":args, "injected":injected}, kwargs.get("priority", 2)
+        )
+
+    def command_queue_handler(self, queue_item):
+        func_list = self.cmd_handlers.get_list_data(queue_item['command'])
+        if func_list:
+            for func_handler in func_list:
                 try:
-                    argspec = inspect.getargspec(funcHandler)
+                    argspec = inspect.getargspec(func_handler)
                     if not argspec.keywords:
-                        funcHandler(*queueItem['args'])
+                        func_handler(*queue_item['args'])
                     else:
-                        funcHandler(*queueItem['args'],injected=queueItem["injected"])
+                        func_handler(*queue_item['args'], injected=queue_item["injected"])
                 except:
-                    self.log.exception("commandQueueHandler error:"+queueItem['command'])
+                    self.log.exception("commandQueueHandler error:"+queue_item['command'])
 
-    def sendQuery(self,query,*args,**kwargs):
-        injected=kwargs.get("injected","")
-        self.log.debug("sendQuery:{0} injected:{1}",query,injected)
-        if (query=="getQueueInfo"):
-            return self.getQueueInfo()
-        q=QueryThread(self.queryHandler,query,args,injected=injected)
-        q.start()
-        q.join()
-        return q.result
+    def send_query(self, query, *args, **kwargs):
+        injected = kwargs.get("injected", "")
+        self.log.debug("sendQuery:{0} injected:{1}", query, injected)
+        if query == "getQueueInfo":
+            return self.get_queue_info()
+        query_thread = QueryThread(self.query_handler, query, args, injected=injected)
+        query_thread.start()
+        query_thread.join()
+        return query_thread.result
 
-    def queryHandler(self,query,args,**kwargs):	
-        injected=kwargs.get("injected","")
-        self.log.debug("query handler called:{0} injected:{1}",query,injected)
-        funcList=self.queryHandlers.getListData(query)
-        result=[]
-        if funcList:
-            for func in funcList:
+    def query_handler(self, query, args, **kwargs):
+        injected = kwargs.get("injected", "")
+        self.log.debug("query handler called:{0} injected:{1}", query, injected)
+        func_list = self.query_handlers.get_list_data(query)
+        result = []
+        if func_list:
+            for func in func_list:
                 argspec = inspect.getargspec(func)
                 if not argspec.keywords:
-                    subResult=func(*args)
-                    if subResult:
-                        result+=[func(*args)]
+                    sub_result = func(*args)
+                    if sub_result:
+                        result += [func(*args)]
                 else:
-                    subResult=func(*args,injected=injected)
-                    if subResult:
-                        result+=[func(*args,injected=injected)]
-        if len(result)==1:
+                    sub_result = func(*args, injected=injected)
+                    if sub_result:
+                        result += [func(*args, injected=injected)]
+        if len(result) == 1:
             return result[0]
 
         return result
 
-    def triggerEvent(self,event,id,*args,**kwargs):
-        injected=kwargs.get("injected","")
-        self.log.debug("triggerEvent:{0}, id:{1} injected:{2}",event,id,injected)
-        self.eventQueue.add({'event':event,'id':id,'args':args,"injected":injected},kwargs.get("priority",2))
-		
-    def eventQueueHandler(self,queueItem):
-        funcList=self.eventHandlers.getListData(queueItem['event'])
-        if funcList:
-            for func in funcList:
+    def trigger_event(self, event, id, *args, **kwargs):
+        injected = kwargs.get("injected", "")
+        self.log.debug("triggerEvent:{0}, id:{1} injected:{2}", event, id, injected)
+        self.event_queue.add(
+            {'event':event, 'id':id, 'args':args, "injected":injected},
+            kwargs.get("priority", 2)
+        )
+
+    def event_queue_handler(self, queue_item):
+        func_list = self.event_handlers.get_list_data(queue_item['event'])
+        if func_list:
+            for func in func_list:
                 argspec = inspect.getargspec(func)
                 if not argspec.keywords:
-                    func(None,*queueItem['args'])
+                    func(None, *queue_item['args'])
                 else:
-                    func(None,*queueItem['args'],injected=queueItem["injected"])
-        if (queueItem["id"]):
-            funcList=self.eventHandlers.getListData(queueItem['event']+"/"+queueItem['id'])
-            if funcList:
-                for func in funcList:
+                    func(None, *queue_item['args'], injected=queue_item["injected"])
+        if queue_item["id"]:
+            func_list = self.event_handlers.get_list_data(queue_item['event']+"/"+queue_item['id'])
+            if func_list:
+                for func in func_list:
                     argspec = inspect.getargspec(func)
                     if not argspec.keywords:
-                        func(queueItem["id"],*queueItem['args'])
+                        func(queue_item["id"], *queue_item['args'])
                     else:
-                        func(queueItem["id"],*queueItem['args'],injected=queueItem["injected"])
+                        func(queue_item["id"], *queue_item['args'], injected=queue_item["injected"])
 
-    def getCommands(self):
-        return self.cmdHandlers.getListNames()
+    def get_commands(self):
+        return self.cmd_handlers.get_list_names()
 
-    def getQueries(self):
-        return self.queryHandlers.getListNames()
+    def get_queries(self):
+        return self.query_handlers.get_list_names()
 
-    def getEvents(self):
-        return self.eventHandlers.getListNames()
+    def get_events(self):
+        return self.event_handlers.get_list_names()

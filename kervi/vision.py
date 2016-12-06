@@ -11,60 +11,60 @@ respond to your code.
 from kervi.moduleThread import  ModuleThread
 
 class VisionModule(ModuleThread):
-    def __init__(self, visionId, name):
+    def __init__(self, vision_id, name):
         ModuleThread.__init__(self)
-        self.roiList = []
-        self.cameraInfo = None
+        self.roi_list = []
+        self.camera_info = None
 
-        self.moduleId = visionId
+        self.module_id = vision_id
 
         self.name = name
 
-        self.spine.registerQueryHandler("visionGetRegionsOfInterest", self.getROIList)
-        self.spine.registerQueryHandler("visionInfo", self.getVisionInfo)
-        self.spine.registerQueryHandler("getVisionsLinkedToCam", self.getVisionsLinkedToCam)
-        self.spine.registerCommandHandler("linkVisionToCam", self.linkToCameraCommand)
+        self.spine.register_query_handler("visionGetRegionsOfInterest", self.get_roi_list)
+        self.spine.register_query_handler("visionInfo", self.get_vision_info)
+        self.spine.register_query_handler("getVisionsLinkedToCam", self.get_visions_linked_to_cam)
+        self.spine.register_command_handler("linkVisionToCam", self.link_to_camera_command)
 
-    def createPointOfInterest(self, POIId, caption, position, size, focusPoint, text):
-        if self.cameraInfo:
+    def create_point_of_interest(self, poi_id, caption, position, size, focus_point, text):
+        if self.camera_info:
             return {
-                "id":POIId,
+                "id":poi_id,
                 "caption":caption,
                 "position":position,
                 "size":size,
-                "focusPoint": focusPoint,
+                "focusPoint": focus_point,
                 "text":text,
-                "cameraId":self.cameraInfo["id"],
-                "visionId": self.moduleId
+                "cameraId":self.camera_info["id"],
+                "visionId": self.module_id
             }
 
-    def getVisionsLinkedToCam(self, cameraId):
-        if self.cameraInfo["id"] == cameraId:
-            return self.moduleId
+    def get_visions_linked_to_cam(self, camera_id):
+        if self.camera_info["id"] == camera_id:
+            return self.module_id
 
-    def getVisionInfo(self):
-        camId = None
-        if self.cameraInfo:
-            camId = self.cameraInfo["id"]
+    def get_vision_info(self):
+        cam_id = None
+        if self.camera_info:
+            cam_id = self.camera_info["id"]
 
-        return {"id":self.moduleId, "camera":camId, "name":self.name}
+        return {"id":self.module_id, "camera":cam_id, "name":self.name}
 
-    def linkToCameraCommand(self, cameraId, visionId):
-        if visionId == self.moduleId:
-            self.linkToCamera(cameraId)
+    def link_to_camera_command(self, camera_id, vision_id):
+        if vision_id == self.module_id:
+            self.link_to_camera(camera_id)
 
-    def linkToCamera(self,cameraId):
+    def link_to_camera(self, camera_id):
         self.spine.log.debug(
             "Link to camera in vision module:{0} cam:{1}",
-            self.moduleId,
-            self.cameraId,
+            self.module_id,
+            self.camera_id,
         )
 
-        cam = self.spine.sendQuery("getObjectInfo", cameraId)
+        cam = self.spine.send_query("getObjectInfo", camera_id)
         if cam:
-            self.cameraInfo = cam
-            self.cameraChanged()
-            self.spine.triggerEvent("visionLinkedToCamera", self.moduleId, cameraId)
+            self.camera_info = cam
+            self.camera_changed()
+            self.spine.trigger_event("visionLinkedToCamera", self.module_id, camera_id)
 
         self.spine.log.warning(
             "Link to camera failed in vision module:{0} cam:{1}",
@@ -72,71 +72,71 @@ class VisionModule(ModuleThread):
             self.cameraId,
         )
 
-    def initVision(self):
+    def init_vision(self):
         self.spine.log.error(
             "abstract initVision reached in module:{0}",
-            self.moduleId
+            self.module_id
         )
 
-    def cameraChanged(self):
+    def camera_changed(self):
         self.spine.log.error(
             "abstract cameraChanged reached in module:{0}",
-            self.moduleId
+            self.module_id
         )
 
-    def moduleStep(self):
-        self.visionStep()
+    def module_step(self):
+        self.vision_step()
 
-    def visionStep(self):
+    def vision_step(self):
         self.spine.log.error(
             "abstract visionStep reached in module:{0}",
-            self.moduleId
+            self.module_id
         )
 
-    def getROIList(self, cameraId):
-        if self.cameraInfo and cameraId == self.cameraInfo["id"]:
-            return self.roiList
+    def get_roi_list(self, camera_id):
+        if self.camera_info and camera_id == self.camera_info["id"]:
+            return self.roi_list
 
-    def clearRegionsOfInterest(self):
-        camId = None
-        if self.cameraInfo:
-            camId = self.cameraInfo["id"]
-        self.spine.triggerEvent(
+    def clear_regions_of_interest(self):
+        cam_id = None
+        if self.camera_info:
+            cam_id = self.camera_info["id"]
+        self.spine.trigger_event(
             "pointOfInterestChange",
-            self.moduleId,
-            {"action":"clear", "visionId":self.moduleId, "cameraId":camId}
+            self.module_id,
+            {"action":"clear", "visionId":self.module_id, "cameraId":cam_id}
         )
 
-    def addRegionOfInterest(self, region):
-        self.roiList += [region]
-        self.spine.triggerEvent(
+    def add_region_of_interest(self, region):
+        self.roi_list += [region]
+        self.spine.trigger_event(
             "pointOfInterestChange",
-            self.moduleId,
+            self.module_id,
             {"action":"add", "pointOfInterest":region},
-            self.moduleId
+            self.module_id
         )
 
-    def removeRegionOfInterest(self, regionId):
+    def remove_region_of_interest(self, region_id):
         try:
-            for r in self.roiList:
-                if r["id"] == regionId:
-                    self.spine.triggerEvent(
+            for r in self.roi_list:
+                if r["id"] == region_id:
+                    self.spine.trigger_event(
                         "pointOfInterestChange",
-                        self.moduleId,
+                        self.module_id,
                         {"action":"delete", "pointOfInterest":r},
-                        self.moduleId
+                        self.module_id
                     )
                     self.roiList.remove(r)
         except:
             self.spine.log.exception("test")
 
-    def updateRegionOfInterest(self, region):
-        for i, r in enumerate(self.roiList):
+    def update_region_of_interest(self, region):
+        for i, r in enumerate(self.roi_list):
             if r["id"] == region["id"]:
                 self.roiList[i] = region
-                self.spine.triggerEvent(
+                self.spine.trigger_event(
                     "pointOfInterestChange",
                     self.moduleId,
-                    {"action":"update", "pointOfInterest":self.roiList[i]}
+                    {"action":"update", "pointOfInterest":self.roi_list[i]}
                 )
                 break

@@ -20,373 +20,373 @@ class ControllerSelect(object):
         print ("Frame rate changed", selectedOptions)
 
     """
-    def __init__(self, selectId, name, controller):
+    def __init__(self, select_id, name, controller):
         self.spine = Spine()
         self.controller = controller
-        self.componentType = "select"
-        self.selectId = selectId
+        self.component_type = "select"
+        self.select_id = select_id
         self.name = name
         self.options = []
-        self.selectedOptions = []
-        self.changeCommand = self.selectId + ".change"
-        self.spine.registerCommandHandler(self.changeCommand, self.onChangeHandler)
+        self.selected_options = []
+        self.change_command = self.select_id + ".change"
+        self.spine.register_command_handler(self.change_command, self.on_change_handler)
 
-    def getInfo(self):
+    def get_info(self):
         """Doc string"""
         return {
-            "id": self.selectId,
+            "id": self.select_id,
             "name": self.name,
-            "componentType": self.componentType,
-            "onSelect": self.changeCommand,
+            "componentType": self.component_type,
+            "onSelect": self.change_command,
             "options": self.options
             }
 
-    def addOption(self, value, text, selected=False):
+    def add_option(self, value, text, selected=False):
         option = {"value": value, "text": text, "selected":selected}
         self.options += [option]
         if selected:
-            self.selectedOptions += [option]
+            self.selected_options += [option]
 
 
-    def onChangeHandler(self, selectedOptions):
+    def on_change_handler(self, selected_options):
         self.spine.log.debug(
             "controller select change:{0}/{1}",
-            self.controller.controllerId,
-            self.selectId
+            self.controller.controller_id,
+            self.select_id
         )
 
         for option in self.options:
             option["selected"] = False
 
-        self.selectedOptions = []
+        self.selected_options = []
 
-        for selectedOption in selectedOptions:
+        for selected_option in selected_options:
             for option in self.options:
-                if option["value"] == selectedOption:
+                if option["value"] == selected_option:
                     option["selected"] = True
-                    self.selectedOptions += [option]
+                    self.selected_options += [option]
 
-        self.change(self.selectedOptions)
-        self.spine.triggerEvent(
+        self.change(self.selected_options)
+        self.spine.trigger_event(
             "controllerSelectChange",
-            self.selectId,
-            {"select":self.selectId, "value":self.options}
+            self.select_id,
+            {"select":self.select_id, "value":self.options}
         )
 
-    def change(self, selectedOptions):
+    def change(self, selected_options):
         self.spine.log.debug(
             "abstract select change reached:{0}/{1}",
-            self.controller.controllerId,
-            self.selectId,
+            self.controller.controller_id,
+            self.select_id,
         )
 
 class ControllerButton(object):
-    def __init__(self, buttonId, name, controller):
+    def __init__(self, button_id, name, controller):
         self.spine = Spine()
         self.controller = controller
-        self.componentType = "button"
+        self.component_type = "button"
         self.state = False
-        self.buttonId = buttonId
+        self.button_id = button_id
         self.name = name
 
-        self.clickCommand = self.buttonId + ".click"
-        self.spine.registerCommandHandler(self.clickCommand, self.onClickHandler)
+        self.click_command = self.button_id + ".click"
+        self.spine.register_command_handler(self.click_command, self.on_click_handler)
 
-    def getInfo(self):
+    def get_info(self):
         return {
-            "id":self.buttonId,
+            "id":self.button_id,
             "name":self.name,
-            "componentType":self.componentType,
-            "onClick":self.clickCommand
+            "componentType":self.component_type,
+            "onClick":self.click_command
         }
 
-    def onClickHandler(self):
+    def on_click_handler(self):
         self.spine.log.debug(
             "controller button click:{0}/{1}",
-            self.controller.controllerId,
-            self.buttonId
+            self.controller.controller_id,
+            self.button_id
         )
         self.click()
-        self.spine.triggerEvent("controllerButtonClick", self.buttonId)
+        self.spine.trigger_event("controllerButtonClick", self.button_id)
 
     def click(self):
         self.spine.log.debug(
             "abstract click reached:{0}/{1}",
-            self.controller.controllerId,
-            self.buttonId,
+            self.controller.controller_id,
+            self.button_id,
         )
 
 class ControllerSwitchButton(object):
-    def __init__(self, buttonId, name, controller):
+    def __init__(self, button_id, name, controller):
         self.spine = Spine()
         self.controller = controller
-        self.componentType = "switchButton"
+        self.component_type = "switchButton"
         self.state = False
-        self.buttonId = buttonId
+        self.button_id = button_id
         self.name = name
 
-        self.onCommand = self.buttonId + ".on"
-        self.offCommand = self.buttonId + ".off"
+        self.on_command = self.button_id + ".on"
+        self.off_command = self.button_id + ".off"
 
-        self.spine.registerCommandHandler(self.onCommand, self.onOnHandler)
-        self.spine.registerCommandHandler(self.offCommand, self.onOffHandler)
+        self.spine.register_command_handler(self.on_command, self.on_on_handler)
+        self.spine.register_command_handler(self.off_command, self.on_off_handler)
 
-    def getInfo(self):
+    def get_info(self):
         return {
-            "id":self.buttonId,
+            "id":self.button_id,
             "name":self.name,
-            "componentType":self.componentType,
-            "onCommand":self.onCommand,
-            "offCommand":self.offCommand,
+            "componentType":self.component_type,
+            "onCommand":self.on_command,
+            "offCommand":self.off_command,
             "state":self.state
         }
 
-    def onOnHandler(self):
+    def on_on_handler(self):
         self.spine.log.debug(
             "controller button on:{0}/{1}",
-            self.controller.controllerId,
-            self.buttonId
+            self.controller.controller_id,
+            self.button_id
         )
 
         if not self.state:
             self.state = True
             self.on()
-            self.spine.triggerEvent(
+            self.spine.trigger_event(
                 "controllerButtonStateChange",
-                self.buttonId,
-                {"button":self.buttonId, "state":self.state}
+                self.button_id,
+                {"button":self.button_id, "state":self.state}
             )
 
     def on(self):
         self.spine.log.debug(
             "abstract on reached:{0}/{1}",
             self.controller.controllerId,
-            self.buttonId,
+            self.button_id,
         )
 
 
-    def onOffHandler(self):
+    def on_off_handler(self):
         self.spine.log.debug(
             "controller button off:{0}/{1}",
-            self.controller.controllerId,
-            self.buttonId
+            self.controller.controller_id,
+            self.button_id
         )
         if self.state:
             self.state = False
             self.off()
-            self.spine.triggerEvent(
+            self.spine.trigger_event(
                 "controllerButtonStateChange",
-                self.buttonId,
-                {"button":self.buttonId, "state":self.state}
+                self.button_id,
+                {"button":self.button_id, "state":self.state}
             )
 
     def off(self):
         self.spine.log.debug(
             "abstract off reached:{0}/{1}",
-            self.controller.controllerId,
-            self.buttonId,
+            self.controller.controller_id,
+            self.button_id,
         )
 
 class ControllerNumberInput(object):
-    def __init__(self, inputId, name, controller):
+    def __init__(self, input_id, name, controller):
         self.spine = Spine()
         self.controller = controller
-        self.inputId = inputId
-        self.minValue = float("-inf")
-        self.maxValue = float("inf")
+        self.input_id = input_id
+        self.min_value = -100
+        self.max_value = 100
         self.unit = ""
         self.value = 0
         self.name = name
-        self.command = self.inputId + ".setValue"
-        self.spine.registerCommandHandler(self.command, self.setValue)
-        self.componentType = "number-input"
-        self.inputType = "number"
+        self.command = self.input_id + ".setValue"
+        self.spine.register_command_handler(self.command, self.set_value)
+        self.component_type = "number-input"
+        self.input_type = "number"
         self.ui = {"orientation":"vertical", "type":"singleLine"}
 
-    def setValue(self, nvalue):
+    def set_value(self, nvalue):
         if self.value != nvalue:
             self.spine.log.debug(
                 "value change on input:{0}/{1} value:{2}",
-                self.controller.controllerId,
-                self.inputId,
+                self.controller.controller_id,
+                self.input_id,
                 nvalue
             )
-            oldValue = self.value
+            old_value = self.value
             self.value = nvalue
-            self.valueChanged(nvalue, oldValue)
-            self.spine.triggerEvent(
+            self.value_changed(nvalue, old_value)
+            self.spine.trigger_event(
                 "changeControllerInputValue",
-                self.inputId,
-                {"input":self.inputId, "value":nvalue}
+                self.input_id,
+                {"input":self.input_id, "value":nvalue}
             )
 
-    def valueChanged(self, newValue, oldValue):
+    def value_changed(self, newValue, oldValue):
         self.spine.log.debug(
             "abstract valueChanged reached:{0}/{1}",
-            self.controller.controllerId,
-            self.inputId,
+            self.controller.controller_id,
+            self.input_id,
         )
 
-    def getInfo(self):
+    def get_info(self):
         return {
             "name":self.name,
-            "componentType":self.componentType,
+            "componentType":self.component_type,
             "ui":self.ui,
             "unit":self.unit,
             "value":self.value,
-            "maxValue":self.maxValue,
-            "minValue":self.minValue,
+            "maxValue":self.max_value,
+            "minValue":self.min_value,
             "command":self.command,
-            "id":self.inputId
+            "id":self.input_id
         }
 
-    def onGetValue(self):
+    def on_get_value(self):
         return self.value
 
 class ControllerTextInput(object):
-    def __init__(self, inputId, name, controller):
+    def __init__(self, input_id, name, controller):
         self.spine = Spine()
         self.controller = controller
-        self.inputId = inputId
+        self.input_id = input_id
         self.name = name
         self.value = ""
-        self.command = self.inputId + ".setValue"
-        self.spine.registerCommandHandler(self.command, self.setValue)
-        self.componentType = "text-input"
-        self.inputType = "text"
+        self.command = self.input_id + ".setValue"
+        self.spine.register_command_handler(self.command, self.set_value)
+        self.component_type = "text-input"
+        self.input_type = "text"
         self.ui = {"orientation":"vertical", "type":"gauge"}
 
-    def setValue(self, nvalue):
+    def set_value(self, nvalue):
         if self.value != nvalue:
             self.spine.log.debug(
                 "value change on input:{0}/{1} value:{2}",
-                self.controller.controllerId,
-                self.inputId,
+                self.controller.controller_id,
+                self.input_id,
                 nvalue
             )
-            oldValue = self.value
+            old_value = self.value
             self.value = nvalue
-            self.valueChanged(nvalue, oldValue)
-            self.spine.triggerEvent(
+            self.value_changed(nvalue, old_value)
+            self.spine.trigger_event(
                 "changeControllerInputValue",
-                self.inputId,
-                {"input":self.inputId, "value":nvalue}
+                self.input_id,
+                {"input":self.input_id, "value":nvalue}
             )
 
-    def valueChanged(self, newValue, oldValue):
+    def value_changed(self, new_value, old_value):
         self.spine.log.debug(
             "abstract valueChange reached:{0}/{1} value:{2} oldvalue:{3}",
-            self.controller.controllerId,
-            self.inputId,
-            newValue,
-            oldValue
+            self.controller.controller_id,
+            self.input_id,
+            new_value,
+            old_value
         )
 
-    def getInfo(self):
+    def get_info(self):
         return {
             "name":self.name,
-            "componentType":self.componentType,
+            "componentType":self.component_type,
             "ui":self.ui,
             "value":self.value,
             "command":self.command,
-            "id":self.inputId
+            "id":self.input_id
         }
 
-    def onGetValue(self):
+    def on_get_value(self):
         return self.value
 
 class ControllerDateTimeInput(object):
-    def __init__(self, inputId, name, inputType, controller):
+    def __init__(self, input_id, name, input_type, controller):
         self.spine = Spine()
         self.controller = controller
-        self.inputId = inputId
-        self.inputType = inputType
+        self.input_id = input_id
+        self.input_type = input_type
         self.name = name
         self.value = ""
-        self.command = self.inputId + ".setValue"
-        self.spine.registerCommandHandler(self.command, self.setValue)
-        self.componentType = "datetime-input"
+        self.command = self.input_id + ".setValue"
+        self.spine.register_command_handler(self.command, self.set_value)
+        self.component_type = "datetime-input"
         self.ui = {"orientation":"vertical", "type":"gauge"}
 
-    def setValue(self, nvalue):
+    def set_value(self, nvalue):
         if self.value != nvalue:
             self.spine.log.debug(
                 "value change on input:{0}/{1} value:{2}",
-                self.controller.controllerId,
-                self.inputId,
+                self.controller.controller_id,
+                self.input_id,
                 nvalue
             )
-            oldValue = self.value
+            old_value = self.value
             self.value = nvalue
-            self.valueChanged(nvalue, oldValue)
-            self.spine.triggerEvent(
+            self.value_changed(nvalue, old_value)
+            self.spine.trigger_event(
                 "changeControllerInputValue",
-                self.inputId,
-                {"input":self.inputId, "value":nvalue}
+                self.input_id,
+                {"input":self.input_id, "value":nvalue}
             )
 
-    def valueChanged(self, newValue, oldValue):
+    def value_changed(self, newValue, oldValue):
         self.spine.log.debug(
             "abstract valueChanged reached:{0}/{1}",
             self.controller.controllerId,
-            self.inputId,
+            self.input_id,
         )
 
-    def getInfo(self):
+    def get_info(self):
         return {
             "name":self.name,
-            "componentType":self.componentType,
-            "inputType": self.inputType,
+            "componentType":self.component_type,
+            "inputType": self.input_type,
             "ui":self.ui,
             "value":self.value,
             "command":self.command,
-            "id":self.inputId
+            "id":self.input_id
         }
 
-    def onGetValue(self):
+    def on_get_value(self):
         return self.value
 
 class Controller(object):
-    def __init__(self, controllerId, name):
+    def __init__(self, controller_id, name):
         spine = Spine()
-        spine.registerQueryHandler("getControllerInfo", self.onGetInfo)
-        spine.registerQueryHandler("getObjectInfo", self.onGetObjectInfo)
-        self.controllerId = controllerId
+        spine.register_query_handler("getControllerInfo", self.on_get_info)
+        spine.register_query_handler("getObjectInfo", self.on_get_object_info)
+        self.controller_id = controller_id
         self.name = name
         self.components = []
         self.type = "unknown"
         self.parameters = {}
         self.dashboards = []
 
-    def addComponents(self, *args):
+    def add_components(self, *args):
         for component in args:
             self.components += [component]
 
-    def onGetObjectInfo(self, id):
-        if self.controllerId == id:
-            return self.onGetInfo(None)
+    def on_get_object_info(self, ctrl_id):
+        if self.controller_id == ctrl_id:
+            return self.on_get_info(None)
 
-    def onGetInfo(self, controllerType):
-        if controllerType is None or controllerType == self.type:
+    def on_get_info(self, controller_type):
+        if controller_type is None or controller_type == self.type:
 
             components = []
             for component in self.components:
-                components += [component.getInfo()]
+                components += [component.get_info()]
 
             template = None
             import os.path
             import sys
             modulepath = os.path.dirname(sys.modules[self.__class__.__module__].__file__)
-            className = self.__class__.__name__
-            cpath = os.path.join(modulepath, className + ".tmpl.html")
+            class_name = self.__class__.__name__
+            cpath = os.path.join(modulepath, class_name + ".tmpl.html")
             if os.path.isfile(cpath):
-                templateFile = open(cpath, 'r')
-                template = templateFile.read()
+                template_file = open(cpath, 'r')
+                template = template_file.read()
 
             return {
                 "type":self.type,
                 "name":self.name,
-                "id":self.controllerId,
+                "id":self.controller_id,
                 "parameters":self.parameters,
                 "components":components,
                 "dashboards":self.dashboards,

@@ -3,61 +3,66 @@
 
 """ Handles multiprocessing functionality in Kervi """
 
-from multiprocessing import Process, Array, Value, Manager, freeze_support
+from multiprocessing import Process #, Array, Value, Manager, freeze_support
 import time
 import kervi.spine as spine
 from kervi.utility.processSpine import ProcessSpine
-import sys
-import kervi.kerviLogging as logging 
+#import sys
+import kervi.kerviLogging as logging
 
-mainProcessSpine = None
-def startRootSpine(settings, resetLog=False):
-    global mainProcessSpine
-    logging.initProcessLogging("kervi-main", resetLog)
-    log = logging.KerviLog("kervi main")
-    spine.initSpine("kervi-main")
-    mainProcessSpine = ProcessSpine(settings["network"]["IPCBasePort"], settings, isRoot=True)
+MAIN_SPINE = None
+def start_root_spine(settings, reset_log=False):
+    global MAIN_SPINE
+    logging.initProcessLogging("kervi-main", reset_log)
+    logging.KerviLog("kervi main")
+    spine.init_spine("kervi-main")
+    MAIN_SPINE = ProcessSpine(settings["network"]["IPCBasePort"], settings, is_root=True)
 
-def stopRootSpine():
-    global mainProcessSpine
-    mainProcessSpine.closeAllConnections()
+def stop_root_spine():
+    MAIN_SPINE.close_all_connections()
 
 
 class KerviProcess(object):
     def __init__(self, name, settings, ipcPort):
-        self.terminate = False
+        self.do_terminate = False
         self.port = ipcPort
         self.settings = settings
-        spine.initSpine(name)
+        spine.init_spine(name)
         self.spine = spine.Spine()
-        self.processSpine = ProcessSpine(ipcPort, settings)
-        self.InitProcess()
-        self.spine.registerCommandHandler("terminateProcess", self.Terminate)
+        self.process_spine = ProcessSpine(ipcPort, settings)
+        self.init_process()
+        self.spine.register_command_handler("terminateProcess", self.terminate)
 
-    def Terminate(self, **kwargs):
-        print ("terminate:", self.port) 
-        self.processSpine.closeAllConnections()
+    def terminate(self):
+        print ("terminate:", self.port)
+        self.process_spine.close_all_connections()
         self.spine.stop()
-        self.TerminateProcess()
-        self.terminate = True
+        self.terminate_process()
+        self.do_terminate = True
 
-def f(name,processClass, settings, ipcPort):
+    def init_process(self):
+        self.spine.log.error("abstract init_process called in KerviProcess")
+
+    def terminate_process(self):
+        self.spine.log.error("abstract init_process called in KerviProcess")
+
+def launch(name, process_class, settings, ipc_port):
     logging.initProcessLogging("KerviSys-" + name, False)
     log = logging.KerviLog(name)
-    log.info('create process:{0} ipc port:{1}:', processClass.__name__, ipcPort)
-    p=processClass(name, settings, ipcPort)
+    log.info('create process:{0} ipc port:{1}:', process_class.__name__, ipc_port)
+    process = process_class(name, settings, ipc_port)
     try:
-        while not p.terminate:
+        while not process.do_terminate:
             time.sleep(1)
     except:
-        pass
+        log.exception("error in process loop")
 
-    log.info("process terminated:{0}", ipcPort)
+    log.info("process terminated:{0}", ipc_port)
 
-def startProcess(name, settings, portIdx, processClass):
-    process = Process(target=f, args=(name, processClass, settings, portIdx))
+def start_process(name, settings, portIdx, processClass):
+    process = Process(target=launch, args=(name, processClass, settings, portIdx))
     process.start()
     return process
 
-def stopProcesses():
-    spine.Spine().sendCommand("terminateProcess")
+def stop_processes():
+    spine.Spine().send_command("terminateProcess")

@@ -147,6 +147,7 @@ export class  KerviSpine{
 	}
 
 	onMessage(evt){
+		//console.log("on m",evt.data);
 		var message=JSON.parse(evt.data);
 		//console.log("on m",message);
 		if (message.messageType=="response")
