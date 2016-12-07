@@ -2,10 +2,9 @@
 # Licensed under MIT
 
 """
-Module that holds log functionality. 
+Module that holds log functionality.
 In general you dont need to include this in your kervi code as the spine class holds a refference
-to a fully configured log. 
-
+to a fully configured log.
 """
 
 import logging
@@ -41,20 +40,21 @@ class KerviLog(object):
     def fatal(self, message, *args):
         self.logger.fatal(BraceMessage(message, *args))
 
-def initProcessLogging(processName,resetLog=False):
-    logger = logging.getLogger()
+def init_process_logging(process_name, reset_log=False):
+    print "L:", logging
+    logger = logging.getLogger(process_name)
     logger.setLevel(logging.DEBUG)
-    if resetLog:
+    if reset_log:
         try:
             os.remove('kervi.log')
         except:
             pass
-    fh = logging.FileHandler('kervi.log')
-    fh.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.ERROR)
+    file_handler = logging.FileHandler('kervi.log')
+    file_handler.setLevel(logging.DEBUG)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.ERROR)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
-    logger.addHandler(fh)
-    logger.addHandler(ch)
+    file_handler.setFormatter(formatter)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)

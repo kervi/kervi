@@ -6,15 +6,15 @@
 from multiprocessing import Process #, Array, Value, Manager, freeze_support
 import time
 import kervi.spine as spine
-from kervi.utility.processSpine import ProcessSpine
+from kervi.utility.process_spine import ProcessSpine
 #import sys
-import kervi.kerviLogging as logging
+import kervi.kervi_logging as k_logging
 
 MAIN_SPINE = None
 def start_root_spine(settings, reset_log=False):
     global MAIN_SPINE
-    logging.initProcessLogging("kervi-main", reset_log)
-    logging.KerviLog("kervi main")
+    k_logging.init_process_logging("kervi-main", reset_log)
+    k_logging.KerviLog("kervi main")
     spine.init_spine("kervi-main")
     MAIN_SPINE = ProcessSpine(settings["network"]["IPCBasePort"], settings, is_root=True)
 
@@ -47,8 +47,8 @@ class KerviProcess(object):
         self.spine.log.error("abstract init_process called in KerviProcess")
 
 def launch(name, process_class, settings, ipc_port):
-    logging.initProcessLogging("KerviSys-" + name, False)
-    log = logging.KerviLog(name)
+    k_logging.init_process_logging("KerviSys-" + name, False)
+    log = k_logging.KerviLog(name)
     log.info('create process:{0} ipc port:{1}:', process_class.__name__, ipc_port)
     process = process_class(name, settings, ipc_port)
     try:

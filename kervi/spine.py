@@ -14,17 +14,17 @@ spine = Spine()
 spine.sendCommand("SetMyValue",myValue)
 """
 
-from kervi.utility.cqrsBus import CQRSBus
+from kervi.utility.bus import CQRSBus
 
-class SpineX(CQRSBus): 
+class KerviSpine(CQRSBus):
     def version(self):
         return 1.0
 
 S = None
-def init_spine(spineName="roboSys"):
+def init_spine(spine_name="roboSys"):
     global S
-    S = SpineX()
-    S.set_log(spineName)
+    S = KerviSpine()
+    S.set_log(spine_name)
     S.reset()
     S.start_queues()
 
@@ -35,7 +35,7 @@ def Spine():
     and other code parts Include this module in all modules where communication is needed.
 
     Usage:
-s
+
     myValue=10
     spine = Spine()
     spine.sendCommand("SetMyValue",myValue)

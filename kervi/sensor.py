@@ -1,10 +1,9 @@
 # Copyright (c) 2016, Tim Wentzlau
 # Licensed under MIT
-
-from kervi.utility.kerviThread import KerviThread
-from kervi.spine import Spine
 from datetime import datetime
 import time
+from kervi.utility.thread import KerviThread
+from kervi.spine import Spine
 
 class Sensor(object):
     def __init__(self, sensor_id, name):

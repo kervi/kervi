@@ -2,14 +2,12 @@
 # Licensed under MIT
 
 """ general DB handling in Kervi, store sensor values  """
-
+import os
+from datetime import datetime
 import sqlite3 as lite
 import kervi.spine as spine
-from datetime import datetime, timedelta
-import traceback
-import os
 
-SPINE=spine.Spine()
+SPINE = spine.Spine()
 
 def init_db():
     con = lite.connect('kervi.db')

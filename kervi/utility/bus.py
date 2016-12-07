@@ -7,14 +7,14 @@
 #import time
 import threading
 import inspect
-from kervi.utility.namedLists import NamedLists
-from kervi.utility.kerviThread import KerviThread
+from kervi.utility.named_lists import NamedLists
+from kervi.utility.thread import KerviThread
 
 try:
     import Queue
 except:
     import queue as Queue
-from  kervi.kerviLogging import KerviLog
+from  kervi.kervi_logging import KerviLog
 
 class QueryThread(threading.Thread):
     def __init__(self, handler, query, args, **kwargs):

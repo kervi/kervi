@@ -6,9 +6,9 @@ import time
 import inspect
 import json
 from kervi.spine import Spine
+import kervi.utility.nethelper as nethelper
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
-import kervi.utility.nethelper as nethelper
 
 class ObjectEncoder(json.JSONEncoder):
     def default(self, obj):

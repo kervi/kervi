@@ -2,25 +2,25 @@
 # Licensed under MIT
 
 """ Module that holds classes for creating / bootstraping a Kervi application or a Kervi module """
-import kervi.utility.process as process
 import time
-import kervi.spine as spine
 #from multiprocessing import  freeze_support
 try:
     import thread
 except:
     import _thread as thread
 
-from kervi.utility.processSpine import ProcessSpine
 #import sys
-import kervi.kerviLogging as logging
+import kervi.utility.process as process
+import kervi.spine as spine
+from kervi.utility.process_spine import ProcessSpine
+import kervi.kervi_logging as logging
 import kervi_ui.webserver as webserver
 
 class KerviSensors(process.KerviProcess):
     """ Private class that starts a seperate process that loads sensors in the Kervi application """
     def init_process(self):
         print ("init mp sensors")
-        import kervi.coreSensors.cpuSensors
+        import kervi.core_sensors.cpu_sensors
         try:
             import sensors
         except:
@@ -47,14 +47,14 @@ class KerviControllers(process.KerviProcess):
 
 class KerviSocketIPC(process.KerviProcess):
     """ Private class that starts a seperate process for IPC communication in the Kervi application """
-    
+
     def init_process(self):
         print ("init IPC")
-        import kervi.utility.socketSpine as socketSpine
+        import kervi.utility.socket_spine as socketSpine
         socketSpine.start(self.settings)
 
     def terminate_process(self):
-        import kervi.utility.socketSpine as socketSpine
+        import kervi.utility.socket_spine as socketSpine
         socketSpine.stop()
 
 class Application(object):

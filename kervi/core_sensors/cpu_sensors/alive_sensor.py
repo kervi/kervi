@@ -1,13 +1,14 @@
 # Copyright (c) 2016, Tim Wentzlau
 # Licensed under MIT
 
-""" CQRS handles in process communication """
+""" Sensor that once every second sends a signal that is monitored by the UI """
 
 from kervi.sensor import Sensor, SensorThread
 #import threading
 #import time
 
 class AliveSensor(Sensor):
+    """ Sensor that once every second sends a signal that is monitored by the UI """
     def __init__(self):
         Sensor.__init__(self, "AliveSensor", "Alive sensor")
         self.type = "counter"
@@ -21,6 +22,6 @@ class AliveSensor(Sensor):
         self.tick += 1
         self.new_sensor_reading(self.tick)
 
-sensor_thread = SensorThread(AliveSensor())
+SENSOR_THREAD = SensorThread(AliveSensor())
 
-sensor_thread.start()
+SENSOR_THREAD.start()

@@ -3,7 +3,7 @@
 
 """ Module that holds a general kervi application module threading class"""
 
-from kervi.utility.kerviThread import KerviThread
+from kervi.utility.thread import KerviThread
 from kervi.spine import Spine
 
 class ModuleThread(KerviThread):

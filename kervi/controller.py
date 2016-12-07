@@ -3,7 +3,7 @@
 
 
 from kervi.spine import Spine
-from kervi.utility.kerviThread import KerviThread
+from kervi.utility.thread import KerviThread
 
 class ControllerSelect(object):
     """

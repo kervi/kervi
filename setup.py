@@ -16,7 +16,8 @@ setup(
     classifiers=[],
     install_requires=[
         'kervi-ui',
-        'autobahn[asyncio]'
+        'autobahn[asyncio]',
+        'psutil'
     ],
     include_package_data=True,
     package_data={

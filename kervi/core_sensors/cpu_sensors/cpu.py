@@ -1,10 +1,13 @@
 # Copyright (c) 2016, Tim Wentzlau
 # Licensed under MIT
 
+""" Module that defines core cpu sensors """
+
 from kervi.sensor import Sensor, SensorThread
 import psutil
 
 class CPULoadSensor(Sensor):
+    """ Sensor that mesures cpu load on host """
     def __init__(self):
         Sensor.__init__(self, "CPULoadSensor", "CPU")
         self.type = "cpu"
@@ -16,7 +19,8 @@ class CPULoadSensor(Sensor):
         self.dashboards = ["cpu"]
         psutil.cpu_percent()
 
-class MemUseSensor (Sensor):
+class MemUseSensor(Sensor):
+    """ Sensor that mesures memory use """
     def __init__(self):
         Sensor.__init__(self, "MemUse", "Memory")
         self.type = "memory"

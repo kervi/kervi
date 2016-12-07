@@ -8,7 +8,7 @@ Based on your vision analasis you may present POI on screen or let other parts o
 respond to your code.
 """
 
-from kervi.moduleThread import  ModuleThread
+from kervi.module_thread import  ModuleThread
 
 class VisionModule(ModuleThread):
     def __init__(self, vision_id, name):
