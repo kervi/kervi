@@ -14,6 +14,10 @@ setup(
     download_url='https://github.com/wentzlau/kervi/archive/v1.0-alpha.tar.gz',
     keywords=['raspberry pi', 'robotic', 'automation'],
     classifiers=[],
+    install_requires=[
+        'kervi-ui',
+        'autobahn[asyncio]'
+    ],
     include_package_data=True,
     package_data={
         'kervi': [

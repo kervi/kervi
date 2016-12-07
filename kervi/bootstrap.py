@@ -14,7 +14,7 @@ except:
 from kervi.utility.processSpine import ProcessSpine
 #import sys
 import kervi.kerviLogging as logging
-import kervi.utility.webserver as webserver
+import kervi_ui.webserver as webserver
 
 class KerviSensors(process.KerviProcess):
     """ Private class that starts a seperate process that loads sensors in the Kervi application """
