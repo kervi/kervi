@@ -152,7 +152,7 @@ class ProcessSpine(object):
         self.spine = spine.Spine()
         self.settings = settings
         self.port = port
-        self.address = ('localhost', port)
+        self.address = (self.settings["network"]["IPAddress"], port)
         #print("listen to:",self.address,self.settings["network"]["IPCSecret"])
         self.listener = Listener(self.address, authkey=self.settings["network"]["IPCSecret"])
         self.response_list = []
