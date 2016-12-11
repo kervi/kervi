@@ -10,6 +10,7 @@ kervi\kervi_logging.py
 kervi\module_thread.py
 kervi\sensor.py
 kervi\spine.py
+kervi\version.py
 kervi\vision.py
 kervi/core_sensors\__init__.py
 kervi/core_sensors\sensor_cache.py

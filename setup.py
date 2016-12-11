@@ -1,13 +1,17 @@
 """ Setup module for kervi generating setup package used with pip """
 from distutils.core import setup
-#from distutils import dir_util
-#from distutils import sysconfig
-#import os
+import distutils
+from kervi.version import VERSION
+
+try:
+    distutils.dir_util.remove_tree("dist")
+except:
+    pass
 
 setup(
     name='kervi',
     packages=['kervi', 'kervi/utility', 'kervi/core_sensors', 'kervi/core_sensors/cpu_sensors'],
-    version='0.6.3',
+    version=VERSION,
     description="""
     A python framework for creating robotic and automation applications on raspberypi (and other platforms).
     UI is web based and generated on the fly based on configuration in python code.

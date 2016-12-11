@@ -13,7 +13,7 @@ import kervi.kervi_logging as k_logging
 MAIN_SPINE = None
 def start_root_spine(settings, reset_log=False):
     global MAIN_SPINE
-    k_logging.init_process_logging("kervi-main", reset_log)
+    k_logging.init_process_logging("kervi-main", settings["log"])
     k_logging.KerviLog("kervi main")
     spine.init_spine("kervi-main")
     MAIN_SPINE = ProcessSpine(settings["network"]["IPCBasePort"], settings, is_root=True)
@@ -47,7 +47,7 @@ class KerviProcess(object):
         self.spine.log.error("abstract init_process called in KerviProcess")
 
 def launch(name, process_class, settings, ipc_port):
-    k_logging.init_process_logging("KerviSys-" + name, False)
+    k_logging.init_process_logging("kervisys-"+name,settings["log"])
     log = k_logging.KerviLog(name)
     log.info('create process:{0} ipc port:{1}:', process_class.__name__, ipc_port)
     process = process_class(name, settings, ipc_port)

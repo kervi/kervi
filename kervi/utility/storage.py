@@ -20,10 +20,22 @@ def init_db():
         break
 
     if not tables_exists:
-        sql_file = os.path.join(os.path.dirname(__file__), 'db.sql')
-        db_file = open(sql_file, 'r')
-        sql_file = db_file.read()
-        db_file.close()
+        sql_file = """
+        CREATE TABLE `log` (
+            `id`	INTEGER PRIMARY KEY AUTOINCREMENT,
+            `ts`	TEXT,
+            `message`	TEXT,
+            `area`	TEXT,
+            `level`	INTEGER
+        );
+        CREATE TABLE "sensorData" (
+            `id`	INTEGER PRIMARY KEY AUTOINCREMENT,
+            `sensor`	TEXT,
+            `value`	TEXT,
+            `timeStamp`	REAL
+        );
+        CREATE INDEX `sensorindex` ON `sensorData` (`sensor` ,`timeStamp` );
+        """
 
         sql_commands = sql_file.split(';')
 

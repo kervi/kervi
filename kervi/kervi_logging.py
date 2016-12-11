@@ -40,15 +40,19 @@ class KerviLog(object):
     def fatal(self, message, *args):
         self.logger.fatal(BraceMessage(message, *args))
 
-def init_process_logging(process_name, reset_log=False):
+def init_process_logging(process_name, settings):
     logger = logging.getLogger(process_name)
-    logger.setLevel(logging.DEBUG)
-    if reset_log:
+    if settings["level"] == "warning":
+        logger.setLevel(logging.WARNING)
+    elif settings["level"] == "debug":
+        logger.setLevel(logging.DEBUG)
+
+    if settings["resetLog"]:
         try:
-            os.remove('kervi.log')
+            os.remove(settings["file"])
         except:
             pass
-    file_handler = logging.FileHandler('kervi.log')
+    file_handler = logging.FileHandler(settings["file"])
     file_handler.setLevel(logging.DEBUG)
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.ERROR)
