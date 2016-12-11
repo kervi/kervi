@@ -140,8 +140,13 @@ class Application(object):
         )
 
         time.sleep(2)
-        print ("start web ui on:", self.settings["web-ui"]["address"])
-        webserver.start(self.settings["web-ui"]["address"])
+        http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
+        print ("start web ui on:", http_address)
+        webserver.start(
+            self.settings["network"]["IPAddress"],
+            self.settings["network"]["WebPort"],
+            self.settings["network"]["WebSocketPort"]
+        )
 
     def input_thread(self, list):
         try:
@@ -192,7 +197,7 @@ class ApplicationModule(object):
         self.settings = settings
         self.started = False
         self.name = name
-        logging.initProcessLogging("kervimodule-"+name)
+        logging.init_process_logging("kervimodule-"+name)
         logging.KerviLog(name)
         spine.init_spine("module-"+name)
         ProcessSpine(settings["network"]["IPCPort"], settings)

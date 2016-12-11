@@ -59,8 +59,8 @@ def launch(name, process_class, settings, ipc_port):
 
     log.info("process terminated:{0}", ipc_port)
 
-def start_process(name, settings, portIdx, processClass):
-    process = Process(target=launch, args=(name, processClass, settings, portIdx))
+def start_process(name, settings, port_idx, process_class):
+    process = Process(target=launch, args=(name, process_class, settings, port_idx))
     process.start()
     return process
 

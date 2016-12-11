@@ -7,6 +7,7 @@ import inspect
 import json
 from kervi.spine import Spine
 import kervi.utility.nethelper as nethelper
+
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
 
@@ -135,7 +136,7 @@ class SpineProtocol(WebSocketServerProtocol):
                 self.send_response(obj["id"], None)
             elif obj["messageType"] == "event":
                 self.spine.trigger_event(
-                    obj["event"], obj["id"], 
+                    obj["event"], obj["id"],
                     obj["args"],
                     injected="socketSpine"
                 )

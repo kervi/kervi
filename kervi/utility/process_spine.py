@@ -178,8 +178,12 @@ class ProcessSpine(object):
         while conn is None:
             try:
                 print ("Try to connect to root:")
+                root_address = (
+                    self.settings["network"]["IPAddress"],
+                    self.settings["network"]["IPCBasePort"]
+                )
                 conn = Client(
-                    self.settings["network"]["IPCRoot"],
+                    root_address,
                     authkey=self.settings["network"]["IPCSecret"]
                 )
             except IOError:
@@ -188,7 +192,7 @@ class ProcessSpine(object):
                 time.sleep(1)
         print ("root found and connected")
         conn.send({"messageType":"registerProcess", "address":self.address})
-        self.add_process_connection(conn, self.settings["network"]["IPCRoot"], True)
+        self.add_process_connection(conn, root_address, True)
 
     def register_process(self, process):
         self.process_list += [process]
