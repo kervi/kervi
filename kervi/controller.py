@@ -26,6 +26,7 @@ class ControllerSelect(object):
         self.component_type = "select"
         self.select_id = select_id
         self.name = name
+        self.dashboards = []
         self.options = []
         self.selected_options = []
         self.change_command = self.select_id + ".change"
@@ -88,6 +89,7 @@ class ControllerButton(object):
         self.state = False
         self.button_id = button_id
         self.name = name
+        self.dashboards = []
 
         self.click_command = self.button_id + ".click"
         self.spine.register_command_handler(self.click_command, self.on_click_handler)
@@ -124,6 +126,7 @@ class ControllerSwitchButton(object):
         self.state = False
         self.button_id = button_id
         self.name = name
+        self.dashboards = []
 
         self.on_command = self.button_id + ".on"
         self.off_command = self.button_id + ".off"
@@ -192,6 +195,7 @@ class ControllerNumberInput(object):
         self.spine = Spine()
         self.controller = controller
         self.input_id = input_id
+        self.dashboards = []
         self.min_value = -100
         self.max_value = 100
         self.unit = ""
@@ -248,6 +252,7 @@ class ControllerTextInput(object):
         self.spine = Spine()
         self.controller = controller
         self.input_id = input_id
+        self.dashboards = []
         self.name = name
         self.value = ""
         self.command = self.input_id + ".setValue"
@@ -300,6 +305,7 @@ class ControllerDateTimeInput(object):
         self.spine = Spine()
         self.controller = controller
         self.input_id = input_id
+        self.dashboards = []
         self.input_type = input_type
         self.name = name
         self.value = ""
