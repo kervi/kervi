@@ -10,14 +10,14 @@ class ModuleThread(KerviThread):
     def __init__(self):
         KerviThread.__init__(self)
         self.spine = Spine()
-        self.spine.registerCommandHandler("startThreads", self.startCommand)
+        self.spine.register_command_handler("startThreads", self._startCommand)
 
-    def step(self):
+    def _step(self):
         self.moduleStep()
 
-    def startCommand(self):
+    def _startCommand(self):
         if not self.isAlive():
             super(KerviThread, self).start()
 
-    def stopCommand(self):
+    def _stopCommand(self):
         self.stop()

@@ -1,7 +1,7 @@
 # Copyright (c) 2016, Tim Wentzlau
 # Licensed under MIT
 
-""" IPC between processes  """
+""" Module that handles IPC between python processes  """
 
 from multiprocessing.connection import Listener, Client
 import time
@@ -11,7 +11,7 @@ import kervi.spine as spine
 #import traceback
 import kervi.utility.nethelper as nethelper
 
-class ConnCommandHandler(object):
+class _ConnCommandHandler(object):
     def __init__(self, command, conn, src):
         self.conn = conn
         self.command = command
@@ -29,7 +29,7 @@ class ConnCommandHandler(object):
         except:
             self.spine.log.exception("ConnCommandHandler")
 
-class ConnQueryHandler(object):
+class _ConnQueryHandler(object):
     id_count = 0
 
     def __init__(self, query, conn, process_spine, src):
@@ -65,7 +65,7 @@ class ConnQueryHandler(object):
         except:
             self.spine.log.exception("ConnQueryHandler")
 
-class ConnEventHandler(object):
+class _ConnEventHandler(object):
     def __init__(self, event, id_event, conn, src):
         self.conn = conn
         self.event = event
@@ -88,7 +88,7 @@ class ConnEventHandler(object):
             self.spine.log.exception("ConnEventHandler")
             pass
 
-class ClientConnectionThread(threading.Thread):
+class _ClientConnectionThread(threading.Thread):
     def __init__(self, process_spine):
         threading.Thread.__init__(self)
         self.daemon = True
@@ -116,7 +116,7 @@ class ClientConnectionThread(threading.Thread):
         except:
             self.process_spine.spine.log.exception("ClientConnectionThread")
 
-class ConnectionMessageThread(threading.Thread):
+class _ConnectionMessageThread(threading.Thread):
     def __init__(self, process_spine, conn, src, is_root_connection=False):
         threading.Thread.__init__(self)
         self.daemon = True
@@ -146,7 +146,7 @@ class ConnectionMessageThread(threading.Thread):
             self.process_spine.spine.log.exception("connectionMessageThread", self.src)
             pass
 
-class ProcessSpine(object):
+class _ProcessSpine(object):
     def __init__(self, port, settings, **kwargs):
         self.is_root = kwargs.get("is_root", False)
         self.spine = spine.Spine()
@@ -162,7 +162,7 @@ class ProcessSpine(object):
 
 
         self.spine.add_linked_spine(self)
-        self.client_connection_thread = ClientConnectionThread(self)
+        self.client_connection_thread = _ClientConnectionThread(self)
         self.client_connection_thread.start()
         self.register_at_root()
 
@@ -231,17 +231,17 @@ class ProcessSpine(object):
         #self.client_connections[port].send(message)
 
     def add_process_connection(self, conn, src, is_root_connection=False):
-        conn_thread = ConnectionMessageThread(self, conn, src, is_root_connection)
+        conn_thread = _ConnectionMessageThread(self, conn, src, is_root_connection)
         self.process_connections += [conn_thread]
         conn_thread.start()
 
         injected_commands = []
         for ijc in self.handlers["command"]:
-            injected_commands += [{"command":ijc.command, "matched":False}]
+            injected_commands += [{"command":ijc.command, "matched":False, "src":ijc.src}]
         for cmd in self.spine.get_commands():
             found = False
             for ic in injected_commands:
-                if ic["command"] == cmd and not ic["matched"]:
+                if ic["command"] == cmd and ic["src"] == src and not ic["matched"]:
                     found = True
                     ic["matched"] = True
 
@@ -253,10 +253,11 @@ class ProcessSpine(object):
         for ijq in self.handlers["query"]:
             injected_queries += [{"query":ijq.query, "matched":False, "src":ijq.src}]
 
+        self.spine.log.debug("send rq to {2} qlist:{0} iq:{1}", self.spine.get_queries(), injected_queries, src)
         for query in self.spine.get_queries():
             found = False
             for iq in injected_queries:
-                if iq["query"] == query and not iq["matched"]:
+                if iq["query"] == query and iq["src"] == src  and not iq["matched"]:
                     found = True
                     iq["matched"] = True
 
@@ -265,7 +266,7 @@ class ProcessSpine(object):
 
         injected_events = []
         for ije in self.handlers["event"]:
-            injected_events += [{"id":ije.id_event, "event":ije.event, "matched":False}]
+            injected_events += [{"id":ije.id_event, "event":ije.event, "matched":False, "src": ije.src}]
 
         for event in self.spine.get_events():
             path = event.split("/")
@@ -275,7 +276,7 @@ class ProcessSpine(object):
                 event_id = path[1]
             found = False
             for ie in injected_events:
-                if ie["id"] == event_id and ie["event"] == event_name and not ie["matched"]:
+                if ie["id"] == event_id and ie["event"] == event_name and ie["src"] == src and not ie["matched"]:
                     found = True
                     ie["matched"] = True
 
@@ -298,7 +299,7 @@ class ProcessSpine(object):
             if ch.command == command and ch.conn == connection:
                 found = True
         if not found:
-            self.handlers["command"] += [ConnCommandHandler(command, connection, src)]
+            self.handlers["command"] += [_ConnCommandHandler(command, connection, src)]
 
     def add_linked_command_handler(self, name, **kwargs):
         injected = kwargs.get("injected", "")
@@ -314,7 +315,7 @@ class ProcessSpine(object):
             if qh.query == query and qh.conn == connection:
                 found = True
         if not found:
-            self.handlers["query"] += [ConnQueryHandler(query, connection, self, src)]
+            self.handlers["query"] += [_ConnQueryHandler(query, connection, self, src)]
 
     def add_linked_query_handler(self, name, **kwargs):
         injected = kwargs.get("injected", "")
@@ -336,7 +337,7 @@ class ProcessSpine(object):
             if eh.event == event and eh.id_event == id_event and eh.conn == connection:
                 found = True
         if not found:
-            self.handlers["event"] += [ConnEventHandler(event, id_event, connection, src)]
+            self.handlers["event"] += [_ConnEventHandler(event, id_event, connection, src)]
 
     def add_response_event(self, event):
         self.response_list += [event]

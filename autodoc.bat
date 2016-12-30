@@ -1,0 +1,1 @@
+sphinx-apidoc -F -F -e -o _doc kervi kervi/utility/bus.py kervi/utility/named_lists.py kervi/utility/process.py kervi/utility/process_spine.py kervi/utility/socket_spine.py kervi/utility/storage.py kervi/utility/thread.py

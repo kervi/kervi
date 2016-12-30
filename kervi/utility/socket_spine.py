@@ -1,7 +1,7 @@
 # Copyright (c) 2016, Tim Wentzlau
 # Licensed under MIT
 
-""" Web socket ipc """
+""" Web socket ipc used by the web ui to comunicate with Kervi """
 import time
 import inspect
 import json
@@ -11,7 +11,7 @@ import kervi.utility.nethelper as nethelper
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
 
-class ObjectEncoder(json.JSONEncoder):
+class _ObjectEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, "to_json"):
             return self.default(obj.to_json())
@@ -32,7 +32,7 @@ class ObjectEncoder(json.JSONEncoder):
             return self.default(data)
         return obj
 
-class WebCommandHandler(object):
+class _WebCommandHandler(object):
     def __init__(self, command, protocol):
         self.protocol = protocol
         self.command = command
@@ -45,7 +45,7 @@ class WebCommandHandler(object):
             jsonres = json.dumps({"messageType":"command", "command":self.command, "args":args}, ensure_ascii=False).encode('utf8')
             self.protocol.sendMessage(jsonres, False)
 
-class WebQueryHandler(object):
+class _WebQueryHandler(object):
     def __init__(self, query, protocol):
         self.protocol = protocol
         self.query = query
@@ -58,7 +58,7 @@ class WebQueryHandler(object):
             jsonres=json.dumps({"messageType":"query", "query":self.query, "args":args}, ensure_ascii=False).encode('utf8')
             self.protocol.sendMessage(jsonres, False)
 
-class WebEventHandler(object):
+class _WebEventHandler(object):
     def __init__(self, event, id_event, protocol):
         self.protocol = protocol
         self.event = event
@@ -71,10 +71,10 @@ class WebEventHandler(object):
         self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
         if not injected == "socketSpine":
             cmd = {"messageType":"event", "event":self.event, "id":id_event, "args":args}
-            jsonres = json.dumps(cmd, cls=ObjectEncoder, ensure_ascii=False).encode('utf8')
+            jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
             self.protocol.sendMessage(jsonres, False)
 
-class SpineProtocol(WebSocketServerProtocol):
+class _SpineProtocol(WebSocketServerProtocol):
 
     def __init__(self):
         self.spine = Spine()
@@ -87,7 +87,7 @@ class SpineProtocol(WebSocketServerProtocol):
             if command_handler.command == command:
                 found = True
         if not found:
-            self.handlers["command"] += [WebCommandHandler(command, self)]
+            self.handlers["command"] += [_WebCommandHandler(command, self)]
 
     def add_query_handler(self, query):
         found = False
@@ -95,7 +95,7 @@ class SpineProtocol(WebSocketServerProtocol):
             if query_handler.query == query:
                 found = True
         if not found:
-            self.handlers["query"] += [WebQueryHandler(query, self)]
+            self.handlers["query"] += [_WebQueryHandler(query, self)]
 
     def add_event_handler(self, event, id_event):
         found = False
@@ -103,7 +103,7 @@ class SpineProtocol(WebSocketServerProtocol):
             if event_handler.event == event and event_handler.id_event == id_event:
                 found = True
         if not found:
-            self.handlers["event"] += [WebEventHandler(event, id_event, self)]
+            self.handlers["event"] += [_WebEventHandler(event, id_event, self)]
 
     def send_response(self, id, response, state="ok", message=""):
         res = {
@@ -150,7 +150,7 @@ class SpineProtocol(WebSocketServerProtocol):
             #self.sendResponse(res,"exception")
 
 TERMINATE_SOCKET=False
-def start(settings):
+def _start(settings):
     global TERMINATE_SOCKET
     try:
         import asyncio
@@ -161,7 +161,7 @@ def start(settings):
     from autobahn.asyncio.websocket import WebSocketServerFactory
 
     factory = WebSocketServerFactory()
-    factory.protocol = SpineProtocol
+    factory.protocol = _SpineProtocol
 
     loop = asyncio.get_event_loop()
     print ("web socket ip:", settings["network"]["IPAddress"], "port:", settings["network"]["WebSocketPort"])
@@ -185,6 +185,6 @@ def start(settings):
             pass
     #loop.run_forever()
 
-def stop():
+def _stop():
     global TERMINATE_SOCKET
     TERMINATE_SOCKET=True

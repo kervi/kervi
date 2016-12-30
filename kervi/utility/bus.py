@@ -12,11 +12,11 @@ from kervi.utility.thread import KerviThread
 
 try:
     import Queue
-except:
+except ImportError:
     import queue as Queue
 from  kervi.kervi_logging import KerviLog
 
-class QueryThread(threading.Thread):
+class _QueryThread(threading.Thread):
     def __init__(self, handler, query, args, **kwargs):
         threading.Thread.__init__(self)
         injected = kwargs.get("injected", "")
@@ -29,7 +29,7 @@ class QueryThread(threading.Thread):
     def run(self):
         self.result = self.handler(self.query, self.args, injected=self.injected)
 
-class CQRSQueue(KerviThread):
+class _CQRSQueue(KerviThread):
     def __init__(self, name):
         KerviThread.__init__(self)
         self.queues = [Queue.Queue(), Queue.Queue(), Queue.Queue()]
@@ -50,18 +50,18 @@ class CQRSQueue(KerviThread):
     def add(self, item, priorty=0):
         self.queues[0].put_nowait(item)
 
-    def step(self):
+    def _step(self):
         item = self.queues[0].get()
         self.queue_handler(item)
 
-class CQRSBus(object):
+class _CQRSBus(object):
     applicationId = ""
     cmd_handlers = NamedLists()
     event_handlers = NamedLists()
     query_handlers = NamedLists()
 
-    cmd_queue = CQRSQueue("cmd")
-    query_queue = CQRSQueue("query")
+    cmd_queue = _CQRSQueue("cmd")
+    query_queue = _CQRSQueue("query")
     event_queue = None #CQRSQueue("event")
 
     linked_spines = []
@@ -84,9 +84,9 @@ class CQRSBus(object):
         self.query_queue.stop()
         #self.eventQueue.stop()
 
-        self.cmd_queue = CQRSQueue("cmd")
-        self.query_queue = CQRSQueue("query")
-        self.event_queue = CQRSQueue("event")
+        self.cmd_queue = _CQRSQueue("cmd")
+        self.query_queue = _CQRSQueue("query")
+        self.event_queue = _CQRSQueue("event")
 
         self.linked_spines = []
 
@@ -160,7 +160,7 @@ class CQRSBus(object):
         self.log.debug("sendQuery:{0} injected:{1}", query, injected)
         if query == "getQueueInfo":
             return self.get_queue_info()
-        query_thread = QueryThread(self.query_handler, query, args, injected=injected)
+        query_thread = _QueryThread(self.query_handler, query, args, injected=injected)
         query_thread.start()
         query_thread.join()
         return query_thread.result

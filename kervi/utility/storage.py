@@ -99,7 +99,8 @@ def store_log_item(id, log_item):
 def get_log_items(date_from, date_to):
     print ("getLogItems")
 
-SPINE.register_query_handler("getSensorData", get_sensor_data)
-SPINE.register_query_handler("getLogItems", get_log_items)
-SPINE.register_event_handler("NewSensorReading", store_sensor_reading)
-SPINE.register_event_handler("newLogItem", store_log_item)
+if (SPINE):
+    SPINE.register_query_handler("getSensorData", get_sensor_data)
+    SPINE.register_query_handler("getLogItems", get_log_items)
+    SPINE.register_event_handler("NewSensorReading", store_sensor_reading)
+    SPINE.register_event_handler("newLogItem", store_log_item)

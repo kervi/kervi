@@ -16,7 +16,7 @@ class CPULoadSensor(Sensor):
         self.min = 0
         self.unit = "%"
         self.store_settings["active"] = False
-        self.dashboards = ["cpu"]
+        self.add_to_dashboard("*", "sys-header", {"type": "sparkline"})
         psutil.cpu_percent()
 
 class MemUseSensor(Sensor):
@@ -30,7 +30,7 @@ class MemUseSensor(Sensor):
         self.unit = "%"
         self.store_settings["active"] = False
         self.store_settings["delta"] = 0.01
-        self.dashboards = ["cpu"]
+        self.add_to_dashboard("*", "sys-header", {"type": "sparkline"})
 
         try:
             percent = psutil.virtual_memory().percent
@@ -48,4 +48,4 @@ class CPUThread(SensorThread):
         self.new_sensor_reading(percent, 1)
 
 CPU_THREAD = CPUThread([CPULoadSensor(), MemUseSensor()])
-CPU_THREAD.start()
+#CPU_THREAD.start()

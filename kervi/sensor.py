@@ -4,13 +4,11 @@ from datetime import datetime
 import time
 from kervi.utility.thread import KerviThread
 from kervi.spine import Spine
+from kervi.utility.component import KerviComponent
 
-class Sensor(object):
+class Sensor(KerviComponent):
     def __init__(self, sensor_id, name):
-        self.spine = Spine()
-        self.spine.register_query_handler("getSensorInfo", self.handle_get_sensor_info)
-        self.sensor_id = sensor_id
-        self.name = name
+        KerviComponent.__init__(self, sensor_id, "sensor", name)
         self.type = None
         self.max = None
         self.min = None
@@ -24,12 +22,10 @@ class Sensor(object):
         self.old_val = None
         self.last_reading = None
         self.sparkline = []
-        self.dashboards = ["global"]
+        print "sensor created", self.component_id
 
-    def handle_get_sensor_info(self):
+    def _get_info(self):
         return {
-            "name":self.name,
-            "id":self.sensor_id,
             "type":self.type,
             "max":self.max,
             "min":self.min,
@@ -40,11 +36,10 @@ class Sensor(object):
             "upperWarningLimit":self.upper_warning_limit,
             "lowerWarningLimit":self.lower_warning_limit,
             "lowerFatalLimit":self.lower_fatal_limit,
-            "sparkline":self.sparkline,
-            "dashboards":self.dashboards
+            "sparkline":self.sparkline
         }
 
-    def delta_exceeded(self,value):
+    def __delta_exceeded(self, value):
         if value is None:
             return False
         elif self.old_val is None:
@@ -57,19 +52,18 @@ class Sensor(object):
             return False
 
     def new_sensor_reading(self, value):
-        if self.delta_exceeded(value):
-            if not  self.sensor_id == "AliveSensor":
-                self.spine.log.debug(
-                    "delta exceeded:{0} value:{1}, old value:{2}",
-                    self.sensor_id,
-                    value,
-                    self.old_val
-                )
+        if self.__delta_exceeded(value):
+            self.spine.log.debug(
+                "delta exceeded:{0} value:{1}, old value:{2}",
+                self.component_id,
+                value,
+                self.old_val
+            )
             timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
-            val = {"sensor":self.sensor_id, "value":value, "timestamp":timestamp}
+            val = {"sensor":self.component_id, "value":value, "timestamp":timestamp}
             if self.store_settings["active"]:
                 self.spine.send_command("StoreSensorValue", val)
-            self.spine.trigger_event("NewSensorReading", self.sensor_id, val)
+            self.spine.trigger_event("NewSensorReading", self.component_id, val)
             self.old_val = value
             if len(self.sparkline) == 0:
                 self.sparkline += [value]
@@ -82,11 +76,13 @@ class Sensor(object):
         pass
 
 class SensorThread(KerviThread):
+    """ Thread that handles polling of one or more sensors """
     def __init__(self, sensors, reading_interval=1):
         KerviThread.__init__(self)
         self.spine = Spine()
-        self.spine.register_command_handler("startThreads", self.start_command)
-        self.spine.register_command_handler("stopThreads", self.stop_command)
+        if self.spine:
+            self.spine.register_command_handler("startThreads", self._start_command)
+            self.spine.register_command_handler("stopThreads", self._stop_command)
         self.alive = False
         self.reading_interval = reading_interval
         if hasattr(sensors, "__len__"):
@@ -97,7 +93,7 @@ class SensorThread(KerviThread):
     def new_sensor_reading(self, value, sensor_idx=0):
         self.sensors[sensor_idx].new_sensor_reading(value)
 
-    def step(self):
+    def _step(self):
         for sensor in self.sensors:
             sensor.read_sensor()
 
@@ -107,12 +103,12 @@ class SensorThread(KerviThread):
     def sensor_step(self):
         pass
 
-    def start_command(self):
+    def _start_command(self):
         if not self.alive:
             self.alive = True
-            super(KerviThread, self).start()
+            KerviThread.start(self)
 
-    def stop_command(self):
+    def _stop_command(self):
         if self.alive:
             self.alive = False
             self.stop()

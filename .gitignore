@@ -4,3 +4,5 @@
 dist
 kervi.egg-info
 kervi-ui/node_modules
+_doc
+_build

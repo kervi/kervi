@@ -1,11 +1,27 @@
 # Copyright (c) 2016, Tim Wentzlau
 # Licensed under MIT
 
+import os
+import threading
+import time
 from kervi.controller import Controller, ControllerNumberInput, ControllerSwitchButton, ControllerButton, ControllerSelect
+from kervi.utility.thread import KerviThread
+import kervi.utility.nethelper as nethelper
+import kervi.spine as spine
+try:
+    from SimpleHTTPServer import SimpleHTTPRequestHandler
+except:
+    from http.server import SimpleHTTPRequestHandler
 
-class CameraPanInput(ControllerNumberInput):
+try:
+    from BaseHTTPServer import HTTPServer
+except:
+    from http.server import HTTPServer
+
+
+class _CameraPanInput(ControllerNumberInput):
     def __init__(self, controller):
-        ControllerNumberInput.__init__(self, controller.controller_id+".pan", "Pan", controller)
+        ControllerNumberInput.__init__(self, controller.component_id+".pan", "Pan", controller)
         self.unit = "degree"
         self.value = 0
         self.max_value = 90
@@ -13,11 +29,11 @@ class CameraPanInput(ControllerNumberInput):
         self.ui = {"orientation":"horizontal", "type":"gauge"}
 
     def value_changed(self, newValue, oldValue):
-        self.controller.pan_changed(newValue)
+        self.controller._pan_changed(newValue)
 
-class CameraTiltInput(ControllerNumberInput):
+class _CameraTiltInput(ControllerNumberInput):
     def __init__(self, controller):
-        ControllerNumberInput.__init__(self, controller.controller_id+".tilt", "Tilt", controller)
+        ControllerNumberInput.__init__(self, controller.component_id+".tilt", "Tilt", controller)
         self.unit = "degree"
         self.value = 0
         self.max_value = 90
@@ -25,15 +41,15 @@ class CameraTiltInput(ControllerNumberInput):
         self.ui = {"orientation":"vertical", "type":"gauge"}
 
     def value_changed(self, newValue, oldValue):
-        self.controller.tilt_changed(newValue)
+        self.controller._tilt_changed(newValue)
 
 
-class CameraFrameRate(ControllerSelect):
+class _CameraFrameRate(ControllerSelect):
     """ Framerate selector """
     def __init__(self, controller):
         ControllerSelect.__init__(
             self,
-            controller.controller_id + ".framerate",
+            controller.component_id + ".framerate",
             "Framerate",
             controller
         )
@@ -42,32 +58,32 @@ class CameraFrameRate(ControllerSelect):
         self.add_option("15", "15 / sec", True)
 
     def change(self, selected_options):
-        self.controller.framerate_changed(selected_options)
+        self.controller._framerate_changed(selected_options)
 
-class CameraRecordButton(ControllerSwitchButton):
+class _CameraRecordButton(ControllerSwitchButton):
     def __init__(self, controller):
         ControllerSwitchButton.__init__(
-            self, controller.controller_id+".record",
+            self, controller.component_id+".record",
             "Record",
             controller)
 
     def on(self):
-        self.controller.start_record()
+        self.controller._start_record()
 
     def off(self):
-        self.controller.stop_record()
+        self.controller._stop_record()
 
-class CameraPictureButton(ControllerButton):
+class _CameraPictureButton(ControllerButton):
     def __init__(self, controller):
         ControllerButton.__init__(
             self,
-            controller.controller_id+".savePicture",
+            controller.component_id+".savePicture",
             "Take picture",
             controller
         )
 
     def click(self):
-        self.controller.save_picture()
+        self.controller._save_picture()
 
 class CameraBase(Controller):
     def __init__(self, camera_id, name):
@@ -75,39 +91,115 @@ class CameraBase(Controller):
         self.type = "camera"
         self.parameters = None
         self.add_components(
-            CameraPanInput(self),
-            CameraTiltInput(self),
-            CameraRecordButton(self),
-            CameraPictureButton(self),
-            CameraFrameRate(self))
-        self.dashboards = None
+            _CameraPanInput(self),
+            _CameraTiltInput(self),
+            _CameraRecordButton(self),
+            _CameraPictureButton(self),
+            _CameraFrameRate(self)
+        )
 
-    def pan_changed(self, panValue):
+    def _pan_changed(self, panValue):
         print ("panChanged", panValue)
         pass
 
-    def tilt_changed(self, tiltValue):
+    def _tilt_changed(self, tiltValue):
         print ("tiltChanged", tiltValue)
         pass
 
-    def framerate_changed(self, framerate):
+    def _framerate_changed(self, framerate):
         print ("framerateChanged", framerate)
         pass
 
-    def save_picture(self):
+    def _save_picture(self):
         print ("save picture")
         pass
 
-    def start_record(self):
+    def _start_record(self):
         print ("start record")
         pass
 
-    def stop_record(self):
+    def _stop_record(self):
         print ("stop record")
         pass
 
 class Camera(CameraBase):
     def __init__(self, camera_id, name, dashboards, source):
         CameraBase.__init__(self, camera_id, name)
+        
         self.parameters = {"height":480, "width":640, "source":source}
-        self.dashboards = dashboards
+
+
+class _FrameThread(KerviThread):
+    def __init__(self, camera):
+        KerviThread.__init__(self)
+        self.spine = spine.Spine()
+        self.alive = False
+        self.camera = camera
+        if self.spine:
+            self.spine.register_command_handler("startThreads", self._start_command)
+            self.spine.register_command_handler("stopThreads", self._stop_command)
+        KerviThread.__init__(self)
+
+    def _step(self):
+        self.camera._get_frame()
+
+    def _start_command(self):
+        if not self.alive:
+            self.alive = True
+            KerviThread.start(self)
+
+    def _stop_command(self):
+        if self.alive:
+            self.alive = False
+            self.stop()
+
+class FrameCamera(CameraBase):
+    def __init__(self, camera_id, name, **kwargs):
+        CameraBase.__init__(self, camera_id, name)
+        cwd = os.getcwd()
+        self.docpath = os.path.join(cwd, "web_assets")
+        self.frame_path = os.path.join(self.docpath, camera_id+".png")
+        print self.frame_path
+        self.ip_address = nethelper.get_ip_address()
+        self.ip_port = nethelper.get_free_port()
+        self.fps = kwargs.get("fps", 10)
+        
+        os.chdir(self.docpath)
+        self.server = HTTPServer(
+            (self.ip_address, self.ip_port),
+            SimpleHTTPRequestHandler
+        )
+        self.server_thread = threading.Thread(target=self.server.serve_forever)
+        self.server_thread.daemon = True
+        self.server_thread.start()
+
+        self.frame_thread = _FrameThread(self)
+        self.parameters = {
+            "height":kwargs.get("height", 480),
+            "width":kwargs.get("width", 640),
+            "fps":self.fps,
+            "source":"http://"+str(self.ip_address)+":"+str(self.ip_port)+"/"+camera_id+".png"
+        }
+
+        print self.parameters["source"]
+
+    def _get_frame(self):
+        frame = self.get_frame(self.parameters["height"], self.parameters["width"])
+        if frame:
+            frame.save(self.frame_path, 'png')
+        time.sleep(1.0/self.fps)
+
+    def get_frame(self, height, width):
+        """abstract method"""
+        from PIL import Image
+        return Image.new('RGBA', size=(height, width), color=(155, 0, 0))
+
+class IPCamera(CameraBase):
+    def __init__(self, camera_id, name, dashboards, source):
+        CameraBase.__init__(self, camera_id, name)
+        self.parameters = {"height":480, "width":640, "source":source}
+
+class USBCamera(CameraBase):
+    def __init__(self, camera_id, name, dashboards, source):
+        CameraBase.__init__(self, camera_id, name)
+        self.parameters = {"height":480, "width":640, "source":source}
