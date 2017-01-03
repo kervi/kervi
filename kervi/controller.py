@@ -30,6 +30,16 @@ class ControllerSelect(KerviComponent):
         self.change_command = self.component_id + ".change"
         self.spine.register_command_handler(self.change_command, self._on_change_handler)
 
+    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.add_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            {
+                "size": kwargs.get("ui_size", 1),
+                "type": kwargs.get("ui_type", "dropdown"),
+            })
+
     def _get_info(self):
         return {
             "onSelect": self.change_command,
@@ -38,7 +48,7 @@ class ControllerSelect(KerviComponent):
 
     def add_option(self, value, text, selected=False):
         """
-        Add option to select 
+        Add option to select
         """
         option = {"value": value, "text": text, "selected":selected}
         self.options += [option]
@@ -87,6 +97,16 @@ class ControllerButton(KerviComponent):
         self.click_command = self.component_id + ".click"
         self.spine.register_command_handler(self.click_command, self._on_click_handler)
 
+    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.add_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            {
+                "size": kwargs.get("ui_size", 1),
+                "type": kwargs.get("ui_type", "normal")
+            })
+
     def _get_info(self):
         return {
             "onClick":self.click_command
@@ -123,6 +143,16 @@ class ControllerSwitchButton(KerviComponent):
 
         self.spine.register_command_handler(self.on_command, self._on_on_handler)
         self.spine.register_command_handler(self.off_command, self._on_off_handler)
+
+    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.add_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            {
+                "size": kwargs.get("ui_size", 1),
+                "type": kwargs.get("ui_type", "normal"),
+            })
 
     def _get_info(self):
         return {
@@ -194,8 +224,18 @@ class ControllerNumberInput(KerviComponent):
         self.value = 0
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
-        self.input_type = "number"
-        self.ui = {"orientation":"vertical", "type":"singleLine"}
+        
+
+
+    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.add_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            {
+                "size": kwargs.get("ui_size", 1),
+                "type": kwargs.get("ui_type", "slider"),
+            })
 
     def _set_value(self, nvalue):
         if self.value != nvalue:
@@ -223,7 +263,6 @@ class ControllerNumberInput(KerviComponent):
 
     def _get_info(self):
         return {
-            "ui":self.ui,
             "unit":self.unit,
             "value":self.value,
             "maxValue":self.max_value,
@@ -243,7 +282,16 @@ class ControllerTextInput(KerviComponent):
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
         self.input_type = "text"
-        self.ui = {"orientation":"vertical", "type":"gauge"}
+
+    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.add_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            {
+                "size": kwargs.get("ui_size", 1),
+                "type": kwargs.get("ui_type", "text"),
+            })
 
     def _set_value(self, nvalue):
         if self.value != nvalue:
@@ -273,7 +321,6 @@ class ControllerTextInput(KerviComponent):
 
     def _get_info(self):
         return {
-            "ui":self.ui,
             "value":self.value,
             "command":self.command
         }
@@ -290,7 +337,17 @@ class ControllerDateTimeInput(KerviComponent):
         self.value = ""
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
-        self.ui = {"orientation":"vertical", "type":"gauge"}
+
+    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.add_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            {
+                "size": kwargs.get("ui_size", 1),
+                "type": kwargs.get("ui_type", "datetime"),
+                "showSparkline": kwargs.get("ui_show_sparkline", True),
+            })
 
     def _set_value(self, nvalue):
         if self.value != nvalue:
@@ -319,7 +376,6 @@ class ControllerDateTimeInput(KerviComponent):
     def _get_info(self):
         return {
             "inputType": self.input_type,
-            "ui":self.ui,
             "value":self.value,
             "command":self.command
         }
@@ -333,6 +389,16 @@ class Controller(KerviComponent):
         self.components = []
         self.type = "unknown"
         self.parameters = {}
+
+    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.add_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            {
+                "size": kwargs.get("ui_size", 1),
+                "type": kwargs.get("ui_type", "normal")
+            })
 
     def add_components(self, *args):
         for component in args:

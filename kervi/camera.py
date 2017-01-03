@@ -26,6 +26,7 @@ class _CameraPanInput(ControllerNumberInput):
         self.value = 0
         self.max_value = 90
         self.min_value = -90
+        self.visible = False
         self.ui = {"orientation":"horizontal", "type":"gauge"}
 
     def value_changed(self, newValue, oldValue):
@@ -38,6 +39,7 @@ class _CameraTiltInput(ControllerNumberInput):
         self.value = 0
         self.max_value = 90
         self.min_value = -90
+        self.visible = False
         self.ui = {"orientation":"vertical", "type":"gauge"}
 
     def value_changed(self, newValue, oldValue):
@@ -191,8 +193,16 @@ class FrameCamera(CameraBase):
 
     def get_frame(self, height, width):
         """abstract method"""
-        from PIL import Image
-        return Image.new('RGBA', size=(height, width), color=(155, 0, 0))
+        from PIL import Image, ImageDraw, ImageFont
+
+        image = Image.new('RGBA', size=(width, height), color=(155, 0, 0))
+        draw = ImageDraw.Draw(image)
+        draw.rectangle([(width/2-50, height/2-50), (width/2+50, height/2+50)])
+        draw.rectangle([(10, 10), (width-10, height-10)])
+
+        font = ImageFont.truetype("sans-serif.ttf", 32)
+        draw.text((15, 15), "test", font=font)
+        return image
 
 class IPCamera(CameraBase):
     def __init__(self, camera_id, name, dashboards, source):

@@ -24,6 +24,17 @@ class Sensor(KerviComponent):
         self.sparkline = []
         print "sensor created", self.component_id
 
+    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.add_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            {
+                "size": kwargs.get("ui_size", 1),
+                "type": kwargs.get("ui_type", "value"),
+                "showSparkline": kwargs.get("ui_show_sparkline", True),
+            })
+
     def _get_info(self):
         return {
             "type":self.type,

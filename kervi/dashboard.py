@@ -19,6 +19,7 @@ class DashboardSection(object):
 
         :Keyword Arguments:
             * *ui_title* (``str``) -- Title of the section.
+            * *ui_columns* (``int``) -- Number of columns in the section, default is 1.
 
         """
     def __init__(self, section_id, **kwargs):
@@ -26,7 +27,8 @@ class DashboardSection(object):
         self.spine = spine.Spine()
         self.section_id = section_id
         self.ui_parameters = {
-            "title":kwargs.get("ui_title", "")
+            "title":kwargs.get("ui_title", ""),
+            "columns":kwargs.get("ui_columns", 1)
         }
         self.dashboard = None
         self.section_id = section_id
@@ -88,6 +90,7 @@ class Dashboard(KerviComponent):
         KerviComponent.__init__(self, dashboard_id, "dashboard", name)
         self.dashboard_id = dashboard_id
         self.is_default = kwargs.get("is_default", False)
+        self.unit_size = kwargs.get("unit_size", 150)
         self.sections = []
         self.add_section(DashboardSection("sys-header"))
         self.add_section(DashboardSection("header"))
@@ -126,7 +129,8 @@ class Dashboard(KerviComponent):
             "isDefault": self.is_default,
             "template" : template,
             "sections" : sections,
-            "background": self.background
+            "background": self.background,
+            "unitSize": self.unit_size
         }
 
 class Camboard(Dashboard):

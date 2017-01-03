@@ -6,6 +6,7 @@ class KerviComponent(object):
         self.component_id = component_id
         self.component_type = component_type
         self.name = name
+        self.visible = True
         self.dashboards = []
         if self.spine:
             self.spine.register_query_handler(
@@ -14,11 +15,11 @@ class KerviComponent(object):
             )
             self.spine.register_query_handler("getComponentInfo", self._get_component_info)
 
-    def add_to_dashboard(self, dashboard_id, section_id, ui_parameters):
+    def add_to_dashboard(self, dashboard_id, section_id, parameters):
         self.dashboards += [{
             "dashboardId":dashboard_id,
             "sectionId":section_id,
-            "parameters": ui_parameters
+            "parameters": parameters
         }]
 
     def get_reference(self):
@@ -41,6 +42,7 @@ class KerviComponent(object):
         info = self._get_info()
         info["componentType"] = self.component_type
         info["id"] = self.component_id
+        info["visible"] = self.visible
         #info["dashboards"] = self.dashboards
         info["name"] = self.name
         return info
