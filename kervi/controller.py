@@ -224,7 +224,7 @@ class ControllerNumberInput(KerviComponent):
         self.value = 0
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
-        
+
 
 
     def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -234,7 +234,7 @@ class ControllerNumberInput(KerviComponent):
             section_id,
             {
                 "size": kwargs.get("ui_size", 1),
-                "type": kwargs.get("ui_type", "slider"),
+                "type": kwargs.get("ui_type", "horizontal_slider"),
             })
 
     def _set_value(self, nvalue):
