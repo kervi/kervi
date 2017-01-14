@@ -152,12 +152,3 @@ class Camboard(Dashboard):
     """
     def __init__(self, dashboard_id, name, camera_id, is_default=False):
         Dashboard.__init__(self, dashboard_id, name, is_default=is_default, camera=camera_id)
-        self.add_section(DashboardSection("0_0"))
-        self.add_section(DashboardSection("0_1", ui_columns=2))
-        self.add_section(DashboardSection("0_2"))
-        self.add_section(DashboardSection("1_0"))
-        self.add_section(DashboardSection("1_1"))
-        self.add_section(DashboardSection("1_2"))
-        self.add_section(DashboardSection("2_0"))
-        self.add_section(DashboardSection("2_1"))
-        self.add_section(DashboardSection("2_2", ui_columns=2))

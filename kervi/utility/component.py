@@ -16,10 +16,14 @@ class KerviComponent(object):
             self.spine.register_query_handler("getComponentInfo", self._get_component_info)
 
     def add_to_dashboard(self, dashboard_id, section_id, parameters):
+        param = parameters
+        if not  "addToHeader" in param:
+            param["addToHeader"] = False
+
         self.dashboards += [{
             "dashboardId":dashboard_id,
             "sectionId":section_id,
-            "parameters": parameters
+            "parameters": param
         }]
 
     def get_reference(self):
@@ -48,9 +52,11 @@ class KerviComponent(object):
         return info
 
     def _get_dashboard_components(self, dashboard_id, section_id):
+        result = []
         for dashboard in self.dashboards:
             if (dashboard["dashboardId"] == "*" or dashboard["dashboardId"] == dashboard_id) and dashboard["sectionId"] == section_id:
-                return {
+                result += [{
                     "componentId":self.component_id,
                     "parameters":dashboard["parameters"]
-                }
+                }]
+        return result

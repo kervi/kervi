@@ -26,7 +26,7 @@ class _CameraPanInput(ControllerNumberInput):
         self.value = 0
         self.max_value = 90
         self.min_value = -90
-        self.visible = False
+        self.visible = True
         self.ui = {"orientation":"horizontal", "type":"gauge"}
 
     def value_changed(self, newValue, oldValue):
@@ -39,7 +39,7 @@ class _CameraTiltInput(ControllerNumberInput):
         self.value = 0
         self.max_value = 90
         self.min_value = -90
-        self.visible = False
+        self.visible = True
         self.ui = {"orientation":"vertical", "type":"gauge"}
 
     def value_changed(self, newValue, oldValue):

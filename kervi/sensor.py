@@ -33,6 +33,7 @@ class Sensor(KerviComponent):
                 "size": kwargs.get("ui_size", 1),
                 "type": kwargs.get("ui_type", "value"),
                 "showSparkline": kwargs.get("ui_show_sparkline", True),
+                "addToHeader":kwargs.get("add_to_header", False)
             })
 
     def _get_info(self):
