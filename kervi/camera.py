@@ -165,7 +165,7 @@ class FrameCamera(CameraBase):
         self.ip_address = nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()
         self.fps = kwargs.get("fps", 10)
-        
+
         os.chdir(self.docpath)
         self.server = HTTPServer(
             (self.ip_address, self.ip_port),

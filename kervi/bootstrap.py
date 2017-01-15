@@ -20,7 +20,7 @@ class _KerviSensors(process._KerviProcess):
     """ Private class that starts a seperate process that loads sensors in the Kervi application """
     def init_process(self):
         print ("init mp sensors")
-        import kervi.core_sensors.cpu_sensors
+        #import kervi.core_sensors.cpu_sensors
         try:
             import sensors
         except ImportError:
@@ -39,6 +39,19 @@ class _KerviControllers(process._KerviProcess):
             import controllers
         except ImportError:
             self.spine.log.exception("load controllers")
+        self.spine.send_command("startThreads")
+
+    def terminate_process(self):
+        pass
+
+class _KerviCams(process._KerviProcess):
+    """ Private class that starts a seperate process that loads cam controllers in the Kervi application """
+    def init_process(self):
+        print ("load controllers")
+        try:
+            import cams
+        except ImportError:
+            self.spine.log.exception("load cams")
         self.spine.send_command("startThreads")
 
     def terminate_process(self):
@@ -132,12 +145,20 @@ class Application(object):
                     self.settings["network"]["IPCBasePort"]+2,
                     _KerviControllers
                 )
+            elif module == "cams":
+                time.sleep(2)
+                self.p2 = process._start_process(
+                    "cams",
+                    self.settings,
+                    self.settings["network"]["IPCBasePort"]+3,
+                    _KerviCams
+                )
 
         time.sleep(2)
         self.p3 = process._start_process(
             "IPC", 
             self.settings,
-            self.settings["network"]["IPCBasePort"]+3,
+            self.settings["network"]["IPCBasePort"]+4,
             _KerviSocketIPC
         )
 
