@@ -44,7 +44,6 @@ setup(
         'kervi-ui',
         'kervi-cli',
         'autobahn[asyncio]',
-        'psutil',
         'pillow'
     ],
 )
