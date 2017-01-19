@@ -19,7 +19,9 @@ class DashboardSection(object):
 
         :Keyword Arguments:
             * *ui_title* (``str``) -- Title of the section.
-            * *ui_columns* (``int``) -- Number of columns in the section, default is 1.
+            * *ui_columns* (``int``) -- Number of columns in this section, default is 1.
+            * *ui_rows* (``int``) -- Number of rows in this section, default is 1.
+            * *add_user_log* (``bool``) -- This section shows user log messages.
 
         """
     def __init__(self, section_id, **kwargs):
@@ -28,7 +30,9 @@ class DashboardSection(object):
         self.section_id = section_id
         self.ui_parameters = {
             "title":kwargs.get("ui_title", ""),
-            "columns":kwargs.get("ui_columns", 1)
+            "columns":kwargs.get("ui_columns", 1),
+            "rows":kwargs.get("ui_rows", 1),
+            "userLog":kwargs.get("user_log", False)
         }
         self.dashboard = None
         self.section_id = section_id

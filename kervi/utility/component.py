@@ -1,4 +1,6 @@
+from datetime import datetime
 import kervi.spine as spine
+
 
 class KerviComponent(object):
     def __init__(self, component_id, component_type, name):
@@ -14,6 +16,18 @@ class KerviComponent(object):
                 self._get_dashboard_components
             )
             self.spine.register_query_handler("getComponentInfo", self._get_component_info)
+
+    def user_log_message(self, topic, body=None, type="information"):
+        """"
+        Adds a message to the user log. 
+        """
+        timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+        self.spine.trigger_event("userLogMessage", None, {
+            "topic": topic,
+            "body": body,
+            "timestamp": timestamp,
+            "type": type
+        })
 
     def add_to_dashboard(self, dashboard_id, section_id, parameters):
         param = parameters
