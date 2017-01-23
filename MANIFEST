@@ -15,10 +15,10 @@ kervi\vision.py
 kervi/core_sensors\__init__.py
 kervi/core_sensors\sensor_cache.py
 kervi/core_sensors/cpu_sensors\__init__.py
-kervi/core_sensors/cpu_sensors\alive_sensor.py
 kervi/core_sensors/cpu_sensors\cpu.py
 kervi/utility\__init__.py
 kervi/utility\bus.py
+kervi/utility\component.py
 kervi/utility\named_lists.py
 kervi/utility\nethelper.py
 kervi/utility\process.py
@@ -26,3 +26,7 @@ kervi/utility\process_spine.py
 kervi/utility\socket_spine.py
 kervi/utility\storage.py
 kervi/utility\thread.py
+kervi\fonts\Fanwood-Italic.otf
+kervi\fonts\Fanwood.otf
+kervi\fonts\FanwoodText-Italic.otf
+kervi\fonts\FanwoodText.otf

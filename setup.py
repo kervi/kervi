@@ -46,5 +46,11 @@ setup(
         'autobahn[asyncio]',
         'pillow'
     ],
+    include_package_data=True,
+    package_data={
+        "kervi":[
+            "fonts/*.*"
+        ]
+    }
 )
 
