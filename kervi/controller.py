@@ -45,9 +45,9 @@ class ControllerSelect(KerviComponent):
             {
                 "size": kwargs.get("ui_size", self.ui_parameters["size"]),
                 "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_type", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_type", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_type", self.ui_parameters["flat"]),
+                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
+                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
+                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
             })
 
     def _get_info(self):
@@ -122,9 +122,9 @@ class ControllerButton(KerviComponent):
             {
                 "size": kwargs.get("ui_size", self.ui_parameters["size"]),
                 "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_type", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_type", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_type", self.ui_parameters["flat"]),
+                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
+                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
+                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
             })
 
     def _get_info(self):
@@ -179,9 +179,9 @@ class ControllerSwitchButton(KerviComponent):
             {
                 "size": kwargs.get("ui_size", self.ui_parameters["size"]),
                 "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_type", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_type", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_type", self.ui_parameters["flat"]),
+                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
+                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
+                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
             })
 
     def _get_info(self):
@@ -271,9 +271,9 @@ class ControllerNumberInput(KerviComponent):
             {
                 "size": kwargs.get("ui_size", self.ui_parameters["size"]),
                 "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_type", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_type", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_type", self.ui_parameters["flat"]),
+                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
+                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
+                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
             })
 
     def _set_value(self, nvalue):
@@ -337,9 +337,9 @@ class ControllerTextInput(KerviComponent):
             {
                 "size": kwargs.get("ui_size", self.ui_parameters["size"]),
                 "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_type", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_type", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_type", self.ui_parameters["flat"]),
+                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
+                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
+                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
             })
 
     def _set_value(self, nvalue):
@@ -402,9 +402,9 @@ class ControllerDateTimeInput(KerviComponent):
             {
                 "size": kwargs.get("ui_size", self.ui_parameters["size"]),
                 "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_type", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_type", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_type", self.ui_parameters["flat"]),
+                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
+                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
+                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
             })
 
     def _set_value(self, nvalue):
@@ -463,9 +463,9 @@ class Controller(KerviComponent):
             {
                 "size": kwargs.get("ui_size", self.ui_parameters["size"]),
                 "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_type", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_type", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_type", self.ui_parameters["flat"]),
+                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
+                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
+                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
             })
 
     def add_components(self, *args):
