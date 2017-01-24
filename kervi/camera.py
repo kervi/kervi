@@ -28,7 +28,7 @@ class _CameraPanInput(ControllerNumberInput):
         self.value = 0
         self.max_value = 90
         self.min_value = -90
-        self.visible = True
+        self.visible = False
 
     def value_changed(self, newValue, oldValue):
         self.controller.pan_changed(newValue)
@@ -40,7 +40,7 @@ class _CameraTiltInput(ControllerNumberInput):
         self.value = 0
         self.max_value = 90
         self.min_value = -90
-        self.visible = True
+        self.visible = False
 
     def value_changed(self, newValue, oldValue):
         self.controller.tilt_changed(newValue)
@@ -68,6 +68,7 @@ class _CameraRecordButton(ControllerSwitchButton):
             self, controller.component_id+".record",
             "Record",
             controller)
+        self.ui_parameters["icon"]="video-camera"
 
     def on(self):
         self.controller.start_record()
@@ -83,6 +84,7 @@ class _CameraPictureButton(ControllerButton):
             "Take picture",
             controller
         )
+        self.ui_parameters["icon"] = "camera"
 
     def click(self):
         self.controller.save_picture()
@@ -227,10 +229,10 @@ class FrameCamera(CameraBase):
     :Keyword Arguments:
             * *height* (``int``) --
                 Height of video frame. Default value is 480.
-            
+
             * *width* (``int``) --
                 Width of video frame. Default value is 640.
-            
+
             * *fps* (``int``) --
                 Frames per second.
     """

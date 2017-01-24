@@ -22,19 +22,30 @@ class Sensor(KerviComponent):
         self.old_val = None
         self.last_reading = None
         self.sparkline = []
+        self.ui_parameters = {
+            "size": 1,
+            "type": "value",
+            "chart_points": 60,
+            "show_sparkline": True,
+            "add_to_header": False,
+            "icon": None,
+            "flat": False
+        }
         print "sensor created", self.component_id
 
     def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
-        KerviComponent.add_to_dashboard(
+        return KerviComponent.add_to_dashboard(
             self,
             dashboard_id,
             section_id,
             {
-                "size": kwargs.get("ui_size", 1),
-                "type": kwargs.get("ui_type", "value"),
-                "chartPoints": kwargs.get("chart_points", 60),
-                "showSparkline": kwargs.get("ui_show_sparkline", True),
-                "addToHeader":kwargs.get("add_to_header", False)
+                "size": kwargs.get("ui_size", self.ui_parameters["size"]),
+                "type": kwargs.get("ui_type", self.ui_parameters["type"]),
+                "chartPoints": kwargs.get("ui_chart_points", self.ui_parameters["chart_points"]),
+                "showSparkline": kwargs.get("ui_show_sparkline", self.ui_parameters["show_sparkline"]),
+                "addToHeader":kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
+                "icon":kwargs.get("ui_icon", self.ui_parameters["icon"]),
+                "flat":kwargs.get("ui_flat", self.ui_parameters["flat"])
             })
 
     def _get_info(self):
