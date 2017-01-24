@@ -86,6 +86,7 @@ class KerviComponent(object):
         info["id"] = self.component_id
         info["visible"] = self.visible
         info["name"] = self.name
+        info["ui"] = self.ui_parameters
         return info
 
     def _get_dashboard_components(self, dashboard_id, section_id):
