@@ -31,7 +31,6 @@ class Sensor(KerviComponent):
             "icon": None,
             "flat": False
         }
-        print "sensor created", self.component_id
 
     def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
         return KerviComponent.add_to_dashboard(
