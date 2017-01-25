@@ -43,7 +43,7 @@ setup(
     install_requires=[
         'kervi-ui',
         'kervi-cli',
-        'autobahn[asyncio]',
+        'autobahn',
         'pillow'
     ],
     include_package_data=True,

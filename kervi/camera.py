@@ -4,7 +4,12 @@
 import os
 import threading
 import time
-import StringIO
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 import socket
 from kervi.controller import Controller, ControllerNumberInput, ControllerSwitchButton, ControllerButton, ControllerSelect
 from kervi.utility.thread import KerviThread

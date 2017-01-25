@@ -42,7 +42,7 @@ def init_db():
         for command in sql_commands:
             try:
                 con.execute(command)
-            except OperationalError, msg:
+            except OperationalError as msg:
                 SPINE.log.error("Command skipped: {0}", msg)
 
 init_db()
