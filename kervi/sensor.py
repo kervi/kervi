@@ -29,7 +29,8 @@ class Sensor(KerviComponent):
             "show_sparkline": True,
             "add_to_header": False,
             "icon": None,
-            "flat": False
+            "flat": False,
+            "show_value": True,
         }
 
     def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -44,7 +45,8 @@ class Sensor(KerviComponent):
                 "showSparkline": kwargs.get("ui_show_sparkline", self.ui_parameters["show_sparkline"]),
                 "addToHeader":kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
                 "icon":kwargs.get("ui_icon", self.ui_parameters["icon"]),
-                "flat":kwargs.get("ui_flat", self.ui_parameters["flat"])
+                "flat":kwargs.get("ui_flat", self.ui_parameters["flat"]),
+                "showValue":kwargs.get("ui_show_value", self.ui_parameters["show_value"]),
             })
 
     def _get_info(self):
