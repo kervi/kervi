@@ -243,7 +243,7 @@ class FrameCamera(CameraBase):
     """
     def __init__(self, camera_id, name, **kwargs):
         CameraBase.__init__(self, camera_id, name)
-        self.ip_address = "localhost" #nethelper.get_ip_address()
+        self.ip_address = nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()
         self.fps = kwargs.get("fps", 10)
         self.current_frame = None
