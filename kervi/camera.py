@@ -6,9 +6,9 @@ import threading
 import time
 
 try:
-    from StringIO import StringIO
+    from io import BytesIO
 except ImportError:
-    from io import StringIO
+    from StringIO import StringIO as BytesIO
 
 import socket
 from kervi.controller import Controller, ControllerNumberInput, ControllerSwitchButton, ControllerButton, ControllerSelect
@@ -198,7 +198,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
             self.send_header('Content-type', 'image/png')
 
             if self.server.camera.current_frame:
-                buf = StringIO.StringIO()
+                buf = BytesIO()
                 self.server.camera.current_frame.save(buf, format='png')
                 data = buf.getvalue()
                 self.send_header('Content-length', len(data))
@@ -243,7 +243,7 @@ class FrameCamera(CameraBase):
     """
     def __init__(self, camera_id, name, **kwargs):
         CameraBase.__init__(self, camera_id, name)
-        self.ip_address = nethelper.get_ip_address()
+        self.ip_address = "localhost" #nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()
         self.fps = kwargs.get("fps", 10)
         self.current_frame = None
