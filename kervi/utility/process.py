@@ -54,6 +54,8 @@ def _launch(name, process_class, settings, ipc_port):
     try:
         while not process.do_terminate:
             time.sleep(1)
+    except KeyboardInterrupt:
+        pass
     except:
         log.exception("error in process loop")
 
