@@ -8,8 +8,8 @@ Features of the framework are:
 * Integrated camera handling (Raspberry PI camera at the moment)
 * Easy dahsboard setup.
 * Dashboard UI is responsive and scales from mobile phones to desktop.
-* Multi process oriented by spreading over more than one core
-
+* Multi process oriented by spreading over more than one core.
+* No need for knowing anything about web tecknologies dashboard layout and settings are done in python. 
 
 Install Kervi via pip:
 ```
