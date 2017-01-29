@@ -18,7 +18,7 @@ import kervi_ui.webserver as webserver
 class _KerviSensors(process._KerviProcess):
     """ Private class that starts a seperate process that loads sensors in the Kervi application """
     def init_process(self):
-        print ("init mp sensors")
+        print ("load sensors")
         #import kervi.core_sensors.cpu_sensors
         try:
             import sensors
@@ -46,7 +46,7 @@ class _KerviControllers(process._KerviProcess):
 class _KerviCams(process._KerviProcess):
     """ Private class that starts a seperate process that loads cam controllers in the Kervi application """
     def init_process(self):
-        print ("load controllers")
+        print ("load cameras")
         try:
             import cams
         except ImportError:
@@ -60,7 +60,7 @@ class _KerviSocketIPC(process._KerviProcess):
     """ Private class that starts a seperate process for IPC communication in the Kervi application """
 
     def init_process(self):
-        print ("init IPC")
+        print ("load interprocess communication")
         import kervi.utility.socket_spine as socketSpine
         time.sleep(2)
         socketSpine._start(self.settings)
@@ -142,6 +142,7 @@ class Application(object):
         return self.settings["info"]
 
     def _start(self):
+        print("Starting kervi application, please wait")
         self.started = True
         process._start_root_spine(self.settings, True)
         self.spine = spine.Spine()
@@ -192,7 +193,7 @@ class Application(object):
 
         time.sleep(2)
         http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
-        print ("start web ui on:", http_address)
+        print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
         webserver.start(
             self.settings["network"]["IPAddress"],
             self.settings["network"]["WebPort"],

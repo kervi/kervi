@@ -164,7 +164,7 @@ def _start(settings):
     factory.protocol = _SpineProtocol
 
     loop = asyncio.get_event_loop()
-    print ("web socket ip:", settings["network"]["IPAddress"], "port:", settings["network"]["WebSocketPort"])
+    #print("web socket ip:", settings["network"]["IPAddress"], "port:", settings["network"]["WebSocketPort"])
 
     Spine().log.debug(
         "start websocket on:{0}, port:{1}",

@@ -177,7 +177,7 @@ class _ProcessSpine(object):
         conn = None
         while conn is None:
             try:
-                print ("Try to connect to root:")
+                #print("Try to connect to root:")
                 root_address = (
                     self.settings["network"]["IPAddress"],
                     self.settings["network"]["IPCBasePort"]
@@ -190,7 +190,7 @@ class _ProcessSpine(object):
                 self.spine.log.exception("root not found")
                 #print ("root not found")
                 time.sleep(1)
-        print ("root found and connected")
+        #print("root found and connected")
         conn.send({"messageType":"registerProcess", "address":self.address})
         self.add_process_connection(conn, root_address, True)
 

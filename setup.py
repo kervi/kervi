@@ -37,8 +37,7 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: MacOS",
         "Operating System :: POSIX :: Linux",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.5"
+        "Programming Language :: Python :: 3.4"
     ],
     install_requires=[
         'kervi-ui',
