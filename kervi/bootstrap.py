@@ -2,7 +2,6 @@
 # Licensed under MIT
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
-
 import time
 try:
     import thread
@@ -106,9 +105,38 @@ class Application(object):
     def __init__(self, settings):
         """ Settings is a dictionary with the following content
         """
-        self.settings = settings
+
+        self.settings = {
+            "info":{
+                "id":None,
+                "name":None,
+                "appKey":None,
+            },
+            "log" : {
+                "level":"WARNING",
+                "file":"myapp.log",
+                "resetLog":True
+            },
+            "modules":["sensors", "controllers", "cams"],
+            "network":{
+                "IPAddress": None,
+                "IPCBasePort":None,
+                "WebSocketPort":None,
+                "WebPort": None,
+                "IPCSecret":None
+            }
+        }
+
+
+
+        self.settings.update(settings)
+        self._validateSettings()
         self.started = False
         self.spine = spine.Spine()
+
+
+    def _validateSettings(self):
+        pass
 
     def _get_application_info(self):
         return self.settings["info"]

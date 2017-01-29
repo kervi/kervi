@@ -24,13 +24,19 @@ class KerviComponent(object):
         self.icon = None
         self.visible = True
         self.dashboard_links = []
-        self.ui_parameters = {}
+        self._ui_parameters = {}
         if self.spine:
             self.spine.register_query_handler(
                 "getDashboardComponents",
                 self._get_dashboard_components
             )
             self.spine.register_query_handler("getComponentInfo", self._get_component_info)
+
+    def set_ui_parameter(self, name, value):
+        if name in self._ui_parameters:
+            self._ui_parameters[name] = value
+        else:
+            raise ValueError("invalud ui parameter name:" + name)
 
     def user_log_message(self, topic, body=None, type="information"):
         """"
@@ -52,15 +58,23 @@ class KerviComponent(object):
         self.icon = icon
         self.spine.trigger_event("componentChangeIcon", self.component_id, icon)
 
-    def add_to_dashboard(self, dashboard_id, section_id, parameters):
-        param = parameters
-        if not  "addToHeader" in param:
-            param["addToHeader"] = False
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        ui_param = {}
+        for key, value in self._ui_parameters.items():
+            ui_param[key] = value
 
-        if not  "ui_icon" in param:
-            param["ui_icon"] = None
+        for key, value in kwargs.items():
+            if key in ui_param:
+                ui_param[key] = value
+            else:
+                raise ValueError("illigal ui parameter name:" + key)
 
-        link = DasboardSectionLink(dashboard_id, section_id, param, self)
+        if not  "link_to_header" in ui_param:
+            ui_param["link_to_header"] = False
+
+        if not  "icon" in ui_param:
+            ui_param["icon"] = None
+        link = DasboardSectionLink(dashboard_id, section_id, ui_param, self)
         self.dashboard_links += [link]
         return link
 
@@ -86,16 +100,34 @@ class KerviComponent(object):
         info["id"] = self.component_id
         info["visible"] = self.visible
         info["name"] = self.name
-        info["ui"] = self.ui_parameters
+        info["ui"] = self._ui_parameters
         return info
+
+    def _underscore_to_camelcase(self, value):
+        def camelcase(): 
+            yield str.lower
+            while True:
+                yield str.capitalize
+
+        c = camelcase()
+        return "".join(next(c)(x) if x else '_' for x in value.split("_"))
+
+
+    def _camelCaseParameters(self, parameters):
+        result = {}
+        for key in parameters:
+            result[self._underscore_to_camelcase(key)] = parameters[key]
+        return result
 
     def _get_dashboard_components(self, dashboard_id, section_id):
         result = []
         for link in self.dashboard_links:
             if (link.dashboard_id == "*" or link.dashboard_id == dashboard_id) and link.section_id == section_id:
+                param = self._camelCaseParameters(link.parameters)
+                #print("pmr", link.dashboard_id, dashboard_id, section_id, self.component_id, param)
                 result += [{
                     "linkId": link.link_id,
                     "componentId":self.component_id,
-                    "parameters":link.parameters
+                    "parameters":param
                 }]
         return result

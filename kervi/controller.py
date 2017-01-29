@@ -29,26 +29,47 @@ class ControllerSelect(KerviComponent):
         self.selected_options = []
         self.change_command = self.component_id + ".change"
         self.spine.register_command_handler(self.change_command, self._on_change_handler)
-        self.ui_parameters = {
+        self._ui_parameters = {
             "size": 1,
             "type": "dropdown",
-            "add_to_header": False,
+            "link_to_header": False,
             "icon": None,
             "flat": False
         }
 
-    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
-        KerviComponent.add_to_dashboard(
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        r"""
+        Links this component to a dashboard section.
+
+        :param dashboard_id:
+            id of the dashboard to link to.
+        :type section_id: str
+
+        :param section_id:
+            id of the section.
+        :type section_id: str
+
+        :param \**kwargs:
+            Use the kwargs below to override default values set in ui_parameters
+
+        :Keyword Arguments:
+            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
+            In order to make the sections and components align correct a dashboard unit is defined.
+            Default the dashboard unit is a square that is 150 x 150 pixels.
+            The width of the select box is ui_size * dashboard unit size.
+
+            * *type* (``str``) -- Type of select box, dropdown or list.
+            * *link_to_header* (``str``) -- Add this component to header of section.
+            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *flat* (``bool``) -- Flat look and feel.
+
+        """
+        KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
             section_id,
-            {
-                "size": kwargs.get("ui_size", self.ui_parameters["size"]),
-                "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
-            })
+            *kwargs
+            )
 
     def _get_info(self):
         return {
@@ -106,26 +127,21 @@ class ControllerButton(KerviComponent):
         self.state = False
         self.click_command = self.component_id + ".click"
         self.spine.register_command_handler(self.click_command, self._on_click_handler)
-        self.ui_parameters = {
+        self._ui_parameters = {
             "size": 1,
             "type": "normal",
-            "add_to_header": False,
+            "link_to_header": False,
             "icon": None,
             "flat": False
         }
 
-    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
-        KerviComponent.add_to_dashboard(
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
             section_id,
-            {
-                "size": kwargs.get("ui_size", self.ui_parameters["size"]),
-                "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
-            })
+            **kwargs
+            )
 
     def _get_info(self):
         return {
@@ -163,26 +179,21 @@ class ControllerSwitchButton(KerviComponent):
 
         self.spine.register_command_handler(self.on_command, self._on_on_handler)
         self.spine.register_command_handler(self.off_command, self._on_off_handler)
-        self.ui_parameters = {
+        self._ui_parameters = {
             "size": 1,
             "type": "normal",
-            "add_to_header": False,
+            "link_to_header": False,
             "icon": None,
             "flat": False
         }
 
-    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
-        KerviComponent.add_to_dashboard(
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
             section_id,
-            {
-                "size": kwargs.get("ui_size", self.ui_parameters["size"]),
-                "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
-            })
+            *kwargs
+            )
 
     def _get_info(self):
         return {
@@ -254,27 +265,22 @@ class ControllerNumberInput(KerviComponent):
         self.value = 0
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
-        self.ui_parameters = {
+        self._ui_parameters = {
             "size": 1,
             "type": "horizontal_slider",
-            "add_to_header": False,
+            "link_to_header": False,
             "icon": None,
             "flat": False
         }
 
 
-    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
-        KerviComponent.add_to_dashboard(
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
             section_id,
-            {
-                "size": kwargs.get("ui_size", self.ui_parameters["size"]),
-                "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
-            })
+            *kwargs
+            )
 
     def _set_value(self, nvalue):
         if self.value != nvalue:
@@ -321,26 +327,19 @@ class ControllerTextInput(KerviComponent):
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
         self.input_type = "text"
-        self.ui_parameters = {
+        self._ui_parameters = {
             "size": 1,
             "type": "text",
-            "add_to_header": False,
+            "link_to_header": False,
             "icon": None,
             "flat": False
         }
 
-    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
-        KerviComponent.add_to_dashboard(
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
-            section_id,
-            {
-                "size": kwargs.get("ui_size", self.ui_parameters["size"]),
-                "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
-            })
+            *kwargs)
 
     def _set_value(self, nvalue):
         if self.value != nvalue:
@@ -386,26 +385,20 @@ class ControllerDateTimeInput(KerviComponent):
         self.value = ""
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
-        self.ui_parameters = {
+        self._ui_parameters = {
             "size": 1,
             "type": "datetime",
-            "add_to_header": False,
+            "link_to_header": False,
             "icon": None,
             "flat": False
         }
 
-    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
-        KerviComponent.add_to_dashboard(
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
-            section_id,
-            {
-                "size": kwargs.get("ui_size", self.ui_parameters["size"]),
-                "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
-            })
+            *kwargs
+            )
 
     def _set_value(self, nvalue):
         if self.value != nvalue:
@@ -447,26 +440,21 @@ class Controller(KerviComponent):
         self.components = []
         self.type = "unknown"
         self.parameters = {}
-        self.ui_parameters = {
+        self._ui_parameters = {
             "size": 1,
             "type": "normal",
-            "add_to_header": False,
+            "link_to_header": False,
             "icon": None,
             "flat": False
         }
 
-    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
-        KerviComponent.add_to_dashboard(
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
             section_id,
-            {
-                "size": kwargs.get("ui_size", self.ui_parameters["size"]),
-                "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "add_to_header": kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
-                "icon": kwargs.get("ui_icon", self.ui_parameters["icon"]),
-                "flat": kwargs.get("ui_flat", self.ui_parameters["flat"]),
-            })
+            *kwargs
+            )
 
     def add_components(self, *args):
         for component in args:

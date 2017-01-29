@@ -22,32 +22,33 @@ class Sensor(KerviComponent):
         self.old_val = None
         self.last_reading = None
         self.sparkline = []
-        self.ui_parameters = {
+        self._ui_parameters = {
             "size": 1,
             "type": "value",
             "chart_points": 60,
             "show_sparkline": True,
-            "add_to_header": False,
+            "link_to_header": False,
             "icon": None,
             "flat": False,
             "show_value": True,
         }
 
-    def add_to_dashboard(self, dashboard_id, section_id, **kwargs):
-        return KerviComponent.add_to_dashboard(
-            self,
-            dashboard_id,
-            section_id,
-            {
-                "size": kwargs.get("ui_size", self.ui_parameters["size"]),
-                "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-                "chartPoints": kwargs.get("ui_chart_points", self.ui_parameters["chart_points"]),
-                "showSparkline": kwargs.get("ui_show_sparkline", self.ui_parameters["show_sparkline"]),
-                "addToHeader":kwargs.get("ui_add_to_header", self.ui_parameters["add_to_header"]),
-                "icon":kwargs.get("ui_icon", self.ui_parameters["icon"]),
-                "flat":kwargs.get("ui_flat", self.ui_parameters["flat"]),
-                "showValue":kwargs.get("ui_show_value", self.ui_parameters["show_value"]),
-            })
+    # def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+    #     result = self._ui_parameters
+    #     return KerviComponent.link_to_dashboard(
+    #         self,
+    #         dashboard_id,
+    #         section_id,
+    #         {
+    #             "size": kwargs.get("ui_size", self.ui_parameters["size"]),
+    #             "type": kwargs.get("ui_type", self.ui_parameters["type"]),
+    #             "chartPoints": kwargs.get("ui_chart_points", self.ui_parameters["chart_points"]),
+    #             "showSparkline": kwargs.get("ui_show_sparkline", self.ui_parameters["show_sparkline"]),
+    #             "addToHeader":kwargs.get("ui_link_to_header", self.ui_parameters["link_to_header"]),
+    #             "icon":kwargs.get("ui_icon", self.ui_parameters["icon"]),
+    #             "flat":kwargs.get("ui_flat", self.ui_parameters["flat"]),
+    #             "showValue":kwargs.get("ui_show_value", self.ui_parameters["show_value"]),
+    #         })
 
     def _get_info(self):
         return {
