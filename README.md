@@ -9,7 +9,7 @@ Features of the framework are:
 * Easy dahsboard setup.
 * Dashboard UI is responsive and scales from mobile phones to desktop.
 * Multi process oriented by spreading over more than one core.
-* No need for knowing anything about web tecknologies dashboard layout and settings are done in python. 
+* No web development knowledge is required as dashboard layout is handled in python. 
 
 Install Kervi via pip:
 ```
