@@ -8,8 +8,8 @@ Install Kervi via pip:
 pip install kervi
 ```
 
-After kervi is installed at commandline tool *kervi* is available that helps with scaffolding kervi apps.
-Kreate you first app in an empty folder:
+After kervi is installed a commandline tool *kervi* is available that helps with scaffolding Kervi apps.
+Kreate you first app in an empty folder by executing:
 ```
 kervi create application myapp "My first app"
 ```
