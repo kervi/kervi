@@ -1,6 +1,17 @@
 # Copyright (c) 2016, Tim Wentzlau
 # Licensed under MIT
-""" Module for dashboard handling in Kervi """
+"""
+A dashboard is the main ui component in a kervi application.
+An application may define one or more dashboards if it is a home automation application
+A dashboard could be a room or a floor.
+
+Each dashbord contains one or more sections where it is possible to link
+ sensors, controllers and camera output.
+
+ A dashboard section is divided in columns and rows where the cell size is 150x150 pixels.
+ When a component is linked to a section it is specified how many cells
+ the component occupies in that section.
+"""
 
 from kervi.utility.component import KerviComponent
 import kervi.spine as spine
