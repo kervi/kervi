@@ -11,6 +11,9 @@ Features of the framework are:
 * Multi process oriented by spreading over more than one core.
 * Knowledge about web development is not required as all UI settings are handled in python.
 
+
+[Read the full documentation](https://kervi.github.io/)
+
 Install Kervi via pip:
 ```
 pip install kervi
