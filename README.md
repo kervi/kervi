@@ -44,3 +44,6 @@ init IPC
 Your Kervi application is ready at http://192.168.0.120:8080
 ```
 
+Goto the url specified
+
+![alt tag](https://kervi.github.io/_images/dashboard.png)
