@@ -2,8 +2,40 @@
 # Licensed under MIT
 
 """
-Sensors in Kervi applications are handled via the classes Sensor and SensorThread.
-Create a new sensor by inheriting from the sensor class. 
+Sensors in Kervi applications are handled via the classes Sensor and SensorThread. 
+The sensor handles sensor settings and reading the values and sensor threads polls the sensor.
+
+**Example**
+
+.. code-block:: python
+
+    class MySensor(Sensor):
+        def __init__(self):
+            Sensor.__init__(self, "mySensor", "My sensor")
+            self.type = "temperature"
+            self.max = 100
+            self.min = 0
+            self.unit = "C"
+            self.
+
+            #link the sensor to a dashboard section
+            #show the sensor as a radial_gauge
+            self.link_to_dashboard("cam", "section1", type="radial_gauge")
+
+        def read_sensor(self):
+            #read_sensor is called by the SensorThread
+
+            #enter your real code here to read your sensor
+
+            #call new_sensor_reading to signal a new value
+            #This will save the value to DB and trigger *newSensorReadingEvent*
+            self.new_sensor_reading(self.counter)
+
+    #Add sensor to a SensorThread that polls the sensor by the specified interval 
+    MY_SENSOR_THREAD = SensorThread(MySensor(),1)
+
+
+
 """
 
 from datetime import datetime
@@ -13,40 +45,42 @@ from kervi.spine import Spine
 from kervi.utility.component import KerviComponent
 
 class Sensor(KerviComponent):
-    """
-    Create a Sensor by inherit from Sensor
+    r"""
+    Sensor is the base class that all sensors inherits from.
+    This class handles storage in DB, trigger events when value change
+    and linking to dashboards.
 
-    *Properties*:
+    :param sensor_id:
+            Id of the sensor.
+            This id is used in other components to reference this sesnor.
+    :type sensor_id: ``str``
+
+    :param name:
+            Name of the sensor. User in UI
+    :type name: ``str``
+
+    :param \**kwargs:
+            See below
+
+    :Keyword Arguments:
+        * *title* (``str``) -- Title of the section.
+        * *columns* (``int``) -- Number of columns in this section, default is 1.
+        * *rows* (``int``) -- Number of rows in this section, default is 1.
+        * *add_user_log* (``bool``) -- This section shows user log messages.
     """
     def __init__(self, sensor_id, name):
         KerviComponent.__init__(self, sensor_id, "sensor", name)
-        self.type = None
-        #:Maximum value the sensor may mesaure.
-        self.max = None
-        #:Minimum value the sensor may mesaure.
-        self.min = None
-        #:mesauring unit for value.
-        self.unit = None
-        self.reading_interval = .5
 
-        #:If set the sensor will trigger an event *sensorUpperFatal* if the value pases this limit.
-        #:When the sensor is displayed on a dashboard the zone from upper_fatal_limit to max is marked red.
-        self.upper_fatal_limit = None
-        #:If set the sensor will trigger an event *sensorUpperWarning* if the value pases this limit.
-        #:When the sensor is displayed on a dashboard the zone from upper_warning_limit
-        #:to upper_fatal_limit or max is marked yellow.
-        self.upper_warning_limit = None
-        #:If set the sensor will trigger an event *sensorLowerWarning*
-        #:if the value pases this limit from a higher previus value.
-        #:When the sensor is displayed on a dashboard
-        #:the zone from min or lower_fatal_limit to lower_warning_limit is marked yellow.
-        self.lower_warning_limit = None
-        #:If set the sensor will trigger an event *sensorLowerFatal*
-        #:if the value pases this limit from a higher previus value.
-        #:When the sensor is displayed on a dashboard
-        #:the zone from min to lower_fatal_limit is marked red.
-        self.lower_fatal_limit = None
-        self.store_settings = {"delta":1, "interval":60, "active":True}
+        self._type = None
+        self._max = None
+        self._min = None
+        self._unit = None
+        self._upper_fatal_limit = None
+        self._upper_warning_limit = None
+        self._lower_warning_limit = None
+        self._lower_fatal_limit = None
+        self._store_delta = 1
+        self._save_to_db = True
         self._old_val = None
         self._last_reading = None
         self._sparkline = []
@@ -61,22 +95,182 @@ class Sensor(KerviComponent):
             "show_value": True,
         }
 
-    # def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
-    #     result = self._ui_parameters
-    #     return KerviComponent.link_to_dashboard(
-    #         self,
-    #         dashboard_id,
-    #         section_id,
-    #         {
-    #             "size": kwargs.get("ui_size", self.ui_parameters["size"]),
-    #             "type": kwargs.get("ui_type", self.ui_parameters["type"]),
-    #             "chartPoints": kwargs.get("ui_chart_points", self.ui_parameters["chart_points"]),
-    #             "showSparkline": kwargs.get("ui_show_sparkline", self.ui_parameters["show_sparkline"]),
-    #             "addToHeader":kwargs.get("ui_link_to_header", self.ui_parameters["link_to_header"]),
-    #             "icon":kwargs.get("ui_icon", self.ui_parameters["icon"]),
-    #             "flat":kwargs.get("ui_flat", self.ui_parameters["flat"]),
-    #             "showValue":kwargs.get("ui_show_value", self.ui_parameters["show_value"]),
-    #         })
+    @property
+    def save_to_db(self):
+        """
+        If true the method new_sensor_reading
+        will save the sensor reading to DB.
+
+        :type: ``bool``
+        """
+        return self._save_to_db
+
+    @save_to_db.setter
+    def save_to_db(self, value):
+        self._save_to_db = value
+    
+
+    @property
+    def store_delta(self):
+        """
+        Enter how much a sensor value should change between readings before
+        the method new_sensor_reading triggers db saving and send events.
+
+        :type: ``float``
+        """
+        return self._store_delta
+
+    @store_delta.setter
+    def store_delta(self, value):
+        self._store_delta = value
+
+    @property
+    def type(self):
+        """
+        Sensor type enter values like temperature, pressure, counter.
+
+        :type: ``str``
+        """
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = value
+
+    @property
+    def max(self):
+        """
+        Maximum value the sensor may mesaure.
+
+        :type: ``float``
+        """
+        return self._max
+
+    @max.setter
+    def max(self, value):
+        self._max = value
+
+    @property
+    def min(self):
+        """
+        Minimum value the sensor may mesaure.
+
+        :type: ``float``
+        """
+        return self._min
+
+    @min.setter
+    def min(self, value):
+        self._min = value
+
+    @property
+    def unit(self):
+        """
+        Mesauring unit for value. Enter values like C, F, hPa
+
+        :type: ``str``
+        """
+        return self._unit
+
+    @unit.setter
+    def unit(self, value):
+        self._unit = value
+
+    @property
+    def upper_fatal_limit(self):
+        """
+        If set the sensor will trigger an event *sensorUpperFatal* if the value pases this limit.
+        When the sensor is displayed on a dashboard
+        the zone from upper_fatal_limit to max is marked red.
+
+        :type: ``float``
+        """
+        return self._upper_fatal_limit
+
+    @upper_fatal_limit.setter
+    def upper_fatal_limit(self, value):
+        self._upper_fatal_limit = value
+
+    @property
+    def upper_warning_limit(self):
+        """
+        If set the sensor will trigger an event *sensorUpperWarning* if the value pases this limit.
+        When the sensor is displayed on a dashboard the zone from upper_warning_limit
+        to upper_fatal_limit or max is marked yellow.
+
+        :type: ``float``
+        """
+        return self._upper_warning_limit
+
+    @upper_warning_limit.setter
+    def upper_warning_limit(self, value):
+        self._upper_warning_limit = value
+
+    @property
+    def lower_warning_limit(self):
+        """
+        If set the sensor will trigger an event *sensorLowerWarning*
+        if the value pases this limit from a higher previus value.
+        When the sensor is displayed on a dashboard
+        the zone from min or lower_fatal_limit to lower_warning_limit is marked yellow.
+
+        :type: ``float``
+        """
+        return self._lower_warning_limit
+
+    @lower_warning_limit.setter
+    def lower_warning_limit(self, value):
+        self._lower_warning_limit = value
+
+    @property
+    def lower_fatal_limit(self):
+        """
+        If set the sensor will trigger an event *sensorLowerFatal*
+        if the value pases this limit from a higher previus value.
+        When the sensor is displayed on a dashboard
+        the zone from min to lower_fatal_limit is marked red.
+
+        :type: ``float``
+        """
+        return self._lower_fatal_limit
+
+    @lower_fatal_limit.setter
+    def lower_fatal_limit(self, value):
+        self._lower_fatal_limit = value
+
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        r"""
+        Links the sensor to a dashboard.
+
+        :param dashboard_id:
+                Id of the dashboard to link to.
+                Enter a * if the sensor should be linked to all dashboards.
+        :type dashboard_id: ``str``
+
+        :param section_id:
+                Id of the section to link to.
+                This is the id of a section you have added your self to a dashboard or one of the
+                system sections *sys-header*, *header* or *footer*
+        :type section_id: ``str``
+
+        :param \**kwargs:
+                See below
+
+        :Keyword Arguments:
+            * *size* (``int``) -- How many cells should the sensor occupy in the dashboard section.
+                The actual size depends on the *type* a radia gauge of size 2 fills 2*2 cells.
+                A vertical gauge is 2 cells heigh and 1 cell wide. 
+                If size is 0 it will be as wide as the section.  
+            * *type* (``str``) -- One of the following values *radial_gauge*, *vertical_gauge*, *horizontal_gauge*, *chart* or *value*.
+            * *chart_points* (``int``) -- Maximun number of points in the chart.
+            * *show_sparkline* (``bool``) -- Show a sparkline next to the value.
+            * *add_to_header* (``bool``) -- Place the sensor in the header of the section.
+            * *icon* (``bool``) -- Icon to show. All Font Awesome icons are valid just enter the name of the icon without *fa-*.
+            * *flat* (``bool``) -- Shows the sensor with out any 3d effect.
+            * *show_value* (``bool``) -- Show the numeric value and unit.
+        """
+        
+        KerviComponent.link_to_dashboard(self, dashboard_id, section_id, **kwargs)
 
     def _get_info(self):
         return {
@@ -84,7 +278,6 @@ class Sensor(KerviComponent):
             "max":self.max,
             "min":self.min,
             "unit":self.unit,
-            "readingInterval":self.reading_interval,
             "value":self._old_val,
             "upperFatalLimit":self.upper_fatal_limit,
             "upperWarningLimit":self.upper_warning_limit,
@@ -98,14 +291,24 @@ class Sensor(KerviComponent):
             return False
         elif self._old_val is None:
             return True
-        elif value >= self._old_val + self.store_settings["delta"]:
+        elif value >= self._old_val + self.store_delta:
             return True
-        elif value <= self._old_val - self.store_settings["delta"]:
+        elif value <= self._old_val - self.store_delta:
             return True
         else:
             return False
 
     def new_sensor_reading(self, value):
+        """
+        Call this method to signal a new sensor reading.
+        This method handles DB storage and triggers different events.
+
+        :param value:
+            New value to be stored in the system.
+
+        :type value: ``float``
+
+        """
         if self.__delta_exceeded(value):
             self.spine.log.debug(
                 "delta exceeded:{0} value:{1}, old value:{2}",
@@ -115,7 +318,7 @@ class Sensor(KerviComponent):
             )
             timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             val = {"sensor":self.component_id, "value":value, "timestamp":timestamp}
-            if self.store_settings["active"]:
+            if self.save_to_db:
                 self.spine.send_command("StoreSensorValue", val)
             self.spine.trigger_event("NewSensorReading", self.component_id, val)
             self._old_val = value
@@ -127,10 +330,33 @@ class Sensor(KerviComponent):
             self._last_reading = time.clock()
 
     def read_sensor(self):
+        """
+            Abstract method that must be implementd by the inherting class.
+            This method is called by the sensor thread on regular intervals.
+            
+            There is no need to implement own polling systems or call time.sleep this
+            is handles by the calling sensor thread.
+
+            Use the method new_sensor_reading to store the value.
+        """
         pass
 
 class SensorThread(KerviThread):
-    """ Thread that handles polling of one or more sensors """
+    r"""
+    SensorThread is the base class that  polls sensors.
+    Add one or more sensors and set polling interval.
+
+    :param sensors:
+            Id of the sensor.
+            This id is used in other components to reference this sesnor.
+    :type sensors: ``str``
+
+    :param reading_interval:
+            Polling interval in seconds between
+    :type reading_interval: ``float``
+
+    """
+
     def __init__(self, sensors, reading_interval=1):
         KerviThread.__init__(self)
         self.spine = Spine()
