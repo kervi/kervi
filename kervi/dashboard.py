@@ -11,6 +11,19 @@ sensors, controllers and camera output.
 A dashboard section is divided in columns and rows where the cell size is 150x150 pixels.
 When a component is linked to a section it is specified how many cells
 the component occupies in that section.
+
+
+**Example**
+
+.. code-block:: python
+
+    SYSTEM = Dashboard("system", "System")
+    SYSTEM.add_section(DashboardSection("cpu", columns=2, rows=2, collapsed=True))
+    SYSTEM.add_section(DashboardSection("memory", columns=2, rows=2, collapsed=True))
+    SYSTEM.add_section(DashboardSection("log", columns=2, rows=2, title="Log", user_log=True))
+    SYSTEM.add_section(DashboardSection("disk", columns=1, rows=1))
+    SYSTEM.add_section(DashboardSection("power", columns=1, rows=1, title="Power"))
+
 """
 
 from kervi.utility.component import KerviComponent
@@ -33,6 +46,7 @@ class DashboardSection(object):
             * *columns* (``int``) -- Number of columns in this section, default is 1.
             * *rows* (``int``) -- Number of rows in this section, default is 1.
             * *add_user_log* (``bool``) -- This section shows user log messages.
+            * *collapsed* (``bool``) -- If true the body of the section is collapsed.
 
         """
     def __init__(self, section_id, **kwargs):
@@ -151,7 +165,7 @@ class Dashboard(KerviComponent):
 class Camboard(Dashboard):
     """
     A Camboard is a specialized dashboard that has a video feed as background
-    and controllers for pan/tilt.
+    and controllers for pan/tilt at the center of the dashboard.
 
     :param dashboard_id: Unique id of the dashboard. Used when referencing this dashboard.
     :type dashboard_id: ``str``

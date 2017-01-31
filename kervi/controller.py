@@ -1,24 +1,30 @@
 # Copyright (c) 2016, Tim Wentzlau
 # Licensed under MIT
-
+"""
+A Kervi controller is a class that acts upon input from users or events or the underlaying os.
+"""
 
 from kervi.spine import Spine
 from kervi.utility.thread import KerviThread
 from kervi.utility.component import KerviComponent
 
 class ControllerSelect(KerviComponent):
-    """
+    r"""
     Select component for Kervi controller
-    Usage:
-    class CameraFrameRate(ControllerSelect):
-        def __init__(self, controller):
-        ControllerSelect.__init__(self, controller.controllerId+".framerate", "Framerate" , controller)
-        self.addOption("5", "5 / sec")
-        self.addOption("10", "10 / sec")
-        self.addOption("15", "15 / sec", True)
 
-    def change(self, selectedOptions):
-        print ("Frame rate changed", selectedOptions)
+    Usage:
+
+    .. code-block:: python
+
+        class CameraFrameRate(ControllerSelect):
+            def __init__(self, controller):
+            ControllerSelect.__init__(self, controller.controllerId+".framerate", "Framerate" , controller)
+            self.addOption("5", "5 / sec")
+            self.addOption("10", "10 / sec")
+            self.addOption("15", "15 / sec", True)
+
+        def change(self, selectedOptions):
+            print("Frame rate changed", selectedOptions)
 
     """
     def __init__(self, select_id, name, controller):
@@ -54,9 +60,9 @@ class ControllerSelect(KerviComponent):
 
         :Keyword Arguments:
             * *ui_size* (``int``) -- Size of the component in dashboard unit size.
-            In order to make the sections and components align correct a dashboard unit is defined.
-            Default the dashboard unit is a square that is 150 x 150 pixels.
-            The width of the select box is ui_size * dashboard unit size.
+                In order to make the sections and components align correct a dashboard unit is defined.
+                Default the dashboard unit is a square that is 150 x 150 pixels.
+                The width of the select box is ui_size * dashboard unit size.
 
             * *type* (``str``) -- Type of select box, dropdown or list.
             * *link_to_header* (``str``) -- Add this component to header of section.
@@ -136,6 +142,32 @@ class ControllerButton(KerviComponent):
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        r"""
+        Links this component to a dashboard section.
+
+        :param dashboard_id:
+            id of the dashboard to link to.
+        :type section_id: str
+
+        :param section_id:
+            id of the section.
+        :type section_id: str
+
+        :param \**kwargs:
+            Use the kwargs below to override default values set in ui_parameters
+
+        :Keyword Arguments:
+            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
+                In order to make the sections and components align correct a dashboard unit is defined.
+                Default the dashboard unit is a square that is 150 x 150 pixels.
+                The width of the select box is ui_size * dashboard unit size.
+
+            * *type* (``str``) -- Type of select box, dropdown or list.
+            * *link_to_header* (``str``) -- Add this component to header of section.
+            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *flat* (``bool``) -- Flat look and feel.
+
+        """
         KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
@@ -168,6 +200,9 @@ class ControllerButton(KerviComponent):
         )
 
 class ControllerSwitchButton(KerviComponent):
+    """
+    Switch button controller component, shows a on/off button in UI
+    """
     def __init__(self, button_id, name, controller):
         KerviComponent.__init__(self, button_id, "switchButton", name)
         #self.spine = Spine()
@@ -188,6 +223,32 @@ class ControllerSwitchButton(KerviComponent):
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        r"""
+        Links this component to a dashboard section.
+
+        :param dashboard_id:
+            id of the dashboard to link to.
+        :type section_id: str
+
+        :param section_id:
+            id of the section.
+        :type section_id: str
+
+        :param \**kwargs:
+            Use the kwargs below to override default values set in ui_parameters
+
+        :Keyword Arguments:
+            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
+                In order to make the sections and components align correct a dashboard unit is defined.
+                Default the dashboard unit is a square that is 150 x 150 pixels.
+                The width of the select box is ui_size * dashboard unit size.
+
+            * *type* (``str``) -- Type of select box, dropdown or list.
+            * *link_to_header* (``str``) -- Add this component to header of section.
+            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *flat* (``bool``) -- Flat look and feel.
+
+        """
         KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
@@ -255,6 +316,9 @@ class ControllerSwitchButton(KerviComponent):
         )
 
 class ControllerNumberInput(KerviComponent):
+    """
+    A number input component shows as a slider on dashboards.
+    """
     def __init__(self, input_id, name, controller):
         KerviComponent.__init__(self, input_id, "number-input", name)
         #self.spine = Spine()
@@ -275,6 +339,32 @@ class ControllerNumberInput(KerviComponent):
 
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        r"""
+        Links this component to a dashboard section.
+
+        :param dashboard_id:
+            id of the dashboard to link to.
+        :type section_id: str
+
+        :param section_id:
+            id of the section.
+        :type section_id: str
+
+        :param \**kwargs:
+            Use the kwargs below to override default values set in ui_parameters
+
+        :Keyword Arguments:
+            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
+                In order to make the sections and components align correct a dashboard unit is defined.
+                Default the dashboard unit is a square that is 150 x 150 pixels.
+                The width of the select box is ui_size * dashboard unit size.
+
+            * *type* (``str``) -- Type of select box, dropdown or list.
+            * *link_to_header* (``str``) -- Add this component to header of section.
+            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *flat* (``bool``) -- Flat look and feel.
+
+        """
         KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
@@ -319,6 +409,9 @@ class ControllerNumberInput(KerviComponent):
         return self.value
 
 class ControllerTextInput(KerviComponent):
+    """
+    Text input component
+    """
     def __init__(self, input_id, name, controller):
         KerviComponent.__init__(self, input_id, "text-input", name)
         #self.spine = Spine()
@@ -336,6 +429,32 @@ class ControllerTextInput(KerviComponent):
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        r"""
+        Links this component to a dashboard section.
+
+        :param dashboard_id:
+            id of the dashboard to link to.
+        :type section_id: str
+
+        :param section_id:
+            id of the section.
+        :type section_id: str
+
+        :param \**kwargs:
+            Use the kwargs below to override default values set in ui_parameters
+
+        :Keyword Arguments:
+            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
+                In order to make the sections and components align correct a dashboard unit is defined.
+                Default the dashboard unit is a square that is 150 x 150 pixels.
+                The width of the select box is ui_size * dashboard unit size.
+
+            * *type* (``str``) -- Type of select box, dropdown or list.
+            * *link_to_header* (``str``) -- Add this component to header of section.
+            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *flat* (``bool``) -- Flat look and feel.
+
+        """
         KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
@@ -359,6 +478,9 @@ class ControllerTextInput(KerviComponent):
             )
 
     def value_changed(self, new_value, old_value):
+        """
+        Abstract method called when the content of the text box change.
+        """
         self.spine.log.debug(
             "abstract valueChange reached:{0}/{1} value:{2} oldvalue:{3}",
             self.controller.component_id,
@@ -377,6 +499,9 @@ class ControllerTextInput(KerviComponent):
         return self.value
 
 class ControllerDateTimeInput(KerviComponent):
+    """
+    A date and time component.
+    """
     def __init__(self, input_id, name, input_type, controller):
         KerviComponent.__init__(self, input_id, "datetime-input", name)
         #self.spine = Spine()
@@ -394,6 +519,32 @@ class ControllerDateTimeInput(KerviComponent):
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        r"""
+        Links this component to a dashboard section.
+
+        :param dashboard_id:
+            id of the dashboard to link to.
+        :type section_id: str
+
+        :param section_id:
+            id of the section.
+        :type section_id: str
+
+        :param \**kwargs:
+            Use the kwargs below to override default values set in ui_parameters
+
+        :Keyword Arguments:
+            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
+                In order to make the sections and components align correct a dashboard unit is defined.
+                Default the dashboard unit is a square that is 150 x 150 pixels.
+                The width of the select box is ui_size * dashboard unit size.
+
+            * *type* (``str``) -- Type of select box, dropdown or list.
+            * *link_to_header* (``str``) -- Add this component to header of section.
+            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *flat* (``bool``) -- Flat look and feel.
+
+        """
         KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
@@ -435,6 +586,12 @@ class ControllerDateTimeInput(KerviComponent):
         return self.value
 
 class Controller(KerviComponent):
+    """
+    A Kervi controller is a class that acts upon input from users or events or the underlaying os.
+
+    Examples for controllers are motor control, servo control, output to IO.
+
+    """
     def __init__(self, controller_id, name):
         KerviComponent.__init__(self, controller_id, "controller", name)
         self.components = []
@@ -449,6 +606,32 @@ class Controller(KerviComponent):
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        r"""
+        Links this component to a dashboard section.
+
+        :param dashboard_id:
+            id of the dashboard to link to.
+        :type section_id: str
+
+        :param section_id:
+            id of the section.
+        :type section_id: str
+
+        :param \**kwargs:
+            Use the kwargs below to override default values set in ui_parameters
+
+        :Keyword Arguments:
+            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
+                In order to make the sections and components align correct a dashboard unit is defined.
+                Default the dashboard unit is a square that is 150 x 150 pixels.
+                The width of the select box is ui_size * dashboard unit size.
+
+            * *type* (``str``) -- Type of select box, dropdown or list.
+            * *link_to_header* (``str``) -- Add this component to header of section.
+            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *flat* (``bool``) -- Flat look and feel.
+
+        """
         KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
