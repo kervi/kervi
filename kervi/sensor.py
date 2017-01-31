@@ -1,5 +1,11 @@
 # Copyright (c) 2016, Tim Wentzlau
 # Licensed under MIT
+
+"""
+Sensors in Kervi applications are handled via the classes Sensor and SensorThread.
+Create a new sensor by inheriting from the sensor class. 
+"""
+
 from datetime import datetime
 import time
 from kervi.utility.thread import KerviThread
@@ -7,21 +13,43 @@ from kervi.spine import Spine
 from kervi.utility.component import KerviComponent
 
 class Sensor(KerviComponent):
+    """
+    Create a Sensor by inherit from Sensor
+
+    *Properties*:
+    """
     def __init__(self, sensor_id, name):
         KerviComponent.__init__(self, sensor_id, "sensor", name)
         self.type = None
+        #:Maximum value the sensor may mesaure.
         self.max = None
+        #:Minimum value the sensor may mesaure.
         self.min = None
+        #:mesauring unit for value.
         self.unit = None
         self.reading_interval = .5
+
+        #:If set the sensor will trigger an event *sensorUpperFatal* if the value pases this limit.
+        #:When the sensor is displayed on a dashboard the zone from upper_fatal_limit to max is marked red.
         self.upper_fatal_limit = None
+        #:If set the sensor will trigger an event *sensorUpperWarning* if the value pases this limit.
+        #:When the sensor is displayed on a dashboard the zone from upper_warning_limit
+        #:to upper_fatal_limit or max is marked yellow.
         self.upper_warning_limit = None
+        #:If set the sensor will trigger an event *sensorLowerWarning*
+        #:if the value pases this limit from a higher previus value.
+        #:When the sensor is displayed on a dashboard
+        #:the zone from min or lower_fatal_limit to lower_warning_limit is marked yellow.
         self.lower_warning_limit = None
+        #:If set the sensor will trigger an event *sensorLowerFatal*
+        #:if the value pases this limit from a higher previus value.
+        #:When the sensor is displayed on a dashboard
+        #:the zone from min to lower_fatal_limit is marked red.
         self.lower_fatal_limit = None
         self.store_settings = {"delta":1, "interval":60, "active":True}
-        self.old_val = None
-        self.last_reading = None
-        self.sparkline = []
+        self._old_val = None
+        self._last_reading = None
+        self._sparkline = []
         self._ui_parameters = {
             "size": 1,
             "type": "value",
@@ -57,22 +85,22 @@ class Sensor(KerviComponent):
             "min":self.min,
             "unit":self.unit,
             "readingInterval":self.reading_interval,
-            "value":self.old_val,
+            "value":self._old_val,
             "upperFatalLimit":self.upper_fatal_limit,
             "upperWarningLimit":self.upper_warning_limit,
             "lowerWarningLimit":self.lower_warning_limit,
             "lowerFatalLimit":self.lower_fatal_limit,
-            "sparkline":self.sparkline
+            "sparkline":self._sparkline
         }
 
     def __delta_exceeded(self, value):
         if value is None:
             return False
-        elif self.old_val is None:
+        elif self._old_val is None:
             return True
-        elif value >= self.old_val + self.store_settings["delta"]:
+        elif value >= self._old_val + self.store_settings["delta"]:
             return True
-        elif value <= self.old_val - self.store_settings["delta"]:
+        elif value <= self._old_val - self.store_settings["delta"]:
             return True
         else:
             return False
@@ -83,20 +111,20 @@ class Sensor(KerviComponent):
                 "delta exceeded:{0} value:{1}, old value:{2}",
                 self.component_id,
                 value,
-                self.old_val
+                self._old_val
             )
             timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             val = {"sensor":self.component_id, "value":value, "timestamp":timestamp}
             if self.store_settings["active"]:
                 self.spine.send_command("StoreSensorValue", val)
             self.spine.trigger_event("NewSensorReading", self.component_id, val)
-            self.old_val = value
-            if len(self.sparkline) == 0:
-                self.sparkline += [value]
-            elif len(self.sparkline) >= 10:
-                self.sparkline.pop(0)
-            self.sparkline += [value]
-            self.last_reading = time.clock()
+            self._old_val = value
+            if len(self._sparkline) == 0:
+                self._sparkline += [value]
+            elif len(self._sparkline) >= 10:
+                self._sparkline.pop(0)
+            self._sparkline += [value]
+            self._last_reading = time.clock()
 
     def read_sensor(self):
         pass

@@ -6,11 +6,11 @@ An application may define one or more dashboards if it is a home automation appl
 A dashboard could be a room or a floor.
 
 Each dashbord contains one or more sections where it is possible to link
- sensors, controllers and camera output.
+sensors, controllers and camera output.
 
- A dashboard section is divided in columns and rows where the cell size is 150x150 pixels.
- When a component is linked to a section it is specified how many cells
- the component occupies in that section.
+A dashboard section is divided in columns and rows where the cell size is 150x150 pixels.
+When a component is linked to a section it is specified how many cells
+the component occupies in that section.
 """
 
 from kervi.utility.component import KerviComponent
@@ -87,11 +87,11 @@ class Dashboard(KerviComponent):
 
     :param dashboard_id:
         Unique id of the dashboard. Used when referencing this dashboard.
-    :type dashboard_id: str
+    :type dashboard_id: ``str``
 
     :param name:
         Name of the dahsboard. Used when this dashboard is listed in the dashboard menu in the UI.
-    :type name: str
+    :type name: ``str``
 
     :param \**kwargs:
             See below
@@ -120,8 +120,8 @@ class Dashboard(KerviComponent):
         """
         Add a dashboard section to the dashboard
 
-        :param section: DashboardSection
-            A dashboardSection to add to this dashboard.
+        :param section: A dashboardSection to add to this dashboard.
+        :type section: ``DashboardSection``
         """
         section.dashboard = self
         self.sections += [section]
@@ -150,20 +150,20 @@ class Dashboard(KerviComponent):
 
 class Camboard(Dashboard):
     """
-    A Camboard is a specialized dashboard that has 3*3 DashboardSections
-    and a video feed as background.
+    A Camboard is a specialized dashboard that has a video feed as background
+    and controllers for pan/tilt.
 
-    :param dashboard_id:
-        Unique id of the dashboard. Used when referencing this dashboard.
+    :param dashboard_id: Unique id of the dashboard. Used when referencing this dashboard.
+    :type dashboard_id: ``str``
 
-    :param name:
-        Name of the dahsboard used in dashboard menu in UI.
+    :param name: Name of the dahsboard used in dashboard menu in UI.
+    :type name: ``str``
 
-    :param camera_id:
-        Id of a camera to use as background.
+    :param camera_id: Id of a camera to use as background.
+    :type camera_id: ``str``
 
-    :param is_default:
-        If true this dashboard will show up as the active dashboard when UI loads.
+    :param is_default: If true this dashboard will show up as the active dashboard when UI loads.
+    :type is_default: ``bool``
     """
     def __init__(self, dashboard_id, name, camera_id, is_default=False):
         Dashboard.__init__(self, dashboard_id, name, is_default=is_default, camera=camera_id)
