@@ -7,12 +7,16 @@ A dashboard could be a room or a floor.
 Each dashbord contains one or more sections where it is possible to link
 sensors, controllers and camera output.
 
-A dashboard section is divided in columns and rows where the cell size is 150x150 pixels.
-When a component is linked to a section it is specified how many cells
-the component occupies in that section.
+The dashboards are responsive and ajust to the width of the browser. Below is the same dashbord in mobile and browser view. 
 
+.. image:: images/dashboard_mobile.png
+    :width: 35 %
+.. image:: images/dashboard_browser.png
+    :width: 45 %
 
-**Example**
+.. image:: 
+
+The code below shows how to configure the dashboard above
 
 .. code-block:: python
 
@@ -23,6 +27,20 @@ the component occupies in that section.
     SYSTEM.add_section(DashboardSection("disk", columns=1, rows=1))
     SYSTEM.add_section(DashboardSection("power", columns=1, rows=1, title="Power"))
 
+On large displays the columns and rows specify the size of a dashboard where the cell size is 150x150 pixels.
+When a component is linked to a section it is specified how many cells that component should occupy in that section.
+
+.. code-block:: python
+    
+    #sensor that links as a radial guage 
+    self.link_to_dashboard("cam", "section1", type="radial_gauge")
+
+    #A sensor that links to the header of a section and into the body. 
+    self.link_to_dashboard("system", "cpu", type="value", size=2, link_to_header=True)
+    self.link_to_dashboard("system", "cpu", type="chart", size=2)
+
+    #A button that links to a section with an icon.
+    self.link_to_dashboard("system", "power", icon="power-off")
 
 .. toctree::
    :hidden:
