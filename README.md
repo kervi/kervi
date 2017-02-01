@@ -46,4 +46,4 @@ Your Kervi application is ready at http://192.168.0.120:8080
 
 Goto the url specified
 
-![](https://kervi.github.io/_images/dashboard_mobile.png =250x) ![](https://kervi.github.io/_images/dashboard_browser.png =250x)
+<img src="https://kervi.github.io/_images/dashboard_mobile.png" width="200"> <img src="https://kervi.github.io/_images/dashboard_browser.png" width="200">
