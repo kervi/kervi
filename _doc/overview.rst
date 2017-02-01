@@ -86,7 +86,7 @@ The __init__.py in the dashboards folder contains the code that defines dashboar
 
 In the example above two dashboards are defined CAM and SYSTEM. Each dashboard has one or more sections where kervi components like sensors and controllers are linked to.
 
-Link components to dashboards
+Sensors
 -----------------------------
 
 In the sensors folder a dummy sensor my_sensor.py looks like this:
@@ -130,5 +130,56 @@ In the sensors folder a dummy sensor my_sensor.py looks like this:
     MY_SENSOR_THREAD = SensorThread(MySensor(),1)
 
 
-The main method to present Kervi components on dashboards is by call link_to_dashboard on a Kervi component. 
-In the snippet above the sensor is linked to the dashboard section *section1* on the dashboard with id *cam* and presented as a radial gauge.
+A custom sensor inherits from the Sensor class. The Sensor class handles storage to DB, notify UI and other components via events.
+The custom sensor must implement the method read_sensor where code to get readings from sensore probes resides. 
+A sensor reading is processed by the system by calling new_sensor_reading.
+
+
+Controllers
+-----------------------
+
+Controllers react to user input and events triggered by other components. A custom controller inherits from the class Controller.
+To react to user input the controller must add one or more controller components.
+The example below implements light controller that controls a GPIO pin.  
+
+.. code-block:: python
+
+    from kervi.controller import Controller, ControllerSwitchButton
+
+    #Switch button shown on a dashboard
+    class LightButton(ControllerSwitchButton):
+        def __init__(self, controller):
+            ControllerSwitchButton.__init__(
+                self,
+                controller.component_id+".light",
+                "Light 1",
+                controller
+            )
+            self.link_to_dashboard("system", "light", icon="light")
+
+        def on(self):
+            #event fired when user click the button in UI
+            #set GPIO 23 pin high
+
+        def off(self):
+            #event fired when user click the button in UI
+            #set GPIO pin 23 low
+
+    class LightController(Controller):
+        def __init__(self):
+            Controller.__init__(self, "lightController", "Light")
+            self.type = "light"
+
+            self.add_components(LightButton(self))
+
+    MY_CONTROLLER = LightController()
+
+
+Add components to dashboards
+----------------------------
+
+In order to display sensors and other Kervi components they must be linked to a dashboard. 
+This is done by calling link_to_dashboard on a Kervi component. 
+In the sensor snippet above the sensor is linked to the dashboard section *section1* on the dashboard with id *cam* and presented as a radial gauge.
+The button defined in the controller snippet is linked to a dashboard section *light* on the dashboard whith id *system* and uses an icon.
+
