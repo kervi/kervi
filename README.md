@@ -14,7 +14,7 @@ Features of the framework are:
 
 [Read the full documentation](https://kervi.github.io/)
 
-<!--<img src="https://kervi.github.io/_images/dashboard_browser.png" width="500">-->
+<img src="https://kervi.github.io/_images/dashboard_browser.png" width="500">
 
 
 Install Kervi via pip:
