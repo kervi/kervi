@@ -14,6 +14,9 @@ Features of the framework are:
 
 [Read the full documentation](https://kervi.github.io/)
 
+<!--<img src="https://kervi.github.io/_images/dashboard_browser.png" width="500">-->
+
+
 Install Kervi via pip:
 ```
 pip install kervi
@@ -46,4 +49,4 @@ Your Kervi application is ready at http://192.168.0.120:8080
 
 Goto the url specified
 
-<img src="https://kervi.github.io/_images/dashboard_mobile.png" width="300"> <img src="https://kervi.github.io/_images/dashboard_browser.png" width="500">
+<img src="https://kervi.github.io/_images/dashboard_mobile.png" width="300">
