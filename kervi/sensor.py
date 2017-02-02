@@ -61,6 +61,7 @@ class Sensor(KerviComponent):
             "icon": None,
             "flat": False,
             "show_value": True,
+            "show_name": True
         }
 
     @property

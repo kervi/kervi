@@ -8,30 +8,30 @@ A dashboard is the main ui component in a kervi application.
 from kervi.utility.component import KerviComponent
 import kervi.spine as spine
 
-class DashboardSection(object):
+class DashboardPanel(object):
     r"""
-        Create a dashboard section.
+        Create a dashboard panel.
 
-        :param section_id:
-            id of the section.
-            This id is used in other components to reference this section.
-        :type section_id: str
+        :param panel_id:
+            id of the panel.
+            This id is used in other components to reference this panel.
+        :type panel_id: str
 
         :param \**kwargs:
             See below
 
         :Keyword Arguments:
-            * *title* (``str``) -- Title of the section.
-            * *columns* (``int``) -- Number of columns in this section, default is 1.
-            * *rows* (``int``) -- Number of rows in this section, default is 1.
-            * *add_user_log* (``bool``) -- This section shows user log messages.
-            * *collapsed* (``bool``) -- If true the body of the section is collapsed.
+            * *title* (``str``) -- Title of the panel.
+            * *columns* (``int``) -- Number of columns in this panel, default is 1.
+            * *rows* (``int``) -- Number of rows in this panel, default is 1.
+            * *add_user_log* (``bool``) -- This panel shows user log messages.
+            * *collapsed* (``bool``) -- If true the body of the panel is collapsed.
 
         """
-    def __init__(self, section_id, **kwargs):
-        #KerviComponent.__init__(self, section_id, "Dashboard-Section", name)
+    def __init__(self, panel_id, **kwargs):
+        #KerviComponent.__init__(self, panel_id, "Dashboard-panel", name)
         self.spine = spine.Spine()
-        self.section_id = section_id
+        self.panel_id = panel_id
         self.ui_parameters = {
             "title":kwargs.get("title", ""),
             "columns":kwargs.get("columns", 1),
@@ -39,13 +39,13 @@ class DashboardSection(object):
             "userLog":kwargs.get("user_log", False)
         }
         self.dashboard = None
-        self.section_id = section_id
+        self.panel_id = panel_id
 
-    def _get_section_components(self, components):
+    def _get_panel_components(self, components):
         result = []
         if hasattr(components, "__len__") and not isinstance(components, dict):
             for component in components:
-                result += self._get_section_components(component)
+                result += self._get_panel_components(component)
         else:
             result += [components]
 
@@ -55,25 +55,24 @@ class DashboardSection(object):
         components = self.spine.send_query(
             "getDashboardComponents",
             self.dashboard.dashboard_id,
-            self.section_id
+            self.panel_id
         )
-        section_components = self._get_section_components(components)
+        panel_components = self._get_panel_components(components)
         return {
-            "id": self.section_id,
+            "id": self.panel_id,
             "uiParameters": self.ui_parameters,
             "dashboard": self.dashboard.get_reference(),
-            "components": section_components
+            "components": panel_components
         }
 
 class Dashboard(KerviComponent):
     r"""
     Create a UI dashboard. The dashboard will show up in the dashboard menu in the UI.
 
-    A dashboard contains one or more sections. Kervi components like *sensors*,
-    *controllers* and *controller components* all have a dashboard property where it is
-    possible to link a kervi component to a dasboard and section.
+    A dashboard contains one or more panels. Kervi components like *sensors*,
+    *controllers* and *controller components* links to a panel on a dashboard.
 
-    All dashboard have the following sections:
+    All dashboard have the following panels:
      * sys-header - for system info like cpu load
      * header - for showing sensors and controllers in the top header
      * footer - for showing sensors and controllers in the footer of the UI.
@@ -99,25 +98,25 @@ class Dashboard(KerviComponent):
         self.dashboard_id = dashboard_id
         self.is_default = kwargs.get("is_default", False)
         self.unit_size = kwargs.get("unit_size", 150)
-        self.sections = []
-        self.add_section(DashboardSection("sys-header"))
-        self.add_section(DashboardSection("header"))
-        self.add_section(DashboardSection("footer"))
+        self.panels = []
+        self.add_panel(DashboardPanel("sys-header"))
+        self.add_panel(DashboardPanel("header"))
+        self.add_panel(DashboardPanel("footer"))
 
         self.background = {}
         camera_id = kwargs.get("camera", "")
         if camera_id:
             self.background = {"type": "camera", "cameraId": camera_id}
 
-    def add_section(self, section):
+    def add_panel(self, panel):
         """
-        Add a dashboard section to the dashboard
+        Add a dashboard panel to the dashboard
 
-        :param section: A dashboardSection to add to this dashboard.
-        :type section: ``DashboardSection``
+        :param panel: A DashboardPanel to add to this dashboard.
+        :type panel: ``DashboardPanel``
         """
-        section.dashboard = self
-        self.sections += [section]
+        panel.dashboard = self
+        self.panels += [panel]
 
     def _get_info(self):
         template = None
@@ -129,14 +128,14 @@ class Dashboard(KerviComponent):
             template_file = open(cpath, 'r')
             template = template_file.read()
 
-        sections = []
-        for section in self.sections:
-            sections += [section._get_info()]
+        panels = []
+        for panel in self.panels:
+            panels += [panel._get_info()]
 
         return {
             "isDefault": self.is_default,
             "template" : template,
-            "sections" : sections,
+            "sections" : panels,
             "background": self.background,
             "unitSize": self.unit_size
         }
