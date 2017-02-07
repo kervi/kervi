@@ -4,7 +4,7 @@ import kervi.spine as spine
 
 
 class DasboardSectionLink(object):
-    def __init__(self,dashboard_id, section_id, param, component):
+    def __init__(self, dashboard_id, section_id, param, component):
         self.link_id = random.getrandbits(64)
         self.dashboard_id = dashboard_id
         self.section_id = section_id
@@ -18,12 +18,12 @@ class DasboardSectionLink(object):
 class KerviComponent(object):
     def __init__(self, component_id, component_type, name):
         self.spine = spine.Spine()
-        self.component_id = component_id
-        self.component_type = component_type
-        self.name = name
-        self.icon = None
-        self.visible = True
-        self.dashboard_links = []
+        self._component_id = component_id
+        self._component_type = component_type
+        self._name = name
+        self._icon = None
+        self._visible = True
+        self._dashboard_links = []
         self._ui_parameters = {}
         if self.spine:
             self.spine.register_query_handler(
@@ -32,31 +32,57 @@ class KerviComponent(object):
             )
             self.spine.register_query_handler("getComponentInfo", self._get_component_info)
 
+    @property
+    def component_id(self):
+        return self._component_id
+
+    @property
+    def component_type(self):
+        return self._component_type
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+        self.spine.trigger_event("componentChangeName", self.component_id, value)
+
+    @property
+    def icon(self):
+        return self._icon
+
+    @icon.setter
+    def icon(self, value):
+        self._icon = value
+        self.spine.trigger_event("componentChangeIcon", self.component_id, value)
+
+    @property
+    def visible(self):
+        return self._visible
+
+    @visible.setter
+    def visible(self, value):
+        self._visible = value
+
     def set_ui_parameter(self, name, value):
         if name in self._ui_parameters:
             self._ui_parameters[name] = value
         else:
             raise ValueError("invalud ui parameter name:" + name)
 
-    def user_log_message(self, topic, body=None, type="information"):
+    def user_log_message(self, topic, body=None, log_type="information"):
         """"
-        Adds a message to the user log. 
+        Adds a message to the user log.
         """
         timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
         self.spine.trigger_event("userLogMessage", None, {
             "topic": topic,
             "body": body,
             "timestamp": timestamp,
-            "type": type
+            "type": log_type
         })
-
-    def set_name(self, name):
-        self.name = name
-        self.spine.trigger_event("componentChangeName", self.component_id, name)
-
-    def set_icon(self, icon):
-        self.icon = icon
-        self.spine.trigger_event("componentChangeIcon", self.component_id, icon)
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         ui_param = {}
@@ -69,16 +95,17 @@ class KerviComponent(object):
             else:
                 raise ValueError("illigal ui parameter name:" + key)
 
-        if not  "link_to_header" in ui_param:
+        if "link_to_header" not in ui_param:
             ui_param["link_to_header"] = False
 
-        if not  "icon" in ui_param:
+        if "icon" not in ui_param:
             ui_param["icon"] = None
         link = DasboardSectionLink(dashboard_id, section_id, ui_param, self)
-        self.dashboard_links += [link]
+        self._dashboard_links += [link]
         return link
 
     def get_reference(self):
+        """Returns a reference for this component"""
         return {
             "id": self.component_id,
             "component_type": self.component_type
@@ -100,20 +127,19 @@ class KerviComponent(object):
         info["id"] = self.component_id
         info["visible"] = self.visible
         info["name"] = self.name
-        info["ui"] = self._ui_parameters
+        info["ui"] = self._camel_case_parameters(self._ui_parameters)
         return info
 
     def _underscore_to_camelcase(self, value):
-        def camelcase(): 
+        def _camelcase():
             yield str.lower
             while True:
                 yield str.capitalize
 
-        c = camelcase()
-        return "".join(next(c)(x) if x else '_' for x in value.split("_"))
+        camelcase = _camelcase()
+        return "".join(next(camelcase)(x) if x else '_' for x in value.split("_"))
 
-
-    def _camelCaseParameters(self, parameters):
+    def _camel_case_parameters(self, parameters):
         result = {}
         for key in parameters:
             result[self._underscore_to_camelcase(key)] = parameters[key]
@@ -121,9 +147,10 @@ class KerviComponent(object):
 
     def _get_dashboard_components(self, dashboard_id, section_id):
         result = []
-        for link in self.dashboard_links:
-            if (link.dashboard_id == "*" or link.dashboard_id == dashboard_id) and link.section_id == section_id:
-                param = self._camelCaseParameters(link.parameters)
+        for link in self._dashboard_links:
+            if ((link.dashboard_id == "*" or link.dashboard_id == dashboard_id)
+                    and link.section_id == section_id):
+                param = self._camel_case_parameters(link.parameters)
                 #print("pmr", link.dashboard_id, dashboard_id, section_id, self.component_id, param)
                 result += [{
                     "linkId": link.link_id,

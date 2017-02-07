@@ -77,7 +77,6 @@ class Sensor(KerviComponent):
     @save_to_db.setter
     def save_to_db(self, value):
         self._save_to_db = value
-    
 
     @property
     def store_delta(self):
@@ -238,7 +237,7 @@ class Sensor(KerviComponent):
             * *flat* (``bool``) -- Shows the sensor with out any 3d effect.
             * *show_value* (``bool``) -- Show the numeric value and unit.
         """
-        
+
         KerviComponent.link_to_dashboard(self, dashboard_id, section_id, **kwargs)
 
     def _get_info(self):

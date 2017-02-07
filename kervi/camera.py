@@ -35,7 +35,7 @@ class _CameraPanInput(ControllerNumberInput):
         self.min_value = -90
         self.visible = False
 
-    def value_changed(self, newValue, oldValue):
+    def value_changed(self, newValue, old_value):
         self.controller.pan_changed(newValue)
 
 class _CameraTiltInput(ControllerNumberInput):
@@ -47,9 +47,8 @@ class _CameraTiltInput(ControllerNumberInput):
         self.min_value = -90
         self.visible = False
 
-    def value_changed(self, newValue, oldValue):
+    def value_changed(self, newValue, old_value):
         self.controller.tilt_changed(newValue)
-
 
 class _CameraFrameRate(ControllerSelect):
     """ Framerate selector """
@@ -95,10 +94,9 @@ class _CameraPictureButton(ControllerButton):
         self.controller.save_picture()
 
 class CameraBase(Controller):
-    def __init__(self, camera_id, name):
+    def __init__(self, camera_id, name, **kwargs):
         Controller.__init__(self, camera_id, name)
         self.type = "camera"
-        self.parameters = None
         self.add_components(
             _CameraPanInput(self),
             _CameraTiltInput(self),
@@ -106,6 +104,57 @@ class CameraBase(Controller):
             _CameraPictureButton(self),
             _CameraFrameRate(self)
         )
+
+        self._ui_parameters["height"] = kwargs.get("height", 480)
+        self._ui_parameters["width"] = kwargs.get("width", 640)
+        self._ui_parameters["type"] = kwargs.get("type", "")
+        self._ui_parameters["fps"] = kwargs.get("fps", 10)
+        self._ui_parameters["source"] = kwargs.get("source", "")
+
+    @property
+    def height(self):
+        """
+        Height of images to capture
+        """
+        return self._ui_parameters["height"]
+
+    @height.setter
+    def height(self, value):
+        self.set_ui_parameter("height", value)
+
+    @property
+    def width(self):
+        """
+        Width of images to capture
+        """
+        return self._ui_parameters["width"]
+
+    @width.setter
+    def width(self, value):
+        self.set_ui_parameter("width", value)
+
+    @property
+    def fps(self):
+        """
+        Frames to capture per second
+        """
+        return self._ui_parameters["fps"]
+
+    @fps.setter
+    def fps(self, value):
+        self.set_ui_parameter("fps", value)
+
+    @property
+    def source(self):
+        """
+        How to connect to this camera
+        """
+        return self._ui_parameters["source"]
+
+    @source.setter
+    def source(self, value):
+        self.set_ui_parameter("source", value)
+
 
     def pan_changed(self, pan_value):
         """abstract method"""
@@ -149,13 +198,7 @@ class CameraBase(Controller):
             self.component_id
         )
 
-class Camera(CameraBase):
-    def __init__(self, camera_id, name, dashboards, source):
-        CameraBase.__init__(self, camera_id, name)
-        self.parameters = {"height":480, "width":640, "source":source}
-
-
-class _FrameThread(KerviThread):
+class _CameraFrameThread(KerviThread):
     def __init__(self, camera):
         KerviThread.__init__(self)
         self.spine = spine.Spine()
@@ -164,10 +207,14 @@ class _FrameThread(KerviThread):
         if self.spine:
             self.spine.register_command_handler("startThreads", self._start_command)
             self.spine.register_command_handler("stopThreads", self._stop_command)
-        KerviThread.__init__(self)
+        #KerviThread.__init__(self)
 
-    def _step(self):
-        self.camera._get_frame()
+    def run(self):
+        """Private method do not call it directly or override it."""
+        try:
+            self.camera.capture_frames()
+        except:
+            self.spine.log.exception("CameraFrameThread")
 
     def _start_command(self):
         if not self.alive:
@@ -175,10 +222,10 @@ class _FrameThread(KerviThread):
             KerviThread.start(self)
 
     def _stop_command(self):
+        self.camera.terminate = True
         if self.alive:
             self.alive = False
             self.stop()
-
 
 class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
@@ -214,7 +261,7 @@ class _HTTPFrameServer(HTTPServer):
         self.camera = camera
 
 class FrameCamera(CameraBase):
-    """
+    r"""
     Simple camera that streams video frame by frame to the ui.
     Colud be used with the Raspberry PI camera.
     Fill in the abstract method get_frame with functionality that graps one frame from the camera.
@@ -242,10 +289,11 @@ class FrameCamera(CameraBase):
                 Frames per second.
     """
     def __init__(self, camera_id, name, **kwargs):
-        CameraBase.__init__(self, camera_id, name)
+        CameraBase.__init__(self, camera_id, name, type="frame", **kwargs)
+        self._terminate = False
         self.ip_address = nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()
-        self.fps = kwargs.get("fps", 10)
+        self.source = "http://"+str(self.ip_address)+":"+str(self.ip_port)+"/"+camera_id+".png"
         self.current_frame = None
 
         self.server = _HTTPFrameServer(
@@ -257,16 +305,24 @@ class FrameCamera(CameraBase):
         self.server_thread.daemon = True
         self.server_thread.start()
 
-        self.frame_thread = _FrameThread(self)
-        self.parameters = {
-            "height":kwargs.get("height", 480),
-            "width":kwargs.get("width", 640),
-            "type":"frame",
-            "fps":self.fps,
-            "source":"http://"+str(self.ip_address)+":"+str(self.ip_port)+"/"+camera_id+".png"
-        }
+        self.frame_thread = _CameraFrameThread(self)
+
+    @property
+    def terminate(self):
+        """
+        Flag to signal that the get_frames method should exit
+        """
+        return self._terminate
+
+    @terminate.setter
+    def terminate(self, value):
+        self._terminate = value
 
     def get_font(self, name="Fanwood", size=16):
+        """
+        Returns a font that can be used by pil image functions.
+        This default font is "Fanwood" that is available on all platforms.
+        """
         import kervi
         from PIL import ImageFont
         kervipath = os.path.dirname(kervi.__file__)
@@ -274,23 +330,26 @@ class FrameCamera(CameraBase):
         font = ImageFont.truetype(fontpath, size)
         return font
 
-    def _get_frame(self):
-        frame = self.get_frame(self.parameters["height"], self.parameters["width"])
+    def wait_next_frame(self):
+        """
+        Waits for next frame.
+        """
+        time.sleep(1.0 / self.fps)
+
+    def frame_ready(self, frame):
+        """
+        Call this method when a frame is ready
+        """
         if frame:
             self.current_frame = frame
-        time.sleep(1.0/self.fps)
 
-    def get_frame(self, height, width):
+    def capture_frames(self):
         """
-        Abstract method.
-        Fill in the abstract method get_frame with functionality that graps one frame from the camera.
-        The method must return a pil images.
+        Abstract method use it like the run method in a thread.
+        capture frames from camera until the flag self.terminate is True.
+        captured frames should be passed to the method frame_ready.
         """
-        self.spine.log.debug(
-            "abstract method get_frame reached:{0}",
-            self.component_id
-        )
-        return None
+        pass
 
 class IPCamera(CameraBase):
     def __init__(self, camera_id, name, dashboards, source):

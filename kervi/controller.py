@@ -215,11 +215,14 @@ class ControllerSwitchButton(KerviComponent):
         self.spine.register_command_handler(self.on_command, self._on_on_handler)
         self.spine.register_command_handler(self.off_command, self._on_off_handler)
         self._ui_parameters = {
-            "size": 1,
+            "size": 0,
             "type": "normal",
             "link_to_header": False,
             "icon": None,
-            "flat": False
+            "flat": False,
+            "on_text": "On",
+            "off_text": "Off",
+            "show_name": True
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -382,14 +385,14 @@ class ControllerNumberInput(KerviComponent):
             )
             old_value = self.value
             self.value = nvalue
-            self.value_changed(nvalue, old_value)
+            self.value_changed(nvalue,old_value)
             self.spine.trigger_event(
                 "changeControllerInputValue",
                 self.component_id,
                 {"input":self.component_id, "value":nvalue}
             )
 
-    def value_changed(self, newValue, oldValue):
+    def value_changed(self, newValue, old_value):
         self.spine.log.debug(
             "abstract valueChanged reached:{0}/{1}",
             self.controller.component_id,
@@ -662,8 +665,6 @@ class Controller(KerviComponent):
             pass
 
         return {
-            "type":self.type,
-            "parameters":self.parameters,
             "components":components,
             "template" : template
         }
