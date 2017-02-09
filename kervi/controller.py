@@ -40,7 +40,8 @@ class ControllerSelect(KerviComponent):
             "type": "dropdown",
             "link_to_header": False,
             "icon": None,
-            "flat": False
+            "flat": False,
+            "inline": False
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -138,7 +139,8 @@ class ControllerButton(KerviComponent):
             "type": "normal",
             "link_to_header": False,
             "icon": None,
-            "flat": False
+            "flat": False,
+            "inline": False
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -222,7 +224,10 @@ class ControllerSwitchButton(KerviComponent):
             "flat": False,
             "on_text": "On",
             "off_text": "Off",
-            "show_name": True
+            "show_name": True,
+            "inline": False,
+            "on_icon": None,
+            "off_icon": None,
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -337,7 +342,8 @@ class ControllerNumberInput(KerviComponent):
             "type": "horizontal_slider",
             "link_to_header": False,
             "icon": None,
-            "flat": False
+            "flat": False,
+            "inline": False
         }
 
 
@@ -428,7 +434,8 @@ class ControllerTextInput(KerviComponent):
             "type": "text",
             "link_to_header": False,
             "icon": None,
-            "flat": False
+            "flat": False,
+            "inline": False
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -518,7 +525,8 @@ class ControllerDateTimeInput(KerviComponent):
             "type": "datetime",
             "link_to_header": False,
             "icon": None,
-            "flat": False
+            "flat": False,
+            "inline": False
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -605,7 +613,8 @@ class Controller(KerviComponent):
             "type": "normal",
             "link_to_header": False,
             "icon": None,
-            "flat": False
+            "flat": False,
+            "inline": False
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -666,5 +675,6 @@ class Controller(KerviComponent):
 
         return {
             "components":components,
-            "template" : template
+            "template" : template,
+            "type": self.type
         }

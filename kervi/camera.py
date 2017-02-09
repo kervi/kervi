@@ -72,7 +72,12 @@ class _CameraRecordButton(ControllerSwitchButton):
             self, controller.component_id+".record",
             "Record",
             controller)
-        self.set_ui_parameter("icon", "video-camera")
+        self.set_ui_parameter("on_icon", "video-camera")
+        self.set_ui_parameter("off_icon", "video-camera")
+        self.set_ui_parameter("size", 1)
+        self.set_ui_parameter("on_text", None)
+        self.set_ui_parameter("off_text", None)
+        self.set_ui_parameter("show_name", False)
 
     def on(self):
         self.controller.start_record()
@@ -89,6 +94,7 @@ class _CameraPictureButton(ControllerButton):
             controller
         )
         self.set_ui_parameter("icon", "camera")
+        self.set_ui_parameter("size", 1)
 
     def click(self):
         self.controller.save_picture()
