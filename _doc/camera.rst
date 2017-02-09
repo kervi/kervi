@@ -1,10 +1,25 @@
 Camera and video
 =================================
 
-Video and camera is managed via special Camera kervi controllers. 
-The CameraBase class handles settings for ui display, reacts to user 
+Video and camera is managed via special Kervi Camera controllers.
+A camera controller capture frames from camera and feeds them into the system.
 
-**Raspberry pi camera excample**
+It is possible to link a camera to dashboard sections or as a dashboard background. 
+
+.. image:: images/dashboard_cam.png
+    :width: 45 %
+.. image:: images/panel_cam.png
+    :width: 45 %
+
+
+There is a pan/tilt area at the center of the camera stream where it is possible to control the cameras
+pan and tilt if the camera is equiped with servos.
+
+Record and picture buttons are available for capturing single frames or video sequences from the camera.
+
+Changes to pan, tilt and buttons in the ui should be handled in abstract methods methods of the camera class.  
+
+**Raspberry pi camera example**
 
 .. code-block:: python
 
@@ -24,7 +39,7 @@ The CameraBase class handles settings for ui display, reacts to user
             with picamera.PiCamera() as camera:
                 camera.resolution = (self.width, self.height)
                 camera.framerate = self.fps
-                
+
                 #wait for camera to be ready
                 time.sleep(2)
 
@@ -73,4 +88,4 @@ The CameraBase class handles settings for ui display, reacts to user
 .. toctree::
    :hidden:
 
-   controllers_api
+   camera_api

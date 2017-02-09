@@ -16,6 +16,7 @@ Features of the framework are:
 
 <img src="https://kervi.github.io/_images/dashboard_browser.png" width="500"> <img src="https://kervi.github.io/_images/dashboard_mobile.png" width="300">
 
+<img src="https://kervi.github.io/_images/dashboard_cam.png" width="500"> <img src="https://kervi.github.io/_images/panel_cam.png" width="300">
 
 
 Install Kervi via pip:
