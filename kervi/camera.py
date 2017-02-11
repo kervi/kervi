@@ -5,6 +5,11 @@ import os
 import threading
 import time
 
+from twisted.web.server import Site
+from twisted.web.resource import Resource
+from twisted.internet import reactor, endpoints
+
+
 try:
     from io import BytesIO
 except ImportError:
@@ -233,6 +238,26 @@ class _CameraFrameThread(KerviThread):
             self.alive = False
             self.stop()
 
+
+class _TwistedResource(Resource):
+    def __init__(self,camera):
+        self.camera = camera
+        Resource.__init__(self)
+
+    def render_GET(self,request):
+        print("t",request)
+        request.setResponseCode(200)
+        request.setHeader('Content-type', 'image/png')
+        print("x")
+        if self.server.camera.current_frame:
+            buf = BytesIO()
+            self.camera.current_frame.save(buf, format='png')
+            data = buf.getvalue()
+            request.setHeader('Content-length', len(data))
+            return data
+        request.setHeader('Content-length', 0)
+        return ""
+
 class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
         try:
@@ -299,7 +324,7 @@ class FrameCamera(CameraBase):
         self._terminate = False
         self.ip_address = nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()
-        self.source = "http://"+str(self.ip_address)+":"+str(self.ip_port)+"/"+camera_id+".png"
+        self.source = "http://" + str(self.ip_address) + ":" + str(self.ip_port) + "/" + camera_id# + ".png"
         self.current_frame = None
 
         self.server = _HTTPFrameServer(
@@ -312,6 +337,20 @@ class FrameCamera(CameraBase):
         self.server_thread.start()
 
         self.frame_thread = _CameraFrameThread(self)
+
+        #root = Resource()
+        #root.putChild(camera_id, _TwistedResource(self))
+        #factory = Site(root)
+        #reactor.listenTCP(self.ip_port, factory)
+        #endpoint = endpoints.TCP4ServerEndpoint(reactor, self.ip_port)
+        #endpoint.listen(factory)
+        #print("a")
+        #reactor.run()
+        #self.server_thread = threading.Thread(target=reactor.run())
+        #self.server_thread.daemon = True
+        #self.server_thread.start()
+
+        print("b")
 
     @property
     def terminate(self):

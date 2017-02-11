@@ -18,9 +18,11 @@ import kervi_ui.webserver as webserver
 class _KerviSensors(process._KerviProcess):
     """ Private class that starts a seperate process that loads sensors in the Kervi application """
     def init_process(self):
-        print ("load sensors")
+        print("load sensors")
         #import kervi.core_sensors.cpu_sensors
         try:
+            import kervi.hal
+            hal._load()
             import sensors
         except ImportError:
             self.spine.log.exception("load sensors")
@@ -33,8 +35,10 @@ class _KerviSensors(process._KerviProcess):
 class _KerviControllers(process._KerviProcess):
     """ Private class that starts a seperate process that loads controllers in the Kervi application """
     def init_process(self):
-        print ("load controllers")
+        print("load controllers")
         try:
+            import kervi.hal as hal
+            hal._load()
             import controllers
         except ImportError:
             self.spine.log.exception("load controllers")
@@ -46,8 +50,11 @@ class _KerviControllers(process._KerviProcess):
 class _KerviCams(process._KerviProcess):
     """ Private class that starts a seperate process that loads cam controllers in the Kervi application """
     def init_process(self):
-        print ("load cameras")
+        print("load cameras")
         try:
+            import kervi.hal
+            hal_driver=hal._load()
+            print("HAL driver", hal_driver)
             import cams
         except ImportError:
             self.spine.log.exception("load cams")
@@ -185,14 +192,14 @@ class Application(object):
 
         time.sleep(2)
         self.p3 = process._start_process(
-            "IPC", 
+            "IPC",
             self.settings,
             self.settings["network"]["IPCBasePort"]+4,
             _KerviSocketIPC
         )
 
         time.sleep(2)
-        http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
+        #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
         print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
         webserver.start(
             self.settings["network"]["IPAddress"],
