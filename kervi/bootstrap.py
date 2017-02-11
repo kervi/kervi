@@ -22,7 +22,7 @@ class _KerviSensors(process._KerviProcess):
         #import kervi.core_sensors.cpu_sensors
         try:
             import kervi.hal
-            hal._load()
+            kervi.hal._load()
             import sensors
         except ImportError:
             self.spine.log.exception("load sensors")
@@ -53,8 +53,9 @@ class _KerviCams(process._KerviProcess):
         print("load cameras")
         try:
             import kervi.hal
-            hal_driver=hal._load()
-            print("HAL driver", hal_driver)
+            hal_driver = kervi.hal._load()
+            if hal_driver:
+                print("Using HAL driver:", hal_driver)
             import cams
         except ImportError:
             self.spine.log.exception("load cams")

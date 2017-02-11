@@ -45,6 +45,9 @@ setup(
         'autobahn',
         'pillow'
     ],
+    extras_require = {
+        'rpi':  ['kervi-hal-rpi'],
+    },
     include_package_data=True,
     package_data={
         "kervi":[

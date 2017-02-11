@@ -7,7 +7,7 @@ A Kervi controller is a class that acts upon input from users or events or the u
 from kervi.spine import Spine
 from kervi.utility.thread import KerviThread
 from kervi.utility.component import KerviComponent
-
+from kervi.hal import GPIO
 class ControllerSelect(KerviComponent):
     r"""
     Select component for Kervi controller
@@ -228,6 +228,7 @@ class ControllerSwitchButton(KerviComponent):
             "inline": False,
             "on_icon": None,
             "off_icon": None,
+            "read_only": False
         }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -255,6 +256,15 @@ class ControllerSwitchButton(KerviComponent):
             * *link_to_header* (``str``) -- Add this component to header of section.
             * *icon* (``str``) -- Icon that should be displayed together with label.
             * *flat* (``bool``) -- Flat look and feel.
+            * *size* (``int``) -- the size of the button including label and icon. If 0 full width of container
+            * *on_text* (``bool``) -- Text to show on button when on.
+            * *off_text* (``bool``) -- Text to show on button when off.
+            * *on_icon* (``bool``) -- Icon to show on button when on.
+            * *off_icon* (``bool``) -- Icon to show on button when off.
+            * *show_name* (``bool``) -- Show the name of button as label.
+            * *read_only* (``bool``) -- If true the user is not able to change state.
+            * *inline* (``bool``) -- Let the button flow in line with other components.
+
 
         """
         KerviComponent.link_to_dashboard(
@@ -322,6 +332,44 @@ class ControllerSwitchButton(KerviComponent):
             self.controller.component_id,
             self.component_id,
         )
+
+class ControllerGPIOInput(ControllerSwitchButton):
+    """
+    GPIO input component, listen to a GPIO pin for going high and low events.
+    Shows a on/off button in UI, all the ui parameters for ControllerSwitchButton applies to 
+    this input.
+    """
+    def __init__(self, button_id, name, controller, pin, read_only=True):
+        ControllerSwitchButton.__init__(self, button_id, name, pin)
+        GPIO.listen_rising(pin, self._on_edge_rise)
+        GPIO.listen_falling(pin, self._on_edge_falling)
+
+    def _on_edge_rise(self):
+        self.on_high()
+
+    def _on_edge_falling(self):
+        self.on_low()
+
+    def on_high(self):
+        """
+        Abstract method that is executed when pin is going high.
+        """
+        self.spine.log.debug(
+            "abstract on_high reached:{0}/{1}",
+            self.controller.component_id,
+            self.component_id,
+        )
+
+    def on_low(self):
+        """
+        Abstract method that is executed when pin is going low.
+        """
+        self.spine.log.debug(
+            "abstract on_high reached:{0}/{1}",
+            self.controller.component_id,
+            self.component_id,
+        )
+
 
 class ControllerNumberInput(KerviComponent):
     """
@@ -391,7 +439,7 @@ class ControllerNumberInput(KerviComponent):
             )
             old_value = self.value
             self.value = nvalue
-            self.value_changed(nvalue,old_value)
+            self.value_changed(nvalue, old_value)
             self.spine.trigger_event(
                 "changeControllerInputValue",
                 self.component_id,
