@@ -27,4 +27,11 @@ def _load():
             _DRIVER = importlib.import_module(module_name)
             GPIO = GPIO()
             return driver_name
-    
+
+class SensorDevice(object):
+    def read_value(self):
+        raise NotImplementedError
+
+class I2CSensor(SensorDevice):
+    def __init__(self, address, busnum):
+        self.i2c = I2C(addess, busnum)

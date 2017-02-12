@@ -47,6 +47,7 @@ setup(
     install_requires=[
         'kervi-ui',
         'kervi-cli',
+        'kervi-components'
         'autobahn',
         'pillow'
     ],
