@@ -10,7 +10,12 @@ except:
 
 setup(
     name='kervi',
-    packages=['kervi', 'kervi/utility', 'kervi/core_sensors', 'kervi/core_sensors/cpu_sensors'],
+    packages=[
+        'kervi',
+        'kervi/utility',
+        'kervi/utility/hal',
+        'kervi/core_sensors',
+        'kervi/core_sensors/cpu_sensors'],
     version=VERSION,
     description="""
     A python framework for creating robotic and automation applications on raspberypi (and other platforms).

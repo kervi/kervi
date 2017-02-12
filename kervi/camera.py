@@ -5,9 +5,9 @@ import os
 import threading
 import time
 
-from twisted.web.server import Site
-from twisted.web.resource import Resource
-from twisted.internet import reactor, endpoints
+#from twisted.web.server import Site
+#from twisted.web.resource import Resource
+#from twisted.internet import reactor, endpoints
 
 
 try:
@@ -239,24 +239,24 @@ class _CameraFrameThread(KerviThread):
             self.stop()
 
 
-class _TwistedResource(Resource):
-    def __init__(self,camera):
-        self.camera = camera
-        Resource.__init__(self)
+# class _TwistedResource(Resource):
+#     def __init__(self,camera):
+#         self.camera = camera
+#         Resource.__init__(self)
 
-    def render_GET(self,request):
-        print("t",request)
-        request.setResponseCode(200)
-        request.setHeader('Content-type', 'image/png')
-        print("x")
-        if self.server.camera.current_frame:
-            buf = BytesIO()
-            self.camera.current_frame.save(buf, format='png')
-            data = buf.getvalue()
-            request.setHeader('Content-length', len(data))
-            return data
-        request.setHeader('Content-length', 0)
-        return ""
+#     def render_GET(self,request):
+#         print("t",request)
+#         request.setResponseCode(200)
+#         request.setHeader('Content-type', 'image/png')
+#         print("x")
+#         if self.server.camera.current_frame:
+#             buf = BytesIO()
+#             self.camera.current_frame.save(buf, format='png')
+#             data = buf.getvalue()
+#             request.setHeader('Content-length', len(data))
+#             return data
+#         request.setHeader('Content-length', 0)
+#         return ""
 
 class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def __init__(self, req, client_addr, server):

@@ -341,14 +341,24 @@ class ControllerGPIOInput(ControllerSwitchButton):
     """
     def __init__(self, button_id, name, controller, pin, read_only=True):
         ControllerSwitchButton.__init__(self, button_id, name, pin)
-        GPIO.listen_rising(pin, self._on_edge_rise)
-        GPIO.listen_falling(pin, self._on_edge_falling)
+        self.pin = pin
+        GPIO.listen(self.pin, self._on_edge)
+        self.state = GPIO.get(self.pin)
 
-    def _on_edge_rise(self):
-        self.on_high()
+    def _on_edge(self, state):
+        print("state", state)
+        if GPIO.get(self.pin):
+            self.on_high()
+            self.state = True
+        else:
+            self.on_low()
+            self.state = False
 
-    def _on_edge_falling(self):
-        self.on_low()
+        self.spine.trigger_event(
+            "controllerButtonStateChange",
+            self.component_id,
+            {"button":self.component_id, "state":self.state}
+        )
 
     def on_high(self):
         """

@@ -4,11 +4,19 @@ from kervi.utility.hal import i2c
 import pip
 import importlib
 
+_DRIVER = None
+
 GPIO = None
-I2C = None
+
+def GPIO(gpio_type=None):
+    if gpio_type == None:
+        return _DRIVER.get_gpio_driver()
+
+def I2C(address, busnum=0):
+    return _DRIVER.get_i2c_driver(address, busnum)
 
 def _load():
-    global GPIO, I2C
+    global GPIO, _DRIVER
 
 
     installed_packages = pip.get_installed_distributions()
@@ -16,8 +24,7 @@ def _load():
     known_drivers = [("kervi-hal-win", "kervi_hal_win"), ("kervi-hal-rpi", "kervi_hal_rpi")]
     for driver_name, module_name in known_drivers:
         if driver_name in flat_installed_packages:
-            driver = importlib.import_module(module_name)
-            GPIO = gpio.KerviGPIO(driver.get_gpio_driver())
-            I2C = i2c.KerviI2C(driver.get_gpio_driver())
+            _DRIVER = importlib.import_module(module_name)
+            GPIO = GPIO()
             return driver_name
     

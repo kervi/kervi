@@ -2,37 +2,33 @@
 
 """
 
-class KerviGPIO(object):
-    def __init__(self, driver):
-        self.driver = driver
+class IGPIODeviceDriver(object):
+    def define_as_input(self, pin):
+        raise NotImplementedError
 
-    def define_as_in(self, pin):
-        self.driver.define_pin_in(pin)
+    def define_as_output(self, pin):
+        raise NotImplementedError
 
-    def define_as_out(self, pin):
-        self.driver.define_pin_out(pin)
+    def define_as_pwm(self, pin, frequency, duty_cycle=None):
+        raise NotImplementedError
 
-    def define_as_pwm(self, pin, frequency):
-        self.driver.define_pin_pwm(pin, frequency)
-
-    def set_high(self, pin):
-        self.driver.set_pin_high(pin)
-
-    def set_low(self, pin):
-        self.driver.set_pin_low(pin)
+    def set(self, pin, state):
+        raise NotImplementedError
 
     def get(self, pin):
-        return self.driver.get_pin(pin)
+        raise NotImplementedError
+
+    def listen(self, pin, callback):
+        raise NotImplementedError
 
     def listen_rising(self, pin, callback):
-        self.driver.listen_rising_pin(pin, callback)
+        raise NotImplementedError
 
     def listen_falling(self, pin, callback):
-        self.driver.listen_falling_pin(pin, callback)
+        raise NotImplementedError
 
-    def pwm_start(self, pin, duty_cycle):
-        self.driver.start_pwm(pin, duty_cycle)
+    def pwm_start(self, pin, duty_cycle=None, frequency=None):
+        raise NotImplementedError
 
     def pwm_stop(self, pin):
-        self.driver.stop_pwm(pin)
-
+        raise NotImplementedError

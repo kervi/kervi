@@ -6,6 +6,7 @@ kervi\bootstrap.py
 kervi\camera.py
 kervi\controller.py
 kervi\dashboard.py
+kervi\hal.py
 kervi\kervi_logging.py
 kervi\module_thread.py
 kervi\sensor.py
@@ -26,6 +27,9 @@ kervi/utility\process_spine.py
 kervi/utility\socket_spine.py
 kervi/utility\storage.py
 kervi/utility\thread.py
+kervi/utility/hal\__init__.py
+kervi/utility/hal\gpio.py
+kervi/utility/hal\i2c.py
 kervi\fonts\Fanwood-Italic.otf
 kervi\fonts\Fanwood.otf
 kervi\fonts\FanwoodText-Italic.otf
