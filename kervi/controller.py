@@ -342,6 +342,7 @@ class ControllerGPIOInput(ControllerSwitchButton):
     def __init__(self, button_id, name, controller, pin, read_only=True):
         ControllerSwitchButton.__init__(self, button_id, name, pin)
         self.pin = pin
+        GPIO.define_as_input(self.pin)
         GPIO.listen(self.pin, self._on_edge)
         self.state = GPIO.get(self.pin)
 

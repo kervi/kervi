@@ -47,11 +47,11 @@ setup(
     install_requires=[
         'kervi-ui',
         'kervi-cli',
-        'kervi-components'
+        'kervi-device-library',
         'autobahn',
         'pillow'
     ],
-    extras_require = {
+    extras_require={
         'rpi':  ['kervi-hal-rpi'],
     },
     include_package_data=True,

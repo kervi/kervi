@@ -1,6 +1,8 @@
 """Hardware abstraction layer"""
 from kervi.utility.hal import gpio
 from kervi.utility.hal import i2c
+from kervi.spine import Spine
+
 import pip
 import importlib
 
@@ -29,9 +31,19 @@ def _load():
             return driver_name
 
 class SensorDevice(object):
+
+    @property
+    def type(self):
+        raise NotImplementedError
+
+    @property
+    def unit(self):
+        raise NotImplementedError
+
     def read_value(self):
         raise NotImplementedError
 
-class I2CSensor(SensorDevice):
-    def __init__(self, address, busnum):
-        self.i2c = I2C(addess, busnum)
+class I2CSensorDevice(SensorDevice):
+    def __init__(self, address, bus):
+        self.i2c = I2C(address, bus)
+        self.logger = spine().log

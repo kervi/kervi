@@ -1,6 +1,6 @@
 
 Sensors
-=================================
+#######
 
 Sensors in Kervi are special classes that handles reading from different kind of probes. 
 Kervis has a base class *Sensor* that handles the hevy lifting of storing readings in database,
@@ -205,7 +205,8 @@ The sensor is linked twice first to the header with the animation and into the b
 
 
 
-
+Sensor api
+----------
 
 .. toctree::
    :hidden:

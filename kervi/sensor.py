@@ -36,13 +36,19 @@ class Sensor(KerviComponent):
         * *rows* (``int``) -- Number of rows in this section, default is 1.
         * *add_user_log* (``bool``) -- This section shows user log messages.
     """
-    def __init__(self, sensor_id, name):
+    def __init__(self, sensor_id, name, device=None):
         KerviComponent.__init__(self, sensor_id, "sensor", name)
+        self._device = device
 
         self._type = None
         self._max = None
         self._min = None
         self._unit = None
+
+        if self._device:
+            self._type = self._device.type
+            self._unit = self._device.unit
+
         self._upper_fatal_limit = None
         self._upper_warning_limit = None
         self._lower_warning_limit = None
@@ -206,6 +212,17 @@ class Sensor(KerviComponent):
     def lower_fatal_limit(self, value):
         self._lower_fatal_limit = value
 
+    @property
+    def device(self):
+        """A hardware device from the kervi device library."""
+        return self._device
+
+    @device.setter
+    def device(self, device):
+        self._device = device
+
+    
+    
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
         Links the sensor to a dashboard.
@@ -297,11 +314,18 @@ class Sensor(KerviComponent):
             self._sparkline += [value]
             self._last_reading = time.clock()
 
+    
+    def _read_sensor(self):
+        if self._device == None:
+            self.read_sensor()
+        else:
+            self.new_sensor_reading(self._device.read_value())
+    
     def read_sensor(self):
         """
-            Abstract method that must be implementd by the inherting class.
+            Abstract method that must be implementd if no device is set.
             This method is called by the sensor thread on regular intervals.
-            
+
             There is no need to implement own polling systems or call time.sleep this
             is handles by the calling sensor thread.
 
@@ -343,8 +367,7 @@ class SensorThread(KerviThread):
 
     def _step(self):
         for sensor in self.sensors:
-            sensor.read_sensor()
-
+            sensor._read_sensor()
         self.sensor_step()
         time.sleep(self.reading_interval)
 

@@ -30,6 +30,7 @@ kervi/utility\thread.py
 kervi/utility/hal\__init__.py
 kervi/utility/hal\gpio.py
 kervi/utility/hal\i2c.py
+kervi/utility/hal\sensor_device.py
 kervi\fonts\Fanwood-Italic.otf
 kervi\fonts\Fanwood.otf
 kervi\fonts\FanwoodText-Italic.otf

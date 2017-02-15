@@ -1,5 +1,4 @@
-Sensors API
------------
-
+Devices API
+-----------------------------
 .. automodule:: kervi.sensor
    :members:

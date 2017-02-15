@@ -3,6 +3,17 @@ class II2CDeviceDriver(object):
     """
     Class for communicating with an I2C devices.
     """
+
+    def reverse_byte_order(self, data):
+        """Reverses the byte order of an int (16-bit) or long (32-bit) value."""
+        # Courtesy Vishal Sapre
+        byte_count = len(hex(data)[2:].replace('L', '')[::2])
+        val = 0
+        for i in range(byte_count):
+            val = (val << 8) | (data & 0xff)
+            data >>= 8
+        return val
+
     def write_raw8(self, value):
         """Write an 8-bit value on the bus (without register)."""
         raise NotImplementedError

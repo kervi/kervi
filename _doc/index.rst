@@ -32,6 +32,7 @@ Features of the framework are:
    sensors
    controllers
    camera
+   hal
    ipc
    cli
 
