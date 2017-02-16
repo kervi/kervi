@@ -43,7 +43,10 @@ class SensorDevice(object):
     def read_value(self):
         raise NotImplementedError
 
+    @property
+    def logger(self):
+        return Spine().log
+
 class I2CSensorDevice(SensorDevice):
     def __init__(self, address, bus):
         self.i2c = I2C(address, bus)
-        self.logger = spine().log
