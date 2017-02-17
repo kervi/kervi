@@ -8,6 +8,7 @@ from kervi.spine import Spine
 from kervi.utility.thread import KerviThread
 from kervi.utility.component import KerviComponent
 from kervi.hal import GPIO
+
 class ControllerSelect(KerviComponent):
     r"""
     Select component for Kervi controller
@@ -31,6 +32,7 @@ class ControllerSelect(KerviComponent):
         KerviComponent.__init__(self, select_id, "select", name)
         #self.spine = Spine()
         self.controller = controller
+        self._persist_value = False
         self.options = []
         self.selected_options = []
         self.change_command = self.component_id + ".change"
@@ -43,6 +45,19 @@ class ControllerSelect(KerviComponent):
             "flat": False,
             "inline": False
         }
+
+    @property
+    def persist_value(self):
+        """ If true the value is saved to kervi DB when it change"""
+        return self._persist_value
+
+    @persist_value.setter
+    def persist_value(self, do_persist):
+        self._persist_value = do_persist
+
+    def _load_persisted(self):
+        if self.persist_value:
+            self._on_change_handler(self.settings.retrieve_value("selected_options"), False)
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
@@ -92,9 +107,11 @@ class ControllerSelect(KerviComponent):
         self.options += [option]
         if selected:
             self.selected_options += [option]
+            if self._persist_value:
+                self.settings.store_value("selected_options", self.selected_options)
 
 
-    def _on_change_handler(self, selected_options):
+    def _on_change_handler(self, selected_options, allow_persist=True):
         self.spine.log.debug(
             "controller select change:{0}/{1}",
             self.controller.component_id,
@@ -108,11 +125,15 @@ class ControllerSelect(KerviComponent):
 
         for selected_option in selected_options:
             for option in self.options:
-                if option["value"] == selected_option:
+                if option["value"] == selected_option["value"]:
                     option["selected"] = True
                     self.selected_options += [option]
 
         self.change(self.selected_options)
+
+        if self._persist_value and allow_persist:
+            self.settings.store_value("value", self.selected_options)
+
         self.spine.trigger_event(
             "controllerSelectChange",
             self.component_id,
@@ -142,6 +163,9 @@ class ControllerButton(KerviComponent):
             "flat": False,
             "inline": False
         }
+
+    def _load_persisted(self):
+        pass
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
@@ -230,6 +254,24 @@ class ControllerSwitchButton(KerviComponent):
             "off_icon": None,
             "read_only": False
         }
+        self._persist_value = False
+
+    @property
+    def persist_value(self):
+        """ If true the value is saved to kervi DB when it change"""
+        return self._persist_value
+
+    @persist_value.setter
+    def persist_value(self, do_persist):
+        self._persist_value = do_persist
+
+    def _load_persisted(self):
+        if self.persist_value:
+            state = self.settings.retrieve_value("state")
+            if state:
+                self._on_on_handler(allow_persist=False)
+            else:
+                self._on_off_handler(allow_persist=False)
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
@@ -281,7 +323,7 @@ class ControllerSwitchButton(KerviComponent):
             "state":self.state,
         }
 
-    def _on_on_handler(self):
+    def _on_on_handler(self, allow_persist=True):
         self.spine.log.debug(
             "controller button on:{0}/{1}",
             self.controller.component_id,
@@ -291,6 +333,11 @@ class ControllerSwitchButton(KerviComponent):
         if not self.state:
             self.state = True
             self.on()
+
+            if self._persist_value and allow_persist:
+                self.settings.store_value("state", self.state)
+
+
             self.spine.trigger_event(
                 "controllerButtonStateChange",
                 self.component_id,
@@ -308,7 +355,7 @@ class ControllerSwitchButton(KerviComponent):
         )
 
 
-    def _on_off_handler(self):
+    def _on_off_handler(self, allow_persist=True):
         self.spine.log.debug(
             "controller button off:{0}/{1}",
             self.controller.component_id,
@@ -317,6 +364,9 @@ class ControllerSwitchButton(KerviComponent):
         if self.state:
             self.state = False
             self.off()
+            if self._persist_value and allow_persist:
+                self.settings.store_value("value", self.state)
+
             self.spine.trigger_event(
                 "controllerButtonStateChange",
                 self.component_id,
@@ -345,7 +395,10 @@ class ControllerGPIOInput(ControllerSwitchButton):
         GPIO.define_as_input(self.pin)
         GPIO.listen(self.pin, self._on_edge)
         self.state = GPIO.get(self.pin)
-
+        
+    def _load_persisted(self):
+        pass
+    
     def _on_edge(self, state):
         print("state", state)
         if GPIO.get(self.pin):
@@ -404,7 +457,20 @@ class ControllerNumberInput(KerviComponent):
             "flat": False,
             "inline": False
         }
+        self._persist_value = False
 
+    @property
+    def persist_value(self):
+        """ If true the value is saved to kervi DB when it change"""
+        return self._persist_value
+
+    @persist_value.setter
+    def persist_value(self, do_persist):
+        self._persist_value = do_persist
+
+    def _load_persisted(self):
+        if self._persist_value:
+            self._set_value(self.settings.retrieve_value("value"), False)
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
@@ -440,7 +506,7 @@ class ControllerNumberInput(KerviComponent):
             *kwargs
             )
 
-    def _set_value(self, nvalue):
+    def _set_value(self, nvalue, allow_persist=True):
         if self.value != nvalue:
             self.spine.log.debug(
                 "value change on input:{0}/{1} value:{2}",
@@ -451,6 +517,9 @@ class ControllerNumberInput(KerviComponent):
             old_value = self.value
             self.value = nvalue
             self.value_changed(nvalue, old_value)
+            if self._persist_value and allow_persist:
+                self.settings.store_value("value", self.value)
+
             self.spine.trigger_event(
                 "changeControllerInputValue",
                 self.component_id,
@@ -496,6 +565,20 @@ class ControllerTextInput(KerviComponent):
             "flat": False,
             "inline": False
         }
+        self._persist_value = False
+
+    @property
+    def persist_value(self):
+        """ If true the value is saved to kervi DB when it change"""
+        return self._persist_value
+
+    @persist_value.setter
+    def persist_value(self, do_persist):
+        self._persist_value = do_persist
+
+    def _load_persisted(self):
+        if self_persist_value:
+            self._set_value(self.settings.retrieve_value("value"))
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
@@ -540,6 +623,9 @@ class ControllerTextInput(KerviComponent):
             old_value = self.value
             self.value = nvalue
             self.value_changed(nvalue, old_value)
+            if self.selected_options:
+                settings.store_value("value", self.value)
+
             self.spine.trigger_event(
                 "changeControllerInputValue",
                 self.component_id,
@@ -587,7 +673,21 @@ class ControllerDateTimeInput(KerviComponent):
             "flat": False,
             "inline": False
         }
+        self._persist_value = False
 
+    @property
+    def persist_value(self):
+        """ If true the value is saved to kervi DB when it change"""
+        return self._persist_value
+
+    @persist_value.setter
+    def persist_value(self, do_persist):
+        self._persist_value = do_persist
+
+    def _load_persisted(self):
+        if self_persist_value:
+            self._set_value(self.settings.retrieve_value("value"))
+    
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
         Links this component to a dashboard section.
@@ -632,6 +732,9 @@ class ControllerDateTimeInput(KerviComponent):
             old_value = self.value
             self.value = nvalue
             self.value_changed(nvalue, old_value)
+            if self.selected_options:
+                settings.store_value("value", self.value)
+
             self.spine.trigger_event(
                 "changeControllerInputValue",
                 self.component_id,
@@ -713,6 +816,8 @@ class Controller(KerviComponent):
     def add_components(self, *args):
         for component in args:
             self.components += [component]
+            component._load_persisted()
+
 
     def _get_info(self):
         components = []

@@ -64,12 +64,16 @@ class _CameraFrameRate(ControllerSelect):
             "Framerate",
             controller
         )
+        self.persist_value = True
         self.add_option("5", "5 / sec")
         self.add_option("10", "10 / sec")
         self.add_option("15", "15 / sec", True)
 
     def change(self, selected_options):
-        self.controller.framerate_changed(selected_options)
+        if (len(selected_options)):
+            value = selected_options[0]["value"]
+            self.controller.framerate_changed(value)
+
 
 class _CameraRecordButton(ControllerSwitchButton):
     def __init__(self, controller):

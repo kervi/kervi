@@ -53,6 +53,11 @@ setup(
     ],
     extras_require={
         'rpi':  ['kervi-hal-rpi'],
+        'raspberry':  ['kervi-hal-rpi'],
+        'win':  ['kervi-hal-win'],
+        'windows':  ['kervi-hal-win'],
+        'linux':  ['kervi-hal-linux'],
+        'mac':  ['kervi-hal-linux'],
     },
     include_package_data=True,
     package_data={

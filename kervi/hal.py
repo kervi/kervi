@@ -33,6 +33,14 @@ def _load():
 class SensorDevice(object):
 
     @property
+    def max(self):
+        return None
+
+    @property
+    def min(self):
+        return None
+
+    @property
     def type(self):
         raise NotImplementedError
 
@@ -48,5 +56,9 @@ class SensorDevice(object):
         return Spine().log
 
 class I2CSensorDevice(SensorDevice):
+    def __init__(self, address, bus):
+        self.i2c = I2C(address, bus)
+
+class I2CGPIODevice(gpio.IGPIODeviceDriver):
     def __init__(self, address, bus):
         self.i2c = I2C(address, bus)

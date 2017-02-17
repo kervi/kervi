@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 import kervi.spine as spine
-
+from kervi.settings import Settings
 
 class DasboardSectionLink(object):
     def __init__(self, dashboard_id, section_id, param, component):
@@ -25,6 +25,7 @@ class KerviComponent(object):
         self._visible = True
         self._dashboard_links = []
         self._ui_parameters = {}
+        self._settings = Settings(self.component_type + "_" + self.component_id)
         if self.spine:
             self.spine.register_query_handler(
                 "getDashboardComponents",
@@ -65,6 +66,24 @@ class KerviComponent(object):
     @visible.setter
     def visible(self, value):
         self._visible = value
+
+
+    @property
+    def settings(self):
+        """
+        You can persist settings to the kervi database via the settings property.
+
+        .. code:: python
+            myComponent.settings.store_value("nameOfValue", value)
+
+        And retrieve it again via.
+
+        .. code:: python
+            value = myComponent.settings.retrieve_value("nameOfValue)
+
+
+        """
+        return self._settings
 
     def set_ui_parameter(self, name, value):
         if name in self._ui_parameters:

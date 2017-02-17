@@ -11,6 +11,7 @@ import time
 from kervi.utility.thread import KerviThread
 from kervi.spine import Spine
 from kervi.utility.component import KerviComponent
+from kervi.settings import Settings
 
 class Sensor(KerviComponent):
     r"""
@@ -36,7 +37,7 @@ class Sensor(KerviComponent):
         * *rows* (``int``) -- Number of rows in this section, default is 1.
         * *add_user_log* (``bool``) -- This section shows user log messages.
     """
-    def __init__(self, sensor_id, name, device=None):
+    def __init__(self, sensor_id, name, device=None, use_thread=True):
         KerviComponent.__init__(self, sensor_id, "sensor", name)
         self._device = device
 
@@ -48,6 +49,8 @@ class Sensor(KerviComponent):
         if self._device:
             self._type = self._device.type
             self._unit = self._device.unit
+            self._min = self._device.min
+            self._max = self._device.max
 
         self._upper_fatal_limit = None
         self._upper_warning_limit = None
@@ -69,6 +72,18 @@ class Sensor(KerviComponent):
             "show_value": True,
             "show_name": True
         }
+        if use_thread:
+            self._sensor_thread = SensorThread(self, 1)
+        else:
+            self._sensor_thread = None
+
+    @property
+    def reading_interval(self):
+        return self._sensor_thread.reading_interval
+
+    @reading_interval.setter
+    def reading_interval(self, interval):
+        self._sensor_thread.reading_interval = interval
 
     @property
     def save_to_db(self):
@@ -221,8 +236,6 @@ class Sensor(KerviComponent):
     def device(self, device):
         self._device = device
 
-    
-    
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
         Links the sensor to a dashboard.
@@ -314,13 +327,12 @@ class Sensor(KerviComponent):
             self._sparkline += [value]
             self._last_reading = time.clock()
 
-    
     def _read_sensor(self):
-        if self._device == None:
+        if self._device is None:
             self.read_sensor()
         else:
             self.new_sensor_reading(self._device.read_value())
-    
+
     def read_sensor(self):
         """
             Abstract method that must be implementd if no device is set.
