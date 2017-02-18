@@ -16,7 +16,7 @@ except ImportError:
     from StringIO import StringIO as BytesIO
 
 import socket
-from kervi.controller import Controller, ControllerNumberInput, ControllerSwitchButton, ControllerButton, ControllerSelect
+from kervi.controller import Controller, UINumberControllerInput, UISwitchButtonControllerInput, UIButtonControllerInput, UISelectControllerInput
 from kervi.utility.thread import KerviThread
 import kervi.utility.nethelper as nethelper
 import kervi.spine as spine
@@ -31,9 +31,9 @@ except:
     from http.server import HTTPServer
 
 
-class _CameraPanInput(ControllerNumberInput):
+class _CameraPanInput(UINumberControllerInput):
     def __init__(self, controller):
-        ControllerNumberInput.__init__(self, controller.component_id+".pan", "Pan", controller)
+        UINumberControllerInput.__init__(self, controller.component_id+".pan", "Pan", controller)
         self.unit = "degree"
         self.value = 0
         self.max_value = 90
@@ -43,9 +43,9 @@ class _CameraPanInput(ControllerNumberInput):
     def value_changed(self, newValue, old_value):
         self.controller.pan_changed(newValue)
 
-class _CameraTiltInput(ControllerNumberInput):
+class _CameraTiltInput(UINumberControllerInput):
     def __init__(self, controller):
-        ControllerNumberInput.__init__(self, controller.component_id+".tilt", "Tilt", controller)
+        UINumberControllerInput.__init__(self, controller.component_id+".tilt", "Tilt", controller)
         self.unit = "degree"
         self.value = 0
         self.max_value = 90
@@ -55,10 +55,10 @@ class _CameraTiltInput(ControllerNumberInput):
     def value_changed(self, newValue, old_value):
         self.controller.tilt_changed(newValue)
 
-class _CameraFrameRate(ControllerSelect):
+class _CameraFrameRate(UISelectControllerInput):
     """ Framerate selector """
     def __init__(self, controller):
-        ControllerSelect.__init__(
+        UISelectControllerInput.__init__(
             self,
             controller.component_id + ".framerate",
             "Framerate",
@@ -75,9 +75,9 @@ class _CameraFrameRate(ControllerSelect):
             self.controller.framerate_changed(value)
 
 
-class _CameraRecordButton(ControllerSwitchButton):
+class _CameraRecordButton(UISwitchButtonControllerInput):
     def __init__(self, controller):
-        ControllerSwitchButton.__init__(
+        UISwitchButtonControllerInput.__init__(
             self, controller.component_id+".record",
             "Record",
             controller)
@@ -94,9 +94,9 @@ class _CameraRecordButton(ControllerSwitchButton):
     def off(self):
         self.controller.stop_record()
 
-class _CameraPictureButton(ControllerButton):
+class _CameraPictureButton(UIButtonControllerInput):
     def __init__(self, controller):
-        ControllerButton.__init__(
+        UIButtonControllerInput.__init__(
             self,
             controller.component_id+".savePicture",
             "Take picture",
@@ -112,7 +112,7 @@ class CameraBase(Controller):
     def __init__(self, camera_id, name, **kwargs):
         Controller.__init__(self, camera_id, name)
         self.type = "camera"
-        self.add_components(
+        self.add_input(
             _CameraPanInput(self),
             _CameraTiltInput(self),
             _CameraRecordButton(self),

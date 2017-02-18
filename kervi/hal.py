@@ -10,7 +10,7 @@ _DRIVER = None
 
 GPIO = None
 
-def GPIO(gpio_type=None):
+def get_gpio(gpio_type=None):
     if gpio_type == None:
         return _DRIVER.get_gpio_driver()
 
@@ -27,7 +27,7 @@ def _load():
     for driver_name, module_name in known_drivers:
         if driver_name in flat_installed_packages:
             _DRIVER = importlib.import_module(module_name)
-            GPIO = GPIO()
+            GPIO = get_gpio()
             return driver_name
 
 class SensorDevice(object):

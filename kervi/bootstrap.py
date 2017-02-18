@@ -9,11 +9,14 @@ except ImportError:
     import _thread as thread
 
 #import sys
+import uuid
 import kervi.utility.process as process
 import kervi.spine as spine
 from kervi.utility.process_spine import _ProcessSpine
 import kervi.kervi_logging as logging
 import kervi_ui.webserver as webserver
+import kervi.utility.nethelper as nethelper
+import kervi.hal as hal
 
 class _KerviSensors(process._KerviProcess):
     """ Private class that starts a seperate process that loads sensors in the Kervi application """
@@ -21,8 +24,7 @@ class _KerviSensors(process._KerviProcess):
         print("load sensors")
         #import kervi.core_sensors.cpu_sensors
         try:
-            import kervi.hal
-            kervi.hal._load()
+            hal._load()
             import sensors
         except ImportError:
             self.spine.log.exception("load sensors")
@@ -52,10 +54,7 @@ class _KerviCams(process._KerviProcess):
     def init_process(self):
         print("load cameras")
         try:
-            import kervi.hal
-            hal_driver = kervi.hal._load()
-            if hal_driver:
-                print("Using HAL driver:", hal_driver)
+            hal._load()
             import cams
         except ImportError:
             self.spine.log.exception("load cams")
@@ -110,38 +109,46 @@ class Application(object):
     ```
 
     """
-    def __init__(self, settings):
+    def __init__(self, settings = None):
         """ Settings is a dictionary with the following content
         """
 
         self.settings = {
             "info":{
-                "id":None,
-                "name":None,
-                "appKey":None,
+                "id":"kervi_app",
+                "name":"Kervi application",
+                "appKey":"",
             },
             "log" : {
                 "level":"WARNING",
-                "file":"myapp.log",
+                "file":"kervi.log",
                 "resetLog":True
             },
-            "modules":["sensors", "controllers", "cams"],
+            "modules":[],
             "network":{
-                "IPAddress": None,
-                "IPCBasePort":None,
-                "WebSocketPort":None,
-                "WebPort": None,
-                "IPCSecret":None
+                "IPAddress": nethelper.get_ip_address(),
+                "IPCBasePort":nethelper.get_free_port([9500]),
+                "WebSocketPort":nethelper.get_free_port([9000]),
+                "WebPort": nethelper.get_free_port([80, 8080, 8081]),
+                "IPCSecret":b"12345"
             }
         }
 
 
-
-        self.settings.update(settings)
+        print("Starting kervi application, please wait")
+        if settings:
+            self.settings.update(settings)
         self._validateSettings()
         self.started = False
+        spine._init_spine("application-" + self.settings["info"]["id"])
         self.spine = spine.Spine()
+        self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
 
+        process._start_root_spine(self.settings, True)
+
+        hal_driver = hal._load()
+        if hal_driver:
+            print("Using HAL driver:", hal_driver)
 
     def _validateSettings(self):
         pass
@@ -150,17 +157,12 @@ class Application(object):
         return self.settings["info"]
 
     def _start(self):
-        print("Starting kervi application, please wait")
         self.started = True
-        process._start_root_spine(self.settings, True)
-        self.spine = spine.Spine()
-        self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
         self.spine.send_command("startThreads")
 
         try:
             import dashboards
         except ImportError:
-            self.spine.log.exception("load dashboards")
             pass
 
 

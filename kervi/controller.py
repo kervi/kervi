@@ -47,6 +47,15 @@ class UISelectControllerInput(KerviComponent):
         }
 
     @property
+    def value(self):
+        """Current value/state of the component"""
+        return self.selected_options
+
+    @value.setter
+    def value(self, new_value):
+        self._on_change_handler(new_value)
+
+    @property
     def persist_value(self):
         """ If true the value is saved to kervi DB when it change"""
         return self._persist_value
@@ -142,11 +151,7 @@ class UISelectControllerInput(KerviComponent):
 
     def change(self, selected_options):
         """ Abstract method fill in with your own code to be executed when a change occur. """
-        self.spine.log.debug(
-            "abstract select change reached:{0}/{1}",
-            self.controller.component_id,
-            self.component_id,
-        )
+        self.controller.input_changed(self)
 
 class UIButtonControllerInput(KerviComponent):
     def __init__(self, button_id, name, controller):
@@ -219,11 +224,7 @@ class UIButtonControllerInput(KerviComponent):
         """
         Abstract method fill in with your own code that should be executed when button is clicked.
         """
-        self.spine.log.debug(
-            "abstract click reached:{0}/{1}",
-            self.controller.component_id,
-            self.component_id,
-        )
+        self.controller.input_changed(self)
 
 class UISwitchButtonControllerInput(KerviComponent):
     """
@@ -255,6 +256,18 @@ class UISwitchButtonControllerInput(KerviComponent):
             "read_only": False
         }
         self._persist_value = False
+
+    @property
+    def value(self):
+        """Current state of the component"""
+        return self.state
+
+    @value.setter
+    def value(self, new_value):
+        if new_value:
+            self._on_on_handler()
+        else:
+            self._on_off_handler()
 
     @property
     def persist_value(self):
@@ -313,7 +326,7 @@ class UISwitchButtonControllerInput(KerviComponent):
             self,
             dashboard_id,
             section_id,
-            *kwargs
+            **kwargs
             )
 
     def _get_info(self):
@@ -348,11 +361,7 @@ class UISwitchButtonControllerInput(KerviComponent):
         """
         Abstract method fill that is executed when button is turned on.
         """
-        self.spine.log.debug(
-            "abstract on reached:{0}/{1}",
-            self.controller.component_id,
-            self.component_id,
-        )
+        self.controller.input_changed(self)
 
 
     def _on_off_handler(self, allow_persist=True):
@@ -377,11 +386,7 @@ class UISwitchButtonControllerInput(KerviComponent):
         """
         Abstract method that is executed then button is turned off.
         """
-        self.spine.log.debug(
-            "abstract off reached:{0}/{1}",
-            self.controller.component_id,
-            self.component_id,
-        )
+        self.controller.input_changed(self)
 
 class DigitalGPIOControllerInput(UISwitchButtonControllerInput):
     """
@@ -419,6 +424,16 @@ class DigitalGPIOControllerInput(UISwitchButtonControllerInput):
         self.gpio.listen(self.channel, self._on_edge)
         self.state = self.gpio.get(self.channel)
 
+    
+    @property
+    def value(self):
+        """Current state of the component"""
+        return self.state
+
+    @value.setter
+    def value(self, new_value):
+        pass
+
     def _load_persisted(self):
         pass
 
@@ -439,23 +454,15 @@ class DigitalGPIOControllerInput(UISwitchButtonControllerInput):
 
     def on_high(self):
         """
-        Abstract method that is executed when pin is going high.
+        Abstract method that is executed when the channel is going high.
         """
-        self.spine.log.debug(
-            "abstract on_high reached:{0}/{1}",
-            self.controller.component_id,
-            self.component_id,
-        )
+        self.controller.input_changed(self)
 
     def on_low(self):
         """
-        Abstract method that is executed when pin is going low.
+        Abstract method that is executed when the channel is going low.
         """
-        self.spine.log.debug(
-            "abstract on_high reached:{0}/{1}",
-            self.controller.component_id,
-            self.component_id,
-        )
+        self.controller.input_changed(self)
 
 
 class UINumberControllerInput(KerviComponent):
@@ -469,7 +476,7 @@ class UINumberControllerInput(KerviComponent):
         self.min_value = -100
         self.max_value = 100
         self.unit = ""
-        self.value = 0
+        self._value = 0
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
         self._ui_parameters = {
@@ -482,6 +489,15 @@ class UINumberControllerInput(KerviComponent):
             "read_only": False
         }
         self._persist_value = False
+
+    @property
+    def value(self):
+        """Current state of the component"""
+        return self._value
+
+    @value.setter
+    def value(self, new_value):
+        self._set_value(new_value)
 
     @property
     def persist_value(self):
@@ -540,7 +556,7 @@ class UINumberControllerInput(KerviComponent):
                 nvalue
             )
             old_value = self.value
-            self.value = nvalue
+            self._value = nvalue
             self.value_changed(nvalue, old_value)
             if self._persist_value and allow_persist:
                 self.settings.store_value("value", self.value)
@@ -552,11 +568,7 @@ class UINumberControllerInput(KerviComponent):
             )
 
     def value_changed(self, newValue, old_value):
-        self.spine.log.debug(
-            "abstract valueChanged reached:{0}/{1}",
-            self.controller.component_id,
-            self.component_id,
-        )
+        self.controller.input_changed(self)
 
     def _get_info(self):
         return {
@@ -574,7 +586,7 @@ class UINumberControllerInput(KerviComponent):
 class AnalogGPIOControllerInput(UINumberControllerInput):
     """
     Analog GPIO input component that listens to the signal level on analog input.
-    This input will show up as an UINumberControllerInput when linked to a dashboard panel 
+    This input will show up as an UINumberControllerInput when linked to a dashboard panel
     and all ui settings for UINumberControllerInput applies to this input.
 
     :param button_id:
@@ -604,46 +616,24 @@ class AnalogGPIOControllerInput(UINumberControllerInput):
         self.gpio = gpio_device
         self.set_ui_parameter("read_only", True)
         self.gpio.define_as_input(self.channel)
-        self.gpio.listen(self.channel, self._on_edge)
-        self.state = self.gpio.get(self.channel)
+        self.gpio.listen(self.channel, self._on_change)
+        self.value = self.gpio.get(self.channel)
+
+    @property
+    def value(self):
+        """Current state of the component"""
+        return self.value
+
+    @value.setter
+    def value(self, new_value):
+        pass
 
     def _load_persisted(self):
         pass
 
-    def _on_edge(self, state):
+    def _on_change(self, state):
         print("state", state)
-        if self.gpio.get(self.channel):
-            self.on_high()
-            self.state = True
-        else:
-            self.on_low()
-            self.state = False
-
-        self.spine.trigger_event(
-            "controllerButtonStateChange",
-            self.component_id,
-            {"button":self.component_id, "state":self.state}
-        )
-
-    def on_high(self):
-        """
-        Abstract method that is executed when pin is going high.
-        """
-        self.spine.log.debug(
-            "abstract on_high reached:{0}/{1}",
-            self.controller.component_id,
-            self.component_id,
-        )
-
-    def on_low(self):
-        """
-        Abstract method that is executed when pin is going low.
-        """
-        self.spine.log.debug(
-            "abstract on_high reached:{0}/{1}",
-            self.controller.component_id,
-            self.component_id,
-        )
+        self.value = state
 
 class UITextControllerInput(KerviComponent):
     """
@@ -666,6 +656,15 @@ class UITextControllerInput(KerviComponent):
             "inline": False
         }
         self._persist_value = False
+
+    @property
+    def value(self):
+        """Current state of the component"""
+        return self.value
+
+    @value.setter
+    def value(self, new_value):
+        self._set_value(new_value)
 
     @property
     def persist_value(self):
@@ -736,13 +735,7 @@ class UITextControllerInput(KerviComponent):
         """
         Abstract method called when the content of the text box change.
         """
-        self.spine.log.debug(
-            "abstract valueChange reached:{0}/{1} value:{2} oldvalue:{3}",
-            self.controller.component_id,
-            self.component_id,
-            new_value,
-            old_value
-        )
+        self.controller.input_changed(self)
 
     def _get_info(self):
         return {
@@ -776,6 +769,15 @@ class DateTimeControllerInput(KerviComponent):
         self._persist_value = False
 
     @property
+    def value(self):
+        """Current state of the component"""
+        return self.value
+
+    @value.setter
+    def value(self, new_value):
+        self._set_value(new_value)
+
+    @property
     def persist_value(self):
         """ If true the value is saved to kervi DB when it change"""
         return self._persist_value
@@ -787,7 +789,7 @@ class DateTimeControllerInput(KerviComponent):
     def _load_persisted(self):
         if self_persist_value:
             self._set_value(self.settings.retrieve_value("value"))
-    
+
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
         Links this component to a dashboard section.
@@ -842,11 +844,7 @@ class DateTimeControllerInput(KerviComponent):
             )
 
     def value_changed(self, newValue, oldValue):
-        self.spine.log.debug(
-            "abstract valueChanged reached:{0}/{1}",
-            self.controller.component_id,
-            self.component_id,
-        )
+        self.controller.input_changed(self)
 
     def _get_info(self):
         return {
@@ -913,11 +911,25 @@ class Controller(KerviComponent):
             *kwargs
             )
 
-    def add_components(self, *args):
+    def add_input(self, *args):
         for component in args:
             self.components += [component]
             component._load_persisted()
 
+    def input_changed(self, changed_input):
+        """
+        Abstract method that is called by when one of the controller inputs change.
+
+        You can implement this method if your controller logic needs to respond
+        changes in multiple inputs.
+
+        :param changed_input:
+            Input that has changed. You can read the value of the changed input
+            via the inputs value property.
+
+        :type changed_input: Input component
+        """
+        pass
 
     def _get_info(self):
         components = []
