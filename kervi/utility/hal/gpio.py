@@ -6,76 +6,76 @@ In your application you access GPIO via:
 
     import kervi.hal.GPIO as GPIO
 
-    #define pin 23 as input
+    #define channel 23 as input
     GPIO.define_as_input(23)
 """
 
 class IGPIODeviceDriver(object):
     """
     """
-    def define_as_input(self, pin):
-        """Define a pin as input"""
+    def define_as_input(self, channel):
+        """Define a channel as input"""
         raise NotImplementedError
 
-    def define_as_output(self, pin):
-        """Define a pin as output"""
+    def define_as_output(self, channel):
+        """Define a channel as output"""
         raise NotImplementedError
 
-    def define_as_pwm(self, pin, frequency, duty_cycle=None):
+    def define_as_pwm(self, channel, frequency, duty_cycle=None):
         """
-        Defines a pin as pwm output.
+        Defines a channel as pwm output.
 
-        :param pin:
-            The pin to define as a pwm output.
+        :param channel:
+            The channel to define as a pwm output.
 
-        :type pin: ``int``
+        :type channel: ``int``
 
         :param frequency:
             The pwn frequency.
 
-        :type pin: ``int``
+        :type channel: ``int``
 
         :param duty_cycle:
             The duty_cycle to use, can be changed in call to pwm_start
 
-        :type pin: ``int``
+        :type channel: ``int``
         """
         raise NotImplementedError
 
-    def set(self, pin, state):
-        """Sets the state of a pin that is defined as output.
+    def set(self, channel, state):
+        """Sets the state of a channel that is defined as output.
 
-        :param pin:
-            The pin that should be changed.
+        :param channel:
+            The channel that should be changed.
 
-        :type pin: ``int``
+        :type channel: ``int``
 
         :param state:
-            The state of the pin.
+            The state of the channel.
 
-        :type pin: ``bool``
+        :type channel: ``bool``
 
         """
         raise NotImplementedError
 
-    def get(self, pin):
+    def get(self, channel):
         """
-        Returns the state of a pin.
+        Returns the state of a channel.
         """
         raise NotImplementedError
 
-    def listen(self, pin, callback):
+    def listen(self, channel, callback):
         """
-        Listen on a pin for state change.
-        The callback function is called when a pin is going high and low.
+        Listen on a channel for state change.
+        The callback function is called when a channel is going high and low.
 
-        :param pin:
-            The pin to listen on.
+        :param channel:
+            The channel to listen on.
 
-        :type pin: ``int``
+        :type channel: ``int``
 
         :param callback:
-            The function or method to call when the state of the pin change.
+            The function or method to call when the state of the channel change.
 
             .. code:: python
                 def callback_func(state):
@@ -88,65 +88,65 @@ class IGPIODeviceDriver(object):
 
         raise NotImplementedError
 
-    def listen_rising(self, pin, callback):
+    def listen_rising(self, channel, callback):
         """
-        calls the callback when a pin is going high.
+        calls the callback when a channel is going high.
 
-        :param pin:
-            The pin to listen on.
+        :param channel:
+            The channel to listen on.
 
-        :type pin: ``int``
+        :type channel: ``int``
 
         :param callback:
-            The function or method to call when the state of the pin change.
+            The function or method to call when the state of the channel change.
 
-        :type pin: ``function or method``
+        :type channel: ``function or method``
         """
         raise NotImplementedError
 
-    def listen_falling(self, pin, callback):
+    def listen_falling(self, channel, callback):
         """
-        calls the callback when a pin is going low.
+        calls the callback when a channel is going low.
 
-        :param pin:
-            The pin to listen on.
+        :param channel:
+            The channel to listen on.
 
-        :type pin: ``int``
+        :type channel: ``int``
 
         :param callback:
-            The function or method to call when the state of the pin change.
+            The function or method to call when the state of the channel change.
 
-        :type pin: ``function or method``
+        :type channel: ``function or method``
         """
 
         raise NotImplementedError
 
-    def pwm_start(self, pin, duty_cycle=None, frequency=None):
+    def pwm_start(self, channel, duty_cycle=None, frequency=None):
         """
-        Starts the pwm signal on a pin. The pin should be defined as pwm prior to this call.
+        Starts the pwm signal on a channel. The channel should be defined as pwm prior to this call.
         If no duty_cycle or frequency is passed in this call previous values from call to
         define_as_pwm or pwm_start is used.
 
-        :param pin:
-            The pin to start the pwm signal on.
+        :param channel:
+            The channel to start the pwm signal on.
 
-        :type pin: ``int``
+        :type channel: ``int``
 
         :param duty_cycle:
-            The duty cycle use on the pin.
+            The duty cycle use on the channel.
 
         :type duty_cycle: ``int``
 
         :param frequency:
-            The frequency to be used on the pwm pin.
+            The frequency to be used on the pwm channel.
 
         :type frequency: ``int``
 
         """
         raise NotImplementedError
 
-    def pwm_stop(self, pin):
+    def pwm_stop(self, channel):
         """
-        Stop pwm signal on pin.
+        Stop pwm signal on channel.
         """
         raise NotImplementedError

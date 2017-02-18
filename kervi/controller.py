@@ -9,7 +9,7 @@ from kervi.utility.thread import KerviThread
 from kervi.utility.component import KerviComponent
 from kervi.hal import GPIO
 
-class ControllerSelect(KerviComponent):
+class UISelectControllerInput(KerviComponent):
     r"""
     Select component for Kervi controller
 
@@ -148,7 +148,7 @@ class ControllerSelect(KerviComponent):
             self.component_id,
         )
 
-class ControllerButton(KerviComponent):
+class UIButtonControllerInput(KerviComponent):
     def __init__(self, button_id, name, controller):
         KerviComponent.__init__(self, button_id, "button", name)
         self.controller = controller
@@ -225,7 +225,7 @@ class ControllerButton(KerviComponent):
             self.component_id,
         )
 
-class ControllerSwitchButton(KerviComponent):
+class UISwitchButtonControllerInput(KerviComponent):
     """
     Switch button controller component, shows a on/off button in UI
     """
@@ -383,25 +383,48 @@ class ControllerSwitchButton(KerviComponent):
             self.component_id,
         )
 
-class ControllerGPIOInput(ControllerSwitchButton):
+class DigitalGPIOControllerInput(UISwitchButtonControllerInput):
     """
-    GPIO input component, listen to a GPIO pin for going high and low events.
-    Shows a on/off button in UI, all the ui parameters for ControllerSwitchButton applies to 
-    this input.
+    Digital GPIO input component that listens to a digital input going high or low.
+    This input will show up as an UISwitchButtonControllerInput when linked to a dashboard panel
+    and all ui settings for UISwitchButtonControllerInput applies to this input.
+
+    :param button_id:
+            id of the input. This id used to reference this input in other parts of the kervi app.
+    :type button_id: str
+
+    :param name:
+            Name of this component is used when displayed.
+    :type name: str
+
+    :param controller:
+            The controller that this component belongs to.
+    :type controller: Controller instance.
+
+    :param channel:
+            channel on the gpio device that should be used.
+    :type channel: int.
+
+    :param gpio_device:
+            GPIO device to use. Defaults to the host platforms gpio e.g the Raspbery PI's gpio.
+    :type gpio_device: IGPIODeviceDriver (defined in kervi.utility.hal.gpio).
+
     """
-    def __init__(self, button_id, name, controller, pin, read_only=True):
-        ControllerSwitchButton.__init__(self, button_id, name, pin)
-        self.pin = pin
-        GPIO.define_as_input(self.pin)
-        GPIO.listen(self.pin, self._on_edge)
-        self.state = GPIO.get(self.pin)
-        
+    def __init__(self, button_id, name, controller, channel, gpio_device=GPIO):
+        UISwitchButtonControllerInput.__init__(self, button_id, name)
+        self.channel = channel
+        self.gpio = gpio_device
+        self.set_ui_parameter("read_only", True)
+        self.gpio.define_as_input(self.channel)
+        self.gpio.listen(self.channel, self._on_edge)
+        self.state = self.gpio.get(self.channel)
+
     def _load_persisted(self):
         pass
-    
+
     def _on_edge(self, state):
         print("state", state)
-        if GPIO.get(self.pin):
+        if self.gpio.get(self.channel):
             self.on_high()
             self.state = True
         else:
@@ -435,7 +458,7 @@ class ControllerGPIOInput(ControllerSwitchButton):
         )
 
 
-class ControllerNumberInput(KerviComponent):
+class UINumberControllerInput(KerviComponent):
     """
     A number input component shows as a slider on dashboards.
     """
@@ -455,7 +478,8 @@ class ControllerNumberInput(KerviComponent):
             "link_to_header": False,
             "icon": None,
             "flat": False,
-            "inline": False
+            "inline": False,
+            "read_only": False
         }
         self._persist_value = False
 
@@ -497,6 +521,7 @@ class ControllerNumberInput(KerviComponent):
             * *link_to_header* (``str``) -- Add this component to header of section.
             * *icon* (``str``) -- Icon that should be displayed together with label.
             * *flat* (``bool``) -- Flat look and feel.
+            * *read_only* (``bool``) -- The user will not be able to change the value of this component.
 
         """
         KerviComponent.link_to_dashboard(
@@ -545,7 +570,82 @@ class ControllerNumberInput(KerviComponent):
     def on_get_value(self):
         return self.value
 
-class ControllerTextInput(KerviComponent):
+
+class AnalogGPIOControllerInput(UINumberControllerInput):
+    """
+    Analog GPIO input component that listens to the signal level on analog input.
+    This input will show up as an UINumberControllerInput when linked to a dashboard panel 
+    and all ui settings for UINumberControllerInput applies to this input.
+
+    :param button_id:
+            id of the input. This id used to reference this input in other parts of the kervi app.
+    :type button_id: str
+
+    :param name:
+            Name of this component is used when displayed.
+    :type name: str
+
+    :param controller:
+            The controller that this component belongs to.
+    :type controller: Controller instance.
+
+    :param channel:
+            channel on the gpio device that should be used.
+    :type channel: int.
+
+    :param gpio_device:
+            GPIO device to use. Defaults to the host platforms gpio e.g the Raspbery PI's gpio.
+    :type gpio_device: IGPIODeviceDriver (defined in kervi.utility.hal.gpio).
+
+    """
+    def __init__(self, button_id, name, controller, channel, gpio_device=GPIO):
+        UINumberControllerInput.__init__(self, button_id, name)
+        self.channel = channel
+        self.gpio = gpio_device
+        self.set_ui_parameter("read_only", True)
+        self.gpio.define_as_input(self.channel)
+        self.gpio.listen(self.channel, self._on_edge)
+        self.state = self.gpio.get(self.channel)
+
+    def _load_persisted(self):
+        pass
+
+    def _on_edge(self, state):
+        print("state", state)
+        if self.gpio.get(self.channel):
+            self.on_high()
+            self.state = True
+        else:
+            self.on_low()
+            self.state = False
+
+        self.spine.trigger_event(
+            "controllerButtonStateChange",
+            self.component_id,
+            {"button":self.component_id, "state":self.state}
+        )
+
+    def on_high(self):
+        """
+        Abstract method that is executed when pin is going high.
+        """
+        self.spine.log.debug(
+            "abstract on_high reached:{0}/{1}",
+            self.controller.component_id,
+            self.component_id,
+        )
+
+    def on_low(self):
+        """
+        Abstract method that is executed when pin is going low.
+        """
+        self.spine.log.debug(
+            "abstract on_high reached:{0}/{1}",
+            self.controller.component_id,
+            self.component_id,
+        )
+
+class UITextControllerInput(KerviComponent):
     """
     Text input component
     """
@@ -653,7 +753,7 @@ class ControllerTextInput(KerviComponent):
     def on_get_value(self):
         return self.value
 
-class ControllerDateTimeInput(KerviComponent):
+class DateTimeControllerInput(KerviComponent):
     """
     A date and time component.
     """

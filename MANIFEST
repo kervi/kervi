@@ -10,6 +10,7 @@ kervi\hal.py
 kervi\kervi_logging.py
 kervi\module_thread.py
 kervi\sensor.py
+kervi\settings.py
 kervi\spine.py
 kervi\version.py
 kervi\vision.py
