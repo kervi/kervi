@@ -20,15 +20,23 @@ Features of the framework are:
 
 
 Install Kervi via pip:
+
+On Raspberry Pi
+
 ```
-pip install kervi
+sudo pip3 install kervi[rpi]
+```
+
+On other systems like windows and linux:
+```
+pip3 install kervi
 ```
 
 After Kervi is installed a commandline tool called *kervi* is available.
 Via the commandline interface it is possible scaffold Kervi apps and
 setup image and video handling on Raspberry PI.
 
-Kreate you first app in an empty folder by executing:
+Create you first app in an empty folder by executing:
 ```
 kervi create application myapp "My first app"
 ```
@@ -38,7 +46,7 @@ Start your new app by executing:
 python myapp.py
 ```
 
-The following output shuld be displayed:
+The following output should be displayed:
 (example)
 ```
 Starting kervi application, please wait
