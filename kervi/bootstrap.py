@@ -120,9 +120,9 @@ class Application(object):
                 "appKey":"",
             },
             "log" : {
-                "level":"WARNING",
+                "level":"DEBUG",
                 "file":"kervi.log",
-                "resetLog":True
+                "resetLog":False
             },
             "modules":[],
             "network":{
@@ -140,11 +140,10 @@ class Application(object):
             self.settings.update(settings)
         self._validateSettings()
         self.started = False
-        spine._init_spine("application-" + self.settings["info"]["id"])
+        process._start_root_spine(self.settings, True)
+        #spine._init_spine("application-" + self.settings["info"]["id"])
         self.spine = spine.Spine()
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
-
-        process._start_root_spine(self.settings, True)
 
         hal_driver = hal._load()
         if hal_driver:
@@ -164,7 +163,6 @@ class Application(object):
             import dashboards
         except ImportError:
             pass
-
 
         for module in self.settings["modules"]:
             if module == "sensors":
@@ -194,6 +192,7 @@ class Application(object):
                 )
 
         time.sleep(2)
+        
         self.p3 = process._start_process(
             "IPC",
             self.settings,
@@ -202,6 +201,7 @@ class Application(object):
         )
 
         time.sleep(2)
+        
         #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
         print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
         webserver.start(
