@@ -192,7 +192,7 @@ class Application(object):
                 )
 
         time.sleep(2)
-        
+
         self.p3 = process._start_process(
             "IPC",
             self.settings,
@@ -201,9 +201,10 @@ class Application(object):
         )
 
         time.sleep(2)
-        
+
         #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
         print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
+        print("Press ctrl + c to stop your application")
         webserver.start(
             self.settings["network"]["IPAddress"],
             self.settings["network"]["WebPort"],
@@ -295,6 +296,6 @@ class ApplicationModule(object):
             pass
 
 
-        print ("stopping module")
+        print("stopping module")
         self.spine.trigger_event("moduleStopped", self.name)
         time.sleep(1)

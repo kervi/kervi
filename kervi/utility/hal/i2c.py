@@ -1,7 +1,16 @@
+"""
+It is possible to communicate with devices via I2C.
+
+.. code:: python
+
+    #create i2c device on i2c address 0x77
+    i2c = I2C(0x77)
+    i2c.write_raw8(123)
+"""
+
 
 class II2CDeviceDriver(object):
     """
-    Class for communicating with an I2C devices.
     """
 
     def reverse_byte_order(self, data):

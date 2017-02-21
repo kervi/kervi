@@ -1,74 +1,144 @@
 
+=======
 Sensors
-#######
+=======
 
-Sensors in Kervi are special classes that handles reading from different kind of probes. 
-Kervis has a base class *Sensor* that handles the hevy lifting of storing readings in database,
-signal ui and send events to other kervi components.
+Sensors in Kervi are special classes that handles reading from different kind of probes and devices. 
+Kervis has a base class *Sensor* that handles the hevy lifting of polling devices and notify other parts of the system about readings.
 
-Reading sensors
----------------
-Below is an example that shows the steps to create a sensor. 
-Propperties of the sensor prope is applied in the constror (__init__) and the actual reading of a probe is handled in
-the abstract method read_sensor.
+Kervi Device library
+--------------------
 
-The read_sensor method should just containt code that handles **one** reading of the probe and the result of that reading
-should be send to Kervi by calling the method new_sensor_reading.
+A part of the Kervi framework is the device library that holds drivers for common devices. 
+To use a device from the library import the device module and apply the driver to a sensor class. 
 
-To poll your sensor create a SensorThread and specify the polling interval in seconds.     
+.. code:: python
+
+    from kervi.sensor import Sensor
+    from kervi_devices.sensors import BMP085
+    SENSOR_1 = Sensor("roomtemp1", "Room 1", BMP085.BMP085DeviceDriver(BMP085.TEMPERATURE_SENSOR))
+
+
+Implementing a sensor device
+----------------------------
+Below is an example that shows the steps to create a sensor device. 
+
+A sensor device inherits from either kervi.hal.SensorDeviceDriver or kervi.hal.I2CSensorDeviceDriver.
+Fill in the abstract properties and the method read_value.
 
 .. code-block:: python
 
-    class MySensor(Sensor):
-        def __init__(self):
-            Sensor.__init__(self, "watertemp", "Water temp")
-            self.type = "temperature"
-            self.max = 100
-            self.min = 0
-            self.unit = "C"
+    import time
+    from kervi.hal import I2CSensorDeviceDriver
 
-        def read_sensor(self):
-            #read_sensor is called by the SensorThread
+    class TSL2561SDeviceDriver(I2CSensorDeviceDriver):
+        def __init__(self, address=0x39, bus=None):
+            I2CSensorDeviceDriver.__init__(self, address, bus)
+            self.gain = 0
+            self.i2c.write8(0x80, 0x03)
+            self.pause = 0.8
+            self.gain = 0
 
-            #enter your real code here to read your sensor probe
+        @property
+        def device_name(self):
+            return "TLS2561"
+        
+        @property
+        def type(self):
+            return "lux"
 
-            #call new_sensor_reading to signal a new value to kervi
-            self.new_sensor_reading(self.counter)
+        @property
+        def unit(self):
+            return "LUX"
 
-    #Add sensor to a SensorThread that polls the sensor by the specified interval 
-    MY_SENSOR_THREAD = SensorThread(MySensor(),1)
+        @property
+        def max(self):
+            return 1000000
+
+        @property
+        def min(self):
+            return 0
+  
+        def read_value(self):
+            """Grabs a lux reading either with autoranging (gain=0) or with a specified gain (1, 16)"""
+            if self.gain == 1 or self.gain == 16:
+                self.set_gain(self.gain)
+                ambient = self.read_full()
+                ir_reading = self.read_ir()
+            elif self.gain == 0:
+                self.set_gain(16)
+                ambient = self.read_full()
+                if ambient < 65535:
+                    ir_reading = self.read_ir()
+                if ambient >= 65535 or ir_reading >= 65535:
+                    self.set_gain(1)
+                    ambient = self.read_full()
+                    ir_reading = self.read_ir()
+
+            if self.gain == 1:
+                ambient *= 16
+                ir_reading *= 16
+
+            ratio = (ir_reading / float(ambient))
+
+            if (ratio >= 0) & (ratio <= 0.52):
+                lux = (0.0315 * ambient) - (0.0593 * ambient * (ratio**1.4))
+            elif ratio <= 0.65:
+                lux = (0.0229 * ambient) - (0.0291 * ir_reading)
+            elif ratio <= 0.80:
+                lux = (0.0157 * ambient) - (0.018 * ir_reading)
+            elif ratio <= 1.3:
+                lux = (0.00338 * ambient) - (0.0026 * ir_reading)
+            elif ratio > 1.3:
+                lux = 0
+
+            return lux
+        
+        #private methods use in the driver
+
+        def set_gain(self, gain=1):
+            """ Set the gain """
+            if gain == 1:
+                self.i2c.write8(0x81, 0x02)
+            else:
+                self.i2c.write8(0x81, 0x12)
+
+            time.sleep(self.pause)
+        
+        def read_word(self, reg):
+            try:
+                wordval = self.i2c.read_U16(reg)
+                newval = self.i2c.reverse_byte_order(wordval)
+                return newval
+            except IOError:
+                print("Error accessing 0x%02X: Check your I2C address" % self.i2c.address)
+                return -1
 
 
+        def read_full(self, reg=0x8C):
+            """Reads visible+IR diode from the I2C device"""
+            return self.read_word(reg)
+
+        def read_ir(self, reg=0x8E):
+            """Reads IR only diode from the I2C device"""
+            return self.read_word(reg)
 
 Linking to dashboards
 ---------------------
 
-A sensor is linked to dashboard by calling the method link_to_dashboard. 
-
+A sensor is linked to a dashboard by calling the method link_to_dashboard. 
 
 .. code-block:: python
 
-    class MySensor(Sensor):
-        def __init__(self):
-            Sensor.__init__(self, "watertemp", "Water temp")
-            self.type = "temperature"
-            self.max = 100
-            self.min = 0
-            self.unit = "C"
-
-            #link this sensor to a dashboard called system on the panel with id=section1
-            self.link_to_sensor("system", "section1")
-
-        def read_sensor(self):
-            #read_sensor is called by the SensorThread
-
-            #enter your real code here to read your sensor probe
-
-            #call new_sensor_reading to signal a new value to kervi
-            self.new_sensor_reading(self.counter)
+    from kervi.sensor import Sensor
+    from kervi_devices.sensors import BMP085
+    SENSOR_1 = Sensor("roomtemp1", "Room 1", BMP085.BMP085DeviceDriver(BMP085.TEMPERATURE_SENSOR))
+    
+    SENSOR_1.link_to_dashboard("system", "cpu", type="value", size=2, link_to_header=True)
+    SENSOR_1.link_to_dashboard("system", "cpu", type="chart", size=2)
 
 
-A sensor can displayed in different ways: just value, value with sparkline, as an animated icon or different kind of gauges.
+A sensor can displayed in different ways: just value, value with sparkline, as an animated icon, chart or different kind of gauges.
 
 **Value and sparkline**
 
@@ -76,7 +146,7 @@ If a sensor is linked with just dashboard and panel as parameters it will be dis
 
 .. code-block:: python
     
-    self.link_to_sensor("system", "section1")
+    SENSOR_1.link_to_sensor("system", "section1")
 
 .. image:: images/sensor_sparkline.png
 
@@ -87,7 +157,7 @@ It is possible to show an icon next to a value. Kervi uses Font awesome icons. J
 
 .. code-block:: python
     
-    self.link_to_dashboard("system", "temp", icon="thermometer-full", show_sparkline=False, show_name=False)
+    SENSOR_1.link_to_dashboard("system", "temp", icon="thermometer-full", show_sparkline=False, show_name=False)
 
 .. image:: images/sensor_icon.png
 
@@ -95,7 +165,7 @@ It is possible to show an icon next to a value. Kervi uses Font awesome icons. J
 
 .. code-block:: python
     
-    self.link_to_sensor("system", "section1", show_sparkline=False)
+    SENSOR_1.link_to_sensor("system", "section1", show_sparkline=False)
 
 .. image:: images/sensor_value.png
 
@@ -104,7 +174,7 @@ It is possible to show an icon next to a value. Kervi uses Font awesome icons. J
 
 .. code-block:: python
     
-    self.link_to_sensor("system", "section1", type="radial_gauge")
+    SENSOR_1.link_to_sensor("system", "section1", type="radial_gauge")
 
 .. image:: images/sensor_radial.png
 
@@ -112,7 +182,7 @@ It is possible to show an icon next to a value. Kervi uses Font awesome icons. J
 
 .. code-block:: python
     
-    self.link_to_sensor("system", "section1", type="horizontal_linear_gauge")
+    SENSOR_1.link_to_sensor("system", "section1", type="horizontal_linear_gauge")
 
 .. image:: images/sensor_horizontal.png
 
@@ -120,7 +190,7 @@ It is possible to show an icon next to a value. Kervi uses Font awesome icons. J
 
 .. code-block:: python
     
-    self.link_to_sensor("system", "section1", type="vertical_linear_gauge")
+    SENSOR_1.link_to_sensor("system", "section1", type="vertical_linear_gauge")
 
 .. image:: images/sensor_vertical.png
 
@@ -133,76 +203,44 @@ The sensor is linked twice first to the header with the animation and into the b
     
     from kervi.sensor import Sensor, SensorThread
 
-    class MySensor(Sensor):
-        """ My sensor """
-        def __init__(self):
-            Sensor.__init__(self, "batterySensor1", "Battery")
-            self.type = "battery"
-            self.max = 100
-            self.min = 0
-            self.unit = "%"
+    
 
-            self.set_ui_parameter("icon", [
-                {
-                    "range":[0, 5],
-                    "icon":"battery-empty"
-                },
-                {
-                    "range":[5, 25],
-                    "icon":"battery-quarter"
-                },
-                {
-                    "range":[20, 50],
-                    "icon":"battery-half"
-                },
-                {
-                    "range":[5, 75],
-                    "icon":"battery-three-quarter"
-                },
-                {
-                    "range":[75, 100],
-                    "icon":"battery-full"
-                }
-            ])
+    SENSOR_1.set_ui_parameter("icon", [
+        {
+            "range":[0, 5],
+            "icon":"battery-empty"
+        },
+        {
+            "range":[5, 25],
+            "icon":"battery-quarter"
+        },
+        {
+            "range":[20, 50],
+            "icon":"battery-half"
+        },
+        {
+            "range":[5, 75],
+            "icon":"battery-three-quarter"
+        },
+        {
+            "range":[75, 100],
+            "icon":"battery-full"
+        }
+    ])
 
-            #link the sensor to the header
-            self.link_to_dashboard(
-                "system", "battery",
-                show_sparkline=False,
-                show_value=False,
-                link_to_header=True
-            )
+    #link the sensor to the header
+    SENSOR_1.link_to_dashboard(
+        "system", "battery",
+        show_sparkline=False,
+        show_value=False,
+        link_to_header=True
+    )
 
-            #link the sensor as a chart
-            self.link_to_dashboard("system", "battery", type="chart")
+    #link the sensor as a chart
+    SENSOR_1.link_to_dashboard("system", "battery", type="chart")
 
-            #variables needed for my sensor
-            self.counter = 0 #dummy counter
-            self.counter_delta = 1
-
-        def read_sensor(self):
-            #read_sensor is called by the SensorThread
-            #snippet below is just dummy code
-            #enter your real code here to read your sensor
-
-            self.counter += self.counter_delta
-
-            if self.counter > self.max:
-                self.counter_delta = -1
-            elif self.counter <= self.min:
-                self.counter_delta = 1
-
-            #call new_sensor_reading to signal a new value
-            self.new_sensor_reading(self.counter)
-
-    #Add sensor to a SensorThread that polls the sensor by the specified interval
-    MY_SENSOR_THREAD = SensorThread(MySensor(),1)
-
+    
 .. image:: images/sensor_animated.png
-
-
-
-
 
 
 Sensor api

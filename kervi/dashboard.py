@@ -102,11 +102,12 @@ class Dashboard(KerviComponent):
         self.add_panel(DashboardPanel("sys-header"))
         self.add_panel(DashboardPanel("header"))
         self.add_panel(DashboardPanel("footer"))
+        self.add_panel(DashboardPanel("background"))
 
         self.background = {}
-        camera_id = kwargs.get("camera", "")
-        if camera_id:
-            self.background = {"type": "camera", "cameraId": camera_id}
+        #camera_id = kwargs.get("camera", "")
+        #if camera_id:
+        #    self.background = {"type": "camera", "cameraId": camera_id}
 
     def add_panel(self, panel):
         """
@@ -136,7 +137,7 @@ class Dashboard(KerviComponent):
             "isDefault": self.is_default,
             "template" : template,
             "sections" : panels,
-            "background": self.background,
+            #"background": self.background,
             "unitSize": self.unit_size
         }
 

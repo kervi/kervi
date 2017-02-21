@@ -1,23 +1,61 @@
 Get started
 =================================
 
+**Prequisits**
 
-Install Kervi via pip::
+Kervi is a python framework and needs python 3.4+ and the python package manager pip. 
 
-    pip install kervi
+Raspberry Pi comes with python and pip preinstalled if you are able to start your Raspberry Pi you are ready to install Kervi.
+
+If you install on other platforms like windows and linux you have to install python and pip. Please follow the instructions on python.org to get python installed. 
+Notice there are no native support for hardware when your install on these platforms but you will be able to
+create dashboards and let users interact with your python kervi application via a browser.
+
+**install**
+
+Open a terminal window and run the pip command below. 
+
+Raspberry Pi::
+
+    sudo pip3 install kervi[rpi]
+
+Other platforms::
+
+    pip3 install kervi
+
+Next your create a folder for your application::
+
+    mkdir myapp
+    cd myapp
+
+After kervi is installed a commandline tool *kervi* is available that helps with creating the sceleton for your Kervi apps.
+You have two choices when it comes to create a kervi applications via the commandline tool.
+
+**1) Single file application**
+
+If you are new to Kervi or just wants to make a quick test application then a single file kervi application is a good chooice to get going.
+You create the single file app via the following command in the terminal window::
+
+    kervi create application myapp "My first app" --single_file_app
 
 
-After kervi is installed a commandline tool *kervi* is available that helps with scaffolding Kervi apps.
-Create you first app in an empty folder by executing::
+**2) Normal application**
 
+If you are planning to build a robot or home automation system it is recommanded to create a normal Kervi application. 
+Such an application consists of several files and the Kervi framework is able to spread the load on all the cores on your board. 
+
+To create a full kervi application write the following command in the terminal::
+    
     kervi create application myapp "My first app"
 
 
-Start your new app by executing:: 
+If you use Raspberry pi you start your new app by executing:: 
 
+    sudo python3 myapp.py
+
+On other platforms you run this command::
 
     python myapp.py
-
 
 The following output shuld be displayed (example)::
 

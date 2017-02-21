@@ -155,7 +155,7 @@ The SPI interface is comming.
 
 
 Device library
--------------
+--------------
 
 It is possible to use ready made devices from the kervi device library.
 Below is an example that uses the light sensor TLS2561.
@@ -183,4 +183,3 @@ Hal API
 
    hal_gpio_api
    hal_i2c_api
-   hal_devices_api

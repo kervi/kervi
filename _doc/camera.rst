@@ -4,7 +4,7 @@ Camera and video
 Video and camera is managed via special Kervi Camera controllers.
 A camera controller capture frames from camera and feeds them into the system.
 
-It is possible to link a camera to dashboard sections or as a dashboard background. 
+It is possible to link a camera to dashboard panel or as a dashboard background. 
 
 .. image:: images/dashboard_cam.png
     :width: 45 %

@@ -387,7 +387,6 @@ class SensorThread(KerviThread):
         pass
 
     def _start_command(self):
-        print("y")
         if not self.alive:
             self.alive = True
             KerviThread.start(self)

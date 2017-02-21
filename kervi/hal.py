@@ -7,7 +7,6 @@ import pip
 import importlib
 
 _DRIVER = None
-
 GPIO = None
 
 
@@ -17,6 +16,9 @@ def get_gpio(gpio_type=None):
 
 def I2C(address, bus=0):
     return _DRIVER.get_i2c_driver(address, bus)
+
+def get_camera_driver(source = None):
+    return _DRIVER.get_camera_driver(source)
 
 def _load():
     global GPIO, _DRIVER
@@ -29,7 +31,6 @@ def _load():
             if driver_name in flat_installed_packages:
                 _DRIVER = importlib.import_module(module_name)
                 GPIO = get_gpio()
-                print("x")
                 return driver_name
 
 class SensorDeviceDriver(object):

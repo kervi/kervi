@@ -20,6 +20,8 @@ from kervi.controller import Controller, UINumberControllerInput, UISwitchButton
 from kervi.utility.thread import KerviThread
 import kervi.utility.nethelper as nethelper
 import kervi.spine as spine
+import kervi.hal as hal
+
 try:
     from SimpleHTTPServer import SimpleHTTPRequestHandler
 except:
@@ -125,6 +127,8 @@ class CameraBase(Controller):
         self._ui_parameters["type"] = kwargs.get("type", "")
         self._ui_parameters["fps"] = kwargs.get("fps", 10)
         self._ui_parameters["source"] = kwargs.get("source", "")
+        self._ui_parameters["show_pan_tilt"] = kwargs.get("show_pan_tilt", True)
+        self._ui_parameters["show_buttons"] = kwargs.get("show_buttons", True)
 
     @property
     def height(self):
@@ -213,12 +217,46 @@ class CameraBase(Controller):
             self.component_id
         )
 
+    def link_to_dashboard(self, dashboard_id, section_id = None, **kwargs):
+        r"""
+        Links this camera to a dashboard section or to the background of a dashboard.
+
+        :param dashboard_id:
+            id of the dashboard to link to.
+        :type section_id: str
+
+        :param section_id:
+            id of the section.
+        :type section_id: str
+
+        :param \**kwargs:
+            Use the kwargs below to override default values set in ui_parameters
+
+        :Keyword Arguments:
+            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
+                In order to make the sections and components align correct a dashboard unit is defined.
+                Default the dashboard unit is a square that is 150 x 150 pixels.
+                The width of the camera picture is ui_size * dashboard unit size.
+
+            * *show_buttons* (``bool``) -- Add this component to header of section.
+            * *show_pan_tilt* (``bool``) -- Add this component to header of section.
+        """
+        if section_id is None:
+            section_id = "background"
+        Controller.link_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            **kwargs
+            )
+
 class _CameraFrameThread(KerviThread):
-    def __init__(self, camera):
+    def __init__(self, camera, mutex):
         KerviThread.__init__(self)
         self.spine = spine.Spine()
         self.alive = False
         self.camera = camera
+        self.mutex = mutex
         if self.spine:
             self.spine.register_command_handler("startThreads", self._start_command)
             self.spine.register_command_handler("stopThreads", self._stop_command)
@@ -227,7 +265,7 @@ class _CameraFrameThread(KerviThread):
     def run(self):
         """Private method do not call it directly or override it."""
         try:
-            self.camera.capture_frames()
+            self.camera._capture_frames()
         except:
             self.spine.log.exception("CameraFrameThread")
 
@@ -242,25 +280,6 @@ class _CameraFrameThread(KerviThread):
             self.alive = False
             self.stop()
 
-
-# class _TwistedResource(Resource):
-#     def __init__(self,camera):
-#         self.camera = camera
-#         Resource.__init__(self)
-
-#     def render_GET(self,request):
-#         print("t",request)
-#         request.setResponseCode(200)
-#         request.setHeader('Content-type', 'image/png')
-#         print("x")
-#         if self.server.camera.current_frame:
-#             buf = BytesIO()
-#             self.camera.current_frame.save(buf, format='png')
-#             data = buf.getvalue()
-#             request.setHeader('Content-length', len(data))
-#             return data
-#         request.setHeader('Content-length', 0)
-#         return ""
 
 class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
@@ -277,31 +296,41 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         try:
             self.send_response(200)
-            self.send_header('Content-type', 'image/png')
+            self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
+            self.end_headers()
+            first_frame = True
+            while not self.server.camera._terminate:
+                if self.server.camera.current_frame:
+                    buf = BytesIO()
+                    self.server.mutex.acquire()
+                    try:
+                        self.server.camera.current_frame.save(buf, format='jpeg')
+                    finally:
+                        self.server.mutex.release()
 
-            if self.server.camera.current_frame:
-                buf = BytesIO()
-                self.server.camera.current_frame.save(buf, format='png')
-                data = buf.getvalue()
-                self.send_header('Content-length', len(data))
-                self.end_headers()
-                self.wfile.write(data)
+                    data = buf.getvalue()
+                    self.wfile.write(b"--jpgboundary")
+                    self.send_header('Content-type', 'image/jpeg')
+                    self.send_header('Content-length', len(data))
+                    self.end_headers()
+                    self.wfile.write(data)
+                    first_frame = False
+                time.sleep(1.0 / self.server.camera.fps)
             return
-        except:
+        finally:
             pass
 
 class _HTTPFrameServer(HTTPServer):
-    def __init__(self, addres, handler, camera):
+    def __init__(self, addres, handler, camera, mutex):
         HTTPServer.__init__(self, addres, handler)
         self.camera = camera
+        self.terminate = False
+        self.mutex = mutex
 
 class FrameCamera(CameraBase):
     r"""
     Simple camera that streams video frame by frame to the ui.
-    Colud be used with the Raspberry PI camera.
-    Fill in the abstract method get_frame with functionality that graps one frame from the camera.
-    Frames must be pil images.
-
+    
     :param camera_id:
         Id of the camera used to reference in dashboards.
     :type name: str
@@ -309,6 +338,11 @@ class FrameCamera(CameraBase):
     :param name:
         Name of the camera used in ui.
     :type name: str
+
+    :param frame_device_driver:
+        A frame driver that is used to capture frames from a camera.
+
+    :type name: A frame driver class that has inherited from the class FrameCameraDeviceDriver.
 
     :param \**kwargs:
             See below
@@ -323,49 +357,43 @@ class FrameCamera(CameraBase):
             * *fps* (``int``) --
                 Frames per second.
     """
-    def __init__(self, camera_id, name, **kwargs):
+    def __init__(self, camera_id, name, frame_device_driver = None, **kwargs):
         CameraBase.__init__(self, camera_id, name, type="frame", **kwargs)
-        self._terminate = False
+        self._device_driver = frame_device_driver
+        if self._device_driver is None:
+            self._device_driver = hal.get_camera_driver()
+            self._device_driver.camera = self
+
         self.ip_address = nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()
         self.source = "http://" + str(self.ip_address) + ":" + str(self.ip_port) + "/" + camera_id# + ".png"
         self.current_frame = None
 
+        from threading import Lock
+        self.mutex = Lock()
+
         self.server = _HTTPFrameServer(
             (self.ip_address, self.ip_port),
             _HTTPFrameHandler,
-            self
+            self,
+            self.mutex
         )
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.daemon = True
         self.server_thread.start()
 
-        self.frame_thread = _CameraFrameThread(self)
-
-        #root = Resource()
-        #root.putChild(camera_id, _TwistedResource(self))
-        #factory = Site(root)
-        #reactor.listenTCP(self.ip_port, factory)
-        #endpoint = endpoints.TCP4ServerEndpoint(reactor, self.ip_port)
-        #endpoint.listen(factory)
-        #print("a")
-        #reactor.run()
-        #self.server_thread = threading.Thread(target=reactor.run())
-        #self.server_thread.daemon = True
-        #self.server_thread.start()
-
-        print("b")
+        self.frame_thread = _CameraFrameThread(self, self.mutex)
 
     @property
-    def terminate(self):
+    def _terminate(self):
         """
         Flag to signal that the get_frames method should exit
         """
-        return self._terminate
+        return self._device_driver.terminate
 
-    @terminate.setter
-    def terminate(self, value):
-        self._terminate = value
+    @_terminate.setter
+    def _terminate(self, value):
+        self._device_driver.terminate = value
 
     def get_font(self, name="Fanwood", size=16):
         """
@@ -379,26 +407,22 @@ class FrameCamera(CameraBase):
         font = ImageFont.truetype(fontpath, size)
         return font
 
-    def wait_next_frame(self):
-        """
-        Waits for next frame.
-        """
-        time.sleep(1.0 / self.fps)
+    def _capture_frames(self):
+        self._device_driver.capture_frames()
 
-    def frame_ready(self, frame):
-        """
-        Call this method when a frame is ready
-        """
+    def _frame_ready(self, frame):
         if frame:
+            self.mutex.acquire()
             self.current_frame = frame
+            self.mutex.release()
 
-    def capture_frames(self):
+    def frame_captured(self, image):
         """
-        Abstract method use it like the run method in a thread.
-        capture frames from camera until the flag self.terminate is True.
-        captured frames should be passed to the method frame_ready.
+        Abstract method that is called when a new frame is ready from the camera.
+        You can use this method to post process images before they are streamed.
         """
         pass
+
 
 class IPCamera(CameraBase):
     def __init__(self, camera_id, name, dashboards, source):
@@ -409,3 +433,52 @@ class USBCamera(CameraBase):
     def __init__(self, camera_id, name, dashboards, source):
         CameraBase.__init__(self, camera_id, name)
         self.parameters = {"height":480, "width":640, "source":source}
+
+
+class FrameCameraDeviceDriver(object):
+    """
+    Base class for camera drivers that grap frames from a camera and streams them via the FrameCamera class.
+    Could be used with the Raspberry PI camera.
+    Fill in the abstract method capture_frames with functionality that graps
+    frames from the camera and feeds them to the streamer.
+    Frames must be pil images.
+    """
+    def __init__(self):
+        self._terminate = False
+
+    @property
+    def camera(self):
+        return self._camera
+
+    @camera.setter
+    def camera(self, value):
+        self._camera = value
+
+    @property
+    def terminate(self):
+        return self._terminate
+
+    @terminate.setter
+    def terminate(self, value):
+        self._terminate = value
+
+    def capture_frames(self):
+        """
+        Abstract method use it like the run method in a thread.
+        capture frames from camera until the flag self.terminate is True.
+        captured frames should be passed to the method frame_ready.
+        """
+        raise NotImplementedError
+
+    def wait_next_frame(self):
+        """
+        Waits for next frame.
+        """
+        time.sleep(1.0 / self.camera.fps)
+
+    def frame_ready(self, frame):
+        """
+        Call this method when a frame is ready
+        """
+        self.camera._frame_ready(frame)
+        
