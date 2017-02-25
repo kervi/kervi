@@ -1,10 +1,23 @@
 Camera and video
 =================================
 
-Video and camera is managed via special Kervi Camera controllers.
-A camera controller capture frames from camera and feeds them into the system.
+Cameras are managed via special Kervi Camera controllers and Kervi camera device drivers.
+A camera device driver capture frames from a camera and feeds them into the camera controller.
 
-It is possible to link a camera to dashboard panel or as a dashboard background. 
+The snippet below shows how to create a camera stream server and link it to a dashboard.
+ 
+
+.. code:: python
+    
+    #Create a streaming camera server
+    from kervi.camera import CameraStreamer
+    CAMERA = CameraStreamer("cam1", "camera 1")
+
+    #link camera as background
+    CAMERA.link_to_dashboard("app")
+    #link camera to a panel
+    CAMERA.link_to_dashboard("system", "cam")
+
 
 .. image:: images/dashboard_cam.png
     :width: 45 %
@@ -12,78 +25,56 @@ It is possible to link a camera to dashboard panel or as a dashboard background.
     :width: 45 %
 
 
-There is a pan/tilt area at the center of the camera stream where it is possible to control the cameras
-pan and tilt if the camera is equiped with servos.
+**Size**
 
-Record and picture buttons are available for capturing single frames or video sequences from the camera.
+It is possible to pass values for size and frames per second when you create the camera.
 
-Changes to pan, tilt and buttons in the ui should be handled in abstract methods methods of the camera class.  
-
-**Raspberry pi camera example**
-
-.. code-block:: python
-
-    import datetime
-    import picamera
-    from kervi.camera import FrameCamera
-    from PIL import Image
-    import time
-    import io
+.. code:: python
     
-    class Cam_1(FrameCamera):
+    from kervi.camera import CameraStreamer
+    CAMERA = CameraStreamer("cam1", "camera 1", size=1024, width=800, fps=30)
+
+
+
+**Source**
+
+In the examples above the camera source is not specifyed and Kervi looks for the default camera on a Raspberry Pi it will be
+the on board camera. If you want to use another camera source than the default you need to specify it. 
+
+.. code:: python
+    
+    from kervi.camera import CameraStreamer
+    CAMERA = CameraStreamer("cam1", "camera 1", camera_source="/dev/video0")
+
+
+
+**Pan and tilt**
+
+If you want to control the cameras pan and tilt with servos you can use the following code
+
+.. code:: python
+
+    from kervi.camera import CameraStreamer
+    class MyPanTiltCamera(CameraStreamer):
         def __init__(self):
-            FrameCamera.__init__(self, "cam1", "camera 1")
-            self.fps = 10
-    
-        def capture_frames(self):
-            with picamera.PiCamera() as camera:
-                camera.resolution = (self.width, self.height)
-                camera.framerate = self.fps
+            CameraStreamer.__init__(self,"cam1", "Cam with pan and tilt")
 
-                #wait for camera to be ready
-                time.sleep(2)
+            #link the camera to the dashboard *app*
+            #enable the pan/tilt controllers in the browser
+            self.link_to_dashboard("app", show_pan_tilt=True)
+        
+        def pan_changed(self, pan_value):
+            #event that is called when the user changes the pan in the browser.
+            #Add the code to move the pan servo.
+            #pan_value goes from - 100 to +100
 
-                stream = io.BytesIO()
-                for foo in camera.capture_continuous(stream, format='jpeg', use_video_port=True):
-                    stream.seek(0)
-                    i = Image.open(stream)
-                    image=i.copy()
-                    
-                    self.frame_ready(image)
-                    stream.seek(0)
-                    self.wait_next_frame()
+        def tilt_changed(self, tilt_value):
+            #event that is called when the user changes the tilt in the browser.
+            #Add the code to move the tilt servo 
+            #tilt_value goes from - 100 to +100
+    
+    MyPanTiltCamera()
 
-                    #check if fps has changed
-                    if camera.framerate <> self.fps:
-                        camera.framerate = self.fps
-                        time.sleep(1)
-
-                    if self.terminate:
-                        break
-            
-            
-        def pan_changed(self, pan_value, old_value):
-            #The user has changed the pan in ui.
-            #If you have a pan servo you can control it from here.
-            #pan_value range is from -100 to 100 where zero is center.
-            print("pan changed", pan_value)
-    
-        def tilt_changed(self, tilt_value, old_value):
-            #The user has changed the tilt in ui.
-            #If you have a tilt servo you can control it from here.
-            #tilt_value range is from -100 to 100 where zero is center.
-            print("tilt changed", tilt_value)
-    
-        def start_record(self):
-            #The user has clicked on the start record button in ui.
-            #Implement you save functionality here
-            print("start record")
-    
-        def stop_record(self):
-            #The user has stopped the recording in ui.
-            print("stop record")
-    
-    Cam_1()
 
 .. toctree::
    :hidden:

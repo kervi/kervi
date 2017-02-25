@@ -4,7 +4,6 @@
 import os
 import threading
 import time
-
 #from twisted.web.server import Site
 #from twisted.web.resource import Resource
 #from twisted.internet import reactor, endpoints
@@ -127,7 +126,7 @@ class CameraBase(Controller):
         self._ui_parameters["type"] = kwargs.get("type", "")
         self._ui_parameters["fps"] = kwargs.get("fps", 10)
         self._ui_parameters["source"] = kwargs.get("source", "")
-        self._ui_parameters["show_pan_tilt"] = kwargs.get("show_pan_tilt", True)
+        self._ui_parameters["show_pan_tilt"] = kwargs.get("show_pan_tilt", False)
         self._ui_parameters["show_buttons"] = kwargs.get("show_buttons", True)
 
     @property
@@ -327,22 +326,22 @@ class _HTTPFrameServer(HTTPServer):
         self.terminate = False
         self.mutex = mutex
 
-class FrameCamera(CameraBase):
+class CameraStreamer(CameraBase):
     r"""
-    Simple camera that streams video frame by frame to the ui.
-    
+    Camera controller that streams video to the ui.
+
     :param camera_id:
-        Id of the camera used to reference in dashboards.
-    :type name: str
+        Id of the camera. The id is used to reference the camera in other parts of the kervi application.
+    :type camera_id: str
 
     :param name:
         Name of the camera used in ui.
     :type name: str
 
-    :param frame_device_driver:
+    :param camera_source:
         A frame driver that is used to capture frames from a camera.
 
-    :type name: A frame driver class that has inherited from the class FrameCameraDeviceDriver.
+    :type camera_source: The name of the camera source to use.
 
     :param \**kwargs:
             See below
@@ -357,12 +356,10 @@ class FrameCamera(CameraBase):
             * *fps* (``int``) --
                 Frames per second.
     """
-    def __init__(self, camera_id, name, frame_device_driver = None, **kwargs):
+    def __init__(self, camera_id, name, camera_source = None, **kwargs):
         CameraBase.__init__(self, camera_id, name, type="frame", **kwargs)
-        self._device_driver = frame_device_driver
-        if self._device_driver is None:
-            self._device_driver = hal.get_camera_driver()
-            self._device_driver.camera = self
+        self._device_driver = hal.get_camera_driver(camera_source)
+        self._device_driver.camera = self
 
         self.ip_address = nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()

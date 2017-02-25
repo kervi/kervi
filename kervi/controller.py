@@ -32,6 +32,7 @@ class UISelectControllerInput(KerviComponent):
         KerviComponent.__init__(self, select_id, "select", name)
         #self.spine = Spine()
         self.controller = controller
+        
         self._persist_value = False
         self.options = []
         self.selected_options = []
@@ -45,7 +46,12 @@ class UISelectControllerInput(KerviComponent):
             "flat": False,
             "inline": False
         }
+        self.controller.add_input(self)
 
+    @property
+    def input_id(self):
+        return self.component_id
+    
     @property
     def value(self):
         """Current value/state of the component"""
@@ -157,17 +163,42 @@ class UIButtonControllerInput(KerviComponent):
     def __init__(self, button_id, name, controller):
         KerviComponent.__init__(self, button_id, "button", name)
         self.controller = controller
+       
         self.state = False
-        self.click_command = self.component_id + ".click"
-        self.spine.register_command_handler(self.click_command, self._on_click_handler)
+        self._down_command = self.component_id + ".down"
+        self._up_command = self.component_id + ".up"
+        self.spine.register_command_handler(self._down_command, self._on_down_handler)
+        self.spine.register_command_handler(self._up_command, self._on_up_handler)
         self._ui_parameters = {
-            "size": 1,
+            "size": 0,
             "type": "normal",
             "link_to_header": False,
-            "icon": None,
+            "label_icon": None,
+            "label": None,
             "flat": False,
-            "inline": False
+            "inline": False,
+            "button_text": self.name,
+            "button_icon": None
+
         }
+        self.state = False
+        self.controller.add_input(self)
+
+    @property
+    def input_id(self):
+        return self._component_id
+
+    @property
+    def value(self):
+        """Current state of the component"""
+        return self.state
+
+    @value.setter
+    def value(self, new_value):
+        if new_value:
+            self._on_down_handler()
+        else:
+            self._on_up_handler()
 
     def _load_persisted(self):
         pass
@@ -208,21 +239,53 @@ class UIButtonControllerInput(KerviComponent):
 
     def _get_info(self):
         return {
-            "onClick":self.click_command
+            "onPress":self._down_command,
+            "onRelease":self._up_command,
+            "state":self.state
         }
 
-    def _on_click_handler(self):
+    def _on_down_handler(self):
         self.spine.log.debug(
-            "controller button click:{0}/{1}",
+            "controller button pressed:{0}/{1}",
             self.controller.component_id,
             self.component_id
         )
-        self.click()
-        self.spine.trigger_event("controllerButtonClick", self.component_id)
 
-    def click(self):
+        if not self.state:
+            self.state = True
+            self.down()
+
+            self.spine.trigger_event(
+                "controllerButtonStateChange",
+                self.component_id,
+                {"button":self.component_id, "state":self.state}
+            )
+
+    def _on_up_handler(self):
+        self.spine.log.debug(
+            "controller button released:{0}/{1}",
+            self.controller.component_id,
+            self.component_id
+        )
+        if self.state:
+            self.state = False
+            self.up()
+
+            self.spine.trigger_event(
+                "controllerButtonStateChange",
+                self.component_id,
+                {"button":self.component_id, "state":self.state}
+            )
+
+    def down(self):
         """
-        Abstract method fill in with your own code that should be executed when button is clicked.
+        Abstract method fill in with your own code that should be executed when button is pressed down.
+        """
+        self.controller.input_changed(self)
+
+    def up(self):
+        """
+        Abstract method fill in with your own code that should be executed when button is released.
         """
         self.controller.input_changed(self)
 
@@ -234,6 +297,7 @@ class UISwitchButtonControllerInput(KerviComponent):
         KerviComponent.__init__(self, button_id, "switchButton", name)
         #self.spine = Spine()
         self.controller = controller
+
         self.state = False
 
         self.on_command = self.component_id + ".on"
@@ -245,17 +309,22 @@ class UISwitchButtonControllerInput(KerviComponent):
             "size": 0,
             "type": "normal",
             "link_to_header": False,
-            "icon": None,
             "flat": False,
             "on_text": "On",
             "off_text": "Off",
-            "show_name": True,
+            "label": self.name,
+            "label_icon": None,
             "inline": False,
             "on_icon": None,
             "off_icon": None,
             "read_only": False
         }
         self._persist_value = False
+        self.controller.add_input(self)
+
+    @property
+    def input_id(self):
+        return self.component_id
 
     @property
     def value(self):
@@ -390,13 +459,13 @@ class UISwitchButtonControllerInput(KerviComponent):
 
 class DigitalGPIOControllerInput(UISwitchButtonControllerInput):
     """
-    Digital GPIO input component that listens to a digital input going high or low.
+    Digital GPIO input that listens to a digital input going high or low.
     This input will show up as an UISwitchButtonControllerInput when linked to a dashboard panel
     and all ui settings for UISwitchButtonControllerInput applies to this input.
 
-    :param button_id:
+    :param input_id:
             id of the input. This id used to reference this input in other parts of the kervi app.
-    :type button_id: str
+    :type input_id: str
 
     :param name:
             Name of this component is used when displayed.
@@ -412,6 +481,7 @@ class DigitalGPIOControllerInput(UISwitchButtonControllerInput):
 
     :param gpio_device:
             GPIO device to use. Defaults to the host platforms gpio e.g the Raspbery PI's gpio.
+    
     :type gpio_device: IGPIODeviceDriver (defined in kervi.utility.hal.gpio).
 
     """
@@ -424,7 +494,7 @@ class DigitalGPIOControllerInput(UISwitchButtonControllerInput):
         self.gpio.listen(self.channel, self._on_edge)
         self.state = self.gpio.get(self.channel)
 
-    
+
     @property
     def value(self):
         """Current state of the component"""
@@ -489,6 +559,11 @@ class UINumberControllerInput(KerviComponent):
             "read_only": False
         }
         self._persist_value = False
+        self.controller.add_input(self)
+
+    @property
+    def input_id(self):
+        return self.component_id
 
     @property
     def value(self):
@@ -585,11 +660,11 @@ class UINumberControllerInput(KerviComponent):
 
 class AnalogGPIOControllerInput(UINumberControllerInput):
     """
-    Analog GPIO input component that listens to the signal level on analog input.
+    Analog GPIO input that listens to the signal level on analog input.
     This input will show up as an UINumberControllerInput when linked to a dashboard panel
     and all ui settings for UINumberControllerInput applies to this input.
 
-    :param button_id:
+    :param input_id:
             id of the input. This id used to reference this input in other parts of the kervi app.
     :type button_id: str
 
@@ -603,10 +678,11 @@ class AnalogGPIOControllerInput(UINumberControllerInput):
 
     :param channel:
             channel on the gpio device that should be used.
-    :type channel: int.
+    :type channel: int or string.
 
     :param gpio_device:
             GPIO device to use. Defaults to the host platforms gpio e.g the Raspbery PI's gpio.
+    
     :type gpio_device: IGPIODeviceDriver (defined in kervi.utility.hal.gpio).
 
     """
@@ -619,10 +695,11 @@ class AnalogGPIOControllerInput(UINumberControllerInput):
         self.gpio.listen(self.channel, self._on_change)
         self.value = self.gpio.get(self.channel)
 
+
     @property
     def value(self):
         """Current state of the component"""
-        return self.value
+        return self._value
 
     @value.setter
     def value(self, new_value):
@@ -632,8 +709,55 @@ class AnalogGPIOControllerInput(UINumberControllerInput):
         pass
 
     def _on_change(self, state):
-        print("state", state)
-        self.value = state
+        self._set_value(state)
+
+class SensorControllerInput(UINumberControllerInput):
+    """
+    Sensor input that listens to a sensor.
+    This input will show up as an UINumberControllerInput when linked to a dashboard panel
+    and all ui settings for UINumberControllerInput applies to this input.
+
+    :param input_id:
+            id of the input. This id used to reference this input in other parts of the kervi app.
+    :type button_id: str
+
+    :param name:
+            Name of this component is used when displayed.
+    :type name: str
+
+    :param controller:
+            The controller that this component belongs to.
+    :type controller: Controller instance.
+
+    :param sensor_id:
+            id of sensor to listen to.
+    :type channel: string.
+
+    """
+    def __init__(self, input_id, name, sensor_id, controller):
+        UINumberControllerInput.__init__(self, input_id, name, controller)
+        self._sensor_id = sensor_id
+        self._value = 0
+        self.set_ui_parameter("read_only", True)
+        self.spine.register_event_handler("NewSensorReading", self._new_sensor_reading, self._sensor_id)
+        sensor_value = self.spine.send_query("getSensorValue", self._sensor_id)
+        if sensor_value:
+            self._set_value(sensor_value)
+
+    def _new_sensor_reading(self,sensor_id, sensor_value):
+        self._set_value(sensor_value["value"])
+
+    @property
+    def value(self):
+        """Current state of the component"""
+        return self._value
+
+    @value.setter
+    def value(self, new_value):
+        pass
+
+    def _load_persisted(self):
+        pass
 
 class UITextControllerInput(KerviComponent):
     """
@@ -656,7 +780,12 @@ class UITextControllerInput(KerviComponent):
             "inline": False
         }
         self._persist_value = False
+        self.controller.add_input(self)
 
+    @property
+    def input_id(self):
+        return self.component_id
+    
     @property
     def value(self):
         """Current state of the component"""
@@ -767,6 +896,11 @@ class DateTimeControllerInput(KerviComponent):
             "inline": False
         }
         self._persist_value = False
+        self.controller.add_input(self)
+
+    @property
+    def input_id(self):
+        return self.component_id
 
     @property
     def value(self):
@@ -876,6 +1010,11 @@ class Controller(KerviComponent):
             "flat": False,
             "inline": False
         }
+
+    
+    @property
+    def controller_id(self):
+        return self.component_id
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""

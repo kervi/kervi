@@ -77,6 +77,8 @@ class Sensor(KerviComponent):
         else:
             self._sensor_thread = None
 
+        self.spine.register_query_handler("getSensorValue", self._query_value)
+
     @property
     def reading_interval(self):
         return self._sensor_thread.reading_interval
@@ -228,6 +230,10 @@ class Sensor(KerviComponent):
         self._lower_fatal_limit = value
 
     @property
+    def sensor_id(self):
+        return self.component_id
+
+    @property
     def device(self):
         """A hardware device from the kervi device library."""
         return self._device
@@ -235,6 +241,10 @@ class Sensor(KerviComponent):
     @device.setter
     def device(self, device):
         self._device = device
+
+    def _query_value(self, id):
+        if self.component_id == id:
+            return self._old_val
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
