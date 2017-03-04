@@ -84,10 +84,10 @@ class _CameraRecordButton(UISwitchButtonControllerInput):
             controller)
         self.set_ui_parameter("on_icon", "video-camera")
         self.set_ui_parameter("off_icon", "video-camera")
-        self.set_ui_parameter("size", 1)
+        self.set_ui_parameter("inline", True)
         self.set_ui_parameter("on_text", None)
         self.set_ui_parameter("off_text", None)
-        self.set_ui_parameter("show_name", False)
+        self.set_ui_parameter("label", None)
 
     def on(self):
         self.controller.start_record()
@@ -103,8 +103,8 @@ class _CameraPictureButton(UIButtonControllerInput):
             "Take picture",
             controller
         )
-        self.set_ui_parameter("icon", "camera")
-        self.set_ui_parameter("size", 1)
+        self.set_ui_parameter("button_icon", "camera")
+        self.set_ui_parameter("inline", True)
 
     def click(self):
         self.controller.save_picture()
@@ -242,6 +242,7 @@ class CameraBase(Controller):
         """
         if section_id is None:
             section_id = "background"
+        
         Controller.link_to_dashboard(
             self,
             dashboard_id,
@@ -297,9 +298,11 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
             self.end_headers()
-            first_frame = True
+            #first_frame = True
+            self.frame_number = 0
             while not self.server.camera._terminate:
-                if self.server.camera.current_frame:
+                if self.server.camera.current_frame and self.server.camera.current_frame_number != self.frame_number:
+                    self.frame_number = self.server.camera.current_frame_number
                     buf = BytesIO()
                     self.server.mutex.acquire()
                     try:
@@ -313,18 +316,29 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
                     self.send_header('Content-length', len(data))
                     self.end_headers()
                     self.wfile.write(data)
-                    first_frame = False
+                    #first_frame = False
                 time.sleep(1.0 / self.server.camera.fps)
             return
         finally:
             pass
 
-class _HTTPFrameServer(HTTPServer):
-    def __init__(self, addres, handler, camera, mutex):
-        HTTPServer.__init__(self, addres, handler)
-        self.camera = camera
-        self.terminate = False
-        self.mutex = mutex
+
+try:
+    from SocketServer import ThreadingMixIn
+    class _HTTPFrameServer(ThreadingMixIn, HTTPServer):
+        def __init__(self, addres, handler, camera, mutex):
+            HTTPServer.__init__(self, addres, handler)
+            self.camera = camera
+            self.terminate = False
+            self.mutex = mutex
+except:
+    print("ThreadingMixIn not found, use single thread camera server")
+    class _HTTPFrameServer(HTTPServer):
+        def __init__(self, addres, handler, camera, mutex):
+            HTTPServer.__init__(self, addres, handler)
+            self.camera = camera
+            self.terminate = False
+            self.mutex = mutex
 
 class CameraStreamer(CameraBase):
     r"""
@@ -365,6 +379,7 @@ class CameraStreamer(CameraBase):
         self.ip_port = nethelper.get_free_port()
         self.source = "http://" + str(self.ip_address) + ":" + str(self.ip_port) + "/" + camera_id# + ".png"
         self.current_frame = None
+        self.current_frame_number = 0
 
         from threading import Lock
         self.mutex = Lock()
@@ -411,6 +426,7 @@ class CameraStreamer(CameraBase):
         if frame:
             self.mutex.acquire()
             self.current_frame = frame
+            self.current_frame_number += 1
             self.mutex.release()
 
     def frame_captured(self, image):

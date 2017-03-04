@@ -21,6 +21,7 @@ kervi/core_sensors/cpu_sensors\cpu.py
 kervi/utility\__init__.py
 kervi/utility\bus.py
 kervi/utility\component.py
+kervi/utility\cron.py
 kervi/utility\named_lists.py
 kervi/utility\nethelper.py
 kervi/utility\process.py
