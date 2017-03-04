@@ -562,7 +562,7 @@ class UINumberControllerInput(KerviComponent):
             "flat": False,
             "inline": False,
             "read_only": False,
-            "value_size":20
+            "value_size":10
         }
         self._persist_value = False
         self.controller.add_input(self)
