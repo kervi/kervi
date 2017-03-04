@@ -80,7 +80,7 @@ The user controls the level via browser.
                     #change the duty_cycle on the pwm pin
                     GPIO.pwm_start(12, duty_cycle=changed_input.value)
 
-        MY_CONTROLLER = LightController()
+        LightController()
 
         APP.run()
 

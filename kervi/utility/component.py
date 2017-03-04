@@ -91,12 +91,26 @@ class KerviComponent(object):
         else:
             raise ValueError("invalud ui parameter name:" + name)
 
-    def user_log_message(self, topic, body=None, log_type="information"):
+    def user_log_message(self, topic, **kwargs):
         """"
         Adds a message to the user log.
         """
+
+        body = kwargs.get("body", None)
+        data = kwargs.get("data", None)
+        area = kwargs.get("area", None)
+        log_type = kwargs.get("log_type", "information")
+        level = kwargs.get("level", 3)
+        deleteable = kwargs.get("deleteable", False)
+
+
         timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
         self.spine.trigger_event("userLogMessage", None, {
+            "source_id": self.component_id,
+            "source_name": self.name,
+            "area": area,
+            "data": data,
+            "level": level,
             "topic": topic,
             "body": body,
             "timestamp": timestamp,

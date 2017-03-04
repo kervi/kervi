@@ -39,12 +39,14 @@ class UISelectControllerInput(KerviComponent):
         self.change_command = self.component_id + ".change"
         self.spine.register_command_handler(self.change_command, self._on_change_handler)
         self._ui_parameters = {
-            "size": 1,
+            "size": 0,
             "type": "dropdown",
             "link_to_header": False,
-            "icon": None,
+            "label_icon": None,
+            "label" : self.name,
             "flat": False,
-            "inline": False
+            "inline": False,
+            "input_size": 50
         }
         self.controller.add_input(self)
 
@@ -105,7 +107,7 @@ class UISelectControllerInput(KerviComponent):
             self,
             dashboard_id,
             section_id,
-            *kwargs
+            **kwargs
             )
 
     def _get_info(self):
@@ -137,10 +139,9 @@ class UISelectControllerInput(KerviComponent):
             option["selected"] = False
 
         self.selected_options = []
-
         for selected_option in selected_options:
             for option in self.options:
-                if option["value"] == selected_option["value"]:
+                if option["value"] == selected_option:
                     option["selected"] = True
                     self.selected_options += [option]
 
@@ -171,6 +172,7 @@ class UIButtonControllerInput(KerviComponent):
         self.spine.register_command_handler(self._up_command, self._on_up_handler)
         self._ui_parameters = {
             "size": 0,
+            "input_size": None,
             "type": "normal",
             "link_to_header": False,
             "label_icon": None,
@@ -307,6 +309,7 @@ class UISwitchButtonControllerInput(KerviComponent):
         self.spine.register_command_handler(self.off_command, self._on_off_handler)
         self._ui_parameters = {
             "size": 0,
+            "input_size": None,
             "type": "normal",
             "link_to_header": False,
             "flat": False,
@@ -550,13 +553,16 @@ class UINumberControllerInput(KerviComponent):
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
         self._ui_parameters = {
-            "size": 1,
+            "size": 0,
+            "input_size": 50,
             "type": "horizontal_slider",
             "link_to_header": False,
-            "icon": None,
+            "label_icon": None,
+            "label": self.name,
             "flat": False,
             "inline": False,
-            "read_only": False
+            "read_only": False,
+            "value_size":20
         }
         self._persist_value = False
         self.controller.add_input(self)
@@ -619,7 +625,7 @@ class UINumberControllerInput(KerviComponent):
             self,
             dashboard_id,
             section_id,
-            *kwargs
+            **kwargs
             )
 
     def _set_value(self, nvalue, allow_persist=True):
@@ -767,15 +773,18 @@ class UITextControllerInput(KerviComponent):
         KerviComponent.__init__(self, input_id, "text-input", name)
         #self.spine = Spine()
         self.controller = controller
-        self.value = ""
+        self._value = ""
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
         self.input_type = "text"
         self._ui_parameters = {
-            "size": 1,
+            "size": 0,
+            "input_size": 50,
             "type": "text",
             "link_to_header": False,
-            "icon": None,
+            "label_icon": None,
+            "label": self.name,
+            "place_holder" : None,
             "flat": False,
             "inline": False
         }
@@ -785,11 +794,11 @@ class UITextControllerInput(KerviComponent):
     @property
     def input_id(self):
         return self.component_id
-    
+
     @property
     def value(self):
         """Current state of the component"""
-        return self.value
+        return self._value
 
     @value.setter
     def value(self, new_value):
@@ -805,7 +814,7 @@ class UITextControllerInput(KerviComponent):
         self._persist_value = do_persist
 
     def _load_persisted(self):
-        if self_persist_value:
+        if self._persist_value:
             self._set_value(self.settings.retrieve_value("value"))
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -838,9 +847,11 @@ class UITextControllerInput(KerviComponent):
         KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
-            *kwargs)
+            section_id,
+            *kwargs
+            )
 
-    def _set_value(self, nvalue):
+    def _set_value(self, nvalue, key, key_code):
         if self.value != nvalue:
             self.spine.log.debug(
                 "value change on input:{0}/{1} value:{2}",
@@ -848,10 +859,11 @@ class UITextControllerInput(KerviComponent):
                 self.component_id,
                 nvalue
             )
-            old_value = self.value
-            self.value = nvalue
+            old_value = self._value
+            self._value = nvalue
             self.value_changed(nvalue, old_value)
-            if self.selected_options:
+
+            if self.persist_value:
                 settings.store_value("value", self.value)
 
             self.spine.trigger_event(
@@ -875,7 +887,7 @@ class UITextControllerInput(KerviComponent):
     def on_get_value(self):
         return self.value
 
-class DateTimeControllerInput(KerviComponent):
+class UIDateTimeControllerInput(KerviComponent):
     """
     A date and time component.
     """
@@ -884,14 +896,16 @@ class DateTimeControllerInput(KerviComponent):
         #self.spine = Spine()
         self.controller = controller
         self.input_type = input_type
-        self.value = ""
+        self._value = ""
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
         self._ui_parameters = {
-            "size": 1,
+            "size": 0,
+            "input_size": 50,
             "type": "datetime",
             "link_to_header": False,
-            "icon": None,
+            "label_icon": None,
+            "label": self.name,
             "flat": False,
             "inline": False
         }
@@ -905,7 +919,7 @@ class DateTimeControllerInput(KerviComponent):
     @property
     def value(self):
         """Current state of the component"""
-        return self.value
+        return self._value
 
     @value.setter
     def value(self, new_value):
@@ -921,7 +935,7 @@ class DateTimeControllerInput(KerviComponent):
         self._persist_value = do_persist
 
     def _load_persisted(self):
-        if self_persist_value:
+        if self._persist_value:
             self._set_value(self.settings.retrieve_value("value"))
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
@@ -954,7 +968,8 @@ class DateTimeControllerInput(KerviComponent):
         KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
-            *kwargs
+            section_id,
+            **kwargs
             )
 
     def _set_value(self, nvalue):
@@ -966,9 +981,9 @@ class DateTimeControllerInput(KerviComponent):
                 nvalue
             )
             old_value = self.value
-            self.value = nvalue
+            self._value = nvalue
             self.value_changed(nvalue, old_value)
-            if self.selected_options:
+            if self._persist_value:
                 settings.store_value("value", self.value)
 
             self.spine.trigger_event(
@@ -1003,7 +1018,7 @@ class Controller(KerviComponent):
         self.type = "unknown"
         self.parameters = {}
         self._ui_parameters = {
-            "size": 1,
+            "size": 0,
             "type": "normal",
             "link_to_header": False,
             "icon": None,

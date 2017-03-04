@@ -67,6 +67,25 @@ def init_db():
             `value`	TEXT
         );
         CREATE INDEX `settingsindex` ON `settings` (`setting_group` ,`name` );
+        CREATE TABLE "cron" (
+            `id`	INTEGER PRIMARY KEY AUTOINCREMENT,
+            `job_id` TEXT,
+            `component_id` TEXT
+            `name`	TEXT,
+            `job_parameters` TEXT
+        );
+        CREATE TABLE "cron_meta" (
+            `id`	INTEGER PRIMARY KEY AUTOINCREMENT,
+            `cron_id`	INTEGER,
+            `repeat_start` REAL NOT NULL,
+            `repeat_end` REAL NOT NULL,
+            `repeat_interval` varchar(255) NOT NULL,
+            `repeat_year` varchar(255) NOT NULL,
+            `repeat_month` varchar(255) NOT NULL,
+            `repeat_day` varchar(255) NOT NULL,
+            `repeat_week` varchar(255) NOT NULL,
+            `repeat_weekday` varchar(255) NOT NULL
+        );
         """
 
         sql_commands = sql_file.split(';')
@@ -179,6 +198,16 @@ def store_log_item(id, log_item):
 def get_log_items(date_from, date_to):
     print ("getLogItems")
 
+
+def create_cron_job(component_id, job_id, name, job_parameters, start, end, repeat_interval, year,month):
+    pass
+
+def delete_cron_job():
+    pass
+
+def query_cron_job():
+    pass
+
 if (SPINE):
     SPINE.register_query_handler("getSensorData", get_sensor_data)
     SPINE.register_command_handler("storeSetting", store_setting)
@@ -186,3 +215,6 @@ if (SPINE):
     SPINE.register_query_handler("getLogItems", get_log_items)
     SPINE.register_event_handler("NewSensorReading", store_sensor_reading)
     SPINE.register_event_handler("newLogItem", store_log_item)
+    SPINE.register_command_handler("createCronJob", create_cron_job)
+    SPINE.register_command_handler("deleteCronJob", delete_cron_job)
+    SPINE.register_query_handler("queryCronJob", query_cron_job)

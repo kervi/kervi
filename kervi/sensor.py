@@ -31,11 +31,6 @@ class Sensor(KerviComponent):
     :param \**kwargs:
             See below
 
-    :Keyword Arguments:
-        * *title* (``str``) -- Title of the section.
-        * *columns* (``int``) -- Number of columns in this section, default is 1.
-        * *rows* (``int``) -- Number of rows in this section, default is 1.
-        * *add_user_log* (``bool``) -- This section shows user log messages.
     """
     def __init__(self, sensor_id, name, device=None, use_thread=True):
         KerviComponent.__init__(self, sensor_id, "sensor", name)
@@ -88,7 +83,7 @@ class Sensor(KerviComponent):
         self._sensor_thread.reading_interval = interval
 
     @property
-    def save_to_db(self):
+    def persist_to_db(self):
         """
         If true the method new_sensor_reading
         will save the sensor reading to DB.
@@ -97,16 +92,16 @@ class Sensor(KerviComponent):
         """
         return self._save_to_db
 
-    @save_to_db.setter
-    def save_to_db(self, value):
+    @persist_to_db.setter
+    def persist_to_db(self, value):
         self._save_to_db = value
 
     @property
     def store_delta(self):
         """
         Enter how much a sensor value should change between readings before
-        the method new_sensor_reading triggers db saving and send events.
-
+        the method new_sensor_reading triggers db saving.
+        Only relevant if persist_to_db is True.
         :type: ``float``
         """
         return self._store_delta
@@ -326,7 +321,7 @@ class Sensor(KerviComponent):
             )
             timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             val = {"sensor":self.component_id, "value":value, "timestamp":timestamp}
-            if self.save_to_db:
+            if self.persist_to_db:
                 self.spine.send_command("StoreSensorValue", val)
             self.spine.trigger_event("NewSensorReading", self.component_id, val)
             self._old_val = value
