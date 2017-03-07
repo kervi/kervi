@@ -1,3 +1,5 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
 """
 It is possible to communicate with devices via I2C.
 

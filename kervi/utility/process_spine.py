@@ -179,8 +179,8 @@ class _ProcessSpine(object):
             try:
                 #print("Try to connect to root:")
                 root_address = (
-                    self.settings["network"]["IPAddress"],
-                    self.settings["network"]["IPCBasePort"]
+                    self.settings["network"]["IPRootAddress"],
+                    self.settings["network"]["IPCRootPort"]
                 )
                 conn = Client(
                     root_address,

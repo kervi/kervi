@@ -39,7 +39,7 @@ You create the single file app via the following command in the terminal window:
     kervi create application myapp "My first app" --single_file_app
 
 
-**2) Normal application**
+**2) Multi file application**
 
 If you are planning to build a robot or home automation system it is recommanded to create a normal Kervi application. 
 Such an application consists of several files and the Kervi framework is able to spread the load on all the cores on your board. 

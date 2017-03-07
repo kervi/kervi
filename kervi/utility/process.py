@@ -16,7 +16,7 @@ def _start_root_spine(settings, reset_log=False):
     k_logging.init_process_logging("kervi-main", settings["log"])
     k_logging.KerviLog("kervi main")
     spine._init_spine("kervi-main")
-    MAIN_SPINE = _ProcessSpine(settings["network"]["IPCBasePort"], settings, is_root=True)
+    MAIN_SPINE = _ProcessSpine(settings["network"]["IPCRootPort"], settings, is_root=True)
 
 def _stop_root_spine():
     MAIN_SPINE.close_all_connections()

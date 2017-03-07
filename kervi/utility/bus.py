@@ -26,6 +26,7 @@ class _QueryThread(threading.Thread):
         self.args = args
         self.result = []
         self.injected = injected
+        
     def run(self):
         self.result = self.handler(self.query, self.args, injected=self.injected)
 
@@ -161,14 +162,18 @@ class _CQRSBus(object):
         if query == "getQueueInfo":
             return self.get_queue_info()
         query_thread = _QueryThread(self.query_handler, query, args, injected=injected)
+        self.log.debug("sendQuery thread start:{0}", query_thread)
+
         query_thread.start()
         query_thread.join()
+        self.log.debug("sendQuery thread done:{0}", query_thread)
         return query_thread.result
 
     def query_handler(self, query, args, **kwargs):
         injected = kwargs.get("injected", "")
-        self.log.debug("query handler called:{0} injected:{1}", query, injected)
+        #self.log.debug("query handler called:{0} injected:{1}", query, injected)
         func_list = self.query_handlers.get_list_data(query)
+        self.log.debug("query handler called:{0} injected:{1}, func{2}", query, injected, func_list)
         result = []
         if func_list:
             for func in func_list:

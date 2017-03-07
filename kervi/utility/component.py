@@ -27,6 +27,7 @@ class KerviComponent(object):
         self._ui_parameters = {}
         self._settings = Settings(self.component_type + "_" + self.component_id)
         if self.spine:
+            self.spine.log.debug("component created:{0}", self.component_id)
             self.spine.register_query_handler(
                 "getDashboardComponents",
                 self._get_dashboard_components

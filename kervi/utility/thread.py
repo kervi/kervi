@@ -32,12 +32,9 @@ class KerviThread(threading.Thread):
                 self._step()
             except:
                 log = logging.getLogger()
-                log.exception("kervi thread")
+                log.exception("kervi thread:" + self.__class__.__name__)
 
     def _step(self):
         """
         Abstract method that handles one cycle in the thread.
         """
-        self.spine.log.debug(
-            "abstract _step reached"
-        )

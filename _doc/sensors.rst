@@ -10,7 +10,7 @@ Kervi Device library
 --------------------
 
 A part of the Kervi framework is the device library that holds drivers for common devices. 
-To use a device from the library import the device module and apply the driver to a sensor class. 
+To use a device from the library you need to import the device module and apply the driver to a sensor class. 
 
 .. code:: python
 

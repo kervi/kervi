@@ -52,6 +52,7 @@ class DashboardPanel(object):
         return result
 
     def _get_info(self):
+        self.spine.log.debug("Query dashboard components:{0} - {1}", self.dashboard.dashboard_id, self.panel_id)
         components = self.spine.send_query(
             "getDashboardComponents",
             self.dashboard.dashboard_id,
@@ -120,6 +121,11 @@ class Dashboard(KerviComponent):
         self.panels += [panel]
 
     def _get_info(self):
+        #import traceback
+        #for line in traceback.format_stack():
+        #    self.spine.log.debug(line.strip())
+
+        self.spine.log.debug("get dashboard info:{0}", self.dashboard_id)
         template = None
         import os.path
         import sys
@@ -133,6 +139,8 @@ class Dashboard(KerviComponent):
         for panel in self.panels:
             panels += [panel._get_info()]
 
+        self.spine.log.debug("get dashboard info done:{0}", self.dashboard_id)
+        
         return {
             "isDefault": self.is_default,
             "template" : template,

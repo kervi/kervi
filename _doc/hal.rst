@@ -2,9 +2,8 @@ Hardware and devices
 ####################
 
 A central feature in Kervi is platform independent access to hardware and devices.
-Kervi abstracts access to varius systems like GPIO and I2C in order to make Kervi solutions
-portable between different platforms and integrate device access into the framework. 
-At the moment there is drivers for Raspberry Pi with more to come.
+Kervi abstracts access to various systems like GPIO and I2C on your board in order to make Kervi solutions
+portable. At the moment there is drivers for Raspberry Pi with more to come.
 
 The kervi device library contains device drivers to common sensors, displays, gpio extenders. 
 
@@ -21,7 +20,7 @@ initialise GPIO, I2C ect.
 GPIO
 ----
 
-Access to GPIO is done via the kervi.hal module. When Kervi starts it scans for installed Kervi platform drivers and loads the GPIO driver.
+Access to GPIO is done via the kervi.hal module. When your Kervi application starts it scans for installed Kervi platform drivers and loads the GPIO driver.
 
 .. code-block:: python
 

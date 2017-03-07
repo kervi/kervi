@@ -21,14 +21,12 @@ myapp.py
 .. code-block:: python
    :linenos:
     
-    if __name__ == '__main__': #This line is needed in windows
-
-        #Create the application object this must be the very first action
-        #as it prepares the system.
+    if __name__ == '__main__':
         from kervi.bootstrap import Application
         APP = Application()
+        #Important GPIO must be imported after application creation
+        from kervi.hal import GPIO
 
-        #create dashboards and panels
         from kervi.dashboard import Dashboard, DashboardPanel
         DASHBOARD = Dashboard("app", "App", is_default=True)
         DASHBOARD.add_panel(DashboardPanel("light", columns=2, rows=2, title="Light"))
@@ -46,30 +44,21 @@ myapp.py
         #link camera to a panel
         CAMERA.link_to_dashboard("system", "cam")
 
-        #Your are ready to create your application logic
-        #Get the GPIO module. The gpio module is used to control 
-        #input and output of your application
-        from kervi.hal import GPIO
-        
-        
-        #Create a sensor this sensors uses a *cpu load device driver* build into kervi 
         from kervi.sensor import Sensor
         from kervi_devices.platforms.common.sensors.cpu_use import CPULoadSensorDeviceDriver
+        #build in sensor that measures cpu use
         SENSOR_1 = Sensor("CPULoadSensor", "CPU", CPULoadSensorDeviceDriver())
-        
-        #link the sensor to sys area top right
+        #link to sys area top right
         SENSOR_1.link_to_dashboard("*", "sys-header")
-        
-        #link the sensor to a panel, show value in panel header and
-        # chart of sensor values in the panel body
+        #link to a panel, show value in panel header and chart in panel body
         SENSOR_1.link_to_dashboard("system", "cpu", type="value", size=2, link_to_header=True)
         SENSOR_1.link_to_dashboard("system", "cpu", type="chart", size=2)
 
 
         #More on sensors https://kervi.github.io/sensors.html
 
+
         #define a light controller
-        #Import controller and a ui controller input.
         from kervi.controller import Controller, UISwitchButtonControllerInput
         class MyController(Controller):
             def __init__(self):
@@ -78,10 +67,7 @@ myapp.py
 
                 #define an input and link it to the dashboard panel
                 light1 = UISwitchButtonControllerInput("lightctrl.light1", "Light", self)
-                light1.link_to_dashboard("app", "light", icon="light", size=0)
-
-                #add the input to this controller
-                self.add_input(light1)
+                light1.link_to_dashboard("app", "light", label_icon="light", size=0)
 
                 #define GPIO
                 GPIO.define_as_output(12)
@@ -106,10 +92,10 @@ if you are using a Raspberry Pi as your board and loads required
 driveres. It also loads a web server that serves the files to the browser. 
 
 ######################
-Dashboards (line 8-15)
+Dashboards (line 7-13)
 ######################
 
-Dashboards are as such no at part of your application logic but you need to
+Dashboards are as such not at part of your application logic but you need to
 tell kervi how you want to organize your application in the browser. 
 You can have multiple dashboards in an application. It can be floores in a house
 if your are developing a house automation project or it can be a camera view and
@@ -119,8 +105,8 @@ In the example above two dashboards are defined APP and SYSTEM.
 
 Each dashboard has one or more panels where kervi components like sensors and controllers are linked to.
 
-################# ##
-camera (line 17-24) 
+###################
+camera (line 15-22) 
 ###################
 
 It is possible to stream your camera as a background on a dashboard or as content in a panel.
@@ -128,11 +114,11 @@ Use the method link_to_dashboard where you specify the dashboard and panel that 
 The camera will be displayed as a background if you omit the name of a panel in the call to link_to_dashboard.
 
 ###############
-Sensors (22-43)
+Sensors (24-35)
 ###############
 
 Sensors are used to sence the world and readings from sensors are handled thru the Sensor Class. 
-You can program a sensor your self or you can utterlize one of the ready made sensor drivers from the Kervi Device Library (KDL).
+You can program a sensor your self or you can utilize one of the ready made sensor drivers from the Kervi Device Library (KDL).
 
 In the example above a *Cpu Load sensor* is fetched from KDL and applied to the Sensor class. 
 When the application is running the Sensor class polls *Cpu load sensor* device and notify other
@@ -143,7 +129,7 @@ This is done by calling the method link_to_dashboard where you specify dashboard
 When a sensor is linked to a dashboard panel the UI logic will pick up sensor readings for the sensor and update the value on the screen.
 
 ########################
-Controllers (line 48-69)
+Controllers (line 38-55)
 ########################
 
 Controllers react to input from user and input channels. 
@@ -155,17 +141,17 @@ When the user pushes the button in the browser it will invoke the input_changed 
 and the controller will set the state on a output channel.
 
 ###########################
-Start the engines (line 71)
+Start the engines (line 57)
 ###########################
 
-The work so far have bin to prepare your application to actually launch it you need to call APP.run().
+The work so far have been to prepare your application nothing is running yet to actually launch your app you need to call APP.run().
 This will launch the web server, interprocess communication systems and start sensor readings.
 
 ------------------
 Normal application
 ------------------
 
-Below is the structure of a *normal* Kervi application. All the parts from a single file application are moved into
+Below is the structure of a multi file Kervi application. All the parts from a single file application are moved into
 seperate files and foldes. Kervi uses this structure to load each section in its own process in order to improve the performance.
 
 A second advantance to this model is that it is easier to maintain as the Kervi project grows bigger.
@@ -216,4 +202,4 @@ The kervi application is bootstrapped in myapp.py
 
 The values for ports and secrets are generated by the Kervi commandline tool.
 When the Application.run is called the system looks for Kervi components in cam, controllers, dashboard and sensor folders.
-In each folder the __init__.py bootstraps and load the components that resides in the local folder.
+In each folder the __init__.py file bootstraps and load the components that resides in the local folder.

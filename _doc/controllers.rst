@@ -8,7 +8,6 @@ Basic controllers manages motors, light, servo and so on but you can also build 
 for *line following* and *self navigation* into your controllers.
 As your application grows your application will contain multiple controllers. 
 
-
 User input comes from the following controller inputs:
 
     * UISelectControllerInput
@@ -67,7 +66,7 @@ The user controls the level via browser.
                 self.add_input(level_input)
 
                 #define GPIO
-                GPIO.define_as_pwm(12, duty_cycle=level_input.value, frequency=20000)
+                GPIO.define_as_pwm(12, 50)
 
             def input_changed(self, changed_input):
                 if changed_input.input_id == "lightctrl.on":

@@ -1,3 +1,5 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
 """
 When Kervi starts it scans for installed Kervi platform drivers and loads the GPIO driver.
 In your application you access GPIO via:
@@ -64,7 +66,7 @@ class IGPIODeviceDriver(object):
         """
         raise NotImplementedError
 
-    def listen(self, channel, callback):
+    def listen(self, channel, callback, bounce_time=.2):
         """
         Listen on a channel for state change.
         The callback function is called when a channel is going high and low.

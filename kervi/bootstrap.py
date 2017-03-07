@@ -9,6 +9,7 @@ except ImportError:
     import _thread as thread
 
 #import sys
+import collections
 import uuid
 import kervi.utility.process as process
 import kervi.spine as spine
@@ -17,6 +18,20 @@ import kervi.kervi_logging as logging
 import kervi_ui.webserver as webserver
 import kervi.utility.nethelper as nethelper
 import kervi.hal as hal
+
+def _deep_update(d, u):
+    """Update a nested dictionary or similar mapping.
+
+    Modify ``source`` in place.
+    """
+
+    for k, v in u.items():
+        if isinstance(v, collections.Mapping):
+            r = _deep_update(d.get(k, {}), v)
+            d[k] = r
+        else:
+            d[k] = u[k]
+    return d
 
 class _KerviSensors(process._KerviProcess):
     """ Private class that starts a seperate process that loads sensors in the Kervi application """
@@ -93,7 +108,7 @@ class Application(object):
         },
         "modules":["sensors","controllers"],
         "network":{
-            "IPCBasePort":9500,
+            "IPCRootPort":9500,
             "WebSocketPort":9000,
             "UIPort":"2222",
             "IPCRoot":(nethelper.getIPAddress(),9500),
@@ -120,14 +135,15 @@ class Application(object):
                 "appKey":"",
             },
             "log" : {
-                "level":"DEBUG",
+                "level":"debug",
                 "file":"kervi.log",
                 "resetLog":False
             },
             "modules":[],
             "network":{
                 "IPAddress": nethelper.get_ip_address(),
-                "IPCBasePort":nethelper.get_free_port([9500]),
+                "IPRootAddress": nethelper.get_ip_address(),
+                "IPCRootPort":nethelper.get_free_port([9500]),
                 "WebSocketPort":nethelper.get_free_port([9000]),
                 "WebPort": nethelper.get_free_port([80, 8080, 8081]),
                 "IPCSecret":b"12345"
@@ -137,7 +153,7 @@ class Application(object):
 
         print("Starting kervi application, please wait")
         if settings:
-            self.settings.update(settings)
+            self.settings = _deep_update(self.settings, settings)
         self._validateSettings()
         self.started = False
         process._start_root_spine(self.settings, True)
@@ -170,7 +186,7 @@ class Application(object):
                 self.p1 = process._start_process(
                     "sensors",
                     self.settings,
-                    self.settings["network"]["IPCBasePort"]+1,
+                    self.settings["network"]["IPCRootPort"]+1,
                     _KerviSensors
                 )
 
@@ -179,7 +195,7 @@ class Application(object):
                 self.p2 = process._start_process(
                     "Controllers",
                     self.settings,
-                    self.settings["network"]["IPCBasePort"]+2,
+                    self.settings["network"]["IPCRootPort"]+2,
                     _KerviControllers
                 )
             elif module == "cams":
@@ -187,7 +203,7 @@ class Application(object):
                 self.p2 = process._start_process(
                     "cams",
                     self.settings,
-                    self.settings["network"]["IPCBasePort"]+3,
+                    self.settings["network"]["IPCRootPort"]+3,
                     _KerviCams
                 )
 
@@ -196,7 +212,7 @@ class Application(object):
         self.p3 = process._start_process(
             "IPC",
             self.settings,
-            self.settings["network"]["IPCBasePort"]+4,
+            self.settings["network"]["IPCRootPort"]+4,
             _KerviSocketIPC
         )
 
@@ -257,21 +273,52 @@ class ApplicationModule(object):
     )
 
     """
-    def __init__(self, name, settings):
-        self.settings = settings
+    def __init__(self, settings=None):
+        
+
+        self.settings = {
+            "info":{
+                "id":"kervi_module",
+                "name":"Kervi module",
+                "appKey":"",
+            },
+            "log" : {
+                "level":"debug",
+                "file":"kervi.log",
+                "resetLog":False
+            },
+            "modules":[],
+            "network":{
+                "IPRootAddress": nethelper.get_ip_address(),
+                "IPCRootPort":9500,
+                "IPAddress": nethelper.get_ip_address(),
+                "IPCPort":nethelper.get_free_port([9600]),
+                "IPCSecret":b"12345"
+            }
+        }
+
+
+        print("Starting kervi module, please wait")
+        if settings:
+            self.settings = _deep_update(self.settings, settings)
+
         self.started = False
-        self.name = name
-        logging.init_process_logging("kervimodule-"+name, settings['log'])
-        logging.KerviLog(name)
-        spine._init_spine("module-"+name)
-        _ProcessSpine(settings["network"]["IPCPort"], settings)
+        logging.init_process_logging("kervi-main", self.settings["log"])
+        logging.KerviLog("kervi main")
+        spine._init_spine("kervi-main")
+        _ProcessSpine(self.settings["network"]["IPCPort"], self.settings)
         self.spine = spine.Spine()
+        hal_driver = hal._load()
+        if hal_driver:
+            print("Using HAL driver:", hal_driver)
 
     def _start(self):
         self.started = True
+        self.spine.send_command("startThreads")
         time.sleep(2)
-        self.spine.trigger_event("moduleStarted", self.name)
+        self.spine.trigger_event("moduleStarted", self.settings["info"]["id"])
         time.sleep(2)
+        print("Module started")
 
     def _input_thread(self, list):
         try:
@@ -297,5 +344,5 @@ class ApplicationModule(object):
 
 
         print("stopping module")
-        self.spine.trigger_event("moduleStopped", self.name)
+        self.spine.trigger_event("moduleStopped", self.settings["info"]["id"])
         time.sleep(1)

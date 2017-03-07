@@ -317,14 +317,14 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
                     self.end_headers()
                     self.wfile.write(data)
                     #first_frame = False
-                time.sleep(1.0 / self.server.camera.fps)
+                time.sleep(1.0 / 30)
             return
         finally:
             pass
 
 
 try:
-    from SocketServer import ThreadingMixIn
+    from socketserver import ThreadingMixIn
     class _HTTPFrameServer(ThreadingMixIn, HTTPServer):
         def __init__(self, addres, handler, camera, mutex):
             HTTPServer.__init__(self, addres, handler)

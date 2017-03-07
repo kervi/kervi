@@ -1,8 +1,10 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
 """Hardware abstraction layer"""
 from kervi.utility.hal import gpio
 from kervi.utility.hal import i2c
 from kervi.spine import Spine
-
+from kervi.utility.thread import KerviThread
 import pip
 import importlib
 
@@ -97,3 +99,48 @@ class I2CGPIODeviceDriver(gpio.IGPIODeviceDriver):
     @property
     def device_name(self):
         return None
+
+    @property
+    def num_gpio(self):
+        return 0
+
+    def _validate_channel(self, channel):
+        # Raise an exception if pin is outside the range of allowed values.
+        if pin < 0 or pin >= self.NUM_GPIO:
+            raise DeviceChannelOutOfBoundsError(channel)
+
+class ChannelPollingThread(KerviThread):
+    def __init__(self, channel, device, callback, polling_time=.1):
+        KerviThread.__init__(self)
+        self._callback = callback
+        self._channel = channel
+        self._device = device
+        self._value = None
+        self._polling_time = bounce_time
+        self.alive = False
+        self.spine = spine.Spine()
+        if self.spine:
+            self.spine.register_command_handler("startThreads", self._start_command)
+            self.spine.register_command_handler("stopThreads", self._stop_command)
+
+    def run(self):
+        """Private method do not call it directly or override it."""
+        try:
+            new_value = self._device.get(self._channel)
+            if new_value != self._value:
+                self._callback(new_value, self._value)
+                self._value = new_value
+            time.sleep(self._polling_time)
+        except:
+            self.spine.log.exception("_PollingThread")
+
+    def _start_command(self):
+        if not self.alive:
+            self.alive = True
+            KerviThread.start(self)
+
+    def _stop_command(self):
+        if self.alive:
+            self.alive = False
+            self.stop()
+
