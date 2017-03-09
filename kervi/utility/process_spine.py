@@ -132,6 +132,7 @@ class _ConnectionMessageThread(threading.Thread):
                 message = self.connection.recv()
                 self.process_spine.handle_message(message, self.connection, self.src)
                 time.sleep(0.001)
+            print("connection closed:", self.src)
             self.connection.close()
         except EOFError:
             self.process_spine.spine.log.debug("connection messageThread eof from:{0}", self.src)
@@ -144,7 +145,6 @@ class _ConnectionMessageThread(threading.Thread):
             self.process_spine.connection_terminated(self)
         except:
             self.process_spine.spine.log.exception("connectionMessageThread", self.src)
-            pass
 
 class _ProcessSpine(object):
     def __init__(self, port, settings, **kwargs):
@@ -174,23 +174,28 @@ class _ProcessSpine(object):
         if self.is_root:
             return
 
+        root_address = (
+            self.settings["network"]["IPRootAddress"],
+            self.settings["network"]["IPCRootPort"]
+        )
+
         conn = None
+        reconnect = False
         while conn is None:
             try:
-                #print("Try to connect to root:")
-                root_address = (
-                    self.settings["network"]["IPRootAddress"],
-                    self.settings["network"]["IPCRootPort"]
-                )
+                if reconnect:
+                    print("Try to connect to root:")
                 conn = Client(
                     root_address,
                     authkey=self.settings["network"]["IPCSecret"]
                 )
             except IOError:
-                self.spine.log.exception("root not found")
-                #print ("root not found")
+                self.spine.log.debug("root not found")
+                reconnect = True
+                print("root not found")
                 time.sleep(1)
-        #print("root found and connected")
+        if reconnect:
+            print("root found and connected")
         conn.send({"messageType":"registerProcess", "address":self.address})
         self.add_process_connection(conn, root_address, True)
 
@@ -205,7 +210,7 @@ class _ProcessSpine(object):
                     self.add_process_connection(conn, process)
                 except:
                     self.spine.log.exception("error add_process_connection")
-                    print ("error connection to:", process, "from:", self.address)
+                    print("error connection to:", process, "from:", self.address)
 
     def connection_terminated(self, connection):
         try:
@@ -235,55 +240,73 @@ class _ProcessSpine(object):
         self.process_connections += [conn_thread]
         conn_thread.start()
 
-        injected_commands = []
-        for ijc in self.handlers["command"]:
-            injected_commands += [{"command":ijc.command, "matched":False, "src":ijc.src}]
-        for cmd in self.spine.get_commands():
-            found = False
-            for ic in injected_commands:
-                if ic["command"] == cmd and ic["src"] == src and not ic["matched"]:
-                    found = True
-                    ic["matched"] = True
+        self.spine.log.debug("send rq to {1} clist:{0}", self.spine.get_commands(), src)
+        for command in self.spine.get_commands():
+            injected_count = 0
+            handlers = self.spine.get_command_handlers(command)
 
-            if not found:
-                conn.send({"messageType":"registerCommandHandler", "command":cmd})
+            for handler in handlers:
+                self.spine.log.debug("send rq handlers:{0}", handler)
+                for ijc in self.handlers["command"]:
+                    if ijc.on_command == handler:
+                        injected_count += 1
 
+            if injected_count < len(handlers):
+                conn.send({"messageType":"registerCommandHandler", "command":command})
 
-        injected_queries = []
-        for ijq in self.handlers["query"]:
-            injected_queries += [{"query":ijq.query, "matched":False, "src":ijq.src}]
-
-        self.spine.log.debug("send rq to {2} qlist:{0} iq:{1}", self.spine.get_queries(), injected_queries, src)
+        self.spine.log.debug("send rq to {1} qlist:{0}", self.spine.get_queries(), src)
         for query in self.spine.get_queries():
-            found = False
-            for iq in injected_queries:
-                if iq["query"] == query and iq["src"] == src  and not iq["matched"]:
-                    found = True
-                    iq["matched"] = True
+            injected_count = 0
+            handlers = self.spine.get_query_handlers(query)
 
-            if not found:
+            for handler in handlers:
+                self.spine.log.debug("send rq handlers:{0}",handler)
+                for ijq in self.handlers["query"]:
+                    if ijq.on_query == handler:
+                        injected_count += 1
+            
+            if injected_count < len(handlers):
                 conn.send({"messageType":"registerQueryHandler", "query":query})
 
-        injected_events = []
-        for ije in self.handlers["event"]:
-            injected_events += [{"id":ije.id_event, "event":ije.event, "matched":False, "src": ije.src}]
+        # injected_events = []
+        # for ije in self.handlers["event"]:
+        #     injected_events += [{"id":ije.id_event, "event":ije.event, "matched":False, "src": ije.src}]
 
+        # for event in self.spine.get_events():
+        #     path = event.split("/")
+        #     event_name = path[0]
+        #     event_id = None
+        #     if len(path) > 1:
+        #         event_id = path[1]
+        #     found = False
+        #     for ie in injected_events:
+        #         if ie["id"] == event_id and ie["event"] == event_name and not ie["matched"]:
+        #             found = True
+        #             ie["matched"] = True
+
+        #     if not found:
+        #         conn.send(
+        #             {"messageType":"registerEventHandler", "eventId":event_id, "event":event_name}
+        #         )
+        self.spine.log.debug("send rq to {1} elist:{0}", self.spine.get_events(), src)
         for event in self.spine.get_events():
             path = event.split("/")
             event_name = path[0]
             event_id = None
             if len(path) > 1:
                 event_id = path[1]
-            found = False
-            for ie in injected_events:
-                if ie["id"] == event_id and ie["event"] == event_name and ie["src"] == src and not ie["matched"]:
-                    found = True
-                    ie["matched"] = True
 
-            if not found:
-                conn.send(
-                    {"messageType":"registerEventHandler", "eventId":event_id, "event":event_name}
-                )
+            injected_count = 0
+            handlers = self.spine.get_event_handlers(event_name, event_id)
+
+            for handler in handlers:
+                self.spine.log.debug("send rq handlers:{0}",handler)
+                for ije in self.handlers["event"]:
+                    if ije.on_event == handler:
+                        injected_count += 1
+
+            if injected_count < len(handlers):
+                conn.send({"messageType":"registerEventHandler", "eventId":event_id, "event":event_name})
 
     def close_all_connections(self):
         self.listener.close()

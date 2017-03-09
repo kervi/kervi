@@ -121,10 +121,6 @@ class Dashboard(KerviComponent):
         self.panels += [panel]
 
     def _get_info(self):
-        #import traceback
-        #for line in traceback.format_stack():
-        #    self.spine.log.debug(line.strip())
-
         self.spine.log.debug("get dashboard info:{0}", self.dashboard_id)
         template = None
         import os.path

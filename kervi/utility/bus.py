@@ -17,7 +17,7 @@ except ImportError:
 from  kervi.kervi_logging import KerviLog
 
 class _QueryThread(threading.Thread):
-    def __init__(self, handler, query, args, **kwargs):
+    def __init__(self, handler, query, args, spine, **kwargs):
         threading.Thread.__init__(self)
         injected = kwargs.get("injected", "")
         self.daemon = True
@@ -26,6 +26,12 @@ class _QueryThread(threading.Thread):
         self.args = args
         self.result = []
         self.injected = injected
+
+        
+        import traceback
+        #spine.log.debug("qtx:{0}, handler:{1}", self.query, self.handler)
+        #for line in traceback.format_stack():
+        #    spine.log.debug(line.strip())
         
     def run(self):
         self.result = self.handler(self.query, self.args, injected=self.injected)
@@ -161,13 +167,17 @@ class _CQRSBus(object):
         self.log.debug("sendQuery:{0} injected:{1}", query, injected)
         if query == "getQueueInfo":
             return self.get_queue_info()
-        query_thread = _QueryThread(self.query_handler, query, args, injected=injected)
+        query_thread = _QueryThread(self.query_handler, query, args, self, injected=injected)
         self.log.debug("sendQuery thread start:{0}", query_thread)
 
         query_thread.start()
-        query_thread.join()
-        self.log.debug("sendQuery thread done:{0}", query_thread)
-        return query_thread.result
+        query_thread.join(3)
+        if not query_thread.isAlive():
+            self.log.debug("sendQuery thread done:{0}", query_thread)
+            return query_thread.result
+        else:
+            self.log.debug("sendQuery thread timeout, query:{0}", query)
+            return []
 
     def query_handler(self, query, args, **kwargs):
         injected = kwargs.get("injected", "")
@@ -175,19 +185,22 @@ class _CQRSBus(object):
         func_list = self.query_handlers.get_list_data(query)
         self.log.debug("query handler called:{0} injected:{1}, func{2}", query, injected, func_list)
         result = []
-        if func_list:
-            for func in func_list:
-                argspec = inspect.getargspec(func)
-                if not argspec.keywords:
-                    sub_result = func(*args)
-                    if sub_result:
-                        result += [func(*args)]
-                else:
-                    sub_result = func(*args, injected=injected)
-                    if sub_result:
-                        result += [func(*args, injected=injected)]
-        if len(result) == 1:
-            return result[0]
+        try:
+            if func_list:
+                for func in func_list:
+                    argspec = inspect.getargspec(func)
+                    if not argspec.keywords:
+                        sub_result = func(*args)
+                        if sub_result:
+                            result += [sub_result]
+                    else:
+                        sub_result = func(*args, injected=injected)
+                        if sub_result:
+                            result += [sub_result]
+            if len(result) == 1:
+                return result[0]
+        except:
+            self.log.exception("Exception in query")
 
         return result
 
@@ -201,23 +214,26 @@ class _CQRSBus(object):
 
     def event_queue_handler(self, queue_item):
         func_list = self.event_handlers.get_list_data(queue_item['event'])
-        if func_list:
-            for func in func_list:
-                argspec = inspect.getargspec(func)
-                if not argspec.keywords:
-                    func(None, *queue_item['args'])
-                else:
-                    func(None, *queue_item['args'], injected=queue_item["injected"])
-        if queue_item["id"]:
-            func_list = self.event_handlers.get_list_data(queue_item['event']+"/"+queue_item['id'])
+        try:
             if func_list:
                 for func in func_list:
                     argspec = inspect.getargspec(func)
                     if not argspec.keywords:
-                        func(queue_item["id"], *queue_item['args'])
+                        func(None, *queue_item['args'])
                     else:
-                        func(queue_item["id"], *queue_item['args'], injected=queue_item["injected"])
-
+                        func(None, *queue_item['args'], injected=queue_item["injected"])
+            if queue_item["id"]:
+                func_list = self.event_handlers.get_list_data(queue_item['event']+"/"+queue_item['id'])
+                if func_list:
+                    for func in func_list:
+                        argspec = inspect.getargspec(func)
+                        if not argspec.keywords:
+                            func(queue_item["id"], *queue_item['args'])
+                        else:
+                            func(queue_item["id"], *queue_item['args'], injected=queue_item["injected"])
+        except:
+            self.log.exception("Exception in query")
+    
     def get_commands(self):
         return self.cmd_handlers.get_list_names()
 
@@ -226,3 +242,16 @@ class _CQRSBus(object):
 
     def get_events(self):
         return self.event_handlers.get_list_names()
+
+    def get_query_handlers(self, query):
+        return self.query_handlers.get_list_data(query)
+
+    def get_command_handlers(self, command):
+        return self.cmd_handlers.get_list_data(command)
+
+    def get_event_handlers(self, event, id=None):
+        func_list = self.event_handlers.get_list_data(event)
+        if id:
+            func_list += self.event_handlers.get_list_data(event+"/"+id)
+        return func_list
+

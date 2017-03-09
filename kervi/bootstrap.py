@@ -306,7 +306,7 @@ class ApplicationModule(object):
         logging.init_process_logging("kervi-main", self.settings["log"])
         logging.KerviLog("kervi main")
         spine._init_spine("kervi-main")
-        _ProcessSpine(self.settings["network"]["IPCPort"], self.settings)
+        self.process_spine = _ProcessSpine(self.settings["network"]["IPCPort"], self.settings)
         self.spine = spine.Spine()
         hal_driver = hal._load()
         if hal_driver:
@@ -344,5 +344,9 @@ class ApplicationModule(object):
 
 
         print("stopping module")
+
         self.spine.trigger_event("moduleStopped", self.settings["info"]["id"])
+        time.sleep(1)
+        self.process_spine.close_all_connections()
+        process._stop_processes()
         time.sleep(1)
