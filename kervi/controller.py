@@ -32,7 +32,7 @@ class UISelectControllerInput(KerviComponent):
         KerviComponent.__init__(self, select_id, "select", name)
         #self.spine = Spine()
         self.controller = controller
-        
+
         self._persist_value = False
         self.options = []
         self.selected_options = []
@@ -76,37 +76,46 @@ class UISelectControllerInput(KerviComponent):
         if self.persist_value:
             self._on_change_handler(self.settings.retrieve_value("selected_options"), False)
 
-    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+    def link_to_dashboard(self, dashboard_id, panel_id, **kwargs):
         r"""
-        Links this component to a dashboard section.
+        Links this input to a dashboard panel.
 
         :param dashboard_id:
-            id of the dashboard to link to.
-        :type section_id: str
+            Id of the dashboard to link to.
+        :type dashboard_id: str
 
-        :param section_id:
-            id of the section.
-        :type section_id: str
+        :param panel_id:
+            Id of the panel on the dashboard to link to.
+        :type panel_id: str
 
         :param \**kwargs:
-            Use the kwargs below to override default values set in ui_parameters
+            Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
-                In order to make the sections and components align correct a dashboard unit is defined.
-                Default the dashboard unit is a square that is 150 x 150 pixels.
-                The width of the select box is ui_size * dashboard unit size.
-
+            * *size* (``int``) -- The number of dashboard cells the input should occupy horizontal.
+                If size is 0 (default) the input and label will expand to the width of the panel.
+             
             * *type* (``str``) -- Type of select box, dropdown or list.
-            * *link_to_header* (``str``) -- Add this component to header of section.
-            * *icon* (``str``) -- Icon that should be displayed together with label.
+
+            * *link_to_header* (``str``) -- Link this input to header of the panel.
+
+            * *label_icon* (``str``) -- Icon that should be displayed together with label.
+
+            * *label* (``str``) -- Label text, default value is the name of the input.
+
             * *flat* (``bool``) -- Flat look and feel.
+
+            * *inline* (``bool``) -- Display input and label in its actual size
+                If you set inline to true the size parameter is ignored.
+                The input will only occupy as much space as the label and input takes.
+                
+            * *input_size* (``int``) -- width of the select box as a percentage of the total container it sits in.
 
         """
         KerviComponent.link_to_dashboard(
             self,
             dashboard_id,
-            section_id,
+            panel_id,
             **kwargs
             )
 
@@ -207,29 +216,41 @@ class UIButtonControllerInput(KerviComponent):
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
-        Links this component to a dashboard section.
+        Links this input to a dashboard panel.
 
         :param dashboard_id:
-            id of the dashboard to link to.
-        :type section_id: str
+            Id of the dashboard to link to.
+        :type dashboard_id: str
 
-        :param section_id:
-            id of the section.
-        :type section_id: str
+        :param panel_id:
+            Id of the panel on the dashboard to link to.
+        :type panel_id: str
 
         :param \**kwargs:
-            Use the kwargs below to override default values set in ui_parameters
+            Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
-                In order to make the sections and components align correct a dashboard unit is defined.
-                Default the dashboard unit is a square that is 150 x 150 pixels.
-                The width of the select box is ui_size * dashboard unit size.
+            * *size* (``int``) -- The number of dashboard cells the input should occupy horizontal.
+                If size is 0 (default) the input and label will expand to the width of the panel.
+             
+            * *link_to_header* (``str``) -- Link this input to header of the panel.
 
-            * *type* (``str``) -- Type of select box, dropdown or list.
-            * *link_to_header* (``str``) -- Add this component to header of section.
-            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *label_icon* (``str``) -- Icon that should be displayed together with label.
+
+            * *label* (``str``) -- Label text, default value is the name of the input.
+
             * *flat* (``bool``) -- Flat look and feel.
+
+            * *inline* (``bool``) -- Display input and label in its actual size
+                If you set inline to true the size parameter is ignored.
+                The input will only occupy as much space as the label and input takes.
+                
+            * *input_size* (``int``) -- width of the select box as a percentage of the total container it sits in.
+            
+            * *button_text* (``str``) -- Text to display on button. Default is name of button.
+            
+            * *button_icon* (``str``) -- Icon to display on button.
+
 
         """
         KerviComponent.link_to_dashboard(
@@ -360,38 +381,46 @@ class UISwitchButtonControllerInput(KerviComponent):
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
-        Links this component to a dashboard section.
+        Links this input to a dashboard panel.
 
         :param dashboard_id:
-            id of the dashboard to link to.
-        :type section_id: str
+            Id of the dashboard to link to.
+        :type dashboard_id: str
 
-        :param section_id:
-            id of the section.
-        :type section_id: str
+        :param panel_id:
+            Id of the panel on the dashboard to link to.
+        :type panel_id: str
 
         :param \**kwargs:
-            Use the kwargs below to override default values set in ui_parameters
+            Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
-                In order to make the sections and components align correct a dashboard unit is defined.
-                Default the dashboard unit is a square that is 150 x 150 pixels.
-                The width of the select box is ui_size * dashboard unit size.
+            * *size* (``int``) -- The number of dashboard cells the input should occupy horizontal.
+                If size is 0 (default) the input and label will expand to the width of the panel.
+             
+            * *link_to_header* (``str``) -- Link this input to header of the panel.
 
-            * *type* (``str``) -- Type of select box, dropdown or list.
-            * *link_to_header* (``str``) -- Add this component to header of section.
-            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *label_icon* (``str``) -- Icon that should be displayed together with label.
+
+            * *label* (``str``) -- Label text, default value is the name of the input.
+
             * *flat* (``bool``) -- Flat look and feel.
-            * *size* (``int``) -- the size of the button including label and icon. If 0 full width of container
-            * *on_text* (``bool``) -- Text to show on button when on.
-            * *off_text* (``bool``) -- Text to show on button when off.
-            * *on_icon* (``bool``) -- Icon to show on button when on.
-            * *off_icon* (``bool``) -- Icon to show on button when off.
-            * *show_name* (``bool``) -- Show the name of button as label.
-            * *read_only* (``bool``) -- If true the user is not able to change state.
-            * *inline* (``bool``) -- Let the button flow in line with other components.
 
+            * *inline* (``bool``) -- Display input and label in its actual size
+                If you set inline to true the size parameter is ignored.
+                The input will only occupy as much space as the label and input takes.
+                
+            * *input_size* (``int``) -- width of the switch as a percentage of the total container it sits in.
+            
+            * *on_text* (``bool``) -- Text to show on button when on.
+            
+            * *off_text* (``bool``) -- Text to show on button when off.
+            
+            * *on_icon* (``bool``) -- Icon to show on button when on.
+            
+            * *off_icon* (``bool``) -- Icon to show on button when off.
+            
+            * *read_only* (``bool``) -- If true the user is not able to change state.
 
         """
         KerviComponent.link_to_dashboard(
@@ -595,31 +624,41 @@ class UINumberControllerInput(KerviComponent):
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
-        Links this component to a dashboard section.
+        Links this input to a dashboard panel.
 
         :param dashboard_id:
-            id of the dashboard to link to.
-        :type section_id: str
+            Id of the dashboard to link to.
+        :type dashboard_id: str
 
-        :param section_id:
-            id of the section.
-        :type section_id: str
+        :param panel_id:
+            Id of the panel on the dashboard to link to.
+        :type panel_id: str
 
         :param \**kwargs:
-            Use the kwargs below to override default values set in ui_parameters
+            Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
-                In order to make the sections and components align correct a dashboard unit is defined.
-                Default the dashboard unit is a square that is 150 x 150 pixels.
-                The width of the select box is ui_size * dashboard unit size.
+            * *size* (``int``) -- The number of dashboard cells the input should occupy horizontal.
+                If size is 0 (default) the input and label will expand to the width of the panel.
 
-            * *type* (``str``) -- Type of select box, dropdown or list.
-            * *link_to_header* (``str``) -- Add this component to header of section.
-            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *link_to_header* (``str``) -- Link this input to header of the panel.
+
+            * *label_icon* (``str``) -- Icon that should be displayed together with label.
+
+            * *label* (``str``) -- Label text, default value is the name of the input.
+
             * *flat* (``bool``) -- Flat look and feel.
-            * *read_only* (``bool``) -- The user will not be able to change the value of this component.
 
+            * *inline* (``bool``) -- Display input and label in its actual size
+                If you set inline to true the size parameter is ignored.
+                The input will only occupy as much space as the label and input takes.
+
+            * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
+
+            * *value_size* (``int``) -- width of the value area as a percentage of the total container it sits in.
+
+            * *type* (``string``) -- 'vertical_slider' or 'horizontal_slider.
+            
         """
         KerviComponent.link_to_dashboard(
             self,
@@ -819,29 +858,37 @@ class UITextControllerInput(KerviComponent):
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
-        Links this component to a dashboard section.
+        Links this input to a dashboard panel.
 
         :param dashboard_id:
-            id of the dashboard to link to.
-        :type section_id: str
+            Id of the dashboard to link to.
+        :type dashboard_id: str
 
-        :param section_id:
-            id of the section.
-        :type section_id: str
+        :param panel_id:
+            Id of the panel on the dashboard to link to.
+        :type panel_id: str
 
         :param \**kwargs:
-            Use the kwargs below to override default values set in ui_parameters
+            Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
-                In order to make the sections and components align correct a dashboard unit is defined.
-                Default the dashboard unit is a square that is 150 x 150 pixels.
-                The width of the select box is ui_size * dashboard unit size.
+            * *size* (``int``) -- The number of dashboard cells the input should occupy horizontal.
+                If size is 0 (default) the input and label will expand to the width of the panel.
 
-            * *type* (``str``) -- Type of select box, dropdown or list.
-            * *link_to_header* (``str``) -- Add this component to header of section.
-            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *link_to_header* (``str``) -- Link this input to header of the panel.
+
+            * *label_icon* (``str``) -- Icon that should be displayed together with label.
+
+            * *label* (``str``) -- Label text, default value is the name of the input.
+
             * *flat* (``bool``) -- Flat look and feel.
+
+            * *inline* (``bool``) -- Display input and label in its actual size
+                If you set inline to true the size parameter is ignored.
+                The input will only occupy as much space as the label and input takes.
+
+            * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
+
 
         """
         KerviComponent.link_to_dashboard(
@@ -940,29 +987,39 @@ class UIDateTimeControllerInput(KerviComponent):
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
-        Links this component to a dashboard section.
+        Links this input to a dashboard panel.
 
         :param dashboard_id:
-            id of the dashboard to link to.
-        :type section_id: str
+            Id of the dashboard to link to.
+        :type dashboard_id: str
 
-        :param section_id:
-            id of the section.
-        :type section_id: str
+        :param panel_id:
+            Id of the panel on the dashboard to link to.
+        :type panel_id: str
 
         :param \**kwargs:
-            Use the kwargs below to override default values set in ui_parameters
+            Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *ui_size* (``int``) -- Size of the component in dashboard unit size.
-                In order to make the sections and components align correct a dashboard unit is defined.
-                Default the dashboard unit is a square that is 150 x 150 pixels.
-                The width of the select box is ui_size * dashboard unit size.
+            * *size* (``int``) -- The number of dashboard cells the input should occupy horizontal.
+                If size is 0 (default) the input and label will expand to the width of the panel.
 
-            * *type* (``str``) -- Type of select box, dropdown or list.
-            * *link_to_header* (``str``) -- Add this component to header of section.
-            * *icon* (``str``) -- Icon that should be displayed together with label.
+            * *link_to_header* (``str``) -- Link this input to header of the panel.
+
+            * *label_icon* (``str``) -- Icon that should be displayed together with label.
+
+            * *label* (``str``) -- Label text, default value is the name of the input.
+
             * *flat* (``bool``) -- Flat look and feel.
+
+            * *inline* (``bool``) -- Display input and label in its actual size
+                If you set inline to true the size parameter is ignored.
+                The input will only occupy as much space as the label and input takes.
+
+            * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
+
+            * *type* (``str``) -- Kind of input either 'date' or 'time'.
+
 
         """
         KerviComponent.link_to_dashboard(

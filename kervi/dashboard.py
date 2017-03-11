@@ -91,7 +91,7 @@ class Dashboard(KerviComponent):
 
     :Keyword Arguments:
             * *is_default* (``bool``) --
-                If true this dashboard will show up as the active dashboard when UI loads.
+                If true this dashboard will show up as the active dashboard when web dashboards loads.
 
     """
     def __init__(self, dashboard_id, name, **kwargs):
@@ -144,23 +144,3 @@ class Dashboard(KerviComponent):
             #"background": self.background,
             "unitSize": self.unit_size
         }
-
-class Camboard(Dashboard):
-    """
-    A Camboard is a specialized dashboard that has a video feed as background
-    and controllers for pan/tilt at the center of the dashboard.
-
-    :param dashboard_id: Unique id of the dashboard. Used when referencing this dashboard.
-    :type dashboard_id: ``str``
-
-    :param name: Name of the dahsboard used in dashboard menu in UI.
-    :type name: ``str``
-
-    :param camera_id: Id of a camera to use as background.
-    :type camera_id: ``str``
-
-    :param is_default: If true this dashboard will show up as the active dashboard when UI loads.
-    :type is_default: ``bool``
-    """
-    def __init__(self, dashboard_id, name, camera_id, is_default=False):
-        Dashboard.__init__(self, dashboard_id, name, is_default=is_default, camera=camera_id)

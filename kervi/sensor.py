@@ -2,8 +2,9 @@
 # Licensed under MIT
 
 """
-Sensors in Kervi applications are handled via the classes Sensor and SensorThread. 
-The sensor handles sensor settings and reading the values and sensor threads polls the sensor.
+Sensor handling in Kervi is split in two parts. 
+The first part is sensor device drivers that handles physical access to a sensors hardware.
+The second part is the Sensor class that reads a sensor devices and triggers events, store readings to DB.
 """
 
 from datetime import datetime
@@ -25,11 +26,15 @@ class Sensor(KerviComponent):
     :type sensor_id: ``str``
 
     :param name:
-            Name of the sensor. User in UI
+            Name of the sensor. Used in web dashbaords
     :type name: ``str``
 
-    :param \**kwargs:
-            See below
+    :param device:
+        The sensor device that should be monitored. Could be one of the sensors from the kervi device library
+        or a sensor device driver that inherits from kervi.hal.SensorDeviceDriver
+    :type device: ``SensorDeviceDriver``
+
+    
 
     """
     def __init__(self, sensor_id, name, device=None, use_thread=True):
@@ -65,10 +70,11 @@ class Sensor(KerviComponent):
             "icon": None,
             "flat": False,
             "show_value": True,
-            "show_name": True
+            "label": self.name,
+            "label_icon": None
         }
         if use_thread:
-            self._sensor_thread = SensorThread(self, 1)
+            self._sensor_thread = _SensorThread(self, 1)
         else:
             self._sensor_thread = None
 
@@ -97,17 +103,17 @@ class Sensor(KerviComponent):
         self._save_to_db = value
 
     @property
-    def store_delta(self):
+    def delta(self):
         """
-        Enter how much a sensor value should change between readings before
-        the method new_sensor_reading triggers db saving.
+        Enter how much a sensor value should change to trigger a new sensor read response.
+        The method new_sensor_reading triggers db saving.
         Only relevant if persist_to_db is True.
         :type: ``float``
         """
         return self._store_delta
 
-    @store_delta.setter
-    def store_delta(self, value):
+    @delta.setter
+    def delta(self, value):
         self._store_delta = value
 
     @property
@@ -230,7 +236,7 @@ class Sensor(KerviComponent):
 
     @property
     def device(self):
-        """A hardware device from the kervi device library."""
+        """A hardware device from the kervi device library. Or a class that inherits from kervi.hal.SensorDeviceDriver"""
         return self._device
 
     @device.setter
@@ -267,10 +273,11 @@ class Sensor(KerviComponent):
             * *type* (``str``) -- One of the following values *radial_gauge*, *vertical_gauge*, *horizontal_gauge*, *chart* or *value*.
             * *chart_points* (``int``) -- Maximun number of points in the chart.
             * *show_sparkline* (``bool``) -- Show a sparkline next to the value.
-            * *add_to_header* (``bool``) -- Place the sensor in the header of the section.
+            * *link_to_header* (``bool``) -- Place the sensor in the header of the section.
             * *icon* (``bool``) -- Icon to show. All Font Awesome icons are valid just enter the name of the icon without *fa-*.
             * *flat* (``bool``) -- Shows the sensor with out any 3d effect.
             * *show_value* (``bool``) -- Show the numeric value and unit.
+            * *label* (``bool``) -- Show the numeric value and unit.
         """
 
         KerviComponent.link_to_dashboard(self, dashboard_id, section_id, **kwargs)
@@ -294,14 +301,14 @@ class Sensor(KerviComponent):
             return False
         elif self._old_val is None:
             return True
-        elif value >= self._old_val + self.store_delta:
+        elif value >= self._old_val + self.delta:
             return True
-        elif value <= self._old_val - self.store_delta:
+        elif value <= self._old_val - self.delta:
             return True
         else:
             return False
 
-    def new_sensor_reading(self, value):
+    def _new_sensor_reading(self, value):
         """
         Call this method to signal a new sensor reading.
         This method handles DB storage and triggers different events.
@@ -333,24 +340,9 @@ class Sensor(KerviComponent):
             self._last_reading = time.clock()
 
     def _read_sensor(self):
-        if self._device is None:
-            self.read_sensor()
-        else:
-            self.new_sensor_reading(self._device.read_value())
+        self._new_sensor_reading(self._device.read_value())
 
-    def read_sensor(self):
-        """
-            Abstract method that must be implementd if no device is set.
-            This method is called by the sensor thread on regular intervals.
-
-            There is no need to implement own polling systems or call time.sleep this
-            is handles by the calling sensor thread.
-
-            Use the method new_sensor_reading to store the value.
-        """
-        pass
-
-class SensorThread(KerviThread):
+class _SensorThread(KerviThread):
     r"""
     SensorThread is the base class that  polls sensors.
     Add one or more sensors and set polling interval.
@@ -380,7 +372,7 @@ class SensorThread(KerviThread):
             self.sensors = [sensors]
 
     def new_sensor_reading(self, value, sensor_idx=0):
-        self.sensors[sensor_idx].new_sensor_reading(value)
+        self.sensors[sensor_idx]._new_sensor_reading(value)
 
     def _step(self):
         for sensor in self.sensors:

@@ -1,4 +1,4 @@
 Devices API
 -----------------------------
-.. automodule:: kervi.sensor
+.. automodule:: kervi.hal
    :members:

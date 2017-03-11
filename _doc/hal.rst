@@ -182,3 +182,4 @@ Hal API
 
    hal_gpio_api
    hal_i2c_api
+   hal_devices_api

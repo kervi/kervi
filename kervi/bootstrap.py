@@ -108,16 +108,12 @@ class Application(object):
         },
         "modules":["sensors","controllers"],
         "network":{
-            "IPCRootPort":9500,
-            "WebSocketPort":9000,
-            "UIPort":"2222",
-            "IPCRoot":(nethelper.getIPAddress(),9500),
+            "IPAddress": "ip address of device",
+            "IPRootAddress": nethelper.get_ip_address(),
+            "IPCRootPort": 9500),
+            "WebSocketPort":9000),
+            "WebPort": 80,
             "IPCSecret":b"The secret"
-        },
-        "web-ui":{
-            "address":((nethelper.getIPAddress(),4444)),
-
-
         }
     })
     APP.run()
@@ -259,17 +255,27 @@ class Application(object):
 class ApplicationModule(object):
     """
     Kervi application module that is used to start a module that connects to at running instance of
-    a Kervi application. Settings for is a dictionary on the following form:
+    a Kervi application. Settings for amodule is a dictionary on the following form:
 
     MODULE=ApplicationModule(
-        "testmodule",
-        {
+        "info":{
+                "id":"kervi_module",
+                "name":"Kervi module",
+                "appKey":"",
+            },
+            "log" : {
+                "level":"debug",
+                "file":"kervi.log",
+                "resetLog":False
+            },
+            "modules":[],
             "network":{
-                "IPCPort":9600,
-                "IPCRoot":(nethelper.getIPAddress(),9500),
-                "IPCSecret":"The secret"
+                "IPRootAddress": nethelper.get_ip_address(),
+                "IPCRootPort":9500,
+                "IPAddress": nethelper.get_ip_address(),
+                "IPCPort":nethelper.get_free_port([9600]),
+                "IPCSecret":b"12345"
             }
-        }
     )
 
     """
