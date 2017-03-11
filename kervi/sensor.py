@@ -71,7 +71,8 @@ class Sensor(KerviComponent):
             "flat": False,
             "show_value": True,
             "label": self.name,
-            "label_icon": None
+            "label_icon": None,
+            "inline": False
         }
         if use_thread:
             self._sensor_thread = _SensorThread(self, 1)
@@ -247,40 +248,54 @@ class Sensor(KerviComponent):
         if self.component_id == id:
             return self._old_val
 
-    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+    def link_to_dashboard(self, dashboard_id, panel_id, **kwargs):
         r"""
         Links the sensor to a dashboard.
 
-        :param dashboard_id:
-                Id of the dashboard to link to.
+        :param dashboard_id: Id of the dashboard to link to.
                 Enter a * if the sensor should be linked to all dashboards.
         :type dashboard_id: ``str``
 
-        :param section_id:
-                Id of the section to link to.
-                This is the id of a section you have added your self to a dashboard or one of the
-                system sections *sys-header*, *header* or *footer*
-        :type section_id: ``str``
+        :param panel_id:  Id of the panel to link to.
+                This is the id of a panel you have added your self to a dashboard or one of the
+                system panels *sys-header*, *header* or *footer*
+        :type panel_id: ``str``
 
         :param \**kwargs:
                 See below
 
         :Keyword Arguments:
-            * *size* (``int``) -- How many cells should the sensor occupy in the dashboard section.
-                The actual size depends on the *type* a radia gauge of size 2 fills 2*2 cells.
-                A vertical gauge is 2 cells heigh and 1 cell wide. 
-                If size is 0 it will be as wide as the section.  
+            :Keyword Arguments:
+            * *size* (``int``) -- The number of dashboard cells the sensor should occupy horizontal or vertical.
+                If size is 0 (default) the input and label will expand to the width of the panel.
+
+            * *link_to_header* (``str``) -- Link this input to header of the panel.
+
+            * *label_icon* (``str``) -- Icon that should be displayed together with label. 
+                All Font Awesome icons are valid just enter the name of the icon without *fa-*
+
+            * *label* (``str``) -- Label text, default value is the name of the sensor.
+
+            * *flat* (``bool``) -- Flat look and feel.
+
+            * *inline* (``bool``) -- Display value, sparkline and label in its actual size
+                If you set inline to true the size parameter is ignored.
+                The input will only occupy as much space as the label and sensor takes.
+
             * *type* (``str``) -- One of the following values *radial_gauge*, *vertical_gauge*, *horizontal_gauge*, *chart* or *value*.
+
             * *chart_points* (``int``) -- Maximun number of points in the chart.
+
             * *show_sparkline* (``bool``) -- Show a sparkline next to the value.
-            * *link_to_header* (``bool``) -- Place the sensor in the header of the section.
+
             * *icon* (``bool``) -- Icon to show. All Font Awesome icons are valid just enter the name of the icon without *fa-*.
-            * *flat* (``bool``) -- Shows the sensor with out any 3d effect.
+
             * *show_value* (``bool``) -- Show the numeric value and unit.
+
             * *label* (``bool``) -- Show the numeric value and unit.
         """
 
-        KerviComponent.link_to_dashboard(self, dashboard_id, section_id, **kwargs)
+        KerviComponent.link_to_dashboard(self, dashboard_id, panel_id, **kwargs)
 
     def _get_info(self):
         return {
