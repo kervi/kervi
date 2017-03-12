@@ -15,7 +15,7 @@ In your application you access GPIO via:
 class IGPIODeviceDriver(object):
     """
     """
-    def define_as_input(self, channel):
+    def define_as_input(self, channel, pullup=False):
         """Define a channel as input"""
         raise NotImplementedError
 
@@ -59,6 +59,18 @@ class IGPIODeviceDriver(object):
 
         """
         raise NotImplementedError
+
+    def set_channels(self, channels):
+        """Sets the state of multiple channels in one operation.
+
+        :param channels:
+            A dictionary where keys are channels and values the value to set for each channel.
+
+        :type channels: ``dict``
+
+        """
+        for key in channels:
+            self.set(key, channels[key])
 
     def get(self, channel):
         """

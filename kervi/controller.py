@@ -732,7 +732,7 @@ class AnalogGPIOControllerInput(UINumberControllerInput):
 
     """
     def __init__(self, button_id, name, controller, channel, gpio_device=GPIO):
-        UINumberControllerInput.__init__(self, button_id, name)
+        UINumberControllerInput.__init__(self, button_id, name, controller)
         self.channel = channel
         self.gpio = gpio_device
         self.set_ui_parameter("read_only", True)

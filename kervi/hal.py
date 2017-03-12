@@ -1,6 +1,7 @@
 # Copyright (c) 2016, Tim Wentzlau
 # Licensed under MIT
 """Hardware abstraction layer"""
+import time
 from kervi.utility.hal import gpio
 from kervi.utility.hal import i2c
 from kervi.spine import Spine
@@ -11,13 +12,20 @@ import importlib
 _DRIVER = None
 GPIO = None
 
-
 def get_gpio(gpio_type=None):
     if gpio_type == None:
         return _DRIVER.get_gpio_driver()
 
-def I2C(address, bus=0):
+
+def default_i2c_bus():
+    if _DRIVER:
+        return _DRIVER.default_i2c_bus()
+    return 0
+
+def i2c(address, bus=default_i2c_bus()):
     return _DRIVER.get_i2c_driver(address, bus)
+
+
 
 def get_camera_driver(source = None):
     return _DRIVER.get_camera_driver(source)
@@ -88,13 +96,14 @@ class I2CSensorDeviceDriver(SensorDeviceDriver):
     def __init__(self, address, bus):
         if address > 0x77:
             raise I2CaddressOutOfBoundsError(self, device_name, address)
-        self.i2c = I2C(address, bus)
+        self.i2c = i2c(address, bus)
 
 class I2CGPIODeviceDriver(gpio.IGPIODeviceDriver):
     def __init__(self, address, bus):
+        gpio.IGPIODeviceDriver.__init__(self)
         if address > 0x77:
             raise I2CaddressOutOfBoundsError(self, device_name, address)
-        self.i2c = I2C(address, bus)
+        self.i2c = i2c(address, bus)
 
     @property
     def device_name(self):
@@ -104,10 +113,15 @@ class I2CGPIODeviceDriver(gpio.IGPIODeviceDriver):
     def num_gpio(self):
         return 0
 
+    def _bit2(self, src, bit, val):
+        bit = 1 << bit
+        return (src | bit) if val else (src & ~bit)
+
+
     def _validate_channel(self, channel):
         # Raise an exception if pin is outside the range of allowed values.
-        if pin < 0 or pin >= self.NUM_GPIO:
-            raise DeviceChannelOutOfBoundsError(channel)
+        if channel < 0 or channel >= self.num_gpio:
+            raise DeviceChannelOutOfBoundsError(self.device_name, channel)
 
 class ChannelPollingThread(KerviThread):
     def __init__(self, channel, device, callback, polling_time=.1):
@@ -116,19 +130,19 @@ class ChannelPollingThread(KerviThread):
         self._channel = channel
         self._device = device
         self._value = None
-        self._polling_time = bounce_time
+        self._polling_time = polling_time
         self.alive = False
-        self.spine = spine.Spine()
+        self.spine = Spine()
         if self.spine:
             self.spine.register_command_handler("startThreads", self._start_command)
             self.spine.register_command_handler("stopThreads", self._stop_command)
 
-    def run(self):
+    def _step(self):
         """Private method do not call it directly or override it."""
         try:
             new_value = self._device.get(self._channel)
             if new_value != self._value:
-                self._callback(new_value, self._value)
+                self._callback(new_value)
                 self._value = new_value
             time.sleep(self._polling_time)
         except:
