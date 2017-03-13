@@ -7,10 +7,12 @@ import socket
 
 def get_ip_address():
     """ returns ip addres of this device bound to primary net adapter """
-    _socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    _socket.connect(('google.com', 0))
-    return _socket.getsockname()[0]
-
+    try:
+        _socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        _socket.connect(('google.com', 0))
+        return _socket.getsockname()[0]
+    except:
+        return "localhost"
 def get_free_port(preferred_ports = None):
     """ returns a free port """
 

@@ -13,12 +13,11 @@ setup(
     packages=[
         'kervi',
         'kervi/utility',
-        'kervi/utility/hal',
-        'kervi/core_sensors',
-        'kervi/core_sensors/cpu_sensors'],
+        'kervi/hal'
+    ],
     version=VERSION,
     description="""
-    A python framework for creating robotic and automation applications on raspberypi (and other platforms).
+    A python framework for creating robotic and automation applications on Raspbery pi (and other platforms).
     UI is web based and generated on the fly based on configuration in python code.
     """,
     author='Tim Wentzlau',
