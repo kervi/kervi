@@ -1072,6 +1072,7 @@ class Controller(KerviComponent):
     def __init__(self, controller_id, name):
         KerviComponent.__init__(self, controller_id, "controller", name)
         self.components = []
+        self._active = True
         self.type = "unknown"
         self.parameters = {}
         self._ui_parameters = {
@@ -1082,6 +1083,7 @@ class Controller(KerviComponent):
             "flat": False,
             "inline": False
         }
+        self.spine.register_event_handler("processTerminating",self._on_terminate)
 
     
     @property
@@ -1126,6 +1128,22 @@ class Controller(KerviComponent):
         for component in args:
             self.components += [component]
             component._load_persisted()
+
+    def _on_terminate(self, id):
+        if self._active:
+            self._active = False
+            try:
+                self.spine.log("exit controller:{0}", self.component_id)
+            except:
+                pass
+            finally:
+                self.exit()
+
+    def exit(self):
+        """
+        Abstract method that is called when the kervi application stops.
+        """
+        pass
 
     def input_changed(self, changed_input):
         """

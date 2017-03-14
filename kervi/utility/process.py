@@ -34,17 +34,23 @@ class _KerviProcess(object):
         self.spine.register_command_handler("terminateProcess", self.terminate)
 
     def terminate(self):
-        print ("terminate:", self.port)
-        self.process_spine.close_all_connections()
-        self.spine.stop()
-        self.terminate_process()
+        self.spine.log.debug("do terminate:{0}", self.port)
+        #print("terminate:", self.port)
         self.do_terminate = True
 
     def init_process(self):
         self.spine.log.error("abstract init_process called in KerviProcess")
 
+    def _terminate_process(self):
+        self.terminate_process()
+        self.spine.trigger_event("processTerminating", None, scope="process")
+        time.sleep(5)
+        self.process_spine.close_all_connections()
+        self.spine.log.info("process terminated:{0}", self.port)
+        self.spine.stop()
+
     def terminate_process(self):
-        self.spine.log.error("abstract init_process called in KerviProcess")
+        pass
 
 def _launch(name, process_class, settings, ipc_port):
     k_logging.init_process_logging(name, settings["log"])
@@ -58,8 +64,10 @@ def _launch(name, process_class, settings, ipc_port):
         pass
     except:
         log.exception("error in process loop")
+        pass
 
-    log.info("process terminated:{0}", ipc_port)
+    process._terminate_process()
+
 
 def _start_process(name, settings, port_idx, process_class):
     process = Process(target=_launch, args=(name, process_class, settings, port_idx))

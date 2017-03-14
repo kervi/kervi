@@ -44,7 +44,7 @@ class _KerviSensors(process._KerviProcess):
         except ImportError:
             self.spine.log.exception("load sensors")
         import kervi.utility.storage
-        self.spine.send_command("startThreads")
+        self.spine.send_command("startThreads", scope="process")
 
     def terminate_process(self):
         pass
@@ -59,7 +59,7 @@ class _KerviControllers(process._KerviProcess):
             import controllers
         except ImportError:
             self.spine.log.exception("load controllers")
-        self.spine.send_command("startThreads")
+        self.spine.send_command("startThreads", scope="process")
 
     def terminate_process(self):
         pass
@@ -73,7 +73,7 @@ class _KerviCams(process._KerviProcess):
             import cams
         except ImportError:
             self.spine.log.exception("load cams")
-        self.spine.send_command("startThreads")
+        self.spine.send_command("startThreads", scope="process")
 
     def terminate_process(self):
         pass
@@ -244,9 +244,9 @@ class Application(object):
         except KeyboardInterrupt:
             pass
 
-
-        print("stopping processes")
         webserver.stop()
+        time.sleep(2)
+        print("stopping processes")
         process._stop_processes()
         time.sleep(2)
         process._stop_root_spine()

@@ -46,6 +46,7 @@ setup(
     install_requires=[
         'kervi-ui',
         'kervi-cli',
+        'kervi-hal-generic',
         'kervi-device-library',
         'autobahn',
         'pillow'

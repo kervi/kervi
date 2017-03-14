@@ -20,12 +20,15 @@ class _QueryThread(threading.Thread):
     def __init__(self, handler, query, args, spine, **kwargs):
         threading.Thread.__init__(self)
         injected = kwargs.get("injected", "")
+        scope = kwargs.get("scope", "global")
+        
         self.daemon = True
         self.handler = handler
         self.query = query
         self.args = args
         self.result = []
         self.injected = injected
+        self.scope = scope
 
         
         import traceback
@@ -34,7 +37,7 @@ class _QueryThread(threading.Thread):
         #    spine.log.debug(line.strip())
         
     def run(self):
-        self.result = self.handler(self.query, self.args, injected=self.injected)
+        self.result = self.handler(self.query, self.args, injected=self.injected, scope=self.scope)
 
 class _CQRSQueue(KerviThread):
     def __init__(self, name):
@@ -144,9 +147,10 @@ class _CQRSBus(object):
 
     def send_command(self, command, *args, **kwargs):
         injected = kwargs.get("injected", "")
-        self.log.debug("sendcommand:{0} injected:{1}", command, injected)
+        scope = kwargs.get("scope", "global")
+        self.log.debug("sendcommand:{0} injected:{1} scope:{2}", command, injected, scope)
         self.cmd_queue.add(
-            {"command":command, "args":args, "injected":injected}, kwargs.get("priority", 2)
+            {"command":command, "args":args, "injected":injected, "scope":scope}, kwargs.get("priority", 2)
         )
 
     def command_queue_handler(self, queue_item):
@@ -158,16 +162,17 @@ class _CQRSBus(object):
                     if not argspec.keywords:
                         func_handler(*queue_item['args'])
                     else:
-                        func_handler(*queue_item['args'], injected=queue_item["injected"])
+                        func_handler(*queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"])
                 except:
                     self.log.exception("commandQueueHandler error:"+queue_item['command'])
 
     def send_query(self, query, *args, **kwargs):
         injected = kwargs.get("injected", "")
-        self.log.debug("sendQuery:{0} injected:{1}", query, injected)
+        scope = kwargs.get("scope", "global")
+        self.log.debug("sendQuery:{0} injected:{1} scope:{2}", query, injected, scope)
         if query == "getQueueInfo":
             return self.get_queue_info()
-        query_thread = _QueryThread(self.query_handler, query, args, self, injected=injected)
+        query_thread = _QueryThread(self.query_handler, query, args, self, injected=injected, scope=scope)
         self.log.debug("sendQuery thread start:{0}", query_thread)
 
         query_thread.start()
@@ -181,9 +186,11 @@ class _CQRSBus(object):
 
     def query_handler(self, query, args, **kwargs):
         injected = kwargs.get("injected", "")
+        scope = kwargs.get("scope", "global")
+
         #self.log.debug("query handler called:{0} injected:{1}", query, injected)
         func_list = self.query_handlers.get_list_data(query)
-        self.log.debug("query handler called:{0} injected:{1}, func{2}", query, injected, func_list)
+        self.log.debug("query handler called:{0} injected:{1}, func:{2}", query, injected, func_list)
         result = []
         try:
             if func_list:
@@ -194,7 +201,7 @@ class _CQRSBus(object):
                         if sub_result:
                             result += [sub_result]
                     else:
-                        sub_result = func(*args, injected=injected)
+                        sub_result = func(*args, injected=injected, scope=scope)
                         if sub_result:
                             result += [sub_result]
             if len(result) == 1:
@@ -206,9 +213,10 @@ class _CQRSBus(object):
 
     def trigger_event(self, event, id, *args, **kwargs):
         injected = kwargs.get("injected", "")
-        self.log.debug("triggerEvent:{0}, id:{1} injected:{2}", event, id, injected)
+        scope = kwargs.get("scope", "global")
+        self.log.debug("triggerEvent:{0}, id:{1} injected:{2}, scope:{3}", event, id, injected, scope)
         self.event_queue.add(
-            {'event':event, 'id':id, 'args':args, "injected":injected},
+            {'event':event, 'id':id, 'args':args, "injected":injected, "scope":scope},
             kwargs.get("priority", 2)
         )
 
@@ -221,7 +229,7 @@ class _CQRSBus(object):
                     if not argspec.keywords:
                         func(None, *queue_item['args'])
                     else:
-                        func(None, *queue_item['args'], injected=queue_item["injected"])
+                        func(None, *queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"])
             if queue_item["id"]:
                 func_list = self.event_handlers.get_list_data(queue_item['event']+"/"+queue_item['id'])
                 if func_list:
@@ -230,7 +238,7 @@ class _CQRSBus(object):
                         if not argspec.keywords:
                             func(queue_item["id"], *queue_item['args'])
                         else:
-                            func(queue_item["id"], *queue_item['args'], injected=queue_item["injected"])
+                            func(queue_item["id"], *queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"])
         except:
             self.log.exception("Exception in query")
     
