@@ -24,6 +24,7 @@ def _stop_root_spine():
 
 class _KerviProcess(object):
     def __init__(self, name, settings, ipcPort):
+        self.name = name
         self.do_terminate = False
         self.port = ipcPort
         self.settings = settings

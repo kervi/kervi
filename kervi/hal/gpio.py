@@ -12,9 +12,48 @@ In your application you access GPIO via:
     GPIO.define_as_input(23)
 """
 
+class GPIOChannel(object):
+    def __init__(self, gpio_device, channel):
+        self._device = gpio_device
+        self._channel = channel
+
+    def get(self):
+        return self._device.get(self, self._channel)
+
+    def set(self, value):
+        self._device.set(self._channel, value)
+
+    def define_as_input(self, pullup=False):
+        self._device.define_as_input(self._channel, pullup)
+
+    def define_as_output(self):
+        self._device.define_as_output(self._channel)
+
+    def define_as_pwm(self, frequency, duty_cycle=None):
+        self._device.define_as_pwm(self._channel, frequency, duty_cycle)
+
+    def listen(self, callback, bounce_time=.2):
+        self._device.listen(self._channel, callback, bounce_time)
+
+    def listen_rising(self, callback):
+        self._device.listen_rising(self._channel, callback)
+
+    def listen_falling(self, callback):
+        self._device.listen_faling(self._channel, callback)
+
+    def pwm_start(self, duty_cycle=None, frequency=None):
+        self._device.pwm_start(self._channel, duty_cycle, frequency)
+
+    def pwm_stop(self, channel):
+        self._device.pwm_stop(self._channel)
+
 class IGPIODeviceDriver(object):
     """
     """
+
+    def __getitem__(self, channel):
+        return GPIOChannel(self, channel)
+
     def define_as_input(self, channel, pullup=False):
         """Define a channel as input"""
         raise NotImplementedError

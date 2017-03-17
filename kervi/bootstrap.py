@@ -17,7 +17,7 @@ from kervi.utility.process_spine import _ProcessSpine
 import kervi.kervi_logging as logging
 import kervi_ui.webserver as webserver
 import kervi.utility.nethelper as nethelper
-import kervi.hal as hal
+
 
 def _deep_update(d, u):
     """Update a nested dictionary or similar mapping.
@@ -33,46 +33,18 @@ def _deep_update(d, u):
             d[k] = u[k]
     return d
 
-class _KerviSensors(process._KerviProcess):
-    """ Private class that starts a seperate process that loads sensors in the Kervi application """
+class _KerviModuleLoader(process._KerviProcess):
+    """ Private class that starts a seperate process that loads a module in the Kervi application """
     def init_process(self):
-        print("load sensors")
+        print("load:", self.name)
         #import kervi.core_sensors.cpu_sensors
-        try:
-            hal._load()
-            import sensors
-        except ImportError:
-            self.spine.log.exception("load sensors")
-        import kervi.utility.storage
-        self.spine.send_command("startThreads", scope="process")
-
-    def terminate_process(self):
-        pass
-
-class _KerviControllers(process._KerviProcess):
-    """ Private class that starts a seperate process that loads controllers in the Kervi application """
-    def init_process(self):
-        print("load controllers")
         try:
             import kervi.hal as hal
             hal._load()
-            import controllers
+            __import__(self.name, fromlist=[''])
         except ImportError:
-            self.spine.log.exception("load controllers")
-        self.spine.send_command("startThreads", scope="process")
-
-    def terminate_process(self):
-        pass
-
-class _KerviCams(process._KerviProcess):
-    """ Private class that starts a seperate process that loads cam controllers in the Kervi application """
-    def init_process(self):
-        print("load cameras")
-        try:
-            hal._load()
-            import cams
-        except ImportError:
-            self.spine.log.exception("load cams")
+            self.spine.log.exception("load module:{0}", self.name)
+        #import kervi.utility.storage
         self.spine.send_command("startThreads", scope="process")
 
     def terminate_process(self):
@@ -82,7 +54,7 @@ class _KerviSocketIPC(process._KerviProcess):
     """ Private class that starts a seperate process for IPC communication in the Kervi application """
 
     def init_process(self):
-        print ("load interprocess communication")
+        print("load interprocess communication")
         import kervi.utility.socket_spine as socketSpine
         time.sleep(2)
         socketSpine._start(self.settings)
@@ -156,7 +128,9 @@ class Application(object):
         #spine._init_spine("application-" + self.settings["info"]["id"])
         self.spine = spine.Spine()
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
-
+        self._module_processes=[]
+        
+        import kervi.hal as hal
         hal_driver = hal._load()
         if hal_driver:
             print("Using HAL driver:", hal_driver)
@@ -176,41 +150,30 @@ class Application(object):
         except ImportError:
             pass
 
+        import kervi.utility.storage
+        
+        module_port = self.settings["network"]["IPCRootPort"]
         for module in self.settings["modules"]:
-            if module == "sensors":
-                time.sleep(2)
-                self.p1 = process._start_process(
-                    "sensors",
+            module_port += 1
+            self._module_processes+=[
+                process._start_process(
+                    module,
                     self.settings,
-                    self.settings["network"]["IPCRootPort"]+1,
-                    _KerviSensors
+                    module_port,
+                    _KerviModuleLoader
                 )
+            ]
+            time.sleep(2)
 
-            elif module == "controllers":
-                time.sleep(2)
-                self.p2 = process._start_process(
-                    "Controllers",
-                    self.settings,
-                    self.settings["network"]["IPCRootPort"]+2,
-                    _KerviControllers
-                )
-            elif module == "cams":
-                time.sleep(2)
-                self.p2 = process._start_process(
-                    "cams",
-                    self.settings,
-                    self.settings["network"]["IPCRootPort"]+3,
-                    _KerviCams
-                )
-
-        time.sleep(2)
-
-        self.p3 = process._start_process(
-            "IPC",
-            self.settings,
-            self.settings["network"]["IPCRootPort"]+4,
-            _KerviSocketIPC
-        )
+        module_port += 1
+        self._module_processes += [
+            process._start_process(
+                "IPC",
+                self.settings,
+                module_port,
+                _KerviSocketIPC
+            )
+        ]
 
         time.sleep(2)
 

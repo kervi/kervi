@@ -15,8 +15,10 @@ kervi\spine.py
 kervi\version.py
 kervi\vision.py
 kervi/hal\__init__.py
+kervi/hal\dc_motor_controller.py
 kervi/hal\gpio.py
 kervi/hal\i2c.py
+kervi/hal\servo_motor_controller.py
 kervi/utility\__init__.py
 kervi/utility\bus.py
 kervi/utility\component.py

@@ -12,9 +12,29 @@ import importlib
 _DRIVER = None
 GPIO = None
 
+def _load():
+    global GPIO, _DRIVER
+
+    if not _DRIVER:
+        installed_packages = pip.get_installed_distributions()
+        flat_installed_packages = [package.project_name for package in installed_packages]
+        known_drivers = [
+            ("kervi-hal-win", "kervi_hal_win"),
+            ("kervi-hal-linux", "kervi_hal_linux"),
+            ("kervi-hal-rpi", "kervi_hal_rpi"),
+            ("kervi-hal-generic", "kervi_hal_generic")
+        ]
+        for driver_name, module_name in known_drivers:
+            if driver_name in flat_installed_packages:
+                _DRIVER = importlib.import_module(module_name)
+                GPIO = get_gpio()
+                return driver_name
+
+
 def get_gpio(gpio_type=None):
     if gpio_type == None:
         return _DRIVER.get_gpio_driver()
+
 
 
 def default_i2c_bus():
@@ -30,23 +50,9 @@ def i2c(address, bus=default_i2c_bus()):
 def get_camera_driver(source = None):
     return _DRIVER.get_camera_driver(source)
 
-def _load():
-    global GPIO, _DRIVER
+#if not _DRIVER:
+#    _load()
 
-    if not _DRIVER:
-        installed_packages = pip.get_installed_distributions()
-        flat_installed_packages = [package.project_name for package in installed_packages]
-        known_drivers = [
-            ("kervi-hal-win", "kervi_hal_win"),
-            ("kervi-hal-win", "kervi_hal_linux"),
-            ("kervi-hal-rpi", "kervi_hal_rpi"),
-            ("kervi-hal-generic", "kervi_hal_generic")
-        ]
-        for driver_name, module_name in known_drivers:
-            if driver_name in flat_installed_packages:
-                _DRIVER = importlib.import_module(module_name)
-                GPIO = get_gpio()
-                return driver_name
 
 class SensorDeviceDriver(object):
 
