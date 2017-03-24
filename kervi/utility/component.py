@@ -96,7 +96,7 @@ class KerviComponent(object):
         """"
         Adds a message to the user log.
         """
-
+        persist = kwargs.get("persist", False)
         body = kwargs.get("body", None)
         data = kwargs.get("data", None)
         area = kwargs.get("area", None)
@@ -115,7 +115,8 @@ class KerviComponent(object):
             "topic": topic,
             "body": body,
             "timestamp": timestamp,
-            "type": log_type
+            "type": log_type,
+            "persist": persist
         })
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):

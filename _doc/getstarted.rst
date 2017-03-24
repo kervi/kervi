@@ -61,11 +61,7 @@ To create a full kervi application write the following command in the terminal::
 Start application
 -----------------
 
-If you use Raspberry pi you start your new app by executing:: 
-
-    sudo python3 myapp.py
-
-On other platforms you run this command::
+You start your new app by executing:: 
 
     python myapp.py
 

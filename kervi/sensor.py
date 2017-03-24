@@ -56,6 +56,17 @@ class Sensor(KerviComponent):
         self._upper_warning_limit = None
         self._lower_warning_limit = None
         self._lower_fatal_limit = None
+
+        self._upper_fatal_message = None
+        self._upper_warning_message = None
+        self._lower_warning_message = None
+        self._lower_fatal_message = None
+
+        self._normal_message = None
+
+        self._log_warnings = False
+        self._log_errors = False
+
         self._store_delta = 1
         self._save_to_db = True
         self._old_val = None
@@ -180,9 +191,36 @@ class Sensor(KerviComponent):
         """
         return self._upper_fatal_limit
 
+
+    @property
+    def normal_message(self):
+        """
+        Message to log when the sensor value reach normal levels from lower or upper limits.
+
+        :type: ``str``
+        """
+        return self._normal_message
+
+    @normal_message.setter
+    def normal_message(self, value):
+        self._normal_message = value
+
     @upper_fatal_limit.setter
     def upper_fatal_limit(self, value):
         self._upper_fatal_limit = value
+
+    @property
+    def upper_fatal_message(self):
+        """
+        Message to log when the sensor value reach upper_fatal_limit
+
+        :type: ``str``
+        """
+        return self._upper_fatal_message
+
+    @upper_fatal_message.setter
+    def upper_fatal_message(self, value):
+        self._upper_fatal_message = value
 
     @property
     def upper_warning_limit(self):
@@ -198,6 +236,19 @@ class Sensor(KerviComponent):
     @upper_warning_limit.setter
     def upper_warning_limit(self, value):
         self._upper_warning_limit = value
+
+    @property
+    def upper_warning_message(self):
+        """
+        Message to log when the sensor value reach upper_warning_limit
+
+        :type: ``str``
+        """
+        return self._upper_warning_message
+
+    @upper_warning_message.setter
+    def upper_warning_message(self, value):
+        self._upper_warning_message = value
 
     @property
     def lower_warning_limit(self):
@@ -216,6 +267,19 @@ class Sensor(KerviComponent):
         self._lower_warning_limit = value
 
     @property
+    def lower_warning_message(self):
+        """
+        Message to log when the sensor value reach lower_warning_limit
+
+        :type: ``str``
+        """
+        return self._lower_warning_message
+
+    @lower_warning_message.setter
+    def lower_warning_message(self, value):
+        self._lower_warning_message = value
+
+    @property
     def lower_fatal_limit(self):
         """
         If set the sensor will trigger an event *sensorLowerFatal*
@@ -230,6 +294,19 @@ class Sensor(KerviComponent):
     @lower_fatal_limit.setter
     def lower_fatal_limit(self, value):
         self._lower_fatal_limit = value
+
+    @property
+    def lower_fatal_message(self):
+        """
+        Message to log when the sensor value reach lower_fatal_limit
+
+        :type: ``str``
+        """
+        return self._lower_fatal_message
+
+    @lower_fatal_message.setter
+    def lower_fatal_message(self, value):
+        self._lower_fatal_message = value
 
     @property
     def sensor_id(self):
@@ -346,7 +423,7 @@ class Sensor(KerviComponent):
             if self.persist_to_db:
                 self.spine.send_command("StoreSensorValue", val)
             self.spine.trigger_event("NewSensorReading", self.component_id, val)
-            self._old_val = value
+            
             if len(self._sparkline) == 0:
                 self._sparkline += [value]
             elif len(self._sparkline) >= 10:
@@ -354,8 +431,65 @@ class Sensor(KerviComponent):
             self._sparkline += [value]
             self._last_reading = time.clock()
 
+            self._send_messages(self._old_val, value)
+
+
+            self._old_val = value
+
     def _read_sensor(self):
         self._new_sensor_reading(self._device.read_value())
+
+
+    def _send_messages(self, old_val, value):
+        if old_val == None:
+            return
+        if self.lower_fatal_message:
+            if old_val > self.lower_fatal_limit and value <= self.lower_fatal_limit:
+                self.user_log_message(self.lower_fatal_message, level = 1)
+
+        if self.lower_warning_message:
+            if self.lower_fatal_limit and self.lower_warning_limit:
+                if old_val < self.lower_fatal_limit and value >= self.lower_fatal_limit:
+                    self.user_log_message(self.lower_warning_message, level=2)
+
+                elif old_val > self.lower_warning_limit and value <= self.lower_warning_limit:
+                    self.user_log_message(self.lower_warning_message, level=2)
+
+            elif self.lower_warning_limit:
+                if old_val > self.lower_warning_limit and value <= self.lower_warning_limit:
+                    self.user_log_message(self.lower_warning_message, level = 2)
+
+
+        if self.upper_fatal_message:
+            if old_val < self.upper_fatal_limit and value >= self.upper_fatal_limit:
+                self.user_log_message(self.upper_fatal_message, level = 1)
+
+        if self.upper_warning_message:
+            if self.upper_fatal_limit and self.upper_warning_limit:
+                if old_val > self.upper_fatal_limit and value <= self.upper_fatal_limit:
+                    self.user_log_message(self.upper_warning_message, level=2)
+                elif old_val < self.upper_warning_limit and value >= self.upper_warning_limit:
+                    self.user_log_message(self.upper_warning_message, level=2)
+
+
+            elif self.upper_warning_limit:
+                if old_val < self.upper_warning_limit and value >= self.upper_warning_limit:
+                    self.user_log_message(self.upper_warning_message, level = 2)
+        
+        if self.normal_message:
+            if self.upper_warning_limit:
+                if old_val >= self.upper_warning_limit and value < self.upper_warning_limit and value:
+                     self.user_log_message(self.normal_message, level = 3)
+            elif self.upper_fatal_limit:
+                if old_val >= self.upper_fatal_limit and value < self.upper_fatal_limit and value:
+                     self.user_log_message(self.normal_message, level = 3)
+            
+            if self.lower_warning_limit:
+                if old_val <= self.lower_warning_limit and value > self.lower_warning_limit and value:
+                     self.user_log_message(self.normal_message, level = 3)
+            elif self.lower_fatal_limit:
+                if old_val <= self.lower_fatal_limit and value > self.lower_fatal_limit and value:
+                     self.user_log_message(self.normal_message, level = 3)
 
 class _SensorThread(KerviThread):
     r"""
