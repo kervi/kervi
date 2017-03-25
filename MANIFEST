@@ -6,7 +6,6 @@ kervi\bootstrap.py
 kervi\camera.py
 kervi\controller.py
 kervi\dashboard.py
-kervi\halx.py
 kervi\kervi_logging.py
 kervi\module_thread.py
 kervi\sensor.py

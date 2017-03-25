@@ -19,7 +19,7 @@ class ServoMotor(object):
         pass
 
     def set(self, value, lock=False):
-        self._device._set_speed(self._motor, speed)
+        self._device._set_speed(self._motor, value)
 
 class ServoMotorControllerBase(object):
     def __init__(self, num_motors):
