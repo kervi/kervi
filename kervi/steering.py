@@ -18,22 +18,22 @@ class MotorSteering(object):
     def adjust(self, value):
         self._adjust = value
 
-    def run(self, speed, direction, rotation=False):
-        print("steering run:", speed, direction)
-        new_direction = direction + self._adjust
+    def run(self, speed, left_right_balance, rotation=False):
+        print("steering run:", speed, left_right_balance)
+        new_direction = left_right_balance + self._adjust
 
         if rotation:
             left_speed = speed * (-new_direction / 100)
             right_speed = speed * (new_direction / 100)
-        elif direction > 0:
+        elif left_right_balance > 0:
             left_speed = speed * (1 - new_direction / 100)
             right_speed = speed
-        elif direction < 0:
+        elif left_right_balance < 0:
             left_speed = speed
             right_speed = speed * (1 + new_direction / 100)
-        elif direction == 0:
+        elif left_right_balance == 0:
             left_speed = speed
             right_speed = speed
 
-        self._left_motor.run(left_speed)
-        self._right_motor.run(right_speed)
+        self._left_motor.set_speed(left_speed)
+        self._right_motor.set_speed(right_speed)
