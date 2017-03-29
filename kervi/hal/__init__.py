@@ -57,6 +57,10 @@ def get_camera_driver(source = None):
 class SensorDeviceDriver(object):
 
     @property
+    def dimensions(self):
+        return 1
+
+    @property
     def device_name(self):
         return None
 

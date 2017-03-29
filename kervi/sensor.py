@@ -51,6 +51,7 @@ class Sensor(KerviComponent):
             self._unit = self._device.unit
             self._min = self._device.min
             self._max = self._device.max
+            self._dimensions = self._device.dimensions
 
         self._upper_fatal_limit = None
         self._upper_warning_limit = None
@@ -393,11 +394,21 @@ class Sensor(KerviComponent):
             return False
         elif self._old_val is None:
             return True
-        elif value >= self._old_val + self.delta:
-            return True
-        elif value <= self._old_val - self.delta:
-            return True
+        elif self._dimensions == 1:
+            if value >= self._old_val + self.delta:
+                return True
+            elif value <= self._old_val - self.delta:
+                return True
+            else:
+                return False
         else:
+            old = list(self._old_val)
+            new = list(value)
+            for dim in range(0, self._dimensions - 1):
+                if new[dim] >= old[dim] + self.delta:
+                    return True
+                elif new[dim] <= old[dim] - self.delta:
+                    return True
             return False
 
     def _new_sensor_reading(self, value):
@@ -423,22 +434,18 @@ class Sensor(KerviComponent):
             if self.persist_to_db:
                 self.spine.send_command("StoreSensorValue", val)
             self.spine.trigger_event("NewSensorReading", self.component_id, val)
-            
+
             if len(self._sparkline) == 0:
                 self._sparkline += [value]
             elif len(self._sparkline) >= 10:
                 self._sparkline.pop(0)
             self._sparkline += [value]
             self._last_reading = time.clock()
-
             self._send_messages(self._old_val, value)
-
-
             self._old_val = value
 
     def _read_sensor(self):
         self._new_sensor_reading(self._device.read_value())
-
 
     def _send_messages(self, old_val, value):
         if old_val == None:

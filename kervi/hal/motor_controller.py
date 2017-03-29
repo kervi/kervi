@@ -61,7 +61,6 @@ class _StepperRunThread(KerviThread):
         self.motor = motor
         self.enabled = False
         self.speed = speed
-        
 
     def _step(self):
         if self.enabled:
@@ -71,9 +70,6 @@ class _StepperRunThread(KerviThread):
                 self.motor.step(-1)
             else:
                 self.motor.release()
-
-             
-
 
 class StepperMotor(object):
     SINGLE = 1
@@ -132,11 +128,11 @@ class StepperMotor(object):
     def step_interval(self, value):
         self._step_interval = value
 
-    def _step(self, dir, style):
-        raise NotImplementedError
+    def _step(self, direction, style=None):
+        self._device._step(self._motor, direction, style)
 
     def _release(self):
-        raise NotImplementedError
+        self._device._release(self._motor)
 
     def set_speed(self, speed):
         if not self.stepper_thread:
@@ -189,7 +185,6 @@ class StepperMotorControllerBase(object):
     def __getitem__(self, motor):
         return StepperMotor(self, motor)
 
-
     def _validate_motor(self, motor):
         if motor < 0 or motor > self._num_motors:
             raise _MotorNumOutOfBoundsError(self._device_name, motor)
@@ -203,6 +198,12 @@ class StepperMotorControllerBase(object):
     def num_motors(self):
         """Number of DC motors this motor controller can handle"""
         return self._num_motors
+
+    def _step(self, motor, style):
+        raise NotImplementedError
+
+    def _release(self, motor):
+        raise NotImplementedError
 
     def _set_speed(self, motor, speed):
         """

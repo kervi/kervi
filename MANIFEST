@@ -12,13 +12,13 @@ kervi\sensor.py
 kervi\settings.py
 kervi\spine.py
 kervi\steering.py
+kervi\tasks.py
 kervi\version.py
 kervi\vision.py
 kervi/hal\__init__.py
 kervi/hal\gpio.py
 kervi/hal\i2c.py
 kervi/hal\motor_controller.py
-kervi/hal\servo_motor_controller.py
 kervi/utility\__init__.py
 kervi/utility\bus.py
 kervi/utility\component.py
