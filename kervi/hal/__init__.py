@@ -61,6 +61,10 @@ class SensorDeviceDriver(object):
         return 1
 
     @property
+    def dimension_labels(self):
+        return []
+
+    @property
     def device_name(self):
         return None
 

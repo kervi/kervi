@@ -45,13 +45,21 @@ class Sensor(KerviComponent):
         self._max = None
         self._min = None
         self._unit = None
-
+        self._sub_sensors = []
+        self._dimensions = 1
         if self._device:
             self._type = self._device.type
             self._unit = self._device.unit
             self._min = self._device.min
             self._max = self._device.max
             self._dimensions = self._device.dimensions
+            self._dimension_labels = self._device.dimension_labels
+            print("l", self._dimension_labels)
+            if self._dimensions > 1:
+                for label in self._dimension_labels:
+                    self._sub_sensors += [
+                        Sensor(self.component_id + "." + label, label, use_thread=False)
+                    ]
 
         self._upper_fatal_limit = None
         self._upper_warning_limit = None
@@ -74,7 +82,7 @@ class Sensor(KerviComponent):
         self._last_reading = None
         self._sparkline = []
         self._ui_parameters = {
-            "size": 1,
+            "size": 0,
             "type": "value",
             "chart_points": 60,
             "show_sparkline": True,
@@ -92,6 +100,11 @@ class Sensor(KerviComponent):
             self._sensor_thread = None
 
         self.spine.register_query_handler("getSensorValue", self._query_value)
+
+    def __getitem__(self, sub_sensor):
+        if self._dimensions == 1:
+            return self
+        return self._sub_sensors[sub_sensor]
 
     @property
     def reading_interval(self):
@@ -376,6 +389,10 @@ class Sensor(KerviComponent):
         KerviComponent.link_to_dashboard(self, dashboard_id, panel_id, **kwargs)
 
     def _get_info(self):
+        dimensions = []
+        if self._dimensions > 1:
+            for dimension in range(0, self._dimensions):
+                dimensions += [self._sub_sensors[dimension]._get_component_info()]
         return {
             "type":self.type,
             "max":self.max,
@@ -386,7 +403,9 @@ class Sensor(KerviComponent):
             "upperWarningLimit":self.upper_warning_limit,
             "lowerWarningLimit":self.lower_warning_limit,
             "lowerFatalLimit":self.lower_fatal_limit,
-            "sparkline":self._sparkline
+            "sparkline":self._sparkline,
+            "subSensors": dimensions,
+            #"ui": self._ui_parameters
         }
 
     def __delta_exceeded(self, value):
@@ -394,24 +413,14 @@ class Sensor(KerviComponent):
             return False
         elif self._old_val is None:
             return True
-        elif self._dimensions == 1:
-            if value >= self._old_val + self.delta:
-                return True
-            elif value <= self._old_val - self.delta:
-                return True
-            else:
-                return False
+        elif value >= self._old_val + self.delta:
+            return True
+        elif value <= self._old_val - self.delta:
+            return True
         else:
-            old = list(self._old_val)
-            new = list(value)
-            for dim in range(0, self._dimensions - 1):
-                if new[dim] >= old[dim] + self.delta:
-                    return True
-                elif new[dim] <= old[dim] - self.delta:
-                    return True
             return False
 
-    def _new_sensor_reading(self, value):
+    def _new_sensor_reading(self, sensor_value):
         """
         Call this method to signal a new sensor reading.
         This method handles DB storage and triggers different events.
@@ -422,27 +431,33 @@ class Sensor(KerviComponent):
         :type value: ``float``
 
         """
-        if self.__delta_exceeded(value):
-            self.spine.log.debug(
-                "delta exceeded:{0} value:{1}, old value:{2}",
-                self.component_id,
-                value,
-                self._old_val
-            )
-            timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
-            val = {"sensor":self.component_id, "value":value, "timestamp":timestamp}
-            if self.persist_to_db:
-                self.spine.send_command("StoreSensorValue", val)
-            self.spine.trigger_event("NewSensorReading", self.component_id, val)
+        if self._dimensions > 1:
+            for dimension in range(0, self._dimensions):
+                value = sensor_value[dimension]
+                self._sub_sensors[dimension]._new_sensor_reading(value)
+        else:
+            value = sensor_value
+            if self.__delta_exceeded(value):
+                self.spine.log.debug(
+                    "delta exceeded:{0} value:{1}, old value:{2}",
+                    self.component_id,
+                    value,
+                    self._old_val
+                )
+                timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+                val = {"sensor":self.component_id, "value":value, "timestamp":timestamp}
+                if self.persist_to_db:
+                    self.spine.send_command("StoreSensorValue", val)
+                self.spine.trigger_event("NewSensorReading", self.component_id, val)
 
-            if len(self._sparkline) == 0:
+                if len(self._sparkline) == 0:
+                    self._sparkline += [value]
+                elif len(self._sparkline) >= 10:
+                    self._sparkline.pop(0)
                 self._sparkline += [value]
-            elif len(self._sparkline) >= 10:
-                self._sparkline.pop(0)
-            self._sparkline += [value]
-            self._last_reading = time.clock()
-            self._send_messages(self._old_val, value)
-            self._old_val = value
+                self._last_reading = time.clock()
+                self._send_messages(self._old_val, value)
+                self._old_val = value
 
     def _read_sensor(self):
         self._new_sensor_reading(self._device.read_value())
@@ -452,7 +467,7 @@ class Sensor(KerviComponent):
             return
         if self.lower_fatal_message:
             if old_val > self.lower_fatal_limit and value <= self.lower_fatal_limit:
-                self.user_log_message(self.lower_fatal_message, level = 1)
+                self.user_log_message(self.lower_fatal_message, level=1)
 
         if self.lower_warning_message:
             if self.lower_fatal_limit and self.lower_warning_limit:
@@ -464,12 +479,11 @@ class Sensor(KerviComponent):
 
             elif self.lower_warning_limit:
                 if old_val > self.lower_warning_limit and value <= self.lower_warning_limit:
-                    self.user_log_message(self.lower_warning_message, level = 2)
-
+                    self.user_log_message(self.lower_warning_message, level=2)
 
         if self.upper_fatal_message:
             if old_val < self.upper_fatal_limit and value >= self.upper_fatal_limit:
-                self.user_log_message(self.upper_fatal_message, level = 1)
+                self.user_log_message(self.upper_fatal_message, level=1)
 
         if self.upper_warning_message:
             if self.upper_fatal_limit and self.upper_warning_limit:
@@ -481,22 +495,22 @@ class Sensor(KerviComponent):
 
             elif self.upper_warning_limit:
                 if old_val < self.upper_warning_limit and value >= self.upper_warning_limit:
-                    self.user_log_message(self.upper_warning_message, level = 2)
-        
+                    self.user_log_message(self.upper_warning_message, level=2)
+
         if self.normal_message:
             if self.upper_warning_limit:
                 if old_val >= self.upper_warning_limit and value < self.upper_warning_limit and value:
-                     self.user_log_message(self.normal_message, level = 3)
+                    self.user_log_message(self.normal_message, level=3)
             elif self.upper_fatal_limit:
                 if old_val >= self.upper_fatal_limit and value < self.upper_fatal_limit and value:
-                     self.user_log_message(self.normal_message, level = 3)
-            
+                    self.user_log_message(self.normal_message, level=3)
+
             if self.lower_warning_limit:
                 if old_val <= self.lower_warning_limit and value > self.lower_warning_limit and value:
-                     self.user_log_message(self.normal_message, level = 3)
+                    self.user_log_message(self.normal_message, level=3)
             elif self.lower_fatal_limit:
                 if old_val <= self.lower_fatal_limit and value > self.lower_fatal_limit and value:
-                     self.user_log_message(self.normal_message, level = 3)
+                    self.user_log_message(self.normal_message, level=3)
 
 class _SensorThread(KerviThread):
     r"""

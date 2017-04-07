@@ -15,7 +15,8 @@ except ImportError:
     from StringIO import StringIO as BytesIO
 
 import socket
-from kervi.controller import Controller, UINumberControllerInput, UISwitchButtonControllerInput, UIButtonControllerInput, UISelectControllerInput
+from kervi.controller import Controller
+from kervi.values import *
 from kervi.utility.thread import KerviThread
 import kervi.utility.nethelper as nethelper
 import kervi.spine as spine
@@ -32,94 +33,59 @@ except:
     from http.server import HTTPServer
 
 
-class _CameraPanInput(UINumberControllerInput):
-    def __init__(self, controller):
-        UINumberControllerInput.__init__(self, controller.component_id+".pan", "Pan", controller)
-        self.unit = "degree"
-        self.value = 0
-        self.max_value = 90
-        self.min_value = -90
-        self.visible = False
-
-    def value_changed(self, newValue, old_value):
-        self.controller.pan_changed(newValue)
-
-class _CameraTiltInput(UINumberControllerInput):
-    def __init__(self, controller):
-        UINumberControllerInput.__init__(self, controller.component_id+".tilt", "Tilt", controller)
-        self.unit = "degree"
-        self.value = 0
-        self.max_value = 90
-        self.min_value = -90
-        self.visible = False
-
-    def value_changed(self, newValue, old_value):
-        self.controller.tilt_changed(newValue)
-
-class _CameraFrameRate(UISelectControllerInput):
-    """ Framerate selector """
-    def __init__(self, controller):
-        UISelectControllerInput.__init__(
-            self,
-            controller.component_id + ".framerate",
-            "Framerate",
-            controller
-        )
-        self.persist_value = True
-        self.add_option("5", "5 / sec")
-        self.add_option("10", "10 / sec")
-        self.add_option("15", "15 / sec", True)
-
-    def change(self, selected_options):
-        if (len(selected_options)):
-            value = selected_options[0]["value"]
-            self.controller.framerate_changed(value)
 
 
-class _CameraRecordButton(UISwitchButtonControllerInput):
-    def __init__(self, controller):
-        UISwitchButtonControllerInput.__init__(
-            self, controller.component_id+".record",
-            "Record",
-            controller)
-        self.set_ui_parameter("on_icon", "video-camera")
-        self.set_ui_parameter("off_icon", "video-camera")
-        self.set_ui_parameter("inline", True)
-        self.set_ui_parameter("on_text", None)
-        self.set_ui_parameter("off_text", None)
-        self.set_ui_parameter("label", None)
+# class _CameraRecordButton(UISwitchButtonControllerInput):
+#     def __init__(self, controller):
+#         UISwitchButtonControllerInput.__init__(
+#             self, controller.component_id+".record",
+#             "Record",
+#             controller)
+#         self.set_ui_parameter("on_icon", "video-camera")
+#         self.set_ui_parameter("off_icon", "video-camera")
+#         self.set_ui_parameter("inline", True)
+#         self.set_ui_parameter("on_text", None)
+#         self.set_ui_parameter("off_text", None)
+#         self.set_ui_parameter("label", None)
 
-    def on(self):
-        self.controller.start_record()
+#     def on(self):
+#         self.controller.start_record()
 
-    def off(self):
-        self.controller.stop_record()
+#     def off(self):
+#         self.controller.stop_record()
 
-class _CameraPictureButton(UIButtonControllerInput):
-    def __init__(self, controller):
-        UIButtonControllerInput.__init__(
-            self,
-            controller.component_id+".savePicture",
-            "Take picture",
-            controller
-        )
-        self.set_ui_parameter("button_icon", "camera")
-        self.set_ui_parameter("inline", True)
+# class _CameraPictureButton(UIButtonControllerInput):
+#     def __init__(self, controller):
+#         UIButtonControllerInput.__init__(
+#             self,
+#             controller.component_id+".savePicture",
+#             "Take picture",
+#             controller
+#         )
+#         self.set_ui_parameter("button_icon", "camera")
+#         self.set_ui_parameter("inline", True)
 
-    def click(self):
-        self.controller.save_picture()
+#     def click(self):
+#         self.controller.save_picture()
 
 class CameraBase(Controller):
     def __init__(self, camera_id, name, **kwargs):
         Controller.__init__(self, camera_id, name)
         self.type = "camera"
-        self.add_input(
-            _CameraPanInput(self),
-            _CameraTiltInput(self),
-            _CameraRecordButton(self),
-            _CameraPictureButton(self),
-            _CameraFrameRate(self)
-        )
+        self.inputs["pan"] = DynamicNumber("Pan")
+        self.inputs["tilt"] = DynamicNumber("Tilt")
+
+        self.inputs["fps"] = DynamicEnum("FPS")
+        self.inputs["fps"].set_ui_parameter("inline", True)
+
+        self.inputs["save"] = DynamicBoolean("Save picture")
+        self.inputs["save"].set_ui_parameter("button_icon", "camera")
+        self.inputs["save"].set_ui_parameter("inline", True)
+
+        self.inputs["record"] = DynamicBoolean("Record")
+        self.inputs["record"].set_ui_parameter("on_icon", "video-camera")
+        self.inputs["record"].set_ui_parameter("off_icon", "video-camera")
+        self.inputs["record"].set_ui_parameter("inline", True)
 
         self._ui_parameters["height"] = kwargs.get("height", 480)
         self._ui_parameters["width"] = kwargs.get("width", 640)
@@ -128,6 +94,12 @@ class CameraBase(Controller):
         self._ui_parameters["source"] = kwargs.get("source", "")
         self._ui_parameters["show_pan_tilt"] = kwargs.get("show_pan_tilt", False)
         self._ui_parameters["show_buttons"] = kwargs.get("show_buttons", True)
+
+    def input_changed(self, changed_input):
+        if changed_input == self.inputs["pan"]:
+            self.pan_changed(changed_input.value)
+        if changed_input == self.inputs["tilt"]:
+            self.tilt_changed(changed_input.value)
 
     @property
     def height(self):
@@ -296,6 +268,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         try:
             self.send_response(200)
+            self.send_header("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate")
             self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
             self.end_headers()
             #first_frame = True
@@ -378,6 +351,10 @@ class CameraStreamer(CameraBase):
         self.ip_address = nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()
         self.source = "http://" + str(self.ip_address) + ":" + str(self.ip_port) + "/" + camera_id# + ".png"
+        self.source = {
+            "server":  str(self.ip_address) + ":" + str(self.ip_port),
+            "path": "/"+camera_id
+        }
         self.current_frame = None
         self.current_frame_number = 0
 

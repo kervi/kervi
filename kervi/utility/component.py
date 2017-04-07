@@ -156,14 +156,15 @@ class KerviComponent(object):
         )
         return {}
 
-    def _get_component_info(self):
-        info = self._get_info()
-        info["componentType"] = self.component_type
-        info["id"] = self.component_id
-        info["visible"] = self.visible
-        info["name"] = self.name
-        info["ui"] = self._camel_case_parameters(self._ui_parameters)
-        return info
+    def _get_component_info(self, component_id=None):
+        if component_id is None or component_id == self.component_id:
+            info = self._get_info()
+            info["componentType"] = self.component_type
+            info["id"] = self.component_id
+            info["visible"] = self.visible
+            info["name"] = self.name
+            info["ui"] = self._camel_case_parameters(self._ui_parameters)
+            return info
 
     def _underscore_to_camelcase(self, value):
         def _camelcase():

@@ -1,5 +1,7 @@
 import time
 from kervi.utility.thread import KerviThread
+from kervi.values import DynamicNumber
+from kervi.controller import Controller
 
 class _MotorNumOutOfBoundsError(Exception):
     def __init__(self, device_name, motor):
@@ -7,15 +9,19 @@ class _MotorNumOutOfBoundsError(Exception):
             '{0} Exception: Motor num out of Bounds, motor={1}'.format(device_name, motor)
         )
 
-class DCMotor(object):
+class DCMotor(DynamicNumber):
     def __init__(self, device, motor):
+        DynamicNumber.__init__(self, device.device_name + "motor-" + str(motor), input_id="motor_"+str(motor))
         self._device = device
         self._motor = motor
 
     def set_speed(self, speed):
-        self._device._set_speed(self._motor, speed)
+        self.value = speed
 
-class DCMotorControllerBase(object):
+    def value_changed(self, new_value, old_value):
+        self._device._set_speed(self._motor, new_value)
+
+class DCMotorControllerBase(Controller):
     def __init__(self, device_name, num_motors):
         self._num_motors = num_motors
         self._device_name = device_name

@@ -265,33 +265,39 @@ def store_log_item(id, item):
     except lite.Error as er:
         SPINE.log.error('error store log data:{0}', er)
 
+def get_log_sort_field(item):
+    return item["timestamp"]
+
 def get_log_items(page, page_size, filters=None):
-    print ("getLogItems")
     connections = [FILE_CON, MEMORY_CON]
     result = []
     for con in connections:
         cur = con.cursor()
         cur.execute(
-            "select * from log orderby ts desc limit ?, ?",
-            page_size,
-            page_size*page
+            "select * from log order by ts desc limit ?, ?",
+            (page_size*page, page_size)
         )
         all_rows = cur.fetchall()
         for row in all_rows:
-            result += [{
-                "source_id": row[0],
-                "source_name": row[1],
-                "area": row[2],
-                "data": row[3],
-                "level": row[4],
-                "topic": row[5],
-                "body": row[6],
-                "timestamp": row[7],
-                "type": row[8]
+            if row[8]:
+                ts = datetime.fromtimestamp(row[8]).strftime('%Y-%m-%dT%H:%M:%SZ')
+            else:
+                ts = None
+            result += [
+                {
+                    "source_id": row[1],
+                    "source_name": row[2],
+                    "area": row[3],
+                    "data": row[4],
+                    "level": row[5],
+                    "topic": row[6],
+                    "body": row[7],
+                    "timestamp": row[8],
+                    "type": row[9]
                 }
             ]
-    
-    return None
+    #result = sorted(result, get_log_sort_field)
+    return result
 
 
 def create_cron_job(component_id, job_id, name, job_parameters, start, end, repeat_interval, year,month):
