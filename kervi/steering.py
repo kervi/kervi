@@ -9,26 +9,20 @@ class MotorSteering(TaskHandler):
     """
     Control the speed and direction of two motors.
     """
-    def __init__(self, controller_id, name, left_motor = None, right_motor = None, left_encoder=None, right_encoder=None):
+    def __init__(self, controller_id, name):
         TaskHandler.__init__(self, controller_id, name)
         self.type = "steering"
-        if left_motor:
-            self.outputs["left_speed"] = left_motor
-        else:
-            self.outputs["left_speed"] = DynamicNumber("Left speed", input_id="left_speed", is_input=False)
+        self.outputs.add("left_speed", "Left speed", DynamicNumber)
+        self.outputs.add("right_speed", "Right speed", DynamicNumber)
 
-        if right_motor:
-            self.outputs["right_speed"] = right_motor
-        else:
-            self.outputs["right_speed"] = DynamicNumber("Right speed", input_id="right_speed", is_input=False)
-        
-        self.inputs["right_encoder"] = right_encoder
-        self.inputs["left_encoder"] = left_encoder
+        self.inputs.add("left_encoder", "Left encoder", DynamicNumber)
+        self.inputs.add("right_encoder", "Right encoder", DynamicNumber)
         self._adjust = 0
 
-        self.inputs["speed"] = DynamicNumber("Speed", parent=self, input_id="speed")
-        self.inputs["direction"] = DynamicNumber("Direction", parent=self, input_id="direction")
-        self.inputs["all_off"] = DynamicBoolean("All off", parent=self, input_id="all_off")
+
+        self.inputs.add("speed", "Speed", DynamicNumber)
+        self.inputs.add("direction", "Direction", DynamicNumber)
+        self.inputs.add("all_off", "All off", DynamicBoolean)
 
     @property
     def adjust(self):

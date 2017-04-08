@@ -11,9 +11,55 @@ In your application you access GPIO via:
     #define channel 23 as input
     GPIO.define_as_input(23)
 """
+from kervi.values import DynamicNumber, DynamicBoolean 
 
-class GPIOChannel(object):
+CHANNEL_TYPE_ANALOG_IN = 1
+CHANNEL_TYPE_ANALOG_OUT = 2
+CHANNEL_TYPE_GPIO = 3
+
+
+class LogicIOChannel(DynamicBoolean):
     def __init__(self, gpio_device, channel):
+        DynamicBoolean.__init__(self, gpio_device.name +" " + str(channel))
+        self._device = gpio_device
+        self._channel = channel
+
+
+    def get(self):
+        return self._device.get(self, self._channel)
+
+    def set(self, value):
+        self._device.set(self._channel, value)
+
+    def define_as_input(self, pullup=False):
+        self.is_input = False
+        self._device.define_as_input(self._channel, pullup)
+
+    def define_as_output(self):
+        self.is_input = True
+        self._device.define_as_output(self._channel)
+
+    def define_as_pwm(self, frequency, duty_cycle=None):
+        self._device.define_as_pwm(self._channel, frequency, duty_cycle)
+
+    def listen(self, callback, bounce_time=.2):
+        self._device.listen(self._channel, callback, bounce_time)
+
+    def listen_rising(self, callback):
+        self._device.listen_rising(self._channel, callback)
+
+    def listen_falling(self, callback):
+        self._device.listen_faling(self._channel, callback)
+
+    def pwm_start(self, duty_cycle=None, frequency=None):
+        self._device.pwm_start(self._channel, duty_cycle, frequency)
+
+    def pwm_stop(self, channel):
+        self._device.pwm_stop(self._channel)
+
+class AnalogIOChannel(DynamicNumber):
+    def __init__(self, gpio_device, channel):
+        DynamicNumber.__init__(self, gpio_device.name +" " + str(channel))
         self._device = gpio_device
         self._channel = channel
 
@@ -24,9 +70,11 @@ class GPIOChannel(object):
         self._device.set(self._channel, value)
 
     def define_as_input(self, pullup=False):
+        self.is_input = False
         self._device.define_as_input(self._channel, pullup)
 
     def define_as_output(self):
+        self.is_input = True
         self._device.define_as_output(self._channel)
 
     def define_as_pwm(self, frequency, duty_cycle=None):
@@ -51,8 +99,25 @@ class IGPIODeviceDriver(object):
     """
     """
 
+    
+        
+
     def __getitem__(self, channel):
-        return GPIOChannel(self, channel)
+        channel_type = self._get_channel_type(channel)
+        if channel_type == CHANNEL_TYPE_ANALOG_IN:
+            return AnalogIOChannel(self, channel)
+        
+        if channel_type == CHANNEL_TYPE_ANALOG_OUT:
+            return AnalogIOChannel(self, channel)
+        
+        if channel_type == CHANNEL_TYPE_GPIO:
+            return LogicIOChannel(self, channel)
+
+        return None
+
+    def _get_channel_type(self, channel):
+        """creates a channel"""
+        raise NotImplementedError
 
     def define_as_input(self, channel, pullup=False):
         """Define a channel as input"""

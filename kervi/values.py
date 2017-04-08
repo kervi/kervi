@@ -3,7 +3,6 @@
 from kervi.spine import Spine
 from kervi.utility.thread import KerviThread
 from kervi.utility.component import KerviComponent
-from kervi.hal import GPIO
 
 
 VALUE_COUNTER = 0
@@ -251,8 +250,8 @@ class DynamicString(DynamicValue):
     """
     Text input component
     """
-    def __init__(self, name, input_id=None, parent=None):
-        DynamicValue.__init__(self, name, "dynamic-string", input_id, parent)
+    def __init__(self, name, input_id=None, is_input=True, parent=None):
+        DynamicValue.__init__(self, name, "dynamic-string", input_id, is_input, parent)
         #self.spine = Spine()
         self._value = ""
         self._ui_parameters["type"] = "text"
@@ -271,8 +270,8 @@ class DynamicBoolean(DynamicValue):
     """
     Switch button controller component, shows a on/off button in UI
     """
-    def __init__(self, name, input_id=None, parent=None):
-        DynamicValue.__init__(self, name, "dynamic-boolean", input_id, parent)
+    def __init__(self, name, input_id=None, is_input=True, parent=None):
+        DynamicValue.__init__(self, name, "dynamic-boolean", input_id, is_input, parent)
         self._value = False
         self._ui_parameters["type"] = "switch"
         self._ui_parameters["on_text"] = "On"
@@ -280,6 +279,8 @@ class DynamicBoolean(DynamicValue):
         self._ui_parameters["on_icon"] = None
         self._ui_parameters["off_icon"] = None
         self._ui_parameters["button_icon"] = None
+        self._ui_parameters["button_text"] = self.name
+       
 
 class DynamicEnum(DynamicValue):
     r"""
@@ -300,15 +301,13 @@ class DynamicEnum(DynamicValue):
             print("Frame rate changed", selectedOptions)
 
     """
-    def __init__(self, name, select_id=None):
-        DynamicValue.__init__(self, name, "dynamic-enum", select_id)
-        #self.spine = Spine()
-        
+    def __init__(self, name, input_id=None, is_input=True, parent=None):
+        DynamicValue.__init__(self, name, "dynamic-enum", input_id, is_input, parent)
+
         self.options = []
         self.selected_options = []
         self._ui_parameters["type"] = "dropdown"
 
-    
     def add_option(self, value, text, selected=False):
         """
         Add option to select

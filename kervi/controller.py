@@ -10,24 +10,28 @@ from kervi.utility.component import KerviComponent
 from kervi.hal import GPIO
 
 
-class _DynamicArray(object):
-    def __init__(self, controller):
-        self._items=[]
+class _DynamicValueList(object):
+    def __init__(self, controller, is_input):
+        self._items={}
+        self.is_input = is_input
         self.controller = controller
 
-    def add(self, *args):
-        for item in args:
-            self._items += [item]
-            item.add_controller(self.controller)
+    def add(self, value_id, name, value_class):
+        item = value_class(
+            name,
+            input_id=self.controller.component_id + "." + value_id,
+            is_input=self.is_input
+        )
+        self._items[value_id]=item
+        if self.is_input:
+            item.add_observer(self.controller)
+
+    @property
+    def keys(self):
+        return self._items.keys()
 
     def __getitem__(self, item_id):
-        if isinstance(item_id, int):
-            return self._items[item_id]
-        else:
-            for item in self._items:
-                if item.component_id == item_id:
-                    return item
-        return None
+        return self._items[item_id]
 
 class Controller(KerviComponent):
     """
@@ -38,8 +42,8 @@ class Controller(KerviComponent):
     """
     def __init__(self, controller_id, name):
         KerviComponent.__init__(self, controller_id, "controller", name)
-        self.inputs = {}
-        self.outputs = {}
+        self.inputs = _DynamicValueList(self, True)
+        self.outputs = _DynamicValueList(self, False)
         self._active = True
         self.type = "unknown"
         self.parameters = {}
@@ -111,6 +115,10 @@ class Controller(KerviComponent):
         pass
 
     def dynamic_value_changed(self, changed_input):
+        self.input_changed(changed_input)
+        pass
+
+    def input_changed(self, changed_input):
         """
         Abstract method that is called by when one of the controller inputs change.
 
@@ -127,12 +135,12 @@ class Controller(KerviComponent):
 
     def _get_info(self):
         inputs = []
-        for key in self.inputs:
+        for key in self.inputs.keys:
             if self.inputs[key]:
                 inputs += [self.inputs[key].get_reference()]
 
         outputs = []
-        for key in self.outputs:
+        for key in self.outputs.keys:
             if self.outputs[key]:
                 outputs += [self.outputs[key].get_reference()]
 
