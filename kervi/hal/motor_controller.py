@@ -1,6 +1,6 @@
 import time
 from kervi.utility.thread import KerviThread
-from kervi.values import DynamicNumber
+from kervi.values import *
 from kervi.controller import Controller
 
 class _MotorNumOutOfBoundsError(Exception):
@@ -9,26 +9,25 @@ class _MotorNumOutOfBoundsError(Exception):
             '{0} Exception: Motor num out of Bounds, motor={1}'.format(device_name, motor)
         )
 
-class DCMotor(DynamicNumber):
-    def __init__(self, device, motor):
-        DynamicNumber.__init__(self, device.device_name + "motor-" + str(motor), input_id="motor_"+str(motor))
-        self._device = device
-        self._motor = motor
+class DCMotor(object):
+    def __init__(self, motor):
+        self._speed = motor
 
-    def set_speed(self, speed):
-        self.value = speed
-
-    def value_changed(self, new_value, old_value):
-        self._device._set_speed(self._motor, new_value)
-
+    @property
+    def speed(self):
+        return self._speed
+    
 class DCMotorControllerBase(Controller):
-    def __init__(self, device_name, num_motors):
+    def __init__(self, controller_id, device_name, num_motors):
+        Controller.__init__(self, controller_id, device_name + "-DC motors")
         self._num_motors = num_motors
         self._device_name = device_name
 
-    def __getitem__(self, motor):
-        return DCMotor(self, motor)
+        for motor in range(0, num_motors):
+            self.inputs.add("motor_" +  str(motor), "Motor " + str(motor), DynamicNumber)
 
+    def __getitem__(self, motor):
+        return DCMotor(self.inputs["motor_" + str(motor)])
 
     def _validate_motor(self, motor):
         if motor < 0 or motor > self._num_motors:
@@ -43,6 +42,9 @@ class DCMotorControllerBase(Controller):
     def num_motors(self):
         """Number of DC motors this motor controller can handle"""
         return self._num_motors
+
+    def input_changed(self, changed_input):
+        self._set_speed(changed_input.index, changed_input.value)
 
     def _set_speed(self, motor, speed):
         """
@@ -232,10 +234,21 @@ class ServoMotor(object):
     def __init__(self, device, motor):
         self._device = device
         self._motor = motor
+        self._position = DynamicNumber(
+            "Servo " +str(motor),
+            input_id="servo_" + str(motor),
+            parent=self._device,
+            index=motor
+        )
+        self._position.add_observer(self)
         self._adjust_max = 0
         self._adjust_min = 0
         self._adjust_center = 0
 
+    @property
+    def position(self):
+        return self._position
+    
     @property
     def adjust_max(self):
         return self._adjust_max
@@ -260,11 +273,16 @@ class ServoMotor(object):
     def adjust_center(self, value):
         self._adjust_center = value
 
+    def dynamic_value_changed(self, input):
+        self.set_position(input.value)
+
     def set_position(self, position):
         self._device._set_position(self._motor, position, self.adjust_min, self.adjust_max, self.adjust_center)
 
-class ServoMotorControllerBase(object):
-    def __init__(self, device_name, num_motors):
+class ServoMotorControllerBase(Controller):
+    def __init__(self, controller_id , device_name, num_motors):
+        Controller.__init__(self, controller_id, device_name + "-DC motors")
+
         self._num_motors = num_motors
         self._device_name = device_name
 
@@ -315,11 +333,14 @@ class ServoMotorControllerBase(object):
 
 
 class MotorControllerBoard(object):
-    def __init__(self, device_name, dc_controller=None, stepper_controller=None, servo_controller=None):
+    def __init__(self, board_id, device_name, dc_controller=None, stepper_controller=None, servo_controller=None):
+
+        self.board_id = board_id
+
         if dc_controller:
             self._dc = dc_controller
         else:
-            self._dc = DCMotorControllerBase(device_name, 0)
+            self._dc = DCMotorControllerBase(board_id+".dc_motors", device_name, 0)
 
         if stepper_controller:
             self._stepper = stepper_controller
@@ -329,7 +350,7 @@ class MotorControllerBoard(object):
         if servo_controller:
             self._servo = servo_controller
         else:
-            self._servo = ServoMotorControllerBase(device_name, 0)
+            self._servo = ServoMotorControllerBase(board_id+".servo_motors", device_name, 0)
 
     @property
     def dc_motors(self):

@@ -11,7 +11,7 @@ In your application you access GPIO via:
     #define channel 23 as input
     GPIO.define_as_input(23)
 """
-from kervi.values import DynamicNumber, DynamicBoolean 
+from kervi.values import DynamicValueList, DynamicNumber, DynamicBoolean 
 
 CHANNEL_TYPE_ANALOG_IN = 1
 CHANNEL_TYPE_ANALOG_OUT = 2
@@ -20,9 +20,20 @@ CHANNEL_TYPE_GPIO = 3
 
 class LogicIOChannel(DynamicBoolean):
     def __init__(self, gpio_device, channel):
-        DynamicBoolean.__init__(self, gpio_device.name +" " + str(channel))
+        DynamicBoolean.__init__(self, gpio_device.name +" " + str(channel), input_id=str(channel))
         self._device = gpio_device
         self._channel = channel
+
+        self.pwm = DynamicValueList(self, True)
+        self.pwm.add("duty_cycle", "Duty cycle", DynamicNumber)
+        self.pwm.add("frequency", "Frequency", DynamicNumber)
+        self.pwm.add("active", "Active", DynamicBoolean)
+
+        self.pwm["duty_cycle"].min = 0
+        self.pwm["duty_cycle"].max = 100
+
+        self.pwm["frequency"].min = 0
+        self.pwm["frequency"].max = 100000
 
 
     def get(self):
@@ -39,7 +50,12 @@ class LogicIOChannel(DynamicBoolean):
         self.is_input = True
         self._device.define_as_output(self._channel)
 
-    def define_as_pwm(self, frequency, duty_cycle=None):
+    def define_as_pwm(self, frequency=None, duty_cycle=None):
+        if frequency:
+            self.pwm["frequency"].value = frequency
+
+        if duty_cycle:
+            self.pwm["duty_cycle"].value = duty_cycle
         self._device.define_as_pwm(self._channel, frequency, duty_cycle)
 
     def listen(self, callback, bounce_time=.2):
@@ -56,12 +72,31 @@ class LogicIOChannel(DynamicBoolean):
 
     def pwm_stop(self, channel):
         self._device.pwm_stop(self._channel)
+
+    def value_changed(self, new_value, old_value):
+        self.set(new_value)
+
+    def dynamic_value_changed(self, changed_input):
+        if changed_input == self.pwm["duty_cycle"]:
+            if self.pwm["active"].value:
+                self._device.pwm_start(self._channel, duty_cycle=changed_input.value)
+
+        if changed_input == self.pwm["frequency"]:
+            self._device.pwm_start(self._channel, frequency=changed_input.value)
+
+        if changed_input == self.pwm["active"]:
+            if changed_input.value:
+                self._device.pwm_start(self._channel)
+            else:
+                self._device.pwm_stop(self._channel)
 
 class AnalogIOChannel(DynamicNumber):
-    def __init__(self, gpio_device, channel):
-        DynamicNumber.__init__(self, gpio_device.name +" " + str(channel))
+    def __init__(self, gpio_device, channel, is_input):
+        DynamicNumber.__init__(self, str(channel), is_input=is_input)
         self._device = gpio_device
         self._channel = channel
+        self.min = 0
+        self.max = 100
 
     def get(self):
         return self._device.get(self, self._channel)
@@ -77,43 +112,29 @@ class AnalogIOChannel(DynamicNumber):
         self.is_input = True
         self._device.define_as_output(self._channel)
 
-    def define_as_pwm(self, frequency, duty_cycle=None):
-        self._device.define_as_pwm(self._channel, frequency, duty_cycle)
-
-    def listen(self, callback, bounce_time=.2):
-        self._device.listen(self._channel, callback, bounce_time)
-
-    def listen_rising(self, callback):
-        self._device.listen_rising(self._channel, callback)
-
-    def listen_falling(self, callback):
-        self._device.listen_faling(self._channel, callback)
-
-    def pwm_start(self, duty_cycle=None, frequency=None):
-        self._device.pwm_start(self._channel, duty_cycle, frequency)
-
-    def pwm_stop(self, channel):
-        self._device.pwm_stop(self._channel)
+    def value_changed(self, new_value, old_value):
+        self.set(new_value)
 
 class IGPIODeviceDriver(object):
     """
     """
-
-    
-        
+    def __init__(self, gpio_id):
+        self.channels = {}
+        self._gpio_id = gpio_id
 
     def __getitem__(self, channel):
-        channel_type = self._get_channel_type(channel)
-        if channel_type == CHANNEL_TYPE_ANALOG_IN:
-            return AnalogIOChannel(self, channel)
-        
-        if channel_type == CHANNEL_TYPE_ANALOG_OUT:
-            return AnalogIOChannel(self, channel)
-        
-        if channel_type == CHANNEL_TYPE_GPIO:
-            return LogicIOChannel(self, channel)
+        if not channel in self.channels.keys():
+            channel_type = self._get_channel_type(channel)
+            if channel_type == CHANNEL_TYPE_ANALOG_IN:
+                self.channels[channel] = AnalogIOChannel(self, channel, False)
 
-        return None
+            if channel_type == CHANNEL_TYPE_ANALOG_OUT:
+                self.channels[channel] = AnalogIOChannel(self, channel, True)
+
+            if channel_type == CHANNEL_TYPE_GPIO:
+                self.channels[channel] = LogicIOChannel(self, channel)
+        
+        return self.channels[channel]
 
     def _get_channel_type(self, channel):
         """creates a channel"""

@@ -72,17 +72,17 @@ class CameraBase(Controller):
     def __init__(self, camera_id, name, **kwargs):
         Controller.__init__(self, camera_id, name)
         self.type = "camera"
-        self.inputs["pan"] = DynamicNumber("Pan")
-        self.inputs["tilt"] = DynamicNumber("Tilt")
+        self.inputs.add("pan", "Pan", DynamicNumber)
+        self.inputs.add("tilt", "Tilt", DynamicNumber)
 
-        self.inputs["fps"] = DynamicEnum("FPS")
+        self.inputs.add("fps", "FPS", DynamicEnum)
         self.inputs["fps"].set_ui_parameter("inline", True)
 
-        self.inputs["save"] = DynamicBoolean("Save picture")
+        self.inputs.add("save", "Save picture", DynamicBoolean)
         self.inputs["save"].set_ui_parameter("button_icon", "camera")
         self.inputs["save"].set_ui_parameter("inline", True)
 
-        self.inputs["record"] = DynamicBoolean("Record")
+        self.inputs.add("record", "Record video", DynamicBoolean)
         self.inputs["record"].set_ui_parameter("on_icon", "video-camera")
         self.inputs["record"].set_ui_parameter("off_icon", "video-camera")
         self.inputs["record"].set_ui_parameter("inline", True)

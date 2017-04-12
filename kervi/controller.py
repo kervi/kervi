@@ -8,30 +8,9 @@ from kervi.spine import Spine
 from kervi.utility.thread import KerviThread
 from kervi.utility.component import KerviComponent
 from kervi.hal import GPIO
+from kervi.values import DynamicValueList
 
 
-class _DynamicValueList(object):
-    def __init__(self, controller, is_input):
-        self._items={}
-        self.is_input = is_input
-        self.controller = controller
-
-    def add(self, value_id, name, value_class):
-        item = value_class(
-            name,
-            input_id=self.controller.component_id + "." + value_id,
-            is_input=self.is_input
-        )
-        self._items[value_id]=item
-        if self.is_input:
-            item.add_observer(self.controller)
-
-    @property
-    def keys(self):
-        return self._items.keys()
-
-    def __getitem__(self, item_id):
-        return self._items[item_id]
 
 class Controller(KerviComponent):
     """
@@ -42,8 +21,8 @@ class Controller(KerviComponent):
     """
     def __init__(self, controller_id, name):
         KerviComponent.__init__(self, controller_id, "controller", name)
-        self.inputs = _DynamicValueList(self, True)
-        self.outputs = _DynamicValueList(self, False)
+        self.inputs = DynamicValueList(self, True, True)
+        self.outputs = DynamicValueList(self, False, True)
         self._active = True
         self.type = "unknown"
         self.parameters = {}

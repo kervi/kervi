@@ -207,7 +207,7 @@ class _CQRSBus(object):
             if len(result) == 1:
                 return result[0]
         except:
-            self.log.exception("Exception in query")
+            self.log.exception("Exception in query:" + query)
 
         return result
 
@@ -240,7 +240,7 @@ class _CQRSBus(object):
                         else:
                             func(queue_item["id"], *queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"])
         except:
-            self.log.exception("Exception in query")
+            self.log.exception("Exception in event:{0}",queue_item)
     
     def get_commands(self):
         return self.cmd_handlers.get_list_names()
