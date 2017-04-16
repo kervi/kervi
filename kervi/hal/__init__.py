@@ -117,8 +117,8 @@ class I2CSensorDeviceDriver(SensorDeviceDriver):
         self.i2c = i2c(address, bus)
 
 class I2CGPIODeviceDriver(gpio.IGPIODeviceDriver):
-    def __init__(self, address, bus):
-        gpio.IGPIODeviceDriver.__init__(self)
+    def __init__(self, address, bus, gpio_id):
+        gpio.IGPIODeviceDriver.__init__(self, gpio_id)
         if address > 0x77:
             raise I2CaddressOutOfBoundsError(self, device_name, address)
         self.i2c = i2c(address, bus)

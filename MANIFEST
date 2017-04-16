@@ -5,6 +5,7 @@ kervi\__init__.py
 kervi\bootstrap.py
 kervi\camera.py
 kervi\controller.py
+kervi\controller_delete.py
 kervi\dashboard.py
 kervi\kervi_logging.py
 kervi\module_thread.py
@@ -13,6 +14,7 @@ kervi\settings.py
 kervi\spine.py
 kervi\steering.py
 kervi\tasks.py
+kervi\values.py
 kervi\version.py
 kervi\vision.py
 kervi/hal\__init__.py

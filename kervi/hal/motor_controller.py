@@ -186,7 +186,7 @@ class StepperMotor(object):
                 time.sleep(s_per_s)
 
 class StepperMotorControllerBase(object):
-    def __init__(self, device_name, num_motors):
+    def __init__(self, controller_id, device_name, num_motors):
         self._num_motors = num_motors
         self._device_name = device_name
 

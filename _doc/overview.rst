@@ -11,7 +11,7 @@ Kervi application anatomy
 Single file application
 ---------------------------
 
-Below you see the content of a *single file application* created with the commandline tool on a Raspberry Pi. 
+Below you see the content of a *single file application* that controls the speed of a motor based on the cpu temperature. 
 
 myapp.py
 
@@ -21,63 +21,94 @@ myapp.py
     if __name__ == '__main__':
         from kervi.bootstrap import Application
         APP = Application()
-        #Important GPIO must be imported after application creation
-        from kervi.hal import GPIO
-
+        
         from kervi.dashboard import Dashboard, DashboardPanel
         DASHBOARD = Dashboard("app", "App", is_default=True)
-        DASHBOARD.add_panel(DashboardPanel("light", columns=2, rows=2, title="Light"))
+        DASHBOARD.add_panel(DashboardPanel("fan", columns=3, rows=2, title="CPU fan"))
 
         SYSTEMBOARD = Dashboard("system", "System")
         SYSTEMBOARD.add_panel(DashboardPanel("cpu", columns=2, rows=2))
         SYSTEMBOARD.add_panel(DashboardPanel("cam", columns=2, rows=2))
 
-        #Create a streaming camera server
-        from kervi.camera import CameraStreamer
-        CAMERA = CameraStreamer("cam1", "camera 1")
-
-        #link camera as background
-        CAMERA.link_to_dashboard("app")
-        #link camera to a panel
-        CAMERA.link_to_dashboard("system", "cam")
-
         from kervi.sensor import Sensor
         from kervi_devices.platforms.common.sensors.cpu_use import CPULoadSensorDeviceDriver
+        from kervi_devices.platforms.common.sensors.cpu_temp import CPUTempSensorDeviceDriver
+        
         #build in sensor that measures cpu use
-        SENSOR_1 = Sensor("CPULoadSensor", "CPU", CPULoadSensorDeviceDriver())
+        SENSOR_CPU_LOAD = Sensor("CPULoadSensor", "CPU", CPULoadSensorDeviceDriver())
         #link to sys area top right
-        SENSOR_1.link_to_dashboard("*", "sys-header")
+        SENSOR_CPU_LOAD.link_to_dashboard("*", "sys-header")
         #link to a panel, show value in panel header and chart in panel body
-        SENSOR_1.link_to_dashboard("system", "cpu", type="value", size=2, link_to_header=True)
-        SENSOR_1.link_to_dashboard("system", "cpu", type="chart", size=2)
+        SENSOR_CPU_LOAD.link_to_dashboard("system", "cpu", type="value", size=2, link_to_header=True)
+        SENSOR_CPU_LOAD.link_to_dashboard("system", "cpu", type="chart", size=2)
 
-
-        #More on sensors https://kervi.github.io/sensors.html
-
-
-        #define a light controller
-        from kervi.controller import Controller, UISwitchButtonControllerInput
-        class MyController(Controller):
+        #build in sensor that measures cpu temperature
+        SENSOR_CPU_TEMP = Sensor("CPUTempSensor", "", CPUTempSensorDeviceDriver())
+        
+        #define a fan controller
+        from kervi.controller import Controller
+        from kervi.values import DynamicNumber, DynamicBoolean
+        class FanController(Controller):
             def __init__(self):
-                Controller.__init__(self, "lightController", "Light")
-                self.type = "light"
+                Controller.__init__(self, "fan_controller", "Fan")
+                self.type = "fan"
 
-                #define an input and link it to the dashboard panel
-                light1 = UISwitchButtonControllerInput("lightctrl.light1", "Light", self)
-                light1.link_to_dashboard("app", "light", label_icon="light", size=0)
+                #define inputs
+                self.temp = self.inputs.add("temp", "Temperature", DynamicNumber)
+                self.temp.min = 0
+                self.temp.max = 150
 
-                #define GPIO
-                GPIO.define_as_output(12)
+                self.trigger_temp = self.inputs.add("trigger_temp", "Trigger temperature", DynamicNumber)
+                self.trigger_temp.min = 0
+                self.trigger_temp.max = 100
+                #remember the value when app restarts
+                self.trigger_temp.persists = True
+
+                self.max_temp = self.inputs.add("max_temp", "Max speed temperature", DynamicNumber)
+                self.max_temp.min = 0
+                self.max_temp.max = 100
+                #remember the value when app restarts
+                self.max_temp.persists = True
+
+                self.active = self.inputs.add("active", "Active", DynamicBoolean)
+                
+                #define output
+                self.fan_speed = self.outputs.add("fan_speed", "Fan speed", DynamicNumber)
 
             def input_changed(self, changed_input):
-                GPIO.set(12, changed_input.value)
+                if self.active.value:
+                    temp = self.temp.value - self.trigger_temp.value
+                    if temp <= 0:
+                        self.fan_speed.value = 0
+                    else:
+                        max_span = self.max_temp.value - self.trigger_temp.value
+                        speed = (temp / max_span) * 100
+                        if speed > 100:
+                            speed = 100
+                        self.fan_speed.value = speed
+                else:
+                    self.fan_speed.value = 0
 
-        MY_CONTROLLER = MyController()
+        FAN_CONTROLLER = FanController()
+
+        #link the fan controllers temp input to cpu temperature sensor
+        FAN_CONTROLLER.temp.link_to(SENSOR_CPU_TEMP)
+        
+        #link the other fan controller inputs to dashboard
+        FAN_CONTROLLER.trigger_temp.link_to_dashboard("app", "fan")
+        FAN_CONTROLLER.max_temp.link_to_dashboard("app", "fan")
+        FAN_CONTROLLER.active.link_to_dashboard("app", "fan")
+        
+        #link the fan controller to a DC motor on controlled by a Adafruit motor hat
+        from kervi_devices.motors.adafruit_i2c_motor_hat import AdafruitMotorHAT
+        MOTOR_CONTROLLER = AdafruitMotorHAT()
+        MOTOR_CONTROLLER.dc_motors[2].speed.link_to(FAN_CONTROLLER.fan_speed)
 
         APP.run()
 
+
 ######################
-Application (line 1-6)
+Application (line 1-3)
 ######################
 
 The hart of a kervi application is the Application class.   
@@ -89,12 +120,12 @@ if you are using a Raspberry Pi as your board and loads required
 driveres. It also loads a web server that serves the files to the browser. 
 
 ######################
-Dashboards (line 7-13)
+Dashboards (line 5-11)
 ######################
 
 Dashboards are as such not at part of your application logic but you need to
-tell kervi how you want to organize your application in the browser. 
-You can have multiple dashboards in an application. It can be floores in a house
+tell kervi how you want to organize your dashboards in the browser. 
+You can have multiple dashboards in an application. It can be floors in a house
 if your are developing a house automation project or it can be a camera view and
 system information if you are creating a robot.
 
@@ -102,19 +133,11 @@ In the example above two dashboards are defined APP and SYSTEM.
 
 Each dashboard has one or more panels where kervi components like sensors and controllers are linked to.
 
-###################
-camera (line 15-22) 
-###################
-
-It is possible to stream your camera as a background on a dashboard or as content in a panel.
-Use the method link_to_dashboard where you specify the dashboard and panel that should display the camera.
-The camera will be displayed as a background if you omit the name of a panel in the call to link_to_dashboard.
-
 ###############
-Sensors (24-35)
+Sensors (13-26)
 ###############
 
-Sensors are used to sence the world and readings from sensors are handled thru the Sensor Class. 
+Sensors are used to sense the world and readings from sensors are handled thru the Sensor Class. 
 You can program a sensor your self or you can utilize one of the ready made sensor drivers from the Kervi Device Library (KDL).
 
 In the example above a *Cpu Load sensor* is fetched from KDL and applied to the Sensor class. 
@@ -126,19 +149,64 @@ This is done by calling the method link_to_dashboard where you specify dashboard
 When a sensor is linked to a dashboard panel the UI logic will pick up sensor readings for the sensor and update the value on the screen.
 
 ########################
-Controllers (line 38-55)
+Controllers (line 28-69)
 ########################
 
-Controllers react to input from user and input channels. 
-A custom controller inherits from the class Controller. 
-In __init__ ( the constructor) you define inputs and setup the hardware.
+A controller reacts to one or more inputs and generates one or more outputs.
+The input could come from the user via the web based UI, sensors or other application logic.
 
-In the example above the controller defines a button and links it to a dashboard panel.
-When the user pushes the button in the browser it will invoke the input_changed on the controller
-and the controller will set the state on a output channel.
+The example above implements a fan controller that calculates speed of a fan by reading the temperature of a sensor.
+The controller is agnostic to how it is linked to user interface and hardware it only works in the interface of inputs it
+defines and the output it produces. In that way it is easy to change hardware and UI without recoding the controller.
+
+In order to do the calculation the controller uses the following inputs:
+
+* temp, the temperature that should be used in the calculation.
+* trigger_temp, if the temperature is below this temperature the fan is stopped.
+* max_temp, if the temperature is greater that this temperature the fan should run at max speed.
+* active, if true the controller should calculate the speed. If false the fan should be turned off.
+
+In the span from trigger_temp to max_temp the controller will graduatly increase the speed.
+
+In __init__ ( the constructor) you define inputs and outputs.
+A controller input is defined by calling self.inputs.add and specify the id, name and type of the input::
+
+    self.temp = self.inputs.add("temp", "Temperature", DynamicNumber)
+                
+A controller output is defined by calling self.outputs.add and specify the id, name and type of the output::
+
+    self.temp = self.inputs.add("temp", "Temperature", DynamicNumber)
+
+The controller reacts to the input_changed event and calculates the outputs (fan_speed)
 
 ###########################
-Start the engines (line 57)
+Linking controller inputs (line 72 - 77)
+###########################
+
+The next step is to link the controller to the cpu sensor:: 
+
+ FAN_CONTROLLER.temp.link_to(SENSOR_CPU_TEMP)
+
+Now the temp input listen to changes in cpu temperature, when the the temperature changes the input_changed event is fired.
+
+The other controller inputs are linked the dashboard where the user can control these parameters. 
+When the user changes one of the inputs the input_changed event is fired.
+
+
+###########################
+Linking controller outputs (line 72 - 77)
+###########################
+
+In this example the the fan controller is linked to a DC motor that is controlled via a Adafruit motor hat.
+
+The dc motor is linked to fan_speed::
+
+    MOTOR_CONTROLLER.dc_motors[2].speed.link_to(FAN_CONTROLLER.fan_speed)
+
+Now the dc motor listen to changes in fan_speed. 
+
+###########################
+Start the engines (line 84)
 ###########################
 
 The work so far have been to prepare your application nothing is running yet to actually launch your app you need to call APP.run().

@@ -40,11 +40,16 @@ class LogicIOChannel(DynamicBoolean):
         return self._device.get(self, self._channel)
 
     def set(self, value):
-        self._device.set(self._channel, value)
+        if self.is_input:
+            self._device.set(self._channel, value)
 
-    def define_as_input(self, pullup=False):
+    def _input_changed(self,v):
+        self.value = self._device.get(self._channel)
+
+    def define_as_input(self, pullup=False, bounce_time=200):
         self.is_input = False
         self._device.define_as_input(self._channel, pullup)
+        self._device.listen(self._channel, self._input_changed, bounce_time)
 
     def define_as_output(self):
         self.is_input = True
@@ -123,18 +128,22 @@ class IGPIODeviceDriver(object):
         self._gpio_id = gpio_id
 
     def __getitem__(self, channel):
+        channel = str(self._map_pin(channel))
         if not channel in self.channels.keys():
             channel_type = self._get_channel_type(channel)
             if channel_type == CHANNEL_TYPE_ANALOG_IN:
                 self.channels[channel] = AnalogIOChannel(self, channel, False)
-
-            if channel_type == CHANNEL_TYPE_ANALOG_OUT:
+            elif channel_type == CHANNEL_TYPE_ANALOG_OUT:
                 self.channels[channel] = AnalogIOChannel(self, channel, True)
-
-            if channel_type == CHANNEL_TYPE_GPIO:
+            elif channel_type == CHANNEL_TYPE_GPIO:
                 self.channels[channel] = LogicIOChannel(self, channel)
-        
+            else:
+                print("unknown channel_type:", channel, channel_type)
+
         return self.channels[channel]
+
+    def _map_pin(self, channel):
+        return channel
 
     def _get_channel_type(self, channel):
         """creates a channel"""
