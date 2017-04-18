@@ -232,6 +232,11 @@ class IGPIODeviceDriver(object):
                 GPIO.listen(12, callback_func)
 
         :type callback: ``function or method``
+
+        :param bounce_time:
+            To reduce switch noice a bounce_time > 0 filters small jitters when a switch or button is pressed
+
+        :type channel: ``float``
         """
 
         raise NotImplementedError

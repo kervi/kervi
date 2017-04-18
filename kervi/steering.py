@@ -9,20 +9,20 @@ class MotorSteering(TaskHandler):
     """
     Control the speed and direction of two motors.
     """
-    def __init__(self, controller_id, name):
+    def __init__(self, controller_id="steering", name="Steering"):
         TaskHandler.__init__(self, controller_id, name)
         self.type = "steering"
-        self.outputs.add("left_speed", "Left speed", DynamicNumber)
-        self.outputs.add("right_speed", "Right speed", DynamicNumber)
+        self.left_speed = self.outputs.add("left_speed", "Left speed", DynamicNumber)
+        self.right_speed = self.outputs.add("right_speed", "Right speed", DynamicNumber)
 
         self.inputs.add("left_encoder", "Left encoder", DynamicNumber)
         self.inputs.add("right_encoder", "Right encoder", DynamicNumber)
         self._adjust = 0
 
 
-        self.inputs.add("speed", "Speed", DynamicNumber)
-        self.inputs.add("direction", "Direction", DynamicNumber)
-        self.inputs.add("all_off", "All off", DynamicBoolean)
+        self.speed = self.inputs.add("speed", "Speed", DynamicNumber)
+        self.direction = self.inputs.add("direction", "Direction", DynamicNumber)
+        self.all_off = self.inputs.add("all_off", "All off", DynamicBoolean)
 
     @property
     def adjust(self):
@@ -60,9 +60,9 @@ class MotorSteering(TaskHandler):
 
     def dynamic_value_changed(self, changed_input):
         #print("steering input changed:", changed_input.input_id, changed_input.value)
-        if changed_input == self.inputs["all_off"]:
-            self.outputs["left_speed"].value = 0
-            self.outputs["right_speed"].value = 0
+        if changed_input == self.all_off:
+            self.left_speed.value = 0
+            self.right_speed.value = 0
 
-        if changed_input == self.inputs["speed"] or changed_input == self.inputs["direction"]:
-            self.run(self.inputs["speed"].value, self.inputs["direction"].value)
+        if changed_input == self.speed or changed_input == self.direction:
+            self.run(self.speed.value, self.direction.value)

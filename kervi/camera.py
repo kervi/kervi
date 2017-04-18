@@ -75,6 +75,9 @@ class CameraBase(Controller):
         self.inputs.add("pan", "Pan", DynamicNumber)
         self.inputs.add("tilt", "Tilt", DynamicNumber)
 
+        self.pan = self.outputs.add("pan", "Pan", DynamicNumber)
+        self.tilt = self.outputs.add("tilt", "Tilt", DynamicNumber)
+
         self.inputs.add("fps", "FPS", DynamicEnum)
         self.inputs["fps"].set_ui_parameter("inline", True)
 
@@ -97,9 +100,9 @@ class CameraBase(Controller):
 
     def input_changed(self, changed_input):
         if changed_input == self.inputs["pan"]:
-            self.pan_changed(changed_input.value)
+            self.pan.value = changed_input.value
         if changed_input == self.inputs["tilt"]:
-            self.tilt_changed(changed_input.value)
+            self.tilt.value = changed_input.value
 
     @property
     def height(self):

@@ -345,7 +345,7 @@ class MotorControllerBoard(object):
         if stepper_controller:
             self._stepper = stepper_controller
         else:
-            self._stepper = StepperMotorControllerBase(device_name, 0)
+            self._stepper = StepperMotorControllerBase(board_id+".stepper_motors", device_name, 0)
 
         if servo_controller:
             self._servo = servo_controller

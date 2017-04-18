@@ -104,6 +104,10 @@ class Dashboard(KerviComponent):
         self.add_panel(DashboardPanel("header"))
         self.add_panel(DashboardPanel("footer"))
         self.add_panel(DashboardPanel("background"))
+        self.add_panel(DashboardPanel("left_pad_x"))
+        self.add_panel(DashboardPanel("left_pad_y"))
+        self.add_panel(DashboardPanel("right_pad_x"))
+        self.add_panel(DashboardPanel("right_pad_y"))
 
         self.background = {}
         #camera_id = kwargs.get("camera", "")
