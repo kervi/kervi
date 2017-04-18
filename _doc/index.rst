@@ -50,6 +50,7 @@ Below is the a complete example to show a sensor on a dashboard with chart
    dashboards
    sensors
    controllers
+   dynamic_values
    camera
    hal
    ipc

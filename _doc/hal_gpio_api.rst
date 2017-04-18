@@ -1,4 +1,4 @@
 GPIO API
 -----------------------------
-.. automodule:: kervi.utility.hal.gpio
+.. automodule:: kervi.hal.gpio
    :members:

@@ -1,4 +1,4 @@
-Dashboards api
+Dynamic values api
 =================================
-.. automodule:: kervi.dashboard
+.. automodule:: kervi.values
    :members:

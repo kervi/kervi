@@ -1,4 +1,4 @@
 I2C API
 -----------------------------
-.. automodule:: kervi.utility.hal.i2c
+.. automodule:: kervi.hal.i2c
    :members:
