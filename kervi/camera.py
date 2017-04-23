@@ -78,6 +78,9 @@ class CameraBase(Controller):
         self.pan = self.outputs.add("pan", "Pan", DynamicNumber)
         self.tilt = self.outputs.add("tilt", "Tilt", DynamicNumber)
 
+        self.flip_vertical = kwargs.get("flip_vertical", False)
+        self.flip_horizontal = kwargs.get("flip_horizontal", False)
+
         self.inputs.add("fps", "FPS", DynamicEnum)
         self.inputs["fps"].set_ui_parameter("inline", True)
 
@@ -94,7 +97,9 @@ class CameraBase(Controller):
         self._ui_parameters["width"] = kwargs.get("width", 640)
         self._ui_parameters["type"] = kwargs.get("type", "")
         self._ui_parameters["fps"] = kwargs.get("fps", 10)
+        
         self._ui_parameters["source"] = kwargs.get("source", "")
+
         self._ui_parameters["show_pan_tilt"] = kwargs.get("show_pan_tilt", False)
         self._ui_parameters["show_buttons"] = kwargs.get("show_buttons", True)
 
