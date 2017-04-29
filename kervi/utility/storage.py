@@ -30,7 +30,7 @@ class MemoryCleanThread(KerviThread):
         time.sleep(20)
         try:
             cursor = MEMORY_CON.cursor()
-            cursor.execute("DELETE FROM sensorData WHERE id IN (SELECT id FROM sensorData ORDER BY id ASC LIMIT 1000);")
+            cursor.execute("DELETE FROM dynamicData WHERE id IN (SELECT id FROM dynamicData ORDER BY id ASC LIMIT 1000);")
         except lite.Error as msg:
             SPINE.log.error("clean memory db, Command skipped: {0}, command{1}", msg)
 
@@ -62,13 +62,13 @@ DB_CREATE_SQL = """
             'ts'    `timeStamp`	REAL,
             `logType`	TEXT
         );
-        CREATE TABLE "sensorData" (
+        CREATE TABLE "dynamicData" (
             `id`	INTEGER PRIMARY KEY AUTOINCREMENT,
-            `sensor`	TEXT,
+            `dynamicValue`	TEXT,
             `value`	TEXT,
             `timeStamp`	REAL
         );
-        CREATE INDEX `sensorindex` ON `sensorData` (`sensor` ,`timeStamp` );
+        CREATE INDEX `sensorindex` ON `dynamicData` (`dynamicValue` ,`timeStamp` );
         CREATE TABLE "settings" (
             `id`	INTEGER PRIMARY KEY AUTOINCREMENT,
             `setting_group`	TEXT,
@@ -152,7 +152,7 @@ def init_db():
 init_db()
 TS_START = datetime.utcnow()
 
-def store_sensor_reading(sensor_id, sensor_value, persist=False):
+def store_dynamic_value(value_id, value, persist=False):
     global FILE_CON
     try:
         if not persist:
@@ -161,12 +161,17 @@ def store_sensor_reading(sensor_id, sensor_value, persist=False):
             cur = FILE_CON.cursor()
 
         cur.execute(
-            "INSERT INTO sensorData ('sensor','value','timeStamp')  VALUES (?, ?, ?)",
-            (sensor_value["sensor"], sensor_value["value"], sensor_value["timestamp"])
+            "INSERT INTO dynamicData ('dynamicValue','value','timeStamp')  VALUES (?, ?, ?)",
+            (value["id"], value["value"], value["timestamp"])
         )
-        FILE_CON.commit()
+        if not persist:
+            cur = MEMORY_CON.commit()
+        else:
+            cur = FILE_CON.commit()
+
+        
     except lite.Error as er:
-        SPINE.log.error('error store sensordata:{0}', er)
+        SPINE.log.error('error store dynamic data:{0}', er)
 
 
 def store_setting(group, name, value):
@@ -214,8 +219,8 @@ def retrieve_setting(group, name):
     if setting:
         return setting["value"]
 
-def get_sensor_data(sensor, date_from=None, date_to=None, limit=60):
-    SPINE.log.debug("getSensorData sensor:{0}, from {1} to {2}", sensor, date_from, date_to)
+def get_dynamic_data(dynamic_value, date_from=None, date_to=None, limit=60):
+    SPINE.log.debug("get dynamic data sensor:{0}, from {1} to {2}",dynamic_value, date_from, date_to)
     if date_from is None:
         date_from = TS_START
 
@@ -231,8 +236,8 @@ def get_sensor_data(sensor, date_from=None, date_to=None, limit=60):
         for con in con_list:
             cur = con.cursor()
             cur.execute(
-                "select * from sensorData where sensor=? and timestamp > ? and timestamp < ? LIMIT ?",
-                (sensor, date_from_ts, date_to_ts, limit)
+                "select * from dynamicData where dynamicValue=? and timestamp > ? and timestamp < ? LIMIT ?",
+                (dynamic_value, date_from_ts, date_to_ts, limit)
             )
 
             all_rows = cur.fetchall()
@@ -247,7 +252,7 @@ def get_sensor_data(sensor, date_from=None, date_to=None, limit=60):
                 break
         return result
     except lite.Error as er:
-        SPINE.log.error('error get sensordata:{0}', er)
+        SPINE.log.error('error get dynamic data:{0}', er)
 
 def store_log_item(id, item):
     try:
@@ -310,11 +315,11 @@ def query_cron_job():
     pass
 
 if (SPINE):
-    SPINE.register_query_handler("getSensorData", get_sensor_data)
+    SPINE.register_query_handler("getSensorData", get_dynamic_data)
     SPINE.register_command_handler("storeSetting", store_setting)
     SPINE.register_query_handler("retrieveSetting", retrieve_setting)
     SPINE.register_query_handler("getLogItems", get_log_items)
-    SPINE.register_event_handler("NewSensorReading", store_sensor_reading)
+    SPINE.register_event_handler("dynamicValueChanged", store_dynamic_value)
     SPINE.register_event_handler("userLogMessage", store_log_item)
     SPINE.register_command_handler("createCronJob", create_cron_job)
     SPINE.register_command_handler("deleteCronJob", delete_cron_job)

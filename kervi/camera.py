@@ -97,9 +97,7 @@ class CameraBase(Controller):
         self._ui_parameters["width"] = kwargs.get("width", 640)
         self._ui_parameters["type"] = kwargs.get("type", "")
         self._ui_parameters["fps"] = kwargs.get("fps", 10)
-        
         self._ui_parameters["source"] = kwargs.get("source", "")
-
         self._ui_parameters["show_pan_tilt"] = kwargs.get("show_pan_tilt", False)
         self._ui_parameters["show_buttons"] = kwargs.get("show_buttons", True)
 

@@ -18,6 +18,8 @@ class Controller(KerviComponent):
 
     Examples for controllers are motor control, servo control, output to IO.
 
+    A controller my define one or more dynamic values as input and output.
+
     """
     def __init__(self, controller_id, name):
         KerviComponent.__init__(self, controller_id, "controller", name)
@@ -36,7 +38,6 @@ class Controller(KerviComponent):
         }
         self.spine.register_event_handler("processTerminating",self._on_terminate)
 
-    
     @property
     def controller_id(self):
         return self.component_id
@@ -75,8 +76,6 @@ class Controller(KerviComponent):
             *kwargs
             )
 
-    
-
     def _on_terminate(self, id):
         if self._active:
             self._active = False
@@ -93,11 +92,11 @@ class Controller(KerviComponent):
         """
         pass
 
-    def dynamic_value_changed(self, changed_input):
-        self.input_changed(changed_input)
+    def dynamic_value_changed(self, value, transformed_value):
+        self.input_changed(value)
         pass
 
-    def input_changed(self, changed_input):
+    def input_changed(self, input_id):
         """
         Abstract method that is called by when one of the controller inputs change.
 
@@ -108,7 +107,7 @@ class Controller(KerviComponent):
             Input that has changed. You can read the value of the changed input
             via the inputs value property.
 
-        :type changed_input: Input component
+        :type changed_input: DynamicValue
         """
         pass
 
@@ -142,3 +141,5 @@ class Controller(KerviComponent):
             "template" : template,
             "type": self.type
         }
+
+

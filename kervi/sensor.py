@@ -3,8 +3,8 @@
 
 """
 Sensor handling in Kervi is split in two parts. 
-The first part is sensor device drivers that handles physical access to a sensors hardware.
-The second part is the Sensor class that reads a sensor devices and triggers events, store readings to DB.
+The first part is sensor device drivers that handles physical access to sensor hardware.
+The second part is the Sensor class that reads a sensor device and triggers events, store readings to DB.
 """
 
 import time
@@ -12,13 +12,17 @@ from kervi.utility.thread import KerviThread
 from kervi.spine import Spine
 from kervi.utility.component import KerviComponent
 from kervi.values import DynamicNumber
-from kervi.settings import Settings
+#from kervi.settings import Settings
 
 class Sensor(DynamicNumber):
     r"""
-    Sensor is the base class that all sensors inherits from.
-    This class handles storage in DB, trigger events when value change
-    and linking to dashboards.
+    Sensor is a class that exposes a sensor device as a dynamic value.
+    The Sensor class polls the associated sensor device and updates it self when
+    the value of the sensor device change.
+
+    All the possibilities for linking to other dynamic values and dashboards is inherit from DynamicNumber.
+
+    Some sensor devices are multi dimensional and each dimension are reached by a numeric index of the sensor it self.
 
     :param sensor_id:
             Id of the sensor.
@@ -26,7 +30,7 @@ class Sensor(DynamicNumber):
     :type sensor_id: ``str``
 
     :param name:
-            Name of the sensor. Used in web dashbaords
+            Name of the sensor. Used in web dashboards
     :type name: ``str``
 
     :param device:
@@ -34,10 +38,14 @@ class Sensor(DynamicNumber):
         or a sensor device driver that inherits from kervi.hal.SensorDeviceDriver
     :type device: ``SensorDeviceDriver``
 
+    :param polling_interval:
+        Polling interval in seconds. Set to zero to disable polling.        
+    :type device: ``float``
+
     (self, name, input_id=None, is_input=True, parent=None, index = None):
 
     """
-    def __init__(self, sensor_id, name, device=None, use_thread=True, parent=None, index=None):
+    def __init__(self, sensor_id, name, device=None, use_thread=True, parent=None, index=None, polling_interval=1):
         DynamicNumber.__init__(self, name, sensor_id, False, parent, index)
         self._device = device
         self._component_type = "sensor"
@@ -70,7 +78,7 @@ class Sensor(DynamicNumber):
         self._ui_parameters["show_value"] = True
         self._ui_parameters["show_sparkline"] = True
         if use_thread:
-            self._sensor_thread = _SensorThread(self, 1)
+            self._sensor_thread = _SensorThread(self, polling_interval)
         else:
             self._sensor_thread = None
 
@@ -80,14 +88,18 @@ class Sensor(DynamicNumber):
         return self._sub_sensors[sub_sensor]
 
     @property
-    def reading_interval(self):
+    def polling_interval(self):
+        """
+        The polling interval of the sensor in seconds.
+
+        :type: ``float``
+        """
         return self._sensor_thread.reading_interval
 
-    @reading_interval.setter
+    @polling_interval.setter
     def reading_interval(self, interval):
         self._sensor_thread.reading_interval = interval
 
-    
     @property
     def type(self):
         """
@@ -101,14 +113,17 @@ class Sensor(DynamicNumber):
     def type(self, value):
         self._type = value
 
-    
     @property
     def sensor_id(self):
         return self.component_id
 
     @property
     def device(self):
-        """A hardware device from the kervi device library. Or a class that inherits from kervi.hal.SensorDeviceDriver"""
+        """
+        The device that is linked to this sensor class.
+        It may be a hardware device from the kervi device library
+        or a class that inherits from kervi.hal.SensorDeviceDriver
+        """
         return self._device
 
     @device.setter
@@ -175,16 +190,11 @@ class Sensor(DynamicNumber):
             "min":self.min,
             "unit":self.unit,
             "value":self._value,
-            "upperFatalLimit":self.upper_fatal_limit,
-            "upperWarningLimit":self.upper_warning_limit,
-            "lowerWarningLimit":self.lower_warning_limit,
-            "lowerFatalLimit":self.lower_fatal_limit,
+            "ranges":self.event_ranges,
             "subSensors": dimensions,
             "sparkline":self._sparkline
-            #"ui": self._ui_parameters
         }
 
-    
     def _new_sensor_reading(self, sensor_value):
         """
         Call this method to signal a new sensor reading.
@@ -205,7 +215,7 @@ class Sensor(DynamicNumber):
 
     def _read_sensor(self):
         self._new_sensor_reading(self._device.read_value())
-    
+
 class _SensorThread(KerviThread):
     r"""
     SensorThread is the base class that  polls sensors.

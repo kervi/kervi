@@ -22,6 +22,16 @@ class Settings(object):
         self.spine.send_command("storeSetting", self.group, name, value)
 
 
-    def retrieve_value(self, name):
+    def retrieve_value(self, name, default_value=None):
         """Retrieve a value from DB"""
-        return self.spine.send_query("retrieveSetting", self.group, name)
+        value = self.spine.send_query("retrieveSetting", self.group, name)
+        if value is None:
+            return default_value
+        elif isinstance(value, list) and len(value) == 0:
+            return default_value
+        elif isinstance(default_value, int):
+            return int(value)
+        elif isinstance(default_value, float):
+            return float(value)
+        else:
+            return value

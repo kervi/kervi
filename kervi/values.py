@@ -27,10 +27,10 @@ class DynamicValueList(object):
         #if self._inject and self.controller:
         #    setattr(self.controller, value_id, item)
         #setattr(self, value_id, item)
-        
+
         self.count += 1
         self._items[value_id] = item
-        if self.is_input:
+        if self.is_input and self.controller:
             item.add_observer(self.controller)
         return item
 
@@ -44,7 +44,7 @@ class DynamicValueList(object):
 
 class DynamicValue(KerviComponent):
     """
-    Generic value
+    Generic dynamic value that is use as base class for specialized dynamic values.
     """
     def __init__(self, name, value_type, input_id=None, is_input=True, parent=None, index = None):
         global VALUE_COUNTER
@@ -60,13 +60,15 @@ class DynamicValue(KerviComponent):
         KerviComponent.__init__(self, input_id, value_type, name)
         #self.spine = Spine()
         self.unit = ""
+        self._default_value = None
         self._index = index
         self.is_input = is_input
         self._value = None
         self._observers = []
+        self._value_event_handlers = []
         if parent:
             self._observers += [parent]
-        self._spine_observers = []
+        self._spine_observers = {}
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value)
         self.spine.register_query_handler("getDynamicValue", self._query_value)
@@ -84,9 +86,13 @@ class DynamicValue(KerviComponent):
             "value_size":10
         }
         self._persist_value = False
+        self._log_values = False
 
     @property
     def index(self):
+        """
+        Index of the value relative to its parent (controller or sensor)
+        """
         return self._index
 
     @property
@@ -100,43 +106,94 @@ class DynamicValue(KerviComponent):
 
     @value.setter
     def value(self, new_value):
+        """
+        Updates the value.
+        If the change exceeds the delta for the dynamic number controllers and linked values are notified.  
+        """
         self._set_value(new_value)
 
     @property
+    def log_values(self):
+        """
+        Set to true if the values should be logged to DB.
+        If false Kervi will hold a small cache in memory
+        for the last reading to be used in sparklines and real time charts.
+        """
+        return self._log_values
+
+    @log_values.setter
+    def log_values(self, value):
+        self._log_values = value
+
+    @property
     def persist_value(self):
-        """ If true the value is saved to kervi DB when it change"""
+        """
+        Set to true if the current value should be saved to db when the Kervi application or module exits.
+        The value will be restored upon application or module start. 
+        """
         return self._persist_value
 
     @persist_value.setter
     def persist_value(self, do_persist):
-        self._persist_value = do_persist
+        if not self._persist_value and do_persist:
+            self._persist_value = do_persist
+            self._load_persisted()
+        else:
+            self._persist_value = do_persist
 
-    
     def _query_value(self, id):
         if self.component_id == id:
             return self.value
-    
+
     def _load_persisted(self):
         if self._persist_value:
-            self._set_value(self.settings.retrieve_value("value"), False)
+            self._set_value(self.settings.retrieve_value("value", self._default_value), False)
 
-    def link_to(self, src):
-        if isinstance(src, DynamicValue):
-            if src.is_input and not self.is_input:
-                self.add_observer(src)
-            elif not src.is_input and self.is_input:
-                src.add_observer(self)
+    def link_to(self, dynamic_value, transformation=None):
+        """
+        Dynamic values may be linked together. 
+        A dynamic value is configured to be an input or output.
+        When an output value is linked to an input value the input will become
+        an observer of the output. Every time the output value change it will notify the input 
+        about the change.
+
+        :param dynamic_value:
+            It is possible to make direct and indirect link.
+
+            If the type of the parameter dynamic_value is of type DynamicValue a direct link is created.
+            this is a fast link where the output can signal directly to input.
+            This type of link is possible if both output and input resides in the same process.
+
+            If the type of the dynamic_value is a string it is expected to hold the id of a dynamic value.
+            In this mode the input value will listen on the kervi spine for events from the output value.
+            This mode is useful if the output and input does not exists in the same process.
+            This type of link must be made by the input.
+
+        :type dynamic_value: ``str`` or ``DynamicValue``
+
+        :param transformation:
+            A function or lambda expression that transform the value before the output is update.
+            This is usefull if the input expects other ranges that the output produce
+            or need to change the sign of the value.
+
+        """
+        source = dynamic_value
+        if isinstance(source, DynamicValue):
+            if source.is_input and not self.is_input:
+                self.add_observer(source, transformation)
+            elif not source.is_input and self.is_input:
+                source.add_observer(self, transformation)
             else:
                 raise Exception("input/output mismatch in dynamic value link:{0} - {1}".format(src.name, self.name))
-        elif isinstance(src, str):
+        elif isinstance(source, str):
             if len(self._spine_observers) == 0:
                 self.spine.register_event_handler("dynamicValueChanged", self._value_changed_event)
-            
-            self._spine_observers += [src]
+
+            self._spine_observers[source] = transformation
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
-        Links this input to a dashboard panel.
+        Links this DynamicValue to a dashboard panel.
 
         :param dashboard_id:
             Id of the dashboard to link to.
@@ -150,26 +207,24 @@ class DynamicValue(KerviComponent):
             Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *size* (``int``) -- The number of dashboard cells the input should occupy horizontal.
+            * *size* (``int``) -- The number of dashboard cells the Dynamic should occupy horizontal.
                 If size is 0 (default) the input and label will expand to the width of the panel.
 
-            * *link_to_header* (``str``) -- Link this input to header of the panel.
+            * *link_to_header* (``str``) -- Link this DynamicValue to header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
 
-            * *label* (``str``) -- Label text, default value is the name of the input.
+            * *label* (``str``) -- Label text, default value is the name of the DynamicValue.
 
             * *flat* (``bool``) -- Flat look and feel.
 
-            * *inline* (``bool``) -- Display input and label in its actual size
+            * *inline* (``bool``) -- Display DynamicValue and label in its actual size
                 If you set inline to true the size parameter is ignored.
-                The input will only occupy as much space as the label and input takes.
+                The DynamicValue will only occupy as much space as the label and input takes.
 
             * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
 
             * *value_size* (``int``) -- width of the value area as a percentage of the total container it sits in.
-
-            * *type* (``string``) -- 'vertical_slider' or 'horizontal_slider.
         """
         KerviComponent.link_to_dashboard(
             self,
@@ -178,12 +233,20 @@ class DynamicValue(KerviComponent):
             **kwargs
             )
 
-    def add_observer(self, observer):
-        self._observers += [observer]
+    def add_observer(self, observer, transformation=None):
+        """
+        Adds an observer to this value.
+        The observer must implement the function dynamic_value_changed. 
+        """
+        self._observers += [(observer, transformation)]
 
     def _value_changed_event(self, id, value ):
-        if value["id"] in self._spine_observers:
-            self.value = value["value"]
+        if value["id"] in self._spine_observers.keys():
+            transformation = self._spine_observers[value["id"]]
+            if transformation:
+                self.value = transformation(value["value"])
+            else:
+                self.value = value["value"]
 
     def _set_value(self, nvalue, allow_persist=True):
         if self._value != nvalue:
@@ -196,30 +259,106 @@ class DynamicValue(KerviComponent):
             old_value = self.value
             self._value = nvalue
             self.value_changed(nvalue, old_value)
+
             for observer in self._observers:
-                observer.dynamic_value_changed(self)
+                item, transformation = observer
+                if transformation:
+                    item.dynamic_value_changed(self, transformation(nvalue))
+                else:
+                    item.dynamic_value_changed(self, nvalue)
+
+            self._check_value_events(nvalue, old_value)
 
             if self._persist_value and allow_persist:
                 self.settings.store_value("value", self.value)
 
             timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+            val = {"id":self.component_id, "value":nvalue, "timestamp":timestamp}
             self.spine.trigger_event(
                 "dynamicValueChanged",
                 self.component_id,
-                {"id":self.component_id, "value":nvalue, "timestamp":timestamp}
+                val,
+                self._log_values
             )
 
-    def dynamic_value_changed(self, dynamic_value):
-        self.value = dynamic_value.value
+    def dynamic_value_changed(self, dynamic_value, transformed_value):
+        self.value = transformed_value
 
     def value_changed(self, new_value, old_value):
         pass
 
+    def add_value_event(self, event_value, func, event_type=None):
+        """
+        Add a function that is called when the dynamic value reach or pass the event_value.
+
+        :param event_value:
+            A single value or range specified as a tuple.
+
+            If it is a range the function specified in func is called when the value enters the range. 
+
+        :type event_value: ``float``, ``string``, ``boolean`` or a tuple of these types. 
+
+        :param func:
+            Function or lambda expression to be called. 
+            This function will receive the dynamcic value as a parameter.
+
+        :param event_type:
+            String with the value "warning" of "error" or None (default).
+            If warning or error is specified the value or range are shown in UI.
+
+        :type event_type: ``str``
+
+        """
+        self._value_event_handlers += [(event_value, func, event_type)]
+
+    def _handle_range_event(self, message, func, level):
+        self.user_log_message(message, level=level)
+        if func:
+            func(self)
+
+    def add_normal_range(self, value, message=None, func=None):
+        self.add_value_event(value, self._handle_range_event(message, func, 3))
+
+    def add_warning_range(self, value, message=None, func=None):
+        self.add_value_event(value, self._handle_range_event(message, func, 2) , event_type="warning")
+
+    def add_error_range(self, value, message=None, func=None):
+        self.add_value_event(value, self._handle_range_event(message, func, 1), event_type="error")
+
+    def _check_value_events(self, new_value, old_value):
+        for event in self._value_event_handlers:
+            value, func, event_type = event
+            if func:
+                if isinstance(value, tuple):
+                    value_start, value_end = value
+                    if old_value < value_start and new_value >= value_start:
+                        func(self)
+                    elif old_value > value_end and new_value <= value_end:
+                        func(self)
+                else:
+                    if old_value < value and new_value >= value:
+                        func(self)
+                    elif old_value > value and new_value <= value:
+                        func(self)
+
+    @property
+    def _event_ranges(self):
+        ranges = []
+        for event in self._value_event_handlers:
+            value, func, event_type = event
+            if isinstance(value, tuple):
+                value_start, value_end = value
+                ranges += [{"start":value_start, "end":value_end, "type":event_type}]
+            if event_type:
+                ranges += [{"start":value, "end":None, "type":event_type}]
+        return ranges
+    
     def _get_info(self):
         return {
             "unit":self.unit,
             "value":self.value,
             "command":self.command,
+            "ranges":self._event_ranges,
             "visible": self.visible
         }
 
@@ -228,7 +367,9 @@ class DynamicValue(KerviComponent):
 
 class DynamicNumber(DynamicValue):
     """
-    A number input component shows as a slider on dashboards.
+    DynamicValue that holds a float value.
+    If this DynamicValue is an input it is shown as a slider on dashboards.
+    If is an output it is possible to specify different kinds of gauges.
     """
     def __init__(self, name, input_id=None, is_input=True, parent=None, index = None):
         DynamicValue.__init__(self, name, "dynamic-number", input_id, is_input, parent, index)
@@ -236,51 +377,23 @@ class DynamicNumber(DynamicValue):
         self._min_value = -100
         self._max_value = 100
         self.unit = ""
+        self._default_value = 0.0
         self._value = 0
         self._delta = None
         self._save_to_db = False
         self._ui_parameters["type"] = "horizontal_slider"
         self._ui_parameters["chart_points"] = 60
         self._ui_parameters["show_sparkline"] = False
-
-        self._upper_fatal_limit = None
-        self._upper_warning_limit = None
-        self._lower_warning_limit = None
-        self._lower_fatal_limit = None
-
-        self._upper_fatal_message = None
-        self._upper_warning_message = None
-        self._lower_warning_message = None
-        self._lower_fatal_message = None
-
-        self._normal_message = None
-
-        self._log_warnings = False
-        self._log_errors = False
+        self._ui_parameters["pad_auto_center"] = False
+        self._ui_parameters["tick"] = 1.0
 
         self._sparkline = []
         self._last_reading = None
         
     @property
-    def persist_to_db(self):
-        """
-        If true the method new_sensor_reading
-        will save the sensor reading to DB.
-
-        :type: ``bool``
-        """
-        return self._save_to_db
-
-    @persist_to_db.setter
-    def persist_to_db(self, value):
-        self._save_to_db = value
-
-    @property
     def delta(self):
         """
-        Enter how much a sensor value should change to trigger a new sensor read response.
-        The method new_sensor_reading triggers db saving.
-        Only relevant if persist_to_db is True.
+        Enter how much a the value should change before it triggers changes events and updates links.
         :type: ``float``
         """
         return self._store_delta
@@ -292,7 +405,7 @@ class DynamicNumber(DynamicValue):
     @property
     def max(self):
         """
-        Maximum value the sensor may mesaure.
+        Maximum value.
 
         :type: ``float``
         """
@@ -305,7 +418,7 @@ class DynamicNumber(DynamicValue):
     @property
     def min(self):
         """
-        Minimum value the sensor may mesaure.
+        Minimum value.
 
         :type: ``float``
         """
@@ -318,7 +431,7 @@ class DynamicNumber(DynamicValue):
     @property
     def unit(self):
         """
-        Mesauring unit for value. Enter values like C, F, hPa
+        Unit of value. Enter values like C, F, hPa
 
         :type: ``str``
         """
@@ -327,135 +440,6 @@ class DynamicNumber(DynamicValue):
     @unit.setter
     def unit(self, value):
         self._unit = value
-      
-
-    @property
-    def upper_fatal_limit(self):
-        """
-        If set the sensor will trigger an event *sensorUpperFatal* if the value pases this limit.
-        When the sensor is displayed on a dashboard
-        the zone from upper_fatal_limit to max is marked red.
-
-        :type: ``float``
-        """
-        return self._upper_fatal_limit
-
-
-    @property
-    def normal_message(self):
-        """
-        Message to log when the sensor value reach normal levels from lower or upper limits.
-
-        :type: ``str``
-        """
-        return self._normal_message
-
-    @normal_message.setter
-    def normal_message(self, value):
-        self._normal_message = value
-
-    @upper_fatal_limit.setter
-    def upper_fatal_limit(self, value):
-        self._upper_fatal_limit = value
-
-    @property
-    def upper_fatal_message(self):
-        """
-        Message to log when the sensor value reach upper_fatal_limit
-
-        :type: ``str``
-        """
-        return self._upper_fatal_message
-
-    @upper_fatal_message.setter
-    def upper_fatal_message(self, value):
-        self._upper_fatal_message = value
-
-    @property
-    def upper_warning_limit(self):
-        """
-        If set the sensor will trigger an event *sensorUpperWarning* if the value pases this limit.
-        When the sensor is displayed on a dashboard the zone from upper_warning_limit
-        to upper_fatal_limit or max is marked yellow.
-
-        :type: ``float``
-        """
-        return self._upper_warning_limit
-
-    @upper_warning_limit.setter
-    def upper_warning_limit(self, value):
-        self._upper_warning_limit = value
-
-    @property
-    def upper_warning_message(self):
-        """
-        Message to log when the sensor value reach upper_warning_limit
-
-        :type: ``str``
-        """
-        return self._upper_warning_message
-
-    @upper_warning_message.setter
-    def upper_warning_message(self, value):
-        self._upper_warning_message = value
-
-    @property
-    def lower_warning_limit(self):
-        """
-        If set the sensor will trigger an event *sensorLowerWarning*
-        if the value pases this limit from a higher previus value.
-        When the sensor is displayed on a dashboard
-        the zone from min or lower_fatal_limit to lower_warning_limit is marked yellow.
-
-        :type: ``float``
-        """
-        return self._lower_warning_limit
-
-    @lower_warning_limit.setter
-    def lower_warning_limit(self, value):
-        self._lower_warning_limit = value
-
-    @property
-    def lower_warning_message(self):
-        """
-        Message to log when the sensor value reach lower_warning_limit
-
-        :type: ``str``
-        """
-        return self._lower_warning_message
-
-    @lower_warning_message.setter
-    def lower_warning_message(self, value):
-        self._lower_warning_message = value
-
-    @property
-    def lower_fatal_limit(self):
-        """
-        If set the sensor will trigger an event *sensorLowerFatal*
-        if the value pases this limit from a higher previus value.
-        When the sensor is displayed on a dashboard
-        the zone from min to lower_fatal_limit is marked red.
-
-        :type: ``float``
-        """
-        return self._lower_fatal_limit
-
-    @lower_fatal_limit.setter
-    def lower_fatal_limit(self, value):
-        self._lower_fatal_limit = value
-
-    @property
-    def lower_fatal_message(self):
-        """
-        Message to log when the sensor value reach lower_fatal_limit
-
-        :type: ``str``
-        """
-        return self._lower_fatal_message
-
-    @lower_fatal_message.setter
-    def lower_fatal_message(self, value):
-        self._lower_fatal_message = value
 
     def _get_info(self):
         return {
@@ -465,10 +449,7 @@ class DynamicNumber(DynamicValue):
             "maxValue":self._max_value,
             "minValue":self._min_value,
             "command":self.command,
-            "upperFatalLimit":self.upper_fatal_limit,
-            "upperWarningLimit":self.upper_warning_limit,
-            "lowerWarningLimit":self.lower_warning_limit,
-            "lowerFatalLimit":self.lower_fatal_limit,
+            "ranges":self._event_ranges,
             "sparkline":self._sparkline,
         }
 
@@ -498,7 +479,17 @@ class DynamicNumber(DynamicValue):
             self.value_changed(new_value, old_value)
 
             for observer in self._observers:
-                observer.dynamic_value_changed(self)
+                if isinstance(observer, tuple):
+                    item, transformation = observer
+                    if transformation:
+                        item.dynamic_value_changed(self, transformation(new_value))
+                    else:
+                        item.dynamic_value_changed(self, new_value)
+                else:
+                    observer.dynamic_value_changed(self, new_value)
+
+            self._check_value_events(new_value, old_value)
+
             if self._persist_value and allow_persist:
                 self.settings.store_value("value", self.value)
 
@@ -511,69 +502,19 @@ class DynamicNumber(DynamicValue):
 
             timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
             val = {"value_id":self.component_id, "value":new_value, "timestamp":timestamp}
-            if self.persist_to_db:
+            if self.persist_value:
                 self.spine.send_command("StoreDynamicValue", val)
 
             self.spine.trigger_event(
                 "dynamicValueChanged",
                 self.component_id,
-                {"id":self.component_id, "value":new_value, "timestamp":timestamp}
+                {"id":self.component_id, "value":new_value, "timestamp":timestamp},
+                 self._log_values
             )
 
-    def _send_messages(self, old_val, value):
-        if old_val == None:
-            return
-        if self.lower_fatal_message:
-            if old_val > self.lower_fatal_limit and value <= self.lower_fatal_limit:
-                self.user_log_message(self.lower_fatal_message, level=1)
-
-        if self.lower_warning_message:
-            if self.lower_fatal_limit and self.lower_warning_limit:
-                if old_val < self.lower_fatal_limit and value >= self.lower_fatal_limit:
-                    self.user_log_message(self.lower_warning_message, level=2)
-
-                elif old_val > self.lower_warning_limit and value <= self.lower_warning_limit:
-                    self.user_log_message(self.lower_warning_message, level=2)
-
-            elif self.lower_warning_limit:
-                if old_val > self.lower_warning_limit and value <= self.lower_warning_limit:
-                    self.user_log_message(self.lower_warning_message, level=2)
-
-        if self.upper_fatal_message:
-            if old_val < self.upper_fatal_limit and value >= self.upper_fatal_limit:
-                self.user_log_message(self.upper_fatal_message, level=1)
-
-        if self.upper_warning_message:
-            if self.upper_fatal_limit and self.upper_warning_limit:
-                if old_val > self.upper_fatal_limit and value <= self.upper_fatal_limit:
-                    self.user_log_message(self.upper_warning_message, level=2)
-                elif old_val < self.upper_warning_limit and value >= self.upper_warning_limit:
-                    self.user_log_message(self.upper_warning_message, level=2)
-
-
-            elif self.upper_warning_limit:
-                if old_val < self.upper_warning_limit and value >= self.upper_warning_limit:
-                    self.user_log_message(self.upper_warning_message, level=2)
-
-        if self.normal_message:
-            if self.upper_warning_limit:
-                if old_val >= self.upper_warning_limit and value < self.upper_warning_limit and value:
-                    self.user_log_message(self.normal_message, level=3)
-            elif self.upper_fatal_limit:
-                if old_val >= self.upper_fatal_limit and value < self.upper_fatal_limit and value:
-                    self.user_log_message(self.normal_message, level=3)
-
-            if self.lower_warning_limit:
-                if old_val <= self.lower_warning_limit and value > self.lower_warning_limit and value:
-                    self.user_log_message(self.normal_message, level=3)
-            elif self.lower_fatal_limit:
-                if old_val <= self.lower_fatal_limit and value > self.lower_fatal_limit and value:
-                    self.user_log_message(self.normal_message, level=3)
-
-    
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
-        Links this input to a dashboard panel.
+        Links this value to a dashboard panel.
 
         :param dashboard_id:
             Id of the dashboard to link to.
@@ -587,27 +528,26 @@ class DynamicNumber(DynamicValue):
             Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *size* (``int``) -- The number of dashboard cells the input should occupy horizontal.
-                If size is 0 (default) the input and label will expand to the width of the panel.
+            * *size* (``int``) -- The number of dashboard cells the value should occupy horizontal.
+                If size is 0 (default) the DynamicValue and label will expand to the width of the panel.
 
-            * *link_to_header* (``str``) -- Link this input to header of the panel.
+            * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
 
-            * *label* (``str``) -- Label text, default value is the name of the input.
+            * *label* (``str``) -- Label text, default value is the name of the DynamicValue.
 
             * *flat* (``bool``) -- Flat look and feel.
 
-            * *inline* (``bool``) -- Display input and label in its actual size
+            * *inline* (``bool``) -- Display DynamicValue and label in its actual size
                 If you set inline to true the size parameter is ignored.
-                The input will only occupy as much space as the label and input takes.
+                The DynamicValue will only occupy as much space as the label and input takes.
 
             * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
 
             * *value_size* (``int``) -- width of the value area as a percentage of the total container it sits in.
 
-            * *type* (``string``) -- 'vertical_slider' or 'horizontal_slider.
-            
+            * *type* (``string``) -- if input 'vertical_slider' or 'horizontal_slider. If output "radial_gauge", "horizontal_gauge", "vertical_gauge"
         """
         KerviComponent.link_to_dashboard(
             self,
@@ -619,7 +559,7 @@ class DynamicNumber(DynamicValue):
 
 class DynamicString(DynamicValue):
     """
-    Text input component
+    DynamicValue that holds a string.
     """
     def __init__(self, name, input_id=None, is_input=True, parent=None, index = None):
         DynamicValue.__init__(self, name, "dynamic-string", input_id, is_input, parent, index)
@@ -629,7 +569,7 @@ class DynamicString(DynamicValue):
 
 class DynamicDateTime(DynamicValue):
     """
-    A date and time component.
+    A DynamicValue that holds a date and/or time.
     """
     def __init__(self, name, input_type="datetime", input_id=None, index = None):
         DynamicValue.__init__(self, name, "dynamic-datetime", input_id, index)
@@ -639,7 +579,8 @@ class DynamicDateTime(DynamicValue):
 
 class DynamicBoolean(DynamicValue):
     """
-    Switch button controller component, shows a on/off button in UI
+    A DynamicValue that holds a boolean.
+    When linked to a dashboard it is represented as a switch button or push button.
     """
     def __init__(self, name, input_id=None, is_input=True, parent=None, index = None):
         DynamicValue.__init__(self, name, "dynamic-boolean", input_id, is_input, parent, index)
@@ -651,6 +592,53 @@ class DynamicBoolean(DynamicValue):
         self._ui_parameters["off_icon"] = None
         self._ui_parameters["button_icon"] = None
         self._ui_parameters["button_text"] = self.name
+
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        r"""
+        Links this value to a dashboard panel.
+
+        :param dashboard_id:
+            Id of the dashboard to link to.
+        :type dashboard_id: str
+
+        :param panel_id:
+            Id of the panel on the dashboard to link to.
+        :type panel_id: str
+
+        :param \**kwargs:
+            Use the kwargs below to override default values for ui parameters
+
+        :Keyword Arguments:
+            * *size* (``int``) -- The number of dashboard cells the value should occupy horizontal.
+                If size is 0 (default) the DynamicValue and label will expand to the width of the panel.
+
+            * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
+
+            * *label_icon* (``str``) -- Icon that should be displayed together with label.
+
+            * *label* (``str``) -- Label text, default value is the name of the DynamicValue.
+
+            * *flat* (``bool``) -- Flat look and feel.
+
+            * *inline* (``bool``) -- Display DynamicValue and label in its actual size
+                If you set inline to true the size parameter is ignored.
+                The DynamicValue will only occupy as much space as the label and input takes.
+
+            * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
+
+            * *value_size* (``int``) -- width of the value area as a percentage of the total container it sits in.
+
+            * *type* (``string``) -- if input 'switch' (default) or 'push'.
+
+            * *on_text* (``string``) -- Text to display when switch is on.
+            * *off_text (``string``) -- Text to display when switch is off.
+            * *on_icon* (``string``) -- Icon to display when switch is on.
+            * *off_icon* (``string``) -- Icon to display when switch is off.
+
+            * *button_icon* (``string``) -- Icon to display on button.
+            * *button_text* (``string``) -- Text to display on button, default is name.
+        """
+    
 
 
 class DynamicEnum(DynamicValue):

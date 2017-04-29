@@ -129,6 +129,7 @@ class Application(object):
         self.spine = spine.Spine()
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
         self._module_processes=[]
+        import kervi.utility.storage
         
         import kervi.hal as hal
         hal_driver = hal._load()
@@ -150,7 +151,7 @@ class Application(object):
         except ImportError:
             pass
 
-        import kervi.utility.storage
+        
         
         module_port = self.settings["network"]["IPCRootPort"]
         for module in self.settings["modules"]:
