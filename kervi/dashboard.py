@@ -24,7 +24,7 @@ class DashboardPanel(object):
             * *title* (``str``) -- Title of the panel.
             * *columns* (``int``) -- Number of columns in this panel, default is 1.
             * *rows* (``int``) -- Number of rows in this panel, default is 1.
-            * *add_user_log* (``bool``) -- This panel shows user log messages.
+            * *user_log* (``bool``) -- This panel shows user log messages. Any components that are linked to a user log panel are ignored.
             * *collapsed* (``bool``) -- If true the body of the panel is collapsed.
 
         """
@@ -71,12 +71,23 @@ class Dashboard(KerviComponent):
     Create a UI dashboard. The dashboard will show up in the dashboard menu in the UI.
 
     A dashboard contains one or more panels. Kervi components like *sensors*,
-    *controllers* and *controller components* links to a panel on a dashboard.
+    *controller inputs* and other dynamic values are able to link to a panel on a dashboard.
 
-    All dashboard have the following panels:
-     * sys-header - for system info like cpu load
-     * header - for showing sensors and controllers in the top header
-     * footer - for showing sensors and controllers in the footer of the UI.
+    All dashboard have the following system defined panels:
+     * header_right
+     * header_center
+     * footer_left
+     * footer_center
+     * footer_right
+
+     Besides from these panels each dashboard has two *controller pad* areas where
+     it is possible to link to the x and y coordinates of the pads.
+     A dynamic value like controller input may link to one of the following panels:
+
+     * left_pad_x
+     * left_pad_y
+     * right_pad_x
+     * right_pad_y
 
     :param dashboard_id:
         Unique id of the dashboard. Used when referencing this dashboard.

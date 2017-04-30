@@ -9,14 +9,24 @@ The snippet below shows how to create a camera stream server and link it to a da
 
 .. code:: python
     
-    #Create a streaming camera server
+    import datetime
     from kervi.camera import CameraStreamer
-    CAMERA = CameraStreamer("cam1", "camera 1")
+    from kervi_devices.motors.PCA9685_i2c_servo import PCA9685ServoBoard
 
+    #Create a streaming camera server
+    CAM1 = CameraStreamer("cam1", "camera 1")
+    CAM1.flip_vertical = True
+    CAM1.flip_horizontal = True
+    
     #link camera as background
-    CAMERA.link_to_dashboard("app")
+    CAM1.link_to_dashboard("app")
     #link camera to a panel
-    CAMERA.link_to_dashboard("system", "cam")
+    CAM1.link_to_dashboard("system", "cam")
+
+    #link pan and tilt to servos
+    motor_board = PCA9685ServoBoard()
+    motor_board.servo_motors[0].position.link_to(CAM1.pan, lambda x: -x)
+    motor_board.servo_motors[1].position.link_to(CAM1.tilt)
 
 
 .. image:: images/dashboard_cam.png

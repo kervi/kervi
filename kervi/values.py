@@ -628,7 +628,7 @@ class DynamicBoolean(DynamicValue):
 
             * *value_size* (``int``) -- width of the value area as a percentage of the total container it sits in.
 
-            * *type* (``string``) -- if input 'switch' (default) or 'push'.
+            * *type* (``string``) -- if value should be displayes as a 'switch' (default) or 'push' for push button.
 
             * *on_text* (``string``) -- Text to display when switch is on.
             * *off_text (``string``) -- Text to display when switch is off.
@@ -638,26 +638,20 @@ class DynamicBoolean(DynamicValue):
             * *button_icon* (``string``) -- Icon to display on button.
             * *button_text* (``string``) -- Text to display on button, default is name.
         """
-    
-
 
 class DynamicEnum(DynamicValue):
     r"""
-    EnumControllerValue holds a selection of predefined values to select amount.
+    A DynamicEnum value holds a selection of predefined values to select between.
+    The DynamicValue is presented as a dropdown on dashboards.
 
     Usage:
 
     .. code-block:: python
 
-        class CameraFrameRate(EnumControllerValue):
-            def __init__(self, controller):
-            EnumControllerValue.__init__(self, controller.controllerId+".framerate", "Framerate" , controller)
-            self.addOption("5", "5 / sec")
-            self.addOption("10", "10 / sec")
-            self.addOption("15", "15 / sec", True)
-
-        def change(self, selectedOptions):
-            print("Frame rate changed", selectedOptions)
+            self.framerate = self.inputs.add("frame_rate", "Frame rate", DynamicEnum)
+            self.framerate.addOption("5", "5 / sec")
+            self.framerate.addOption("10", "10 / sec")
+            self.framerate.addOption("15", "15 / sec", True)
 
     """
     def __init__(self, name, input_id=None, is_input=True, parent=None, index = None):
@@ -670,6 +664,12 @@ class DynamicEnum(DynamicValue):
     def add_option(self, value, text, selected=False):
         """
         Add option to select
+
+        :param value: The value that the option represent.
+
+        :param text: The text that should be displayer in dropdown
+
+        :param selected: True if the option should be the default value.
         """
         option = {"value": value, "text": text, "selected":selected}
         self.options += [option]

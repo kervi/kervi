@@ -28,7 +28,7 @@ and calculates the speed of the left and right motors.
         Control the speed and direction of two motors.
         """
         def __init__(self, controller_id="steering", name="Steering"):
-            TaskHandler.__init__(self, controller_id, name)
+            Controller.__init__(self, controller_id, name)
             self.type = "steering"
             self.left_speed = self.outputs.add("left_speed", "Left speed", DynamicNumber)
             self.right_speed = self.outputs.add("right_speed", "Right speed", DynamicNumber)
@@ -74,7 +74,7 @@ and calculates the speed of the left and right motors.
             self.outputs["left_speed"].value = left_speed
             self.outputs["right_speed"].value = right_speed
 
-        def dynamic_value_changed(self, changed_input):
+        def input_changed(self, changed_input):
             #print("steering input changed:", changed_input.input_id, changed_input.value)
             if changed_input == self.all_off:
                 self.left_speed.value = 0
@@ -92,7 +92,7 @@ In the example above the inputs and outputs are defined via::
 self.inputs.add and self.outputs.add are factory functions that creates dynamic values that are special Kervi value classes that 
 may be linked to dashboards or to another dynamic value.
 
-When an input value is changed by a user or other part of your application the dynamic_value_changed event is fired and your controller may
+When an input value is changed by a user or other part of your application the input_changed event is fired and your controller may
 calculate its outputs. 
 
 Linking controllers
@@ -106,7 +106,6 @@ In that way it is easy to change hardware and make changes to UI without re-codi
 .. code-block:: python
    :linenos:
 
-
     steering = MotorSteering()
     
     #Link to ui
@@ -118,6 +117,10 @@ In that way it is easy to change hardware and make changes to UI without re-codi
     motor_board = AdafruitMotorHAT()
     motor_board.dc_motors[2].speed.link_to(steering.left_speed)
     motor_board.dc_motors[3].speed.link_to(steering.right_speed)
+
+
+Controller api
+==============
 
 .. toctree::
    :hidden:

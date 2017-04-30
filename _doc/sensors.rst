@@ -123,7 +123,7 @@ Fill in the abstract properties and the method read_value.
             """Reads IR only diode from the I2C device"""
             return self.read_word(reg)
 
-Linking to dashboards
+Linking sensors
 ---------------------
 
 A sensor is linked to a dashboard by calling the method link_to_dashboard. 
@@ -138,116 +138,7 @@ A sensor is linked to a dashboard by calling the method link_to_dashboard.
     SENSOR_1.link_to_dashboard("system", "cpu", type="chart", size=2)
 
 
-A sensor can displayed in different ways: just value, value with sparkline, as an animated icon, chart or different kind of gauges.
-
-**Value and sparkline**
-
-If a sensor is linked with just dashboard and panel as parameters it will be displayed with name, sparkline and value.
-
-.. code-block:: python
-    
-    SENSOR_1.link_to_sensor("system", "section1")
-
-.. image:: images/sensor_sparkline.png
 
 
-**Value and icon**
 
-It is possible to show an icon next to a value. Kervi uses Font awesome icons. Just enter the name of the icon without *fa-*
-
-.. code-block:: python
-    
-    SENSOR_1.link_to_dashboard("system", "temp", icon="thermometer-full", show_sparkline=False, show_name=False)
-
-.. image:: images/sensor_icon.png
-
-**Value and no sparkline**
-
-.. code-block:: python
-    
-    SENSOR_1.link_to_sensor("system", "section1", show_sparkline=False)
-
-.. image:: images/sensor_value.png
-
-
-**radial gauge**
-
-.. code-block:: python
-    
-    SENSOR_1.link_to_sensor("system", "section1", type="radial_gauge")
-
-.. image:: images/sensor_radial.png
-
-**Horizontal gauge**
-
-.. code-block:: python
-    
-    SENSOR_1.link_to_sensor("system", "section1", type="horizontal_linear_gauge")
-
-.. image:: images/sensor_horizontal.png
-
-**Vertical gauge**
-
-.. code-block:: python
-    
-    SENSOR_1.link_to_sensor("system", "section1", type="vertical_linear_gauge")
-
-.. image:: images/sensor_vertical.png
-
-**Animated icon**
-
-Below is a full example of a battery sensor where the icon change depending on value.
-The sensor is linked twice first to the header with the animation and into the body as a chart. 
-
-.. code-block:: python
-    
-    from kervi.sensor import Sensor, SensorThread
-
-    
-
-    SENSOR_1.set_ui_parameter("icon", [
-        {
-            "range":[0, 5],
-            "icon":"battery-empty"
-        },
-        {
-            "range":[5, 25],
-            "icon":"battery-quarter"
-        },
-        {
-            "range":[20, 50],
-            "icon":"battery-half"
-        },
-        {
-            "range":[5, 75],
-            "icon":"battery-three-quarter"
-        },
-        {
-            "range":[75, 100],
-            "icon":"battery-full"
-        }
-    ])
-
-    #link the sensor to the header
-    SENSOR_1.link_to_dashboard(
-        "system", "battery",
-        show_sparkline=False,
-        show_value=False,
-        link_to_header=True
-    )
-
-    #link the sensor as a chart
-    SENSOR_1.link_to_dashboard("system", "battery", type="chart")
-
-    
-.. image:: images/sensor_animated.png
-
-
-Sensor api
-----------
-
-.. toctree::
-   :hidden:
-
-   sensors_api
 

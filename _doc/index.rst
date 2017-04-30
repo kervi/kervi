@@ -49,6 +49,7 @@ Below is the a complete example to show a sensor on a dashboard with chart
    overview
    dashboards
    sensors
+   sensors_api
    controllers
    dynamic_values
    camera
