@@ -6,13 +6,13 @@ Controllers is the fun part of your Kervi application this is where you code the
 Your controller acts upon input from users, GPIO events or the underlaying os and initiates different actions based on the input.
 
 Basic controllers manages motors, light, servos and so on but you can also build more advanced controllers
-for *line following* and *self navigation* into your controllers.
+for *line following* and *self navigation*.
 As your application grows your application will contain multiple controllers. 
 
 Input and output interfaces
 ===========================
 
-Basicly a controller reads a set of inputs and generates one or more outputs.
+Basically a controller reads a set of inputs and generates one or more outputs.
 Below is an example of a steering controller, that takes speed, and left/right balance between motors as inputs
 and calculates the speed of the left and right motors.
 
@@ -33,10 +33,7 @@ and calculates the speed of the left and right motors.
             self.left_speed = self.outputs.add("left_speed", "Left speed", DynamicNumber)
             self.right_speed = self.outputs.add("right_speed", "Right speed", DynamicNumber)
 
-            self.inputs.add("left_encoder", "Left encoder", DynamicNumber)
-            self.inputs.add("right_encoder", "Right encoder", DynamicNumber)
             self.adjust = self.inputs.add("adjust", "Left right adjust", DynamicNumber)
-
 
             self.speed = self.inputs.add("speed", "Speed", DynamicNumber)
             self.direction = self.inputs.add("direction", "Direction", DynamicNumber)
@@ -50,16 +47,8 @@ and calculates the speed of the left and right motors.
         def adjust(self, value):
             self._adjust = value
 
-        def rotate(self, speed, wheel_rotations=None, duration=None ):
-            new_direction = self.adjust.value
-            left_speed = speed * (-new_direction / 100)
-            right_speed = speed * (new_direction / 100)
-
-            self.outputs["left_speed"].value = left_speed
-            self.outputs["right_speed"].value = right_speed
-
-        def run(self, speed, left_right_balance, wheel_rotations=None, duration=None):
-            new_direction = left_right_balance + self.adjust.value
+        def update(self):
+            new_direction = self.direction.value + self.adjust.value
 
             if left_right_balance > 0:
                 left_speed = speed * (1 - new_direction / 100)
@@ -71,17 +60,16 @@ and calculates the speed of the left and right motors.
                 left_speed = speed
                 right_speed = speed
 
-            self.outputs["left_speed"].value = left_speed
-            self.outputs["right_speed"].value = right_speed
+            self.left_speed.value = left_speed
+            self.right_speed.value = right_speed
 
         def input_changed(self, changed_input):
-            #print("steering input changed:", changed_input.input_id, changed_input.value)
-            if changed_input == self.all_off:
+            if changed_input == self.all_off and self.all_off.value==True:
                 self.left_speed.value = 0
                 self.right_speed.value = 0
 
             if changed_input == self.speed or changed_input == self.direction:
-                self.run(self.speed.value, self.direction.value)
+                self.update()
 
 In the example above the inputs and outputs are defined via::
 
@@ -101,7 +89,6 @@ Linking controllers
 A controller that works entirely on in- and outputs that are dynamic values
 is agnostic to how it is linked to user interface and hardware.
 In that way it is easy to change hardware and make changes to UI without re-coding the controller.
-
 
 .. code-block:: python
    :linenos:

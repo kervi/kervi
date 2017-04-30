@@ -3,8 +3,7 @@
 Sensors
 =======
 
-Sensors in Kervi are special classes that handles reading from different kind of probes and devices. 
-Kervis has a base class *Sensor* that handles the hevy lifting of polling devices and notify other parts of the system about readings.
+Sensors in Kervi are are handled via the class Sensor that handles reading from different kind of probes and devices. 
 
 Kervi Device library
 --------------------
@@ -18,6 +17,27 @@ To use a device from the library you need to import the device module and apply 
     from kervi_devices.sensors import BMP085
     SENSOR_1 = Sensor("roomtemp1", "Room 1", BMP085.BMP085DeviceDriver(BMP085.TEMPERATURE_SENSOR))
 
+Linking sensors
+---------------------
+
+A sensor is linked to a dashboard by calling the method link_to_dashboard. 
+
+.. code-block:: python
+
+    from kervi.sensor import Sensor
+    from kervi_devices.sensors import BMP085
+    SENSOR_1 = Sensor("roomtemp1", "Room 1", BMP085.BMP085DeviceDriver(BMP085.TEMPERATURE_SENSOR))
+    
+    SENSOR_1.link_to_dashboard("system", "cpu", type="value", size=2, link_to_header=True)
+    SENSOR_1.link_to_dashboard("system", "cpu", type="chart", size=2)
+
+Beside from linking to dashboards an sensor may also be linked to controller inputs.
+
+.. code-block:: python
+
+    FAN_CONTROLLER.temp.link_to(SENSOR_1)
+
+For full information about linking take a look at the section :ref:`dynamic_values-label`.
 
 Implementing a sensor device
 ----------------------------
@@ -122,23 +142,3 @@ Fill in the abstract properties and the method read_value.
         def read_ir(self, reg=0x8E):
             """Reads IR only diode from the I2C device"""
             return self.read_word(reg)
-
-Linking sensors
----------------------
-
-A sensor is linked to a dashboard by calling the method link_to_dashboard. 
-
-.. code-block:: python
-
-    from kervi.sensor import Sensor
-    from kervi_devices.sensors import BMP085
-    SENSOR_1 = Sensor("roomtemp1", "Room 1", BMP085.BMP085DeviceDriver(BMP085.TEMPERATURE_SENSOR))
-    
-    SENSOR_1.link_to_dashboard("system", "cpu", type="value", size=2, link_to_header=True)
-    SENSOR_1.link_to_dashboard("system", "cpu", type="chart", size=2)
-
-
-
-
-
-

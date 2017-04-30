@@ -20,56 +20,46 @@ initialise GPIO, I2C ect.
 GPIO
 ----
 
-Access to GPIO is done via the kervi.hal module. When your Kervi application starts it scans for installed Kervi platform drivers and loads the GPIO driver.
+Access to GPIO is done via the kervi.hal module. When your Kervi application starts it scans
+for installed Kervi platform drivers and loads the GPIO driver.
 
 .. code-block:: python
 
-    """ Sample controller """
-    from kervi.controller import Controller, ControllerSwitchButton
-    
-    #import GPIO
+    if __name__ == '__main__':
+    from kervi.bootstrap import Application
+    APP = Application()
+
+    #add dashboard and panel
+    from kervi.dashboard import Dashboard, DashboardPanel
+    DASHBOARD = Dashboard("main", "Controller Buttons", is_default=True)
+    DASHBOARD.add_panel(DashboardPanel("gpio", columns=3, rows=3, title="GPIO"))
+
     from kervi.hal import GPIO
 
-    #Switch button shown on a dashboard
-    class LightButton(ControllerSwitchButton):
-        def __init__(self, controller):
-            ControllerSwitchButton.__init__(
-                self,
-                controller.component_id+".light",
-                "Light 1",
-                controller
-            )
-            self.set_ui_parameter("size", 0)
+    GPIO["GPIO12"].define_as_input()
+    #Link to dashboard it will show as a read only switch.
+    #If the the GPIO 12 pin is set high, the switch will change to on. 
+    GPIO["GPIO12"].link_to_dashboard("main", "gpio")
 
-            #Setup pin
-            self.pin = 23
-            GPIO.define_as_output(self.pin)
+    GPIO["GPIO13"].define_as_output()
+    #Link to dashboard it will show as a switch
+    #Press the button on screen to turn the GPIO pin 12 high
+    GPIO["GPIO13"].link_to_dashboard("main", "gpio")
 
-        def on(self):
-            #event fired when user click the button in UI
-            #set GPIO pin high
-            GPIO.set(self.pin, True)
-
-        def off(self):
-            #event fired when user click the button in UI
-            #set GPIO pin low
-            GPIO.set(self.pin, False)
-
-    class LightController(Controller):
-        def __init__(self):
-            Controller.__init__(self, "lightController", "Light")
-            self.type = "light"
-
-            self.add_components(LightButton(self))
-            self.link_to_dashboard("system", "light")
-
-    LIGHT_CONTROLLER = LightController()
+    APP.run()
 
 I2C
 ---
 
+I2C is used when communicating with i2c serial devices like sensors, displayes and motor controllers.
+
+If a device exists in the device library there is no need
+to work with i2c directly as the device driver handles i2c communication.
+
+If a device is not present in the device library you could make your own device driver.
+
 Below is an example on using I2C that implements a LUX sensor that can be used in a 
-Kervi sensor.
+Kervi sensor (this is the actual code from the device library).
 
 .. code-block:: python
 

@@ -1,3 +1,5 @@
+.. _dynamic_values-label:
+
 ===============
 Dynamic values
 ===============

@@ -7,7 +7,7 @@ Prequisits
 
 Kervi is a python framework and needs python 3.4+ and the python package manager pip. 
 
-Raspberry Pi comes with python and pip preinstalled if you are able to start your Raspberry Pi you are ready to install Kervi.
+The standard Raspberry Pi operating systems comes with python and pip preinstalled if you are able to start your Raspberry Pi you are ready to install Kervi.
 
 If you install on other platforms like windows and linux you have to install python and pip. Please follow the instructions on python.org to get python installed. 
 Notice there are no native support for hardware when your install on these platforms but you will be able to
@@ -48,7 +48,7 @@ You create the single file app via the following command in the terminal window:
 
 
 Multi process/file application
------------------------
+------------------------------
 
 If you are planning to build a robot or home automation system it is recommended to create a normal Kervi application. 
 Such an application consists of several files and the Kervi framework is able to spread the load on all the cores on your board. 

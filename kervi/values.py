@@ -184,7 +184,7 @@ class DynamicValue(KerviComponent):
             elif not source.is_input and self.is_input:
                 source.add_observer(self, transformation)
             else:
-                raise Exception("input/output mismatch in dynamic value link:{0} - {1}".format(src.name, self.name))
+                raise Exception("input/output mismatch in dynamic value link:{0} - {1}".format(source.name, self.name))
         elif isinstance(source, str):
             if len(self._spine_observers) == 0:
                 self.spine.register_event_handler("dynamicValueChanged", self._value_changed_event)
@@ -352,7 +352,7 @@ class DynamicValue(KerviComponent):
             if event_type:
                 ranges += [{"start":value, "end":None, "type":event_type}]
         return ranges
-    
+
     def _get_info(self):
         return {
             "unit":self.unit,
@@ -389,7 +389,7 @@ class DynamicNumber(DynamicValue):
 
         self._sparkline = []
         self._last_reading = None
-        
+
     @property
     def delta(self):
         """
@@ -631,13 +631,19 @@ class DynamicBoolean(DynamicValue):
             * *type* (``string``) -- if value should be displayes as a 'switch' (default) or 'push' for push button.
 
             * *on_text* (``string``) -- Text to display when switch is on.
-            * *off_text (``string``) -- Text to display when switch is off.
+            * *off_text* (``string``) -- Text to display when switch is off.
             * *on_icon* (``string``) -- Icon to display when switch is on.
             * *off_icon* (``string``) -- Icon to display when switch is off.
 
             * *button_icon* (``string``) -- Icon to display on button.
             * *button_text* (``string``) -- Text to display on button, default is name.
         """
+        KerviComponent.link_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            **kwargs
+            )
 
 class DynamicEnum(DynamicValue):
     r"""

@@ -12,13 +12,14 @@ Features of the framework are:
 * Python classes for handling sensor readings and display on dashboards.
 * Python classes for handling user interactions from controllers on dashboards.
 * Integrated camera handling (Raspberry PI camera at the moment)
+* Device driver library for common devices 
 * Easy dashboard setup.
 * Dashboard UI is responsive and scales from mobile phones to desktop.
 * Multi process oriented by spreading over more than one core.
 * Multi device oriented by connecting multiple Raspberry Pi's in one large application 
 * No web development knowledge is required as dashboard layout is handled in python. 
 
-Below is the a complete example to show a sensor on a dashboard with chart
+Below is a complete example that shows how to display a sensor on a dashboard with a chart
 
 .. code-block:: python
 
@@ -44,6 +45,7 @@ Below is the a complete example to show a sensor on a dashboard with chart
    :maxdepth: 2
    :includehidden:
    :caption: Contents:
+   :hidden:
 
    getstarted
    overview
@@ -57,11 +59,3 @@ Below is the a complete example to show a sensor on a dashboard with chart
    ipc
    cli
    contribute
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
