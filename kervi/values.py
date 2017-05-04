@@ -2,21 +2,36 @@
 import time
 from datetime import datetime
 
-from kervi.spine import Spine
-from kervi.utility.thread import KerviThread
+#from kervi.spine import Spine
+#from kervi.utility.thread import KerviThread
 from kervi.utility.component import KerviComponent
 
 VALUE_COUNTER = 0
 
 class DynamicValueList(object):
-    def __init__(self, controller, is_input, inject_in_controller=False):
+    """
+    List that holds dynamic values
+
+    :param parent: Parent component that holds this list. 
+
+    :param is_input: True if the list holds input values.
+    """
+    def __init__(self, parent, is_input):
+        
         self._items = {}
         self.is_input = is_input
-        self.controller = controller
+        self.controller = parent
         self.count = 0
-        self._inject = inject_in_controller
+        #self._inject = inject_in_controller
 
     def add(self, value_id, name, value_class):
+        """
+        Factory function that creates a dynamic value.
+
+        :param value_id: id of the value, used to reference the value within this list.BaseException
+
+        :param value_class: The class of the dynamic value that should be created with this function.
+        """
         item = value_class(
             name,
             input_id=self.controller.component_id + "." + value_id,
@@ -287,7 +302,7 @@ class DynamicValue(KerviComponent):
     def value_changed(self, new_value, old_value):
         pass
 
-    def add_value_event(self, event_value, func, event_type=None):
+    def add_value_event(self, event_value, func, event_type=None, parameters=None):
         """
         Add a function that is called when the dynamic value reach or pass the event_value.
 
@@ -309,43 +324,43 @@ class DynamicValue(KerviComponent):
         :type event_type: ``str``
 
         """
-        self._value_event_handlers += [(event_value, func, event_type)]
+        self._value_event_handlers += [(event_value, func, event_type, parameters)]
 
-    def _handle_range_event(self, message, func, level):
+    def _handle_range_event(self, value, message, func, level):
         self.user_log_message(message, level=level)
         if func:
             func(self)
 
     def add_normal_range(self, value, message=None, func=None):
-        self.add_value_event(value, self._handle_range_event(message, func, 3))
+        self.add_value_event(value, self._handle_range_event, parameters=[message, func, 3])
 
     def add_warning_range(self, value, message=None, func=None):
-        self.add_value_event(value, self._handle_range_event(message, func, 2) , event_type="warning")
+        self.add_value_event(value, self._handle_range_event, event_type="warning", parameters=[message, func, 2])
 
     def add_error_range(self, value, message=None, func=None):
-        self.add_value_event(value, self._handle_range_event(message, func, 1), event_type="error")
+        self.add_value_event(value, self._handle_range_event, event_type="error", parameters=[message, func, 1])
 
     def _check_value_events(self, new_value, old_value):
         for event in self._value_event_handlers:
-            value, func, event_type = event
+            value, func, event_type, parameters = event
             if func:
                 if isinstance(value, tuple):
                     value_start, value_end = value
                     if old_value < value_start and new_value >= value_start:
-                        func(self)
+                        func(self, *parameters)
                     elif old_value > value_end and new_value <= value_end:
-                        func(self)
+                        func(self, *parameters)
                 else:
                     if old_value < value and new_value >= value:
-                        func(self)
+                        func(self, *parameters)
                     elif old_value > value and new_value <= value:
-                        func(self)
+                        func(self, *parameters)
 
     @property
     def _event_ranges(self):
         ranges = []
         for event in self._value_event_handlers:
-            value, func, event_type = event
+            value, func, event_type, parameters = event
             if isinstance(value, tuple):
                 value_start, value_end = value
                 ranges += [{"start":value_start, "end":value_end, "type":event_type}]

@@ -12,6 +12,8 @@ import importlib
 _DRIVER = None
 GPIO = None
 
+HAL_DRIVER_ID = None
+
 def _load():
     global GPIO, _DRIVER
 
@@ -27,6 +29,7 @@ def _load():
         for driver_name, module_name in known_drivers:
             if driver_name in flat_installed_packages:
                 _DRIVER = importlib.import_module(module_name)
+                HAL_DRIVER_ID = module_name
                 GPIO = get_gpio()
                 return driver_name
 

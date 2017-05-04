@@ -44,7 +44,7 @@ class Controller(KerviComponent):
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
-        Links this component to a dashboard section.
+        Links this component to a dashboard section all input are displayed.
 
         :param dashboard_id:
             id of the dashboard to link to.

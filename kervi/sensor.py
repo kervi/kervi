@@ -190,7 +190,7 @@ class Sensor(DynamicNumber):
             "min":self.min,
             "unit":self.unit,
             "value":self._value,
-            "ranges":self.event_ranges,
+            "ranges":self._event_ranges,
             "subSensors": dimensions,
             "sparkline":self._sparkline
         }
