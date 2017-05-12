@@ -23,8 +23,8 @@ class Controller(KerviComponent):
     """
     def __init__(self, controller_id, name):
         KerviComponent.__init__(self, controller_id, "controller", name)
-        self.inputs = DynamicValueList(self, True, True)
-        self.outputs = DynamicValueList(self, False, True)
+        self.inputs = DynamicValueList(self, True)
+        self.outputs = DynamicValueList(self, False)
         self._active = True
         self.type = "unknown"
         self.parameters = {}
@@ -92,8 +92,8 @@ class Controller(KerviComponent):
         """
         pass
 
-    def dynamic_value_changed(self, value, transformed_value):
-        self.input_changed(value)
+    def dynamic_value_changed(self, dynamic_value, value):
+        self.input_changed(dynamic_value)
         pass
 
     def input_changed(self, input_id):

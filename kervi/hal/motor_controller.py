@@ -273,8 +273,8 @@ class ServoMotor(object):
     def adjust_center(self, value):
         self._adjust_center = value
 
-    def dynamic_value_changed(self, input):
-        self.set_position(input.value)
+    def dynamic_value_changed(self, input, value):
+        self.set_position(value)
 
     def set_position(self, position):
         self._device._set_position(self._motor, position, self.adjust_min, self.adjust_max, self.adjust_center)

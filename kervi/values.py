@@ -296,8 +296,8 @@ class DynamicValue(KerviComponent):
                 self._log_values
             )
 
-    def dynamic_value_changed(self, dynamic_value, transformed_value):
-        self.value = transformed_value
+    def dynamic_value_changed(self, dynamic_value, value):
+        self.value = value
 
     def value_changed(self, new_value, old_value):
         pass
