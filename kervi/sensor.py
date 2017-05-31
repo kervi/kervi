@@ -54,9 +54,9 @@ class Sensor(DynamicNumber):
         self._dimensions = 1
         if self._device:
             self._type = self._device.type
-            self._unit = self._device.unit
-            self._min = self._device.min
-            self._max = self._device.max
+            self.unit = self._device.unit
+            self.min = self._device.min
+            self.max = self._device.max
             self._dimensions = self._device.dimensions
             self._dimension_labels = self._device.dimension_labels
             if self._dimensions > 1:
@@ -186,12 +186,13 @@ class Sensor(DynamicNumber):
                 dimensions += [self._sub_sensors[dimension]._get_component_info()]
         return {
             "type":self.type,
-            "max":self.max,
-            "min":self.min,
+            "subSensors": dimensions,
+            "isInput": False,
+            "maxValue":self.max,
+            "minValue":self.min,
             "unit":self.unit,
             "value":self._value,
             "ranges":self._event_ranges,
-            "subSensors": dimensions,
             "sparkline":self._sparkline
         }
 
