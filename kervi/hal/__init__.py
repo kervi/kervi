@@ -3,7 +3,8 @@
 """Hardware abstraction layer"""
 import time
 from kervi.hal import gpio
-from kervi.hal import i2c
+#from kervi.hal import i2c
+#from kervi.hal import one_wire
 from kervi.spine import Spine
 from kervi.utility.thread import KerviThread
 import pip
@@ -38,8 +39,6 @@ def get_gpio(gpio_type=None):
     if gpio_type == None:
         return _DRIVER.get_gpio_driver()
 
-
-
 def default_i2c_bus():
     if _DRIVER:
         return _DRIVER.default_i2c_bus()
@@ -48,6 +47,8 @@ def default_i2c_bus():
 def i2c(address, bus=default_i2c_bus()):
     return _DRIVER.get_i2c_driver(address, bus)
 
+def one_wire(address):
+    return _DRIVER.get_one_wire_driver(address)
 
 
 def get_camera_driver(source = None):
@@ -143,6 +144,10 @@ class I2CGPIODeviceDriver(gpio.IGPIODeviceDriver):
         # Raise an exception if pin is outside the range of allowed values.
         if channel < 0 or channel >= self.num_gpio:
             raise DeviceChannelOutOfBoundsError(self.device_name, channel)
+
+class OneWireSensorDeviceDriver(SensorDeviceDriver):
+    def __init__(self, address):
+        self.one_wire = one_wire(address)
 
 class ChannelPollingThread(KerviThread):
     def __init__(self, channel, device, callback, polling_time=.1):

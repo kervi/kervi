@@ -255,7 +255,7 @@ class DynamicValue(KerviComponent):
         """
         self._observers += [(observer, transformation)]
 
-    def _value_changed_event(self, id, value ):
+    def _value_changed_event(self, id, value, old_value ):
         if value["id"] in self._spine_observers.keys():
             transformation = self._spine_observers[value["id"]]
             if transformation:
