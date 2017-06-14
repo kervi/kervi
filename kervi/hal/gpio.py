@@ -56,12 +56,13 @@ class LogicIOChannel(DynamicBoolean):
         self._device.define_as_output(self._channel)
 
     def define_as_pwm(self, frequency=None, duty_cycle=None):
+        self._device.define_as_pwm(self._channel, frequency, duty_cycle)
         if frequency:
             self.pwm["frequency"].value = frequency
 
         if duty_cycle:
             self.pwm["duty_cycle"].value = duty_cycle
-        self._device.define_as_pwm(self._channel, frequency, duty_cycle)
+        
 
     def listen(self, callback, bounce_time=.2):
         self._device.listen(self._channel, callback, bounce_time)
@@ -81,7 +82,7 @@ class LogicIOChannel(DynamicBoolean):
     def value_changed(self, new_value, old_value):
         self.set(new_value)
 
-    def dynamic_value_changed(self, changed_input):
+    def dynamic_value_changed(self, changed_input, value):
         if changed_input == self.pwm["duty_cycle"]:
             if self.pwm["active"].value:
                 self._device.pwm_start(self._channel, duty_cycle=changed_input.value)

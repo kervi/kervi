@@ -21,6 +21,7 @@ kervi/hal\__init__.py
 kervi/hal\gpio.py
 kervi/hal\i2c.py
 kervi/hal\motor_controller.py
+kervi/hal\one_wire.py
 kervi/utility\__init__.py
 kervi/utility\bus.py
 kervi/utility\component.py

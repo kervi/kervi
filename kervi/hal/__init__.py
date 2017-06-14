@@ -47,7 +47,7 @@ def default_i2c_bus():
 def i2c(address, bus=default_i2c_bus()):
     return _DRIVER.get_i2c_driver(address, bus)
 
-def one_wire(address):
+def get_one_wire(address):
     return _DRIVER.get_one_wire_driver(address)
 
 
@@ -147,7 +147,7 @@ class I2CGPIODeviceDriver(gpio.IGPIODeviceDriver):
 
 class OneWireSensorDeviceDriver(SensorDeviceDriver):
     def __init__(self, address):
-        self.one_wire = one_wire(address)
+        self.one_wire = get_one_wire(address)
 
 class ChannelPollingThread(KerviThread):
     def __init__(self, channel, device, callback, polling_time=.1):
