@@ -16,8 +16,8 @@ class DasboardSectionLink(object):
         self.component.spine.triggerEvent("dashboardLinkChanged", self.link_id, self.parameters)
 
 class KerviComponent(object):
-    def __init__(self, component_id, component_type, name):
-        self.spine = spine.Spine()
+    def __init__(self, component_id, component_type, name, **kwargs):
+        self.spine = kwargs.get("spine", spine.Spine())
         self._component_id = component_id
         self._component_type = component_type
         self._name = name
