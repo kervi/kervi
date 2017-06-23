@@ -176,10 +176,19 @@ def _start(settings):
         settings["network"]["IPAddress"],
         settings["network"]["WebSocketPort"]
     )
+
+    coro_local = loop.create_server(
+        factory,
+        "localhost",
+        settings["network"]["WebSocketPort"]
+    )
+
     loop.run_until_complete(coro)
+    #loop.run_until_complete(coro_local)
     try:
         while not TERMINATE_SOCKET:
             loop.run_until_complete(coro)
+            #loop.run_until_complete(coro_local)
             time.sleep(.001)
     except KeyboardInterrupt:
             pass

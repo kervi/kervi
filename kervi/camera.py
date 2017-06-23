@@ -220,7 +220,7 @@ class CameraBase(Controller):
         """
         if section_id is None:
             section_id = "background"
-        
+
         Controller.link_to_dashboard(
             self,
             dashboard_id,
@@ -258,7 +258,6 @@ class _CameraFrameThread(KerviThread):
             self.alive = False
             self.stop()
 
-
 class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
         try:
@@ -269,7 +268,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
             pass
 
     def log_message(self, format, *args):
-        return
+        pass
 
     def do_GET(self):
         try:
@@ -358,7 +357,7 @@ class CameraStreamer(CameraBase):
         self.ip_port = nethelper.get_free_port()
         self.source = "http://" + str(self.ip_address) + ":" + str(self.ip_port) + "/" + camera_id# + ".png"
         self.source = {
-            "server":  str(self.ip_address) + ":" + str(self.ip_port),
+            "server": "http://" + str(self.ip_address) + ":" + str(self.ip_port),
             "path": "/"+camera_id
         }
         self.current_frame = None
