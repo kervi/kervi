@@ -90,7 +90,7 @@ class KerviComponent(object):
         if name in self._ui_parameters:
             self._ui_parameters[name] = value
         else:
-            raise ValueError("invalud ui parameter name:" + name)
+            raise ValueError("invalid ui parameter name:" + name)
 
     def user_log_message(self, topic, **kwargs):
         """"
