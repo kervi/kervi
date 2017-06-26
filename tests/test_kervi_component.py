@@ -11,4 +11,4 @@ def test_instantiation():
     assert component.visible == True
 
     assert "getDashboardComponents" in spine.queryHandlers
-    assert "getComponentInfox" in spine.queryHandlers
+    assert "getComponentInfo" in spine.queryHandlers
