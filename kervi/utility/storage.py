@@ -15,6 +15,11 @@ SPINE = spine.Spine()
 FILE_CON = None
 MEMORY_CON = None
 
+def create_file_con():
+    return lite.connect('kervi.db', check_same_thread=False)
+
+def create_memory_con():
+    return lite.connect("kervi_mem.db", check_same_thread=False)
 
 
 class MemoryCleanThread(KerviThread):
@@ -29,7 +34,8 @@ class MemoryCleanThread(KerviThread):
     def _step(self):
         time.sleep(20)
         try:
-            cursor = MEMORY_CON.cursor()
+            con = create_memory_con()
+            cursor = con.cursor()
             cursor.execute("DELETE FROM dynamicData WHERE id IN (SELECT id FROM dynamicData ORDER BY id ASC LIMIT 1000);")
         except lite.Error as msg:
             SPINE.log.error("clean memory db, Command skipped: {0}, command{1}", msg)
@@ -129,11 +135,12 @@ def execute_sql(con, sql):
         except lite.Error as msg:
             SPINE.log.error("create db, Command skipped: {0}, command{1}", msg, command)
 
+
 def init_db():
     global FILE_CON, MEMORY_CON
 
-    MEMORY_CON = lite.connect("kervi_mem.db", check_same_thread=False)
-    FILE_CON = lite.connect('kervi.db', check_same_thread=False)
+    MEMORY_CON = create_memory_con()
+    FILE_CON = create_file_con()
 
     for con in [FILE_CON, MEMORY_CON]:
         cursor = con.cursor()
