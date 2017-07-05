@@ -582,6 +582,59 @@ class DynamicString(DynamicValue):
         self._value = ""
         self._ui_parameters["type"] = "text"
 
+    def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
+        r"""
+        Links this value to a dashboard panel.
+
+        :param dashboard_id:
+            Id of the dashboard to link to.
+        :type dashboard_id: str
+
+        :param panel_id:
+            Id of the panel on the dashboard to link to.
+        :type panel_id: str
+
+        :param \**kwargs:
+            Use the kwargs below to override default values for ui parameters
+
+        :Keyword Arguments:
+            * *size* (``int``) -- The number of dashboard cells the value should occupy horizontal.
+                If size is 0 (default) the DynamicValue and label will expand to the width of the panel.
+
+            * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
+
+            * *label_icon* (``str``) -- Icon that should be displayed together with label.
+
+            * *label* (``str``) -- Label text, default value is the name of the DynamicValue.
+
+            * *flat* (``bool``) -- Flat look and feel.
+
+            * *inline* (``bool``) -- Display DynamicValue and label in its actual size
+                If you set inline to true the size parameter is ignored.
+                The DynamicValue will only occupy as much space as the label and input takes.
+
+            * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
+
+            * *value_size* (``int``) -- width of the value area as a percentage of the total container it sits in.
+
+            * *type* (``string``) -- if value should be displayes as a 'switch' (default) or 'push' for push button.
+
+            * *on_text* (``string``) -- Text to display when switch is on.
+            * *off_text* (``string``) -- Text to display when switch is off.
+            * *on_icon* (``string``) -- Icon to display when switch is on.
+            * *off_icon* (``string``) -- Icon to display when switch is off.
+
+            * *button_icon* (``string``) -- Icon to display on button.
+            * *button_text* (``string``) -- Text to display on button, default is name.
+        """
+        KerviComponent.link_to_dashboard(
+            self,
+            dashboard_id,
+            section_id,
+            **kwargs
+            )
+
+
 class DynamicDateTime(DynamicValue):
     """
     A DynamicValue that holds a date and/or time.
