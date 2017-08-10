@@ -72,7 +72,7 @@ DB_CREATE_SQL = """
             `id`	INTEGER PRIMARY KEY AUTOINCREMENT,
             `dynamicValue`	TEXT,
             `value`	TEXT,
-            `timeStamp`	REAL
+            `timeStamp`	TEXT
         );
         CREATE INDEX `sensorindex` ON `dynamicData` (`dynamicValue` ,`timeStamp` );
         CREATE TABLE "settings" (
@@ -167,9 +167,11 @@ def store_dynamic_value(value_id, value, persist=False):
         else:
             cur = FILE_CON.cursor()
 
+        #print("vt", value["timestamp"])
+        #timestamp = (value["timestamp"] - datetime(1970, 1, 1)).total_seconds()
         cur.execute(
             "INSERT INTO dynamicData ('dynamicValue','value','timeStamp')  VALUES (?, ?, ?)",
-            (value["id"], value["value"], value["timestamp"])
+            (value["id"], value["value"], value["timestamp"] )
         )
         if not persist:
             cur = MEMORY_CON.commit()
@@ -227,24 +229,31 @@ def retrieve_setting(group, name):
         return setting["value"]
 
 def get_dynamic_data(dynamic_value, date_from=None, date_to=None, limit=60):
+    #print("gdf", date_from)
+    #print("gdt", date_to)
     SPINE.log.debug("get dynamic data sensor:{0}, from {1} to {2}",dynamic_value, date_from, date_to)
     if date_from is None:
         date_from = TS_START
+    elif isinstance(date_from, str):
+        date_from = datetime.strptime(date_from,'%Y-%m-%dT%H:%M:%S.%fZ')
+
 
     if date_to is None:
         date_to = datetime.utcnow()
+    elif isinstance(date_to, str):
+        date_to = datetime.strptime(date_to,'%Y-%m-%dT%H:%M:%S.%fZ')
 
-    date_from_ts = (date_from - datetime(1970, 1, 1)).total_seconds()
-    date_to_ts = (date_to - datetime(1970, 1, 1)).total_seconds()
+    #date_from_ts = (date_from - datetime(1970, 1, 1)).total_seconds()
+    #date_to_ts = (date_to - datetime(1970, 1, 1)).total_seconds()
 
     try:
-        con_list = [MEMORY_CON, FILE_CON]
+        con_list = [MEMORY_CON, FILE_CON]   
         result = []
         for con in con_list:
             cur = con.cursor()
             cur.execute(
-                "select * from dynamicData where dynamicValue=? and timestamp > ? and timestamp < ? LIMIT ?",
-                (dynamic_value, date_from_ts, date_to_ts, limit)
+                "select * from dynamicData where dynamicValue=? and timestamp >= Datetime(?) and timestamp < Datetime(?)",
+                (dynamic_value, date_from, date_to)
             )
 
             all_rows = cur.fetchall()
@@ -252,7 +261,7 @@ def get_dynamic_data(dynamic_value, date_from=None, date_to=None, limit=60):
                 result += [
                     {
                         "value":row[2],
-                        "ts": datetime.fromtimestamp(row[3]).strftime('%Y-%m-%dT%H:%M:%SZ')
+                        "ts": row[3]
                     }
                 ]
             if len(result):
