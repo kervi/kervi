@@ -90,7 +90,7 @@ class DynamicValue(KerviComponent):
 
         self._ui_parameters = {
             "size": 0,
-            "input_size": 50,
+            "input_size": 40,
             "type": "unkonwn",
             "link_to_header": False,
             "label_icon": None,
@@ -98,7 +98,7 @@ class DynamicValue(KerviComponent):
             "flat": False,
             "inline": False,
             "is_input":self.is_input,
-            "value_size":10
+            "value_size":20
         }
         self._persist_value = False
         self._log_values = False
@@ -287,8 +287,7 @@ class DynamicValue(KerviComponent):
             if self._persist_value and allow_persist:
                 self.settings.store_value("value", self.value)
 
-            timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
-            val = {"id":self.component_id, "value":nvalue, "timestamp":timestamp}
+            val = {"id":self.component_id, "value":nvalue, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
             self.spine.trigger_event(
                 "dynamicValueChanged",
                 self.component_id,
@@ -396,7 +395,7 @@ class DynamicNumber(DynamicValue):
         self._value = 0
         self._delta = None
         self._save_to_db = False
-        self._ui_parameters["type"] = "horizontal_slider"
+        self._ui_parameters["type"] = ""
         self._ui_parameters["chart_points"] = 60
         self._ui_parameters["show_sparkline"] = False
         self._ui_parameters["pad_auto_center"] = False
@@ -515,15 +514,15 @@ class DynamicNumber(DynamicValue):
             self._sparkline += [new_value]
             self._last_reading = time.clock()
 
-            timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
-            val = {"value_id":self.component_id, "value":new_value, "timestamp":timestamp}
+            
+            val = {"value_id":self.component_id, "value":new_value, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
             if self.persist_value:
                 self.spine.send_command("StoreDynamicValue", val)
 
             self.spine.trigger_event(
                 "dynamicValueChanged",
                 self.component_id,
-                {"id":self.component_id, "value":new_value, "timestamp":timestamp},
+                {"id":self.component_id, "value":new_value, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")},
                  self._log_values
             )
 
@@ -659,7 +658,8 @@ class DynamicBoolean(DynamicValue):
         self._ui_parameters["on_icon"] = None
         self._ui_parameters["off_icon"] = None
         self._ui_parameters["button_icon"] = None
-        self._ui_parameters["button_text"] = self.name
+        self._ui_parameters["button_text"] = self.name,
+        self._ui_parameters["input_size"] = 25
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
