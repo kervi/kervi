@@ -7,6 +7,7 @@ import socket
 
 def get_ip_address():
     """ returns ip addres of this device bound to primary net adapter """
+    
     try:
         _socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         _socket.connect(('google.com', 0))

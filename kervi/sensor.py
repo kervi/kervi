@@ -62,14 +62,16 @@ class Sensor(DynamicNumber):
             if self._dimensions > 1:
                 count = 0
                 for label in self._dimension_labels:
-                    self._sub_sensors += [
-                        Sensor(
+                    sub_sensor = Sensor(
                             self.component_id + "." + label,
                             label,
                             use_thread=False,
                             parent=self,
                             index=count
                         )
+                    sub_sensor.unit = self.unit
+                    self._sub_sensors += [
+                        sub_sensor
                     ]
                     count += 1
 

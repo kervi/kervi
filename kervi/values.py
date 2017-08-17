@@ -74,7 +74,7 @@ class DynamicValue(KerviComponent):
 
         KerviComponent.__init__(self, input_id, value_type, name)
         #self.spine = Spine()
-        self.unit = ""
+        self._unit = ""
         self._default_value = None
         self._index = index
         self.is_input = is_input
@@ -369,7 +369,7 @@ class DynamicValue(KerviComponent):
 
     def _get_info(self):
         return {
-            "unit":self.unit,
+            "unit":self._unit,
             "value":self.value,
             "command":self.command,
             "ranges":self._event_ranges,
@@ -390,7 +390,7 @@ class DynamicNumber(DynamicValue):
         #self.spine = Spine()
         self._min_value = -100
         self._max_value = 100
-        self.unit = ""
+        self._unit = ""
         self._default_value = 0.0
         self._value = 0
         self._delta = None
@@ -458,7 +458,7 @@ class DynamicNumber(DynamicValue):
     def _get_info(self):
         return {
             "isInput":self.is_input,
-            "unit":self.unit,
+            "unit":self._unit,
             "value":self.value,
             "maxValue":self._max_value,
             "minValue":self._min_value,

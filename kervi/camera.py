@@ -21,6 +21,7 @@ from kervi.utility.thread import KerviThread
 import kervi.utility.nethelper as nethelper
 import kervi.spine as spine
 import kervi.hal as hal
+import kervi.utility.authorization as authorization
 
 try:
     from SimpleHTTPServer import SimpleHTTPRequestHandler
@@ -272,30 +273,35 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            self.send_response(200)
-            self.send_header("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate")
-            self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
-            self.end_headers()
-            #first_frame = True
-            self.frame_number = 0
-            while not self.server.camera._terminate:
-                if self.server.camera.current_frame and self.server.camera.current_frame_number != self.frame_number:
-                    self.frame_number = self.server.camera.current_frame_number
-                    buf = BytesIO()
-                    self.server.mutex.acquire()
-                    try:
-                        self.server.camera.current_frame.save(buf, format='jpeg')
-                    finally:
-                        self.server.mutex.release()
+            print("ch", self.headers["Cookie"])
+            if authorization.is_cookie_valid(self.headers["Cookie"]):
+                self.send_response(200)
+                self.send_header("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate")
+                self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
+                self.end_headers()
+                #first_frame = True
+                self.frame_number = 0
+                while not self.server.camera._terminate:
+                    if self.server.camera.current_frame and self.server.camera.current_frame_number != self.frame_number:
+                        self.frame_number = self.server.camera.current_frame_number
+                        buf = BytesIO()
+                        self.server.mutex.acquire()
+                        try:
+                            self.server.camera.current_frame.save(buf, format='jpeg')
+                        finally:
+                            self.server.mutex.release()
 
-                    data = buf.getvalue()
-                    self.wfile.write(b"--jpgboundary")
-                    self.send_header('Content-type', 'image/jpeg')
-                    self.send_header('Content-length', len(data))
-                    self.end_headers()
-                    self.wfile.write(data)
-                    #first_frame = False
-                time.sleep(1.0 / 30)
+                        data = buf.getvalue()
+                        self.wfile.write(b"--jpgboundary")
+                        self.send_header('Content-type', 'image/jpeg')
+                        self.send_header('Content-length', len(data))
+                        self.end_headers()
+                        self.wfile.write(data)
+                        #first_frame = False
+                    time.sleep(1.0 / 30)
+            else:
+                self.send_response(403)
+                self.end_headers()
             return
         finally:
             pass
@@ -353,7 +359,7 @@ class CameraStreamer(CameraBase):
         self._device_driver = hal.get_camera_driver(camera_source)
         self._device_driver.camera = self
 
-        self.ip_address = nethelper.get_ip_address()
+        self.ip_address = "localhost" #nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()
         self.source = "http://" + str(self.ip_address) + ":" + str(self.ip_port) + "/" + camera_id# + ".png"
         self.source = {

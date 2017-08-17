@@ -7,6 +7,7 @@ import inspect
 import json
 from kervi.spine import Spine
 import kervi.utility.nethelper as nethelper
+import kervi.utility.authorization as authorization 
 
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
@@ -80,6 +81,7 @@ class _SpineProtocol(WebSocketServerProtocol):
         self.spine = Spine()
         WebSocketServerProtocol.__init__(self)
         self.handlers = {"command":[], "query":[], "event":[]}
+        self._authenticated = False
 
     def add_command_handler(self, command):
         found = False
@@ -116,34 +118,71 @@ class _SpineProtocol(WebSocketServerProtocol):
         jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
         self.sendMessage(jsonres, False)
 
+    
+    def onConnect(self, request):
+        print("Web socket Client connecting: {}".format(request.peer))
+        
+    def onOpen(self):
+        if authorization.active():
+            res = {
+                "messageType":"authenticate"
+            }
+        else:
+            self._authenticated = True
+            res = {
+                "messageType":"session_authenticated",
+                "session":"123456",
+            }
+        jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
+        self.sendMessage(jsonres, False)
+    
     def onMessage(self, payload, is_binary):
         try:
             obj = json.loads(payload.decode('utf8'))
-            self.spine.log.debug("WS onMessage:{0}", obj)
-
-            if obj["messageType"] == "query":
-                res = self.spine.send_query(obj["query"], *obj["args"], injected="socketSpine")
-                self.spine.log.debug("query response:{0}", res)
-                self.send_response(obj["id"], res)
-            elif obj["messageType"] == "registerQueryHandler":
-                self.add_query_handler(obj["query"])
-                self.send_response(None, None)
-            elif obj["messageType"] == "command":
-                self.spine.send_command(obj["command"], *obj["args"], injected="socketSpine")
-                self.send_response(obj["id"], None)
-            elif obj["messageType"] == "registerCommandHandler":
-                self.add_command_handler(obj["command"])
-                self.send_response(obj["id"], None)
-            elif obj["messageType"] == "event":
-                self.spine.trigger_event(
-                    obj["event"], obj["id"],
-                    obj["args"],
-                    injected="socketSpine"
-                )
-                self.send_response(obj["id"], None)
-            elif obj["messageType"] == "registerEventHandler":
-                self.add_event_handler(obj["event"], obj["eventId"])
-                self.send_response(obj["id"], None)
+            
+            if obj["messageType"] == "authenticate":
+                print("u",obj)
+                session = authorization.authorize(obj["userName"], obj["password"])
+                if session is None:
+                    res = {
+                        "messageType":"authentication_failed",
+                    }
+                    #self.close()
+                else:
+                    self._authenticated = True
+                    res = {
+                        "messageType":"session_authenticated",
+                        "session":session,
+                    }
+                jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
+                self.sendMessage(jsonres, False)
+            else:
+                self.spine.log.debug("WS onMessage:{0}", obj)
+                if not self._authenticated:
+                    pass
+                elif obj["messageType"] == "query":
+                    res = self.spine.send_query(obj["query"], *obj["args"], injected="socketSpine")
+                    self.spine.log.debug("query response:{0}", res)
+                    self.send_response(obj["id"], res)
+                elif obj["messageType"] == "registerQueryHandler":
+                    self.add_query_handler(obj["query"])
+                    self.send_response(None, None)
+                elif obj["messageType"] == "command":
+                    self.spine.send_command(obj["command"], *obj["args"], injected="socketSpine")
+                    self.send_response(obj["id"], None)
+                elif obj["messageType"] == "registerCommandHandler":
+                    self.add_command_handler(obj["command"])
+                    self.send_response(obj["id"], None)
+                elif obj["messageType"] == "event":
+                    self.spine.trigger_event(
+                        obj["event"], obj["id"],
+                        obj["args"],
+                        injected="socketSpine"
+                    )
+                    self.send_response(obj["id"], None)
+                elif obj["messageType"] == "registerEventHandler":
+                    self.add_event_handler(obj["event"], obj["eventId"])
+                    self.send_response(obj["id"], None)
         except :
             self.spine.log.exception("WS onMessage exception")
             #res={"execptionType":exc_type,"value":exc_value,"traceback":exc_traceback}
