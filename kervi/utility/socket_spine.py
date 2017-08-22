@@ -7,7 +7,7 @@ import inspect
 import json
 from kervi.spine import Spine
 import kervi.utility.nethelper as nethelper
-import kervi.utility.authorization as authorization 
+import kervi.utility.authorization_handler as authorization 
 
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
@@ -154,6 +154,14 @@ class _SpineProtocol(WebSocketServerProtocol):
                         "messageType":"session_authenticated",
                         "session":session,
                     }
+                jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
+                self.sendMessage(jsonres, False)
+            elif obj["messageType"] == "logoff":
+                self._authenticated = False
+                authorization.remove_session(obj["session"])
+                res = {
+                        "messageType":"session_logoff"
+                }
                 jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
                 self.sendMessage(jsonres, False)
             else:

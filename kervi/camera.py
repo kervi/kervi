@@ -274,7 +274,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         try:
             print("ch", self.headers["Cookie"])
-            if authorization.is_cookie_valid(self.headers["Cookie"]):
+            if authorization.is_session_valid(self.headers):
                 self.send_response(200)
                 self.send_header("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate")
                 self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
@@ -305,8 +305,6 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
             return
         finally:
             pass
-
-
 try:
     from socketserver import ThreadingMixIn
     class _HTTPFrameServer(ThreadingMixIn, HTTPServer):
