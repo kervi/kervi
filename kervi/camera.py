@@ -273,7 +273,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            print("ch", self.headers["Cookie"])
+            #print("ch", self.headers["Cookie"])
             if authorization.is_session_valid(self.headers):
                 self.send_response(200)
                 self.send_header("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate")
@@ -292,7 +292,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
                             self.server.mutex.release()
 
                         data = buf.getvalue()
-                        self.wfile.write(b"--jpgboundary")
+                        self.wfile.write(b"--jpgboundary\r\n")
                         self.send_header('Content-type', 'image/jpeg')
                         self.send_header('Content-length', len(data))
                         self.end_headers()
@@ -300,6 +300,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
                         #first_frame = False
                     time.sleep(1.0 / 30)
             else:
+                print("invalid session")
                 self.send_response(403)
                 self.end_headers()
             return

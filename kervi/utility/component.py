@@ -20,6 +20,7 @@ class KerviComponent(object):
         self.spine = kwargs.get("spine", spine.Spine())
         self._component_id = component_id
         self._component_type = component_type
+        self._user_groups = []
         self._name = name
         self._icon = None
         self._visible = True
@@ -68,6 +69,13 @@ class KerviComponent(object):
     def visible(self, value):
         self._visible = value
 
+    @property
+    def user_groups(self):
+        return self._user_groups
+
+    @user_groups.setter
+    def user_groups(self, value):
+        self._user_groups = value
 
     @property
     def settings(self):
@@ -156,15 +164,25 @@ class KerviComponent(object):
         )
         return {}
 
-    def _get_component_info(self, component_id=None):
-        if component_id is None or component_id == self.component_id:
-            info = self._get_info()
-            info["componentType"] = self.component_type
-            info["id"] = self.component_id
-            info["visible"] = self.visible
-            info["name"] = self.name
-            info["ui"] = self._camel_case_parameters(self._ui_parameters)
-            return info
+    def _get_component_info(self, component_id=None, **kwargs):
+        if  component_id is None or component_id == self.component_id:
+            session = kwargs.get("session", None)
+            authorized = True
+            if session and len(self.user_groups) > 0:
+                for group in self.user_groups:
+                    if group in session["groups"]:
+                        break
+                else:
+                    authorized = False
+                
+            if authorized:
+                info = self._get_info()
+                info["componentType"] = self.component_type
+                info["id"] = self.component_id
+                info["visible"] = self.visible
+                info["name"] = self.name
+                info["ui"] = self._camel_case_parameters(self._ui_parameters)
+                return info
 
     def _underscore_to_camelcase(self, value):
         def _camelcase():

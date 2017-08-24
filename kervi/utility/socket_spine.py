@@ -70,7 +70,7 @@ class _WebEventHandler(object):
     def on_event(self, id_event, *args, **kwargs):
         injected = kwargs.get("injected", "")
         self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
-        if not injected == "socketSpine":
+        if self.protocol.authenticated and not injected == "socketSpine":
             cmd = {"messageType":"event", "event":self.event, "id":id_event, "args":args}
             jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
             self.protocol.sendMessage(jsonres, False)
@@ -81,7 +81,9 @@ class _SpineProtocol(WebSocketServerProtocol):
         self.spine = Spine()
         WebSocketServerProtocol.__init__(self)
         self.handlers = {"command":[], "query":[], "event":[]}
-        self._authenticated = False
+        self.authenticated = False
+        self.session = None
+        self.user = None
 
     def add_command_handler(self, command):
         found = False
@@ -120,15 +122,16 @@ class _SpineProtocol(WebSocketServerProtocol):
 
     
     def onConnect(self, request):
-        print("Web socket Client connecting: {}".format(request.peer))
-        
+        #print("Web socket Client connecting: {}".format(request.peer))
+        pass
+
     def onOpen(self):
         if authorization.active():
             res = {
                 "messageType":"authenticate"
             }
         else:
-            self._authenticated = True
+            self.authenticated = True
             res = {
                 "messageType":"session_authenticated",
                 "session":"123456",
@@ -141,15 +144,17 @@ class _SpineProtocol(WebSocketServerProtocol):
             obj = json.loads(payload.decode('utf8'))
             
             if obj["messageType"] == "authenticate":
-                print("u",obj)
-                session = authorization.authorize(obj["userName"], obj["password"])
+                session, user = authorization.authorize(obj["userName"], obj["password"])
                 if session is None:
+                    print("authorization failed for:", obj["userName"])
                     res = {
                         "messageType":"authentication_failed",
                     }
                     #self.close()
                 else:
-                    self._authenticated = True
+                    self.session = session
+                    self.user = user
+                    self.authenticated = True
                     res = {
                         "messageType":"session_authenticated",
                         "session":session,
@@ -157,7 +162,8 @@ class _SpineProtocol(WebSocketServerProtocol):
                 jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
                 self.sendMessage(jsonres, False)
             elif obj["messageType"] == "logoff":
-                self._authenticated = False
+                self.authenticated = False
+                self.session = None
                 authorization.remove_session(obj["session"])
                 res = {
                         "messageType":"session_logoff"
@@ -166,17 +172,17 @@ class _SpineProtocol(WebSocketServerProtocol):
                 self.sendMessage(jsonres, False)
             else:
                 self.spine.log.debug("WS onMessage:{0}", obj)
-                if not self._authenticated:
+                if not self.authenticated:
                     pass
                 elif obj["messageType"] == "query":
-                    res = self.spine.send_query(obj["query"], *obj["args"], injected="socketSpine")
+                    res = self.spine.send_query(obj["query"], *obj["args"], injected="socketSpine", session=self.user)
                     self.spine.log.debug("query response:{0}", res)
                     self.send_response(obj["id"], res)
                 elif obj["messageType"] == "registerQueryHandler":
                     self.add_query_handler(obj["query"])
                     self.send_response(None, None)
                 elif obj["messageType"] == "command":
-                    self.spine.send_command(obj["command"], *obj["args"], injected="socketSpine")
+                    self.spine.send_command(obj["command"], *obj["args"], injected="socketSpine", session=self.user)
                     self.send_response(obj["id"], None)
                 elif obj["messageType"] == "registerCommandHandler":
                     self.add_command_handler(obj["command"])

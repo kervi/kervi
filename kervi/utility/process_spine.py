@@ -23,8 +23,9 @@ class _ConnCommandHandler(object):
         try:
             injected = kwargs.get("injected", "")
             scope = kwargs.get("scope", "global")
+            session = kwargs.get("session", None)
             if not (injected == "processSpine" and scope == "global"):
-                self.conn.send({"messageType":"command", "command":self.command, "args":args})
+                self.conn.send({"messageType":"command", "command":self.command, "args":args, "session":session})
         except IOError:
             self.spine.log.debug("IOError ConnCommandHandler:{0}", self.src)
         except:
@@ -45,10 +46,11 @@ class _ConnQueryHandler(object):
         try:
             injected = kwargs.get("injected", "")
             scope = kwargs.get("scope", "global")
+            session = kwargs.get("session", "session")
             if not (injected == "processSpine" and scope == "global"):
                 self.id_count += 1
                 self.conn.send(
-                    {"id":self.id_count, "messageType":"query", "query":self.query, "args":args}
+                    {"id":self.id_count, "messageType":"query", "query":self.query, "args":args, "session":session}
                 )
                 event = threading.Event()
                 event_data = {
@@ -381,7 +383,8 @@ class _ProcessSpine(object):
                 res = self.spine.send_query(
                     message["query"],
                     *message["args"],
-                    injected="processSpine"
+                    injected="processSpine",
+                    session=message["session"]
                 )
                 connection.send({"messageType":"queryResponse", "id":message["id"], "response":res})
 
@@ -393,7 +396,8 @@ class _ProcessSpine(object):
                 self.spine.send_command(
                     message["command"],
                     *message["args"],
-                    injected="processSpine"
+                    injected="processSpine",
+                    session=message["session"]
                 )
             elif message["messageType"] == "registerCommandHandler":
                 self.add_command_handler(message["command"], connection, src)

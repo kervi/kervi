@@ -21,7 +21,7 @@ class _QueryThread(threading.Thread):
         threading.Thread.__init__(self)
         injected = kwargs.get("injected", "")
         scope = kwargs.get("scope", "global")
-        
+        session = kwargs.get("session", None)
         self.daemon = True
         self.handler = handler
         self.query = query
@@ -29,7 +29,7 @@ class _QueryThread(threading.Thread):
         self.result = []
         self.injected = injected
         self.scope = scope
-
+        self.session = session
         
         import traceback
         #spine.log.debug("qtx:{0}, handler:{1}", self.query, self.handler)
@@ -37,7 +37,7 @@ class _QueryThread(threading.Thread):
         #    spine.log.debug(line.strip())
         
     def run(self):
-        self.result = self.handler(self.query, self.args, injected=self.injected, scope=self.scope)
+        self.result = self.handler(self.query, self.args, injected=self.injected, scope=self.scope, session=self.session)
 
 class _CQRSQueue(KerviThread):
     def __init__(self, name):
@@ -76,7 +76,6 @@ class _CQRSBus(object):
 
     linked_spines = []
     log = None
-
 
     def __init__(self):
         return
@@ -148,9 +147,10 @@ class _CQRSBus(object):
     def send_command(self, command, *args, **kwargs):
         injected = kwargs.get("injected", "")
         scope = kwargs.get("scope", "global")
+        session = kwargs.get("session", None)
         self.log.debug("sendcommand:{0} injected:{1} scope:{2}", command, injected, scope)
         self.cmd_queue.add(
-            {"command":command, "args":args, "injected":injected, "scope":scope}, kwargs.get("priority", 2)
+            {"command":command, "args":args, "injected":injected, "scope":scope, "session":session}, kwargs.get("priority", 2)
         )
 
     def command_queue_handler(self, queue_item):
@@ -162,17 +162,18 @@ class _CQRSBus(object):
                     if not argspec.keywords:
                         func_handler(*queue_item['args'])
                     else:
-                        func_handler(*queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"])
+                        func_handler(*queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"], session=queue_item["session"])
                 except:
                     self.log.exception("commandQueueHandler error:"+queue_item['command'])
 
     def send_query(self, query, *args, **kwargs):
         injected = kwargs.get("injected", "")
         scope = kwargs.get("scope", "global")
+        session = kwargs.get("session", None)
         self.log.debug("sendQuery:{0} injected:{1} scope:{2}", query, injected, scope)
         if query == "getQueueInfo":
             return self.get_queue_info()
-        query_thread = _QueryThread(self.query_handler, query, args, self, injected=injected, scope=scope)
+        query_thread = _QueryThread(self.query_handler, query, args, self, injected=injected, scope=scope, session=session)
         self.log.debug("sendQuery thread start:{0}", query_thread)
 
         query_thread.start()
@@ -187,7 +188,7 @@ class _CQRSBus(object):
     def query_handler(self, query, args, **kwargs):
         injected = kwargs.get("injected", "")
         scope = kwargs.get("scope", "global")
-
+        session = kwargs.get("session", None)
         #self.log.debug("query handler called:{0} injected:{1}", query, injected)
         func_list = self.query_handlers.get_list_data(query)
         self.log.debug("query handler called:{0} injected:{1}, func:{2}", query, injected, func_list)
@@ -201,7 +202,7 @@ class _CQRSBus(object):
                         if sub_result:
                             result += [sub_result]
                     else:
-                        sub_result = func(*args, injected=injected, scope=scope)
+                        sub_result = func(*args, injected=injected, scope=scope, session=session)
                         if sub_result:
                             result += [sub_result]
             if len(result) == 1:
