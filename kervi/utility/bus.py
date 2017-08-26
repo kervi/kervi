@@ -30,12 +30,12 @@ class _QueryThread(threading.Thread):
         self.injected = injected
         self.scope = scope
         self.session = session
-        
+
         import traceback
         #spine.log.debug("qtx:{0}, handler:{1}", self.query, self.handler)
         #for line in traceback.format_stack():
         #    spine.log.debug(line.strip())
-        
+
     def run(self):
         self.result = self.handler(self.query, self.args, injected=self.injected, scope=self.scope, session=self.session)
 
@@ -119,18 +119,20 @@ class _CQRSBus(object):
 
     def register_command_handler(self, name, func, **kwargs):
         injected = kwargs.get("injected", "")
+        groups = kwargs.get("groups", None)
         self.log.debug("register command handler, command:{0} injected:{1}", name, injected)
-        self.cmd_handlers.add(name, func)
+        self.cmd_handlers.add(name, (func, groups))
         for linked_spine in self.linked_spines:
             linked_spine.add_linked_command_handler(name, injected=injected)
 
     def register_event_handler(self, name, func, id=None, **kwargs):
         injected = kwargs.get("injected", "")
+        groups = kwargs.get("groups", None)
         self.log.debug("register event handler event:{0} id:{1} injected:{2}", name, id, injected)
         if id:
-            self.event_handlers.add(name+"/"+id, func)
+            self.event_handlers.add(name+"/"+id, (func, groups))
         else:
-            self.event_handlers.add(name, func)
+            self.event_handlers.add(name, (func, groups))
 
         for linkedspine in self.linked_spines:
             linkedspine.add_linked_event_handler(name, id, injected=injected)
@@ -139,8 +141,9 @@ class _CQRSBus(object):
 
     def register_query_handler(self, name, func, **kwargs):
         injected = kwargs.get("injected", "")
+        groups = kwargs.get("groups", None)
         self.log.debug("register query handler query:{0} injected:{1}", name, injected)
-        self.query_handlers.add(name, func)
+        self.query_handlers.add(name, (func, groups))
         for linked_spine in self.linked_spines:
             linked_spine.add_linked_query_handler(name, injected=injected)
 
@@ -156,15 +159,29 @@ class _CQRSBus(object):
     def command_queue_handler(self, queue_item):
         func_list = self.cmd_handlers.get_list_data(queue_item['command'])
         if func_list:
-            for func_handler in func_list:
-                try:
-                    argspec = inspect.getargspec(func_handler)
-                    if not argspec.keywords:
-                        func_handler(*queue_item['args'])
+            for func_handler, groups in func_list:
+                if queue_item['session']:
+                    session_groups = queue_item['session']['groups']
+                else:
+                    session_groups = None
+                authorized = True
+
+                if session_groups != None and len(groups) > 0:
+                    for group in groups:
+                        if group in session_groups:
+                            break
                     else:
-                        func_handler(*queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"], session=queue_item["session"])
-                except:
-                    self.log.exception("commandQueueHandler error:"+queue_item['command'])
+                        authorized = False
+
+                if authorized:
+                    try:
+                        argspec = inspect.getargspec(func_handler)
+                        if not argspec.keywords:
+                            func_handler(*queue_item['args'])
+                        else:
+                            func_handler(*queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"], session=queue_item["session"])
+                    except:
+                        self.log.exception("commandQueueHandler error:"+queue_item['command'])
 
     def send_query(self, query, *args, **kwargs):
         injected = kwargs.get("injected", "")
@@ -195,16 +212,31 @@ class _CQRSBus(object):
         result = []
         try:
             if func_list:
-                for func in func_list:
-                    argspec = inspect.getargspec(func)
-                    if not argspec.keywords:
-                        sub_result = func(*args)
-                        if sub_result:
-                            result += [sub_result]
+                for func, groups in func_list:
+                    
+                    if session:
+                        session_groups = session['groups']
                     else:
-                        sub_result = func(*args, injected=injected, scope=scope, session=session)
-                        if sub_result:
-                            result += [sub_result]
+                        session_groups = None
+                    authorized = True
+                    
+                    if session_groups != None and groups and len(groups)>0:
+                        for group in groups:
+                            if group in session_groups:
+                                break
+                        else:
+                            authorized = False
+                    
+                    if authorized:
+                        argspec = inspect.getargspec(func)
+                        if not argspec.keywords:
+                            sub_result = func(*args)
+                            if sub_result:
+                                result += [sub_result]
+                        else:
+                            sub_result = func(*args, injected=injected, scope=scope, session=session)
+                            if sub_result:
+                                result += [sub_result]
             if len(result) == 1:
                 return result[0]
         except:
@@ -215,9 +247,10 @@ class _CQRSBus(object):
     def trigger_event(self, event, id, *args, **kwargs):
         injected = kwargs.get("injected", "")
         scope = kwargs.get("scope", "global")
+        groups = kwargs.get("groups", None)
         self.log.debug("triggerEvent:{0}, id:{1} injected:{2}, scope:{3}", event, id, injected, scope)
         self.event_queue.add(
-            {'event':event, 'id':id, 'args':args, "injected":injected, "scope":scope},
+            {'event':event, 'id':id, 'args':args, "injected":injected, "scope":scope, "groups":groups},
             kwargs.get("priority", 2)
         )
 
@@ -225,21 +258,44 @@ class _CQRSBus(object):
         func_list = self.event_handlers.get_list_data(queue_item['event'])
         try:
             if func_list:
-                for func in func_list:
-                    argspec = inspect.getargspec(func)
-                    if not argspec.keywords:
-                        func(None, *queue_item['args'])
-                    else:
-                        func(None, *queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"])
+                for func, groups in func_list:
+
+                    session_groups = queue_item['groups']
+                    authorized = True
+
+                    if session_groups and groups:
+                        for group in groups:
+                            if group in session_groups:
+                                break
+                        else:
+                            authorized = False
+
+                    if authorized:
+                        argspec = inspect.getargspec(func)
+                        if not argspec.keywords:
+                            func(None, *queue_item['args'])
+                        else:
+                            func(None, *queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"])
             if queue_item["id"]:
                 func_list = self.event_handlers.get_list_data(queue_item['event']+"/"+queue_item['id'])
                 if func_list:
-                    for func in func_list:
-                        argspec = inspect.getargspec(func)
-                        if not argspec.keywords:
-                            func(queue_item["id"], *queue_item['args'])
-                        else:
-                            func(queue_item["id"], *queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"])
+                    for func, group in func_list:
+                        session_groups = queue_item['groups']
+                        authorized = True
+
+                        if session_groups and groups:
+                            for group in groups:
+                                if group in session_groups:
+                                    break
+                            else:
+                                authorized = False
+
+                        if authorized:
+                            argspec = inspect.getargspec(func)
+                            if not argspec.keywords:
+                                func(queue_item["id"], *queue_item['args'])
+                            else:
+                                func(queue_item["id"], *queue_item['args'], injected=queue_item["injected"], scope=queue_item["scope"])
         except:
             self.log.exception("Exception in event:{0}",queue_item)
     

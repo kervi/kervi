@@ -21,6 +21,8 @@ class KerviComponent(object):
         self._component_id = component_id
         self._component_type = component_type
         self._user_groups = []
+        self._admin_groups = []
+        
         self._name = name
         self._icon = None
         self._visible = True
@@ -31,9 +33,10 @@ class KerviComponent(object):
             self.spine.log.debug("component created:{0}", self.component_id)
             self.spine.register_query_handler(
                 "getDashboardComponents",
-                self._get_dashboard_components
+                self._get_dashboard_components,
+                groups=self.user_groups
             )
-            self.spine.register_query_handler("getComponentInfo", self._get_component_info)
+            self.spine.register_query_handler("getComponentInfo", self._get_component_info, groups=self.user_groups)
 
     @property
     def component_id(self):
@@ -75,7 +78,25 @@ class KerviComponent(object):
 
     @user_groups.setter
     def user_groups(self, value):
-        self._user_groups = value
+        self._user_groups.clear()
+        self._user_groups += value
+        self._user_groups += self.admin_groups
+
+    @property
+    def admin_groups(self):
+        return self._admin_groups
+
+    @admin_groups.setter
+    def admin_groups(self, value):
+        self._admin_groups.clear()
+        self._admin_groups += value
+        self._user_groups += self.admin_groups
+
+    @property
+    def ui_groups(self):
+        resulting_list = list(self.user_groups)
+        resulting_list.extend(x for x in self.admin_groups if x not in resulting_list)
+        return resulting_list
 
     @property
     def settings(self):

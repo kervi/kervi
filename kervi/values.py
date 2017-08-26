@@ -85,8 +85,8 @@ class DynamicValue(KerviComponent):
             self._observers += [parent]
         self._spine_observers = {}
         self.command = self.component_id + ".setValue"
-        self.spine.register_command_handler(self.command, self._set_value)
-        self.spine.register_query_handler("getDynamicValue", self._query_value)
+        self.spine.register_command_handler(self.command, self._set_value, groups=self.admin_groups)
+        self.spine.register_query_handler("getDynamicValue", self._query_value, groups=self.user_groups)
 
         self._ui_parameters = {
             "size": 0,
@@ -292,7 +292,8 @@ class DynamicValue(KerviComponent):
                 "dynamicValueChanged",
                 self.component_id,
                 val,
-                self._log_values
+                self._log_values,
+                groups=self.user_groups
             )
 
     def dynamic_value_changed(self, dynamic_value, value):
