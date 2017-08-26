@@ -197,7 +197,7 @@ class _ProcessSpine(object):
             except IOError:
                 self.spine.log.debug("root not found")
                 reconnect = True
-                print("root not found")
+                print("root not found", self.address)
                 time.sleep(1)
         if reconnect:
             print("root found and connected")

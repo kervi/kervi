@@ -524,7 +524,8 @@ class DynamicNumber(DynamicValue):
                 "dynamicValueChanged",
                 self.component_id,
                 {"id":self.component_id, "value":new_value, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")},
-                 self._log_values
+                self._log_values,
+                groups=self.user_groups
             )
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):

@@ -103,7 +103,7 @@ class Application(object):
                 "appKey":"",
             },
             "log" : {
-                "level":"debug",
+                "level":"info",
                 "file":"kervi.log",
                 "resetLog":False
             },

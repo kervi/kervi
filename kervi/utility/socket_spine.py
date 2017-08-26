@@ -69,8 +69,19 @@ class _WebEventHandler(object):
 
     def on_event(self, id_event, *args, **kwargs):
         injected = kwargs.get("injected", "")
+        groups = kwargs.get("groups", None)
         self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
-        if self.protocol.authenticated and not injected == "socketSpine":
+        
+        authorized = True
+
+        if self.protocol.user != None and self.protocol.user["groups"] != None and groups != None and len(groups) > 0:
+            for group in groups:
+                if group in self.protocol.user["groups"]:
+                    break
+            else:
+                authorized = False
+
+        if authorized and self.protocol.authenticated and not injected == "socketSpine":
             cmd = {"messageType":"event", "event":self.event, "id":id_event, "args":args}
             jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
             self.protocol.sendMessage(jsonres, False)
