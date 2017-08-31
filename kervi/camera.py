@@ -4,6 +4,7 @@
 import os
 import threading
 import time
+import kervi.utility.encryption as encryption
 #from twisted.web.server import Site
 #from twisted.web.resource import Resource
 #from twisted.internet import reactor, endpoints
@@ -32,42 +33,6 @@ try:
     from BaseHTTPServer import HTTPServer
 except:
     from http.server import HTTPServer
-
-
-
-
-# class _CameraRecordButton(UISwitchButtonControllerInput):
-#     def __init__(self, controller):
-#         UISwitchButtonControllerInput.__init__(
-#             self, controller.component_id+".record",
-#             "Record",
-#             controller)
-#         self.set_ui_parameter("on_icon", "video-camera")
-#         self.set_ui_parameter("off_icon", "video-camera")
-#         self.set_ui_parameter("inline", True)
-#         self.set_ui_parameter("on_text", None)
-#         self.set_ui_parameter("off_text", None)
-#         self.set_ui_parameter("label", None)
-
-#     def on(self):
-#         self.controller.start_record()
-
-#     def off(self):
-#         self.controller.stop_record()
-
-# class _CameraPictureButton(UIButtonControllerInput):
-#     def __init__(self, controller):
-#         UIButtonControllerInput.__init__(
-#             self,
-#             controller.component_id+".savePicture",
-#             "Take picture",
-#             controller
-#         )
-#         self.set_ui_parameter("button_icon", "camera")
-#         self.set_ui_parameter("inline", True)
-
-#     def click(self):
-#         self.controller.save_picture()
 
 class CameraBase(Controller):
     def __init__(self, camera_id, name, **kwargs):
@@ -299,6 +264,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
                         self.wfile.write(data)
                         #first_frame = False
                     time.sleep(1.0 / 30)
+                print("exit cam thread")
             else:
                 print("invalid session")
                 self.send_response(403)
@@ -358,11 +324,15 @@ class CameraStreamer(CameraBase):
         self._device_driver = hal.get_camera_driver(camera_source)
         self._device_driver.camera = self
 
+        protocol = "http://"
+        if encryption.enabled():
+            protocol = "https://"
+
         self.ip_address = "localhost" #nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()
-        self.source = "http://" + str(self.ip_address) + ":" + str(self.ip_port) + "/" + camera_id# + ".png"
+        self.source = protocol + str(self.ip_address) + ":" + str(self.ip_port) + "/" + camera_id# + ".png"
         self.source = {
-            "server": "http://" + str(self.ip_address) + ":" + str(self.ip_port),
+            "server": protocol + str(self.ip_address) + ":" + str(self.ip_port),
             "path": "/"+camera_id
         }
         self.current_frame = None
@@ -377,11 +347,24 @@ class CameraStreamer(CameraBase):
             self,
             self.mutex
         )
+
+        if encryption.enabled():
+            cert_file, key_file = encryption.get_cert()
+            if key_file and cert_file:
+                import ssl
+                self.server.socket = ssl.wrap_socket (self.server.socket, keyfile=key_file, certfile=cert_file, server_side=True)
+                
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.daemon = True
         self.server_thread.start()
 
         self.frame_thread = _CameraFrameThread(self, self.mutex)
+
+    def exit(self):
+        print("stop cam")
+        self.terminate = True
+        self._terminate = True
+        self.server.shutdown()
 
     @property
     def _terminate(self):

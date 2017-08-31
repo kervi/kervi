@@ -7,7 +7,8 @@ import inspect
 import json
 from kervi.spine import Spine
 import kervi.utility.nethelper as nethelper
-import kervi.utility.authorization_handler as authorization 
+import kervi.utility.authorization_handler as authorization
+import kervi.utility.encryption as encryption
 
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
@@ -224,6 +225,20 @@ def _start(settings):
 
     from autobahn.asyncio.websocket import WebSocketServerFactory
 
+    ssl_context = None
+
+    if encryption.enabled():
+        print("socket using ssl")
+        cert_file, key_file = encryption.get_cert()
+        try:
+            import ssl
+            ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+            ssl_context.load_cert_chain(cert_file, key_file)
+            print("socket ssl found")
+        except:
+            ssl_context = None
+            print("socket failed to use ssl")
+
     factory = WebSocketServerFactory()
     factory.protocol = _SpineProtocol
 
@@ -238,7 +253,8 @@ def _start(settings):
     coro = loop.create_server(
         factory,
         settings["network"]["IPAddress"],
-        settings["network"]["WebSocketPort"]
+        settings["network"]["WebSocketPort"],
+        ssl=ssl_context
     )
 
     coro_local = loop.create_server(

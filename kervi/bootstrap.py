@@ -17,7 +17,7 @@ from kervi.utility.process_spine import _ProcessSpine
 import kervi.kervi_logging as logging
 import kervi_ui.webserver as webserver
 import kervi.utility.nethelper as nethelper
-
+import kervi.utility.encryption as encryption
 
 def _deep_update(d, u):
     """Update a nested dictionary or similar mapping.
@@ -95,6 +95,9 @@ class Application(object):
     def __init__(self, settings = None):
         """ Settings is a dictionary with the following content
         """
+        def_ports = [80, 8080, 8081]
+        if encryption.enabled():
+            def_ports = [443, 8443]
 
         self.settings = {
             "info":{
@@ -113,11 +116,10 @@ class Application(object):
                 "IPRootAddress": nethelper.get_ip_address(),
                 "IPCRootPort":nethelper.get_free_port([9500]),
                 "WebSocketPort":nethelper.get_free_port([9000]),
-                "WebPort": nethelper.get_free_port([80, 8080, 8081]),
-                "IPCSecret":b"12345"
+                "WebPort": nethelper.get_free_port(def_ports),
+                "IPCSecret":b"12345",
             }
         }
-
 
         print("Starting kervi application, please wait")
         if settings:

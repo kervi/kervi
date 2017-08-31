@@ -3,8 +3,8 @@ import http.cookies as Cookie
 from  kervi.spine import Spine
 
 try:
-    from user import users
-    USERS = users
+    from users import settings
+    USERS = settings
 except ImportError:
     USERS ={}
 
