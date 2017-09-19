@@ -166,13 +166,12 @@ class _CQRSBus(object):
                     session_groups = None
                 authorized = True
 
-                if session_groups != None and len(groups) > 0:
+                if session_groups != None and groups != None and len(groups) > 0:
                     for group in groups:
                         if group in session_groups:
                             break
                     else:
                         authorized = False
-
                 if authorized:
                     try:
                         argspec = inspect.getargspec(func_handler)

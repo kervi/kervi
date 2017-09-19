@@ -3,18 +3,17 @@
 """
 A Kervi controller is a class that acts upon input from users or events or the underlaying os.
 """
-
+import inspect
 from kervi.spine import Spine
 from kervi.utility.thread import KerviThread
 from kervi.utility.component import KerviComponent
 from kervi.hal import GPIO
-from kervi.values import DynamicValueList
-
-
+from kervi.values import DynamicValueList, DynamicValue
+from kervi.values import DynamicNumber
 
 class Controller(KerviComponent):
     """
-    A Kervi controller is a class that acts upon input from users or events or the underlaying os.
+    A Kervi controller is a class that acts upon input from users, hardware events or the underlaying os.
 
     Examples for controllers are motor control, servo control, output to IO.
 
@@ -143,3 +142,50 @@ class Controller(KerviComponent):
         }
 
 
+    @staticmethod
+    def create(controller_id, name):
+        """Turn class into a kervi controller"""
+        def _decorator(cls):
+            class _ControllerClass(cls, Controller):
+                def __init__(self):
+                    Controller.__init__(self, controller_id, name)
+                    for key in cls.__dict__.keys():
+                        prop = cls.__dict__[key]
+                        if isinstance(prop, DynamicValue):
+                            if prop.is_input:
+                                self.inputs._add_internal(key, prop)
+                            else:
+                                self.outputs._add_internal(key, prop)
+                    cls.__init__(self)
+            return _ControllerClass
+        return _decorator
+
+    @staticmethod
+    def input(input_id, name, value_class=DynamicNumber):
+        """Add input to controller"""
+        def _init():
+            return value_class(
+                name,
+                input_id=input_id,
+                is_input=True,
+                index=-1
+            )
+        def _decorator(cls):
+            setattr(cls, input_id, _init())
+            return cls
+        return _decorator
+
+    @staticmethod
+    def output(output_id, name, value_class=DynamicNumber):
+        """Add output to controller"""
+        def _init():
+            return value_class(
+                name,
+                input_id=output_id,
+                is_input=False,
+                index=-1
+            )
+        def _decorator(cls):
+            setattr(cls, output_id, _init())
+            return cls
+        return _decorator

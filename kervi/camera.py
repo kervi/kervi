@@ -5,10 +5,6 @@ import os
 import threading
 import time
 import kervi.utility.encryption as encryption
-#from twisted.web.server import Site
-#from twisted.web.resource import Resource
-#from twisted.internet import reactor, endpoints
-
 
 try:
     from io import BytesIO
@@ -328,7 +324,7 @@ class CameraStreamer(CameraBase):
         if encryption.enabled():
             protocol = "https://"
 
-        self.ip_address = "localhost" #nethelper.get_ip_address()
+        self.ip_address = nethelper.get_ip_address()
         self.ip_port = nethelper.get_free_port()
         self.source = protocol + str(self.ip_address) + ":" + str(self.ip_port) + "/" + camera_id# + ".png"
         self.source = {

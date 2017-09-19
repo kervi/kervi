@@ -49,6 +49,15 @@ class DynamicValueList(object):
             item.add_observer(self.controller)
         return item
 
+    def _add_internal(self, value_id, item):
+        self._items[value_id] = item
+        item._component_id = self.controller.component_id + "." + value_id
+        item._index = self.count
+        self.count += 1
+
+        if self.is_input and self.controller:
+            item.add_observer(self.controller)
+
     @property
     def keys(self):
         return self._items.keys()
@@ -61,7 +70,7 @@ class DynamicValue(KerviComponent):
     """
     Generic dynamic value that is use as base class for specialized dynamic values.
     """
-    def __init__(self, name, value_type, input_id=None, is_input=True, parent=None, index = None):
+    def __init__(self, name, value_type, input_id=None, is_input=True, parent=None, index=None):
         global VALUE_COUNTER
         if input_id is None:
             VALUE_COUNTER += 1
