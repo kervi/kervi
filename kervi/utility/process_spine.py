@@ -24,7 +24,7 @@ class _ConnCommandHandler(object):
             injected = kwargs.get("injected", "")
             scope = kwargs.get("scope", "global")
             session = kwargs.get("session", None)
-            if not (injected == "processSpine" and scope == "global"):
+            if not injected == "processSpine" and scope == "global":
                 self.conn.send({"messageType":"command", "command":self.command, "args":args, "session":session})
         except IOError:
             self.spine.log.debug("IOError ConnCommandHandler:{0}", self.src)
@@ -47,7 +47,7 @@ class _ConnQueryHandler(object):
             injected = kwargs.get("injected", "")
             scope = kwargs.get("scope", "global")
             session = kwargs.get("session", "session")
-            if not (injected == "processSpine" and scope == "global"):
+            if not injected == "processSpine" and scope == "global":
                 self.id_count += 1
                 self.conn.send(
                     {"id":self.id_count, "messageType":"query", "query":self.query, "args":args, "session":session}
@@ -82,7 +82,7 @@ class _ConnEventHandler(object):
         try:
             injected = kwargs.get("injected", "")
             scope = kwargs.get("scope", "global")
-            if not (injected == "processSpine" and scope == "global"):
+            if not injected == "processSpine" and scope == "global":
                 self.spine.log.debug("trigger event: {0} on:{1} ", self.event, self.src)
                 self.conn.send(
                     {"messageType":"event", "event":self.event, "id":id_event, "args":args}

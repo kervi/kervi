@@ -19,7 +19,8 @@ def create_file_con():
     return lite.connect('kervi.db', check_same_thread=False)
 
 def create_memory_con():
-    return lite.connect("kervi_mem.db", check_same_thread=False)
+    #return lite.connect("kervi_mem.db", check_same_thread=False)
+    return lite.connect(":memory:", check_same_thread=False)
 
 
 class MemoryCleanThread(KerviThread):
@@ -41,7 +42,7 @@ class MemoryCleanThread(KerviThread):
             SPINE.log.error("clean memory db, Command skipped: {0}, command{1}", msg)
 
     def _start_command(self):
-        print("start mcl")
+        print("start storage service")
         if not self.alive:
             self.alive = True
             KerviThread.start(self)
