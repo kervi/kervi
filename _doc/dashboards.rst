@@ -2,10 +2,10 @@
 Dashboards
 ==========
 
-An application may define one or more dashboards if it is a home automation application
+An application may define one or more dashboards. If it is a home automation application
 A dashboard could be a room or a floor.
 
-Each dashbord contains one or more panels where it is possible to link sensors, controllers, camera and other components.
+Each dashboard contains one or more panels where it is possible to link sensors, controllers, camera and other components.
 
 The dashboards are responsive and adjust to the width of the browser. Below is the same dashboard in mobile and browser view. 
 
@@ -29,7 +29,7 @@ The code below shows how to configure the dashboard above
 
 On large displays the columns and rows specify the size of a panel where the cell size is 150x150 pixels.
 
-I a title is set for a panel it will be displayed in a header.
+If a title is set for a panel it will be displayed in a header.
 
 Collapsed specify if the panel should be collapsed when a panel is first shown.
 
@@ -168,10 +168,9 @@ GPIO and dynamic boolean
 
 Linked output components like digital GPIO channels and boolean controller input/outputs
 are displayed as a switch button or push button.
-If it is an input GPIO channel or a controller output the button is read only.
+If the dynamic value is an GPIO input channel or a controller output the button is read only.
 
-If it is a output GPIO channel or a controller input the user will be able to switch/push the button. 
-
+If the dynamic value is a output GPIO channel or a controller input the user will be able to switch/push the button. 
 
 Controller pads
 ===============

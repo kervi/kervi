@@ -112,12 +112,12 @@ Application (line 1-3)
 ######################
 
 The hart of a kervi application is the Application class.   
-You must create an Application instance as the very first   
+You must create an Application instance as the very first  operation 
 in your application. 
 
-The Application class prepares your application it figures out
+The Application class prepares your application. It figures out
 if you are using a Raspberry Pi as your board and loads required
-driveres. It also loads a web server that serves the files to the browser. 
+driveres. It also loads a web server that serves the UI files to the browser. 
 
 ######################
 Dashboards (line 5-11)
@@ -129,9 +129,9 @@ You can have multiple dashboards in an application. It can be floors in a house
 if your are developing a house automation project or it can be a camera view and
 system information if you are creating a robot.
 
-In the example above two dashboards are defined APP and SYSTEM. 
+In the example above two dashboards are defined: APP and SYSTEM. 
 
-Each dashboard has one or more panels where kervi components like sensors and controllers are linked to.
+Each dashboard has one or more panels where it is possible to link kervi components like sensors and controllers.
 
 ###############
 Sensors (13-26)
@@ -157,7 +157,7 @@ The input could come from the user via the web based UI, sensors or other applic
 
 The example above implements a fan controller that calculates speed of a fan by reading the temperature of a sensor.
 The controller only works on its interfaces and is agnostic to how it is linked to user interface and hardware. 
-In that way it is easy to change hardware and UI without recoding the controller.
+In that way it is easy to change hardware and UI without the need for recoding the controller.
 
 In order to do the calculation the controller uses the following inputs:
 
@@ -211,16 +211,16 @@ Now the dc motor listen to changes in fan_speed.
 Start the engines (line 84)
 ###########################
 
-The work so far have been to prepare your application call APP.run() keep your application going.
+The work so far have been to prepare your application call APP.run() to keep your application going.
 
 ------------------------------
 Multi file/process application
 ------------------------------
 
 Below is the structure of a multi file Kervi application. All the parts from a single file application are moved into
-seperate files and foldes. Kervi uses this structure to load each section in its own process in order to improve the performance.
+separate files and folders. Kervi uses this structure to load each section in its own process in order to improve the performance.
 
-A second advantance to this model is that it is easier to maintain as the Kervi project grows bigger.
+A second advantage to this model is that it is easier to maintain the code as the Kervi project grows bigger.
 
 .. code::
 
