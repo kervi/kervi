@@ -18,12 +18,14 @@ def allow_anonymous():
 
 def is_session_valid(headers):
     if active():
-        cookie = Cookie.SimpleCookie()
-        cookie.load(headers["Cookie"])
-        if 'kervisession' in cookie:
-            session = cookie['kervisession'].value
-            if session in SESSIONS:
-                return SESSIONS[session]
+        if headers and headers["Cookie"]:
+            cookie = Cookie.SimpleCookie()
+            cookie.load(headers["Cookie"])
+            if 'kervisession' in cookie:
+                session = cookie['kervisession'].value
+                if session in SESSIONS:
+                    return SESSIONS[session]
+            return False
         return False
     else:
         return True

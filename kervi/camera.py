@@ -262,7 +262,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
                     time.sleep(1.0 / 30)
                 print("exit cam thread")
             else:
-                print("invalid session")
+                print("camera streamer, invalid session id")
                 self.send_response(403)
                 self.end_headers()
             return
