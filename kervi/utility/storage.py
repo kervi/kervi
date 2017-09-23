@@ -10,7 +10,7 @@ import inspect
 import sqlite3 as lite
 import kervi.spine as spine
 from kervi.utility.thread import KerviThread
-0
+
 SPINE = spine.Spine()
 FILE_CON = None
 MEMORY_CON = None
@@ -35,7 +35,7 @@ class MemoryCleanThread(KerviThread):
     def _step(self):
         time.sleep(20)
         try:
-            con = create_memory_con()
+            con = MEMORY_CON # create_memory_con()
             cursor = con.cursor()
             cursor.execute("DELETE FROM dynamicData WHERE id IN (SELECT id FROM dynamicData ORDER BY id ASC LIMIT 1000);")
         except lite.Error as msg:
