@@ -44,7 +44,7 @@ def default_i2c_bus():
         return _DRIVER.default_i2c_bus()
     return 0
 
-def i2c(address, bus=default_i2c_bus()):
+def get_i2c(address, bus=default_i2c_bus()):
     return _DRIVER.get_i2c_driver(address, bus)
 
 def get_one_wire(address):
@@ -117,15 +117,15 @@ class DACValueOutOfBoundsError(Exception):
 class I2CSensorDeviceDriver(SensorDeviceDriver):
     def __init__(self, address, bus):
         if address > 0x77:
-            raise I2CaddressOutOfBoundsError(self, device_name, address)
-        self.i2c = i2c(address, bus)
+            raise I2CaddressOutOfBoundsError(self.device_name, address)
+        self.i2c = get_i2c(address, bus)
 
 class I2CGPIODeviceDriver(gpio.IGPIODeviceDriver):
     def __init__(self, address, bus, gpio_id):
         gpio.IGPIODeviceDriver.__init__(self, gpio_id)
         if address > 0x77:
-            raise I2CaddressOutOfBoundsError(self, device_name, address)
-        self.i2c = i2c(address, bus)
+            raise I2CaddressOutOfBoundsError(self.device_name, address)
+        self.i2c = get_i2c(address, bus)
 
     @property
     def device_name(self):

@@ -23,9 +23,12 @@ kervi/hal\i2c.py
 kervi/hal\motor_controller.py
 kervi/hal\one_wire.py
 kervi/utility\__init__.py
+kervi/utility\authorization.py
+kervi/utility\authorization_handler.py
 kervi/utility\bus.py
 kervi/utility\component.py
 kervi/utility\cron.py
+kervi/utility\encryption.py
 kervi/utility\named_lists.py
 kervi/utility\nethelper.py
 kervi/utility\process.py
