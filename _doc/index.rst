@@ -55,6 +55,7 @@ Below is a complete example that shows how to display a sensor on a dashboard wi
    controllers
    dynamic_values
    camera
+   security
    hal
    ipc
    cli
