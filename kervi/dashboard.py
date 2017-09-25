@@ -40,6 +40,16 @@ class DashboardPanel(object):
         }
         self.dashboard = None
         self.panel_id = panel_id
+        self._user_groups = []
+
+    @property
+    def user_groups(self):
+        return self._user_groups
+
+    @user_groups.setter
+    def user_groups(self, value):
+        self._user_groups.clear()
+        self._user_groups += value
 
     def _get_panel_components(self, components):
         result = []
@@ -53,18 +63,29 @@ class DashboardPanel(object):
 
     def _get_info(self):
         self.spine.log.debug("Query dashboard components:{0} - {1}", self.dashboard.dashboard_id, self.panel_id)
-        components = self.spine.send_query(
-            "getDashboardComponents",
-            self.dashboard.dashboard_id,
-            self.panel_id
-        )
-        panel_components = self._get_panel_components(components)
-        return {
-            "id": self.panel_id,
-            "uiParameters": self.ui_parameters,
-            "dashboard": self.dashboard.get_reference(),
-            "components": panel_components
-        }
+        
+        session = kwargs.get("session", None)
+        authorized = True
+        if session and len(self.user_groups) > 0:
+            for group in self.user_groups:
+                if group in session["groups"]:
+                    break
+            else:
+                authorized = False
+            
+        if authorized:
+            components = self.spine.send_query(
+                "getDashboardComponents",
+                self.dashboard.dashboard_id,
+                self.panel_id
+            )
+            panel_components = self._get_panel_components(components)
+            return {
+                "id": self.panel_id,
+                "uiParameters": self.ui_parameters,
+                "dashboard": self.dashboard.get_reference(),
+                "components": panel_components
+            }
 
 class Dashboard(KerviComponent):
     r"""
