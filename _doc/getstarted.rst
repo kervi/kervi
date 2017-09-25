@@ -14,6 +14,14 @@ If you install on other platforms like windows and linux you have to install pyt
 Notice there are no native support for hardware when your install on these platforms but you will be able to
 create dashboards and let users interact with your python kervi application via a browser.
 
+There is a requirement for libjpeg-dev on certain versions of python on the raspberry pi.
+To besure of correct kervi installation please run these commands first.
+
+::
+    
+    sudo apt-get update
+    sudo apt-get install libjpeg-dev
+
 Install
 ========
 
