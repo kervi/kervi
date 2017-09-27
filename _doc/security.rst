@@ -2,10 +2,8 @@
 Security
 ========
 
-::
+.. topic:: Notice
 
-    *Notice*:
-    
     The security features of the Kervi framework has not been reviewed by any external experts and
     use is at own risk. 
     
@@ -88,9 +86,9 @@ Now the web ui will try to login as anonymous user when the users go to the UI w
 All components that does not have the property user_groups set will be visible to the anonymous user.
 In addition components that belongs to any user groups specified for the anonymous user will be visible too.  
 
-::
+.. topic:: Notice
 
-    *Note:* authentication only apply to the web users. 
+    Authentication only apply to the web users. 
     Internal communication in the kervi applications python code is not affected by user authentication.
     All components can query and command each other plus receive events. 
 
