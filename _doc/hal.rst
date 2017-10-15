@@ -26,7 +26,7 @@ for installed Kervi platform drivers and loads the GPIO driver.
 .. code-block:: python
 
     if __name__ == '__main__':
-    from kervi.bootstrap import Application
+    from kervi.application import Application
     APP = Application()
 
     #add dashboard and panel
