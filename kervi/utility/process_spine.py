@@ -2,7 +2,7 @@
 # Licensed under MIT
 
 """ Module that handles IPC between python processes  """
-
+import uuid
 from multiprocessing.connection import Listener, Client
 import time
 import threading
@@ -33,7 +33,7 @@ class _ConnCommandHandler(object):
 
 class _ConnQueryHandler(object):
     id_count = 0
-
+    uuid_handler = uuid.uuid4().hex
     def __init__(self, query, conn, process_spine, src):
         self.conn = conn
         self.query = query
@@ -49,17 +49,19 @@ class _ConnQueryHandler(object):
             session = kwargs.get("session", "session")
             if not injected == "processSpine" and scope == "global":
                 self.id_count += 1
-                self.conn.send(
-                    {"id":self.id_count, "messageType":"query", "query":self.query, "args":args, "session":session}
-                )
+                query_id = self.uuid_handler + "-" + str(self.id_count)
                 event = threading.Event()
                 event_data = {
-                    "id":self.id_count,
+                    "id":query_id,
                     "eventSignal":event,
                     "response":None,
                     "processed":False
                 }
                 self.process_spine.add_response_event(event_data)
+                
+                self.conn.send(
+                    {"id":query_id, "messageType":"query", "query":self.query, "args":args, "session":session}
+                )
                 event.wait()
                 res = event_data["response"]
                 event_data["processed"] = True

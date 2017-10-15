@@ -99,15 +99,18 @@ class DynamicValue(KerviComponent):
 
         self._ui_parameters = {
             "size": 0,
-            "input_size": 40,
+            "input_size": 0,
             "type": "unkonwn",
             "link_to_header": False,
             "label_icon": None,
             "label": self.name,
+            "label_size":0,
             "flat": False,
             "inline": False,
             "is_input":self.is_input,
-            "value_size":20
+            "value_size":3,
+            "width":0,
+            "height":0
         }
         self._persist_value = False
         self._log_values = False
@@ -670,7 +673,9 @@ class DynamicBoolean(DynamicValue):
         self._ui_parameters["off_icon"] = None
         self._ui_parameters["button_icon"] = None
         self._ui_parameters["button_text"] = self.name,
-        self._ui_parameters["input_size"] = 25
+        self._ui_parameters["button_width"] = None
+        self._ui_parameters["button_height"] = None,
+        self._ui_parameters["input_size"] = 0
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""

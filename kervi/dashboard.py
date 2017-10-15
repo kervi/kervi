@@ -28,20 +28,22 @@ class DashboardPanelGroup(object):
             * *collapsed* (``bool``) -- If true the body of the panel is collapsed.
 
         """
-    def __init__(self, group_id, **kwargs):
+    def __init__(self, panels=None, **kwargs):
         #KerviComponent.__init__(self, panel_id, "Dashboard-panel", name)
         self.spine = spine.Spine()
-        self.group_id = group_id
+        self.group_id = kwargs.get("title", None)
         self.ui_parameters = {
             "title":kwargs.get("title", ""),
-            "width":kwargs.get("width", 1),
-            "height":kwargs.get("height", 1),
+            "width":kwargs.get("width", 0),
+            "height":kwargs.get("height", 0),
+            "gauge_width":kwargs.get("gauge_width", 0),
+            "gauge_height":kwargs.get("gauge_height", 0),
         }
         self._dashboard = None
         self._user_groups = []
         self._panels = []
 
-        for panel in kwargs.get("panels", []):
+        for panel in panels:
             self.add_panel(panel)
     @property
     def user_groups(self):
@@ -119,8 +121,11 @@ class DashboardPanel(object):
         self.ui_parameters = {
             "title":kwargs.get("title", ""),
             "width":kwargs.get("width", 33),
-            "height":kwargs.get("height", 1),
-            "userLog":kwargs.get("user_log", False)
+            "height":kwargs.get("height", 0),
+            "userLog":kwargs.get("user_log", False),
+            "logLength":kwargs.get("log_length", 5),
+            "gauge_width":kwargs.get("gauge_width", 0),
+            "gauge_height":kwargs.get("gauge_height", 0),
         }
         self.dashboard = None
         self.panel_id = panel_id
@@ -211,11 +216,12 @@ class Dashboard(KerviComponent):
                 If true this dashboard will show up as the active dashboard when web dashboards loads.
 
     """
-    def __init__(self, dashboard_id, name, **kwargs):
+    def __init__(self, dashboard_id, name, panels=None, **kwargs):
         KerviComponent.__init__(self, dashboard_id, "dashboard", name)
         self.dashboard_id = dashboard_id
         self.is_default = kwargs.get("is_default", False)
-        self.unit_size = kwargs.get("unit_size", 150)
+        self.gauge_width = kwargs.get("gauge_width", 0)
+        self.gauge_height = kwargs.get("gauge_height", 0)
         self.panels = []
         self.add_panel(DashboardPanel("header_right"))
         self.add_panel(DashboardPanel("header_center"))
@@ -228,8 +234,9 @@ class Dashboard(KerviComponent):
         self.add_panel(DashboardPanel("right_pad_x"))
         self.add_panel(DashboardPanel("right_pad_y"))
         
-        for panel in kwargs.get("panels", []):
-            self.add_panel(panel)
+        if panels:
+            for panel in panels:
+                self.add_panel(panel)
 
         self.background = {}
 
@@ -264,5 +271,6 @@ class Dashboard(KerviComponent):
             "template" : template,
             "sections" : panels,
             #"background": self.background,
-            "unitSize": self.unit_size
+            "gaugeWidth": self.gauge_width,
+            "gaugeHeight": self.gauge_height
         }

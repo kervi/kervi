@@ -193,11 +193,12 @@ class _CQRSBus(object):
         self.log.debug("sendQuery thread start:{0}", query_thread)
 
         query_thread.start()
-        query_thread.join(3)
+        query_thread.join(5)
         if not query_thread.isAlive():
             self.log.debug("sendQuery thread done:{0}", query_thread)
             return query_thread.result
         else:
+            print( "xxx", query, injected, scope, session)
             self.log.debug("sendQuery thread timeout, query:{0}", query)
             return []
 
