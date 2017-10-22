@@ -248,16 +248,17 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
                         buf = BytesIO()
                         self.server.mutex.acquire()
                         try:
-                            self.server.camera.current_frame.save(buf, format='jpeg')
+                            self.server.camera.current_frame.save(buf, format='png')
                         finally:
                             self.server.mutex.release()
-
+                        
                         data = buf.getvalue()
                         self.wfile.write(b"--jpgboundary\r\n")
-                        self.send_header('Content-type', 'image/jpeg')
+                        self.send_header('Content-type', 'image/png')
                         self.send_header('Content-length', len(data))
                         self.end_headers()
                         self.wfile.write(data)
+                        
                         #first_frame = False
                     time.sleep(1.0 / 30)
                 print("exit cam thread")
