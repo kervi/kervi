@@ -38,6 +38,8 @@ class DashboardPanelGroup(object):
             "height":kwargs.get("height", 0),
             "gauge_width":kwargs.get("gauge_width", 0),
             "gauge_height":kwargs.get("gauge_height", 0),
+            "panel_width":kwargs.get("panel_width", 0),
+            "panel_height":kwargs.get("panel_height", 0),
         }
         self._dashboard = None
         self._user_groups = []
@@ -120,7 +122,7 @@ class DashboardPanel(object):
         self.panel_id = panel_id
         self.ui_parameters = {
             "title":kwargs.get("title", ""),
-            "width":kwargs.get("width", 33),
+            "width":kwargs.get("width", 0),
             "height":kwargs.get("height", 0),
             "userLog":kwargs.get("user_log", False),
             "logLength":kwargs.get("log_length", 5),
@@ -222,6 +224,8 @@ class Dashboard(KerviComponent):
         self.is_default = kwargs.get("is_default", False)
         self.gauge_width = kwargs.get("gauge_width", 0)
         self.gauge_height = kwargs.get("gauge_height", 0)
+        self.panel_width = kwargs.get("panel_width", 0),
+        self.panel_height = kwargs.get("panel_height", 0),
         self.panels = []
         self.add_panel(DashboardPanel("header_right"))
         self.add_panel(DashboardPanel("header_center"))
@@ -270,7 +274,8 @@ class Dashboard(KerviComponent):
             "isDefault": self.is_default,
             "template" : template,
             "sections" : panels,
-            #"background": self.background,
             "gaugeWidth": self.gauge_width,
-            "gaugeHeight": self.gauge_height
+            "gaugeHeight": self.gauge_height,
+            "panelWidth": self.panel_width,
+            "panelHeight": self.panel_height
         }

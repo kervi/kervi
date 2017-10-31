@@ -19,8 +19,8 @@ def create_file_con():
     return lite.connect('kervi.db', check_same_thread=False)
 
 def create_memory_con():
-    #return lite.connect("kervi_mem.db", check_same_thread=False)
-    return lite.connect(":memory:", check_same_thread=False)
+    return lite.connect("kervi_mem.db", check_same_thread=False)
+    #return lite.connect(":memory:", check_same_thread=False)
 
 
 class MemoryCleanThread(KerviThread):
