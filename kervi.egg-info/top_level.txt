@@ -1,4 +1,0 @@
-kervi
-kervi/application
-kervi/hal
-kervi/utility
