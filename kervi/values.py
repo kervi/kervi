@@ -99,15 +99,18 @@ class DynamicValue(KerviComponent):
 
         self._ui_parameters = {
             "size": 0,
-            "input_size": 40,
+            "input_size": 0,
             "type": "unkonwn",
             "link_to_header": False,
             "label_icon": None,
             "label": self.name,
+            "label_size":0,
             "flat": False,
             "inline": False,
             "is_input":self.is_input,
-            "value_size":20
+            "value_size":3,
+            "width":0,
+            "height":0
         }
         self._persist_value = False
         self._log_values = False
@@ -409,6 +412,9 @@ class DynamicNumber(DynamicValue):
         self._ui_parameters["chart_points"] = 60
         self._ui_parameters["show_sparkline"] = False
         self._ui_parameters["pad_auto_center"] = False
+        self._ui_parameters["chart_buttons"] = True
+        self._ui_parameters["chart_grid"] = True
+        self._ui_parameters["chart_interval"] = "5min"
         self._ui_parameters["tick"] = 1.0
 
         self._sparkline = []
@@ -553,9 +559,7 @@ class DynamicNumber(DynamicValue):
             Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *size* (``int``) -- The number of dashboard cells the value should occupy horizontal.
-                If size is 0 (default) the DynamicValue and label will expand to the width of the panel.
-
+            
             * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
@@ -565,14 +569,24 @@ class DynamicNumber(DynamicValue):
             * *flat* (``bool``) -- Flat look and feel.
 
             * *inline* (``bool``) -- Display DynamicValue and label in its actual size
-                If you set inline to true the size parameter is ignored.
                 The DynamicValue will only occupy as much space as the label and input takes.
 
             * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
 
             * *value_size* (``int``) -- width of the value area as a percentage of the total container it sits in.
 
-            * *type* (``string``) -- if input 'vertical_slider' or 'horizontal_slider. If output "radial_gauge", "horizontal_gauge", "vertical_gauge"
+            * *type* (``string``) -- How to display the value on the panel. The possible display type values depends on the value type being input or output
+                                     Input: 'horizontal_slider' (default) or 'vertical_slider'. 
+                                     Output: 'value' (default), 'chart', 'radial_gauge', 'horizontal_gauge', 'vertical_gauge'
+            
+            * *chart_buttons* (``bool / str``) -- False no chart buttons are shown. 
+                                                  True chart buttons are shown at the bottom.
+                                                  "top" the chart buttons are shown above the chart.
+            
+            * *chart_grid* (``bool``) -- If true the value grid is displayed.
+            * *chart_interval* (``str``) -- Initial time interval displayed.
+            possible values are "5min", "15min", "30min", "hour" (default), "day", "week", "month", "year"
+
         """
         KerviComponent.link_to_dashboard(
             self,
@@ -608,9 +622,7 @@ class DynamicString(DynamicValue):
             Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *size* (``int``) -- The number of dashboard cells the value should occupy horizontal.
-                If size is 0 (default) the DynamicValue and label will expand to the width of the panel.
-
+            
             * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
@@ -620,22 +632,12 @@ class DynamicString(DynamicValue):
             * *flat* (``bool``) -- Flat look and feel.
 
             * *inline* (``bool``) -- Display DynamicValue and label in its actual size
-                If you set inline to true the size parameter is ignored.
                 The DynamicValue will only occupy as much space as the label and input takes.
 
             * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
 
             * *value_size* (``int``) -- width of the value area as a percentage of the total container it sits in.
 
-            * *type* (``string``) -- if value should be displayes as a 'switch' (default) or 'push' for push button.
-
-            * *on_text* (``string``) -- Text to display when switch is on.
-            * *off_text* (``string``) -- Text to display when switch is off.
-            * *on_icon* (``string``) -- Icon to display when switch is on.
-            * *off_icon* (``string``) -- Icon to display when switch is off.
-
-            * *button_icon* (``string``) -- Icon to display on button.
-            * *button_text* (``string``) -- Text to display on button, default is name.
         """
         KerviComponent.link_to_dashboard(
             self,
@@ -670,7 +672,9 @@ class DynamicBoolean(DynamicValue):
         self._ui_parameters["off_icon"] = None
         self._ui_parameters["button_icon"] = None
         self._ui_parameters["button_text"] = self.name,
-        self._ui_parameters["input_size"] = 25
+        self._ui_parameters["button_width"] = None
+        self._ui_parameters["button_height"] = None,
+        self._ui_parameters["input_size"] = 0
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""

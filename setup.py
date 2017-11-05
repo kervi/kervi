@@ -12,6 +12,7 @@ setup(
     name='kervi',
     packages=[
         'kervi',
+        'kervi/application',
         'kervi/utility',
         'kervi/hal'
     ],

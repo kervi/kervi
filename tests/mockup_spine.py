@@ -1,5 +1,3 @@
-
-
 class MockupSpineLog(object):
     def debug(self, message, *args):
         pass

@@ -13,7 +13,7 @@ a user to set the speed and direction of the motor via the web UI.
 
 .. code:: python
 
-    from kervi.bootstrap import Application
+    from kervi.application import Application
 
     APP = Application()
 
