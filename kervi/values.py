@@ -414,6 +414,7 @@ class DynamicNumber(DynamicValue):
         self._ui_parameters["pad_auto_center"] = False
         self._ui_parameters["chart_buttons"] = True
         self._ui_parameters["chart_grid"] = True
+        self._ui_parameters["chart_interval"] = "5min"
         self._ui_parameters["tick"] = 1.0
 
         self._sparkline = []
@@ -583,6 +584,8 @@ class DynamicNumber(DynamicValue):
                                                   "top" the chart buttons are shown above the chart.
             
             * *chart_grid* (``bool``) -- If true the value grid is displayed.
+            * *chart_interval* (``str``) -- Initial time interval displayed.
+            possible values are "5min", "15min", "30min", "hour" (default), "day", "week", "month", "year"
 
         """
         KerviComponent.link_to_dashboard(
