@@ -42,7 +42,7 @@ class DashboardPanelGroup(object):
             "panel_height":kwargs.get("panel_height", 0),
         }
         self._dashboard = None
-        self._user_groups = kwargs.get("user_groups", 0)
+        self._user_groups = kwargs.get("user_groups", [])
         self._panels = []
 
         for panel in panels:
@@ -131,7 +131,7 @@ class DashboardPanel(object):
         }
         self.dashboard = None
         self.panel_id = panel_id
-        self._user_groups = []
+        self._user_groups = kwargs.get("user_groups", [])
 
     @property
     def user_groups(self):
