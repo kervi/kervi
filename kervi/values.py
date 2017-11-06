@@ -83,7 +83,7 @@ class DynamicValue(KerviComponent):
         elif parent:
             input_id = parent.component_id + "." + input_id
 
-        KerviComponent.__init__(self, input_id, value_type, name)
+        KerviComponent.__init__(self, input_id, value_type, name, **kwargs)
         #self.spine = Spine()
         self._unit = ""
         self._default_value = None

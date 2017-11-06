@@ -42,7 +42,7 @@ class DashboardPanelGroup(object):
             "panel_height":kwargs.get("panel_height", 0),
         }
         self._dashboard = None
-        self._user_groups = []
+        self._user_groups = kwargs.get("user_groups", 0)
         self._panels = []
 
         for panel in panels:
@@ -219,7 +219,7 @@ class Dashboard(KerviComponent):
 
     """
     def __init__(self, dashboard_id, name, panels=None, **kwargs):
-        KerviComponent.__init__(self, dashboard_id, "dashboard", name)
+        KerviComponent.__init__(self, dashboard_id, "dashboard", name, **kwargs)
         self.dashboard_id = dashboard_id
         self.is_default = kwargs.get("is_default", False)
         self.gauge_width = kwargs.get("gauge_width", 0)
