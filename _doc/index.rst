@@ -24,7 +24,7 @@ Below is a complete example that shows how to display a sensor on a dashboard wi
 .. code-block:: python
 
     if __name__ == '__main__':
-        from kervi.bootstrap import Application
+        from kervi.application import Application
         APP = Application()
 
         #add dashboard and panel

@@ -8,6 +8,94 @@ A dashboard is the main ui component in a kervi application.
 from kervi.utility.component import KerviComponent
 import kervi.spine as spine
 
+class DashboardPanelGroup(object):
+    r"""
+        Create a group of dashboard panels.
+
+        :param group_id:
+            id of the group.
+            
+        :type group_id: str
+
+        :param \**kwargs:
+            See below
+
+        :Keyword Arguments:
+            * *title* (``str``) -- Title of the group.
+            * *columns* (``int``) -- Number of columns in this group, default is 1.
+            * *rows* (``int``) -- Number of rows in this panel, default is 1.
+            * *user_log* (``bool``) -- This panel shows user log messages. Any components that are linked to a user log panel are ignored.
+            * *collapsed* (``bool``) -- If true the body of the panel is collapsed.
+
+        """
+    def __init__(self, panels=None, **kwargs):
+        #KerviComponent.__init__(self, panel_id, "Dashboard-panel", name)
+        self.spine = spine.Spine()
+        self.group_id = kwargs.get("title", None)
+        self.ui_parameters = {
+            "title":kwargs.get("title", ""),
+            "width":kwargs.get("width", 0),
+            "height":kwargs.get("height", 0),
+            "gauge_width":kwargs.get("gauge_width", 0),
+            "gauge_height":kwargs.get("gauge_height", 0),
+            "panel_width":kwargs.get("panel_width", 0),
+            "panel_height":kwargs.get("panel_height", 0),
+        }
+        self._dashboard = None
+        self._user_groups = []
+        self._panels = []
+
+        for panel in panels:
+            self.add_panel(panel)
+    @property
+    def user_groups(self):
+        return self._user_groups
+
+    @user_groups.setter
+    def user_groups(self, value):
+        self._user_groups.clear()
+        self._user_groups += value
+
+    @property
+    def dashboard(self):
+        return self._dashboard
+
+    @dashboard.setter
+    def dashboard(self, dashboard):
+        self._dashboard = dashboard
+        for panel in self._panels:
+            panel.dashboard = dashboard
+
+    def add_panel(self, panel):
+        self._panels += [panel]
+        panel.dashboard = self.dashboard
+
+    def _get_info(self, **kwargs):
+        self.spine.log.debug("Query dashboard components:{0} - {1}", self.dashboard.dashboard_id, self.group_id)
+
+        session = kwargs.get("session", None)
+        authorized = True
+        if session and len(self.user_groups) > 0:
+            for group in self.user_groups:
+                if group in session["groups"]:
+                    break
+            else:
+                authorized = False
+
+        if authorized:
+            panels = []
+            for panel in self._panels:
+                panels += [panel._get_info(*kwargs)]
+            
+            return {
+                "id": self.group_id,
+                "type": "group",
+                "uiParameters": self.ui_parameters,
+                "dashboard": self.dashboard.get_reference(),
+                "panels": panels
+            }
+
+
 class DashboardPanel(object):
     r"""
         Create a dashboard panel.
@@ -34,9 +122,12 @@ class DashboardPanel(object):
         self.panel_id = panel_id
         self.ui_parameters = {
             "title":kwargs.get("title", ""),
-            "columns":kwargs.get("columns", 1),
-            "rows":kwargs.get("rows", 1),
-            "userLog":kwargs.get("user_log", False)
+            "width":kwargs.get("width", 0),
+            "height":kwargs.get("height", 0),
+            "userLog":kwargs.get("user_log", False),
+            "logLength":kwargs.get("log_length", 5),
+            "gauge_width":kwargs.get("gauge_width", 0),
+            "gauge_height":kwargs.get("gauge_height", 0),
         }
         self.dashboard = None
         self.panel_id = panel_id
@@ -82,6 +173,7 @@ class DashboardPanel(object):
             panel_components = self._get_panel_components(components)
             return {
                 "id": self.panel_id,
+                "type": "panel",
                 "uiParameters": self.ui_parameters,
                 "dashboard": self.dashboard.get_reference(),
                 "components": panel_components
@@ -126,11 +218,14 @@ class Dashboard(KerviComponent):
                 If true this dashboard will show up as the active dashboard when web dashboards loads.
 
     """
-    def __init__(self, dashboard_id, name, **kwargs):
+    def __init__(self, dashboard_id, name, panels=None, **kwargs):
         KerviComponent.__init__(self, dashboard_id, "dashboard", name)
         self.dashboard_id = dashboard_id
         self.is_default = kwargs.get("is_default", False)
-        self.unit_size = kwargs.get("unit_size", 150)
+        self.gauge_width = kwargs.get("gauge_width", 0)
+        self.gauge_height = kwargs.get("gauge_height", 0)
+        self.panel_width = kwargs.get("panel_width", 0),
+        self.panel_height = kwargs.get("panel_height", 0),
         self.panels = []
         self.add_panel(DashboardPanel("header_right"))
         self.add_panel(DashboardPanel("header_center"))
@@ -142,11 +237,12 @@ class Dashboard(KerviComponent):
         self.add_panel(DashboardPanel("left_pad_y"))
         self.add_panel(DashboardPanel("right_pad_x"))
         self.add_panel(DashboardPanel("right_pad_y"))
+        
+        if panels:
+            for panel in panels:
+                self.add_panel(panel)
 
         self.background = {}
-        #camera_id = kwargs.get("camera", "")
-        #if camera_id:
-        #    self.background = {"type": "camera", "cameraId": camera_id}
 
     def add_panel(self, panel):
         """
@@ -174,11 +270,12 @@ class Dashboard(KerviComponent):
             panels += [panel._get_info()]
 
         self.spine.log.debug("get dashboard info done:{0}", self.dashboard_id)
-        
         return {
             "isDefault": self.is_default,
             "template" : template,
             "sections" : panels,
-            #"background": self.background,
-            "unitSize": self.unit_size
+            "gaugeWidth": self.gauge_width,
+            "gaugeHeight": self.gauge_height,
+            "panelWidth": self.panel_width,
+            "panelHeight": self.panel_height
         }

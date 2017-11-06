@@ -2,12 +2,12 @@
 setup.cfg
 setup.py
 kervi\__init__.py
-kervi\bootstrap.py
 kervi\camera.py
 kervi\controller.py
 kervi\controller_delete.py
 kervi\dashboard.py
 kervi\kervi_logging.py
+kervi\module.py
 kervi\module_thread.py
 kervi\sensor.py
 kervi\settings.py
@@ -17,6 +17,8 @@ kervi\tasks.py
 kervi\values.py
 kervi\version.py
 kervi\vision.py
+kervi/application\__init__.py
+kervi/application\applicationx.py
 kervi/hal\__init__.py
 kervi/hal\gpio.py
 kervi/hal\i2c.py

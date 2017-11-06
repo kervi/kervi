@@ -19,8 +19,8 @@ def create_file_con():
     return lite.connect('kervi.db', check_same_thread=False)
 
 def create_memory_con():
-    #return lite.connect("kervi_mem.db", check_same_thread=False)
-    return lite.connect(":memory:", check_same_thread=False)
+    return lite.connect("kervi_mem.db", check_same_thread=False)
+    #return lite.connect(":memory:", check_same_thread=False)
 
 
 class MemoryCleanThread(KerviThread):
@@ -37,7 +37,12 @@ class MemoryCleanThread(KerviThread):
         try:
             con = MEMORY_CON # create_memory_con()
             cursor = con.cursor()
-            cursor.execute("DELETE FROM dynamicData WHERE id IN (SELECT id FROM dynamicData ORDER BY id ASC LIMIT 1000);")
+            rows = cursor.execute("select count(*) from dynamicData")
+            values = rows.fetchone()
+            row_count = values[0]
+            if row_count>20000:
+                limit = row_count - 20000 
+                cursor.execute("DELETE FROM dynamicData WHERE id IN (SELECT id FROM dynamicData ORDER BY id ASC LIMIT "+ str(limit) +");")
         except lite.Error as msg:
             SPINE.log.error("clean memory db, Command skipped: {0}, command{1}", msg)
 
