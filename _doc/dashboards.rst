@@ -20,18 +20,21 @@ The code below shows how to configure the dashboard above
 
 .. code-block:: python
 
-    SYSTEM = Dashboard("system", "System")
-    SYSTEM.add_panel(DashboardPanel("cpu", columns=2, rows=2, collapsed=True))
-    SYSTEM.add_panel(DashboardPanel("memory", columns=2, rows=2, collapsed=True))
-    SYSTEM.add_panel(DashboardPanel("log", columns=2, rows=2, title="Log", user_log=True))
-    SYSTEM.add_panel(DashboardPanel("disk", columns=1, rows=1))
-    SYSTEM.add_panel(DashboardPanel("power", columns=1, rows=1, title="Power"))
+    Dashboard(
+        "system",
+        "System",
+        [
+            DashboardPanel("cpu", width=30),
+            DashboardPanel("memory", width=30),
+            DashboardPanel("log", width="250px", title="Log", user_log=True),
+            DashboardPanel("disk"),
+            DashboardPanel("power")
+        ]
+    )
 
-On large displays the columns and rows specify the size of a panel where the cell size is 150x150 pixels.
+On large displays the width parameter specify the relative the width of the browser window.
 
 If a title is set for a panel it will be displayed in a header.
-
-Collapsed specify if the panel should be collapsed when a panel is first shown.
 
 If user_log is set to true the panel will show the content of the user log for the application.
 
@@ -41,17 +44,17 @@ Linking
 A kervi component is linked to a panel by calling the link_to_dashboard method on the component.
 This method takes several parameters that specify how the component should be displayed.
 
-When a component is linked to a panel it is specified how many cells that component should occupy in that panel via the size parameter.
+When a component is linked to a panel you are able to set the width and height of the component it could be as a percentage or pixels.
 
 
 .. code-block:: python
     
     #sensor that links as a radial guage 
-    cpu_temp.link_to_dashboard("cam", "panel1", type="radial_gauge")
+    cpu_temp.link_to_dashboard("cam", "panel1", type="radial_gauge", width=30)
 
     #A sensor that links to the header of a panel and into the body. 
-    cpu_temp.link_to_dashboard("system", "cpu", type="value", size=2, link_to_header=True)
-    cpu_temp.link_to_dashboard("system", "cpu", type="chart", size=2)
+    cpu_temp.link_to_dashboard("system", "cpu", type="value", link_to_header=True)
+    cpu_temp.link_to_dashboard("system", "cpu", type="chart", width="200px")
 
     #A button that links to a panel with an icon.
     GPIO[12].link_to_dashboard("system", "power", icon="power-off")
@@ -123,9 +126,6 @@ The sensor is linked twice first to the header with the animation and into the b
 
 .. code-block:: python
     
-    from kervi.sensor import Sensor
-    
-
     SENSOR_1.set_ui_parameter("icon", [
         {
             "range":[0, 5],

@@ -9,7 +9,6 @@ The snippet below shows how to create a camera stream server and link it to a da
 
 .. code:: python
     
-    import datetime
     from kervi.camera import CameraStreamer
     from kervi_devices.motors.PCA9685_i2c_servo import PCA9685ServoBoard
 

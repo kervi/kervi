@@ -2,7 +2,7 @@
 Motors
 ========
 
-Kervi offers  a standardized interface where it is possible to link up signals from your application logic to the motor drivers. 
+Kervi offers a standardized interface where it is possible to link up signals from your application logic to the motor drivers. 
 
 
 DC motors
@@ -13,14 +13,21 @@ a user to set the speed and direction of the motor via the web UI.
 
 .. code:: python
 
-    from kervi.bootstrap import Application
+    from kervi.application import Application
 
     APP = Application()
 
     #add dashboard and panel
     from kervi.dashboard import Dashboard, DashboardPanel
-    DASHBOARD = Dashboard("dashboard", "adafruit motor driver dc test", is_default=True)
-    DASHBOARD.add_panel(DashboardPanel("input", columns=2, rows=4, title="input"))
+    
+    Dashboard(
+        "dashboard",
+        "adafruit motor driver dc test",
+        [
+            DashboardPanel("input" title="input")
+        ],
+        is_default=True
+    )
     
     #import motor device driver
     from kervi_devices.motors.adafruit_i2c_motor_hat import AdafruitMotorHAT

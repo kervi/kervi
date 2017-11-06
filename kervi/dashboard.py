@@ -61,7 +61,7 @@ class DashboardPanel(object):
 
         return result
 
-    def _get_info(self):
+    def _get_info(self, **kwargs):
         self.spine.log.debug("Query dashboard components:{0} - {1}", self.dashboard.dashboard_id, self.panel_id)
         
         session = kwargs.get("session", None)
