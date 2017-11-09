@@ -42,7 +42,7 @@ class Sensor(DynamicNumber):
 
     """
     def __init__(self, sensor_id, name, device=None, **kwargs):
-        DynamicNumber.__init__(self, name, sensor_id, False, **kwargs)
+        DynamicNumber.__init__(self, name, value_id=sensor_id, is_input=False, **kwargs)
         self._device = device
         self._component_type = "sensor"
         self._type = None
@@ -63,7 +63,8 @@ class Sensor(DynamicNumber):
                             label,
                             use_thread=False,
                             parent=self,
-                            index=count
+                            index=count,
+                            **kwargs
                         )
                     sub_sensor.unit = self.unit
                     self._sub_sensors += [
@@ -71,7 +72,6 @@ class Sensor(DynamicNumber):
                     ]
                     count += 1
 
-        self._save_to_db = True
         self._ui_parameters["type"] = "value"
         self._ui_parameters["show_value"] = True
         self._ui_parameters["show_sparkline"] = True

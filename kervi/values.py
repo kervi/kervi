@@ -34,7 +34,7 @@ class DynamicValueList(object):
         """
         item = value_class(
             name,
-            input_id=self.controller.component_id + "." + value_id,
+            value_id=self.controller.component_id + "." + value_id,
             is_input=self.is_input,
             index=self.count
         )
@@ -73,7 +73,7 @@ class DynamicValue(KerviComponent):
     def __init__(self, name, value_type, **kwargs):
         global VALUE_COUNTER
         parent = kwargs.get("parent", None)
-        input_id = kwargs.get("input_id", None)
+        input_id = kwargs.get("value_id", None)
         if input_id is None:
             VALUE_COUNTER += 1
             if parent:
@@ -125,7 +125,7 @@ class DynamicValue(KerviComponent):
         return self._index
 
     @property
-    def input_id(self):
+    def value_id(self):
         return self.component_id
 
     @property
@@ -407,7 +407,6 @@ class DynamicNumber(DynamicValue):
         self._default_value = 0.0
         self._value = 0
         self._delta = None
-        self._save_to_db = False
         self._ui_parameters["type"] = ""
         self._ui_parameters["chart_points"] = 60
         self._ui_parameters["show_sparkline"] = False
@@ -426,11 +425,11 @@ class DynamicNumber(DynamicValue):
         Enter how much a the value should change before it triggers changes events and updates links.
         :type: ``float``
         """
-        return self._store_delta
+        return self._delta
 
     @delta.setter
     def delta(self, value):
-        self._store_delta = value
+        self._delta = value
 
     @property
     def max(self):
