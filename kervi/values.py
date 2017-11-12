@@ -36,7 +36,8 @@ class DynamicValueList(object):
             name,
             value_id=self.controller.component_id + "." + value_id,
             is_input=self.is_input,
-            index=self.count
+            index=self.count,
+            spine = self.controller.spine
         )
 
         #if self._inject and self.controller:

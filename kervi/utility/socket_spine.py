@@ -12,6 +12,7 @@ import kervi.utility.encryption as encryption
 
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
+DO_TERMINATE = False
 
 class _ObjectEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -91,11 +92,19 @@ class _SpineProtocol(WebSocketServerProtocol):
 
     def __init__(self):
         self.spine = Spine()
+        self.do_terminate = False
+        self.spine.register_command_handler("terminateProcess", self.terminate)
         WebSocketServerProtocol.__init__(self)
         self.handlers = {"command":[], "query":[], "event":[]}
         self.authenticated = False
         self.session = None
         self.user = None
+        
+
+    def terminate(self):
+        global DO_TERMINATE
+        print("u")
+        DO_TERMINATE = True
 
     def add_command_handler(self, command):
         found = False
@@ -263,13 +272,15 @@ def _start(settings):
         settings["network"]["WebSocketPort"]
     )
 
-    loop.run_until_complete(coro)
+    #loop.run_until_complete(coro)
     #loop.run_until_complete(coro_local)
     try:
-        while not TERMINATE_SOCKET:
+        while not DO_TERMINATE:
             loop.run_until_complete(coro)
+            print("p")
             #loop.run_until_complete(coro_local)
             time.sleep(.001)
+           
     except KeyboardInterrupt:
             pass
     #loop.run_forever()
@@ -277,3 +288,4 @@ def _start(settings):
 def _stop():
     global TERMINATE_SOCKET
     TERMINATE_SOCKET=True
+    print("y")

@@ -20,8 +20,8 @@ class Controller(KerviComponent):
     A controller my define one or more dynamic values as input and output.
 
     """
-    def __init__(self, controller_id, name):
-        KerviComponent.__init__(self, controller_id, "controller", name)
+    def __init__(self, controller_id, name, **kwargs):
+        KerviComponent.__init__(self, controller_id, "controller", name, **kwargs)
         self.inputs = DynamicValueList(self, True)
         self.outputs = DynamicValueList(self, False)
         self._active = True

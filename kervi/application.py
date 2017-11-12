@@ -46,6 +46,10 @@ class _KerviModuleLoader(process._KerviProcess):
             self.spine.log.exception("load module:{0}", self.name)
         #import kervi.utility.storage
         self.spine.send_command("startThreads", scope="process")
+        self.spine.trigger_event(
+            "moduleLoaded",
+            self.name,
+        )
 
     def terminate_process(self):
         pass
@@ -58,8 +62,10 @@ class _KerviSocketIPC(process._KerviProcess):
         import kervi.utility.socket_spine as socketSpine
         time.sleep(2)
         socketSpine._start(self.settings)
+        
 
     def terminate_process(self):
+        print("E")
         import kervi.utility.socket_spine as socketSpine
         socketSpine._stop()
 
@@ -153,6 +159,7 @@ class Application(object):
             pass
 
         module_port = self.settings["network"]["IPCRootPort"]
+        
         for module in self.settings["modules"]:
             module_port += 1
             self._module_processes+=[
@@ -174,8 +181,8 @@ class Application(object):
                 _KerviSocketIPC
             )
         ]
-
         time.sleep(2)
+        
 
         #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
         print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
@@ -207,6 +214,15 @@ class Application(object):
         except KeyboardInterrupt:
             pass
 
+        self.stop()
+
+    def _xrun(self):
+        """Used in tests"""
+
+        if not self.started:
+            self._start()
+
+    def stop(self):
         webserver.stop()
         time.sleep(2)
         print("stopping processes")
@@ -214,3 +230,5 @@ class Application(object):
         time.sleep(2)
         process._stop_root_spine()
         time.sleep(2)
+
+        print("application stopped")

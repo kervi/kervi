@@ -319,9 +319,10 @@ class _ProcessSpine(object):
         self.listener.close()
         for conn_thread in self.process_connections:
             conn_thread.terminate = True
-            #connThread.join()
+            #conn_thread.join()
         self.client_connection_thread.terminate = True
-        time.sleep(1)
+        self.client_connection_thread.join()
+        #time.sleep(1)
 
     def add_command_handler(self, command, connection, src):
         found = False

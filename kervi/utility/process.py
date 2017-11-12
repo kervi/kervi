@@ -31,10 +31,16 @@ class _KerviProcess(object):
         spine._init_spine(name)
         self.spine = spine.Spine()
         self.process_spine = _ProcessSpine(ipcPort, settings)
-        self.init_process()
         self.spine.register_command_handler("terminateProcess", self.terminate)
+        self.spine.trigger_event(
+            "moduleLoaded",
+            self.name,
+        )
+        self.init_process()
+        
 
     def terminate(self):
+        print("terminate process", self.name)
         self.spine.log.debug("do terminate:{0}", self.port)
         #print("terminate:", self.port)
         self.do_terminate = True
@@ -45,7 +51,7 @@ class _KerviProcess(object):
     def _terminate_process(self):
         self.terminate_process()
         self.spine.trigger_event("processTerminating", None, scope="process")
-        time.sleep(5)
+        #time.sleep(5)
         self.process_spine.close_all_connections()
         self.spine.log.info("process terminated:{0}", self.port)
         self.spine.stop()
@@ -58,15 +64,19 @@ def _launch(name, process_class, settings, ipc_port):
     log = k_logging.KerviLog(name)
     log.info('create process:{0} ipc port:{1}:', process_class.__name__, ipc_port)
     process = process_class(name, settings, ipc_port)
+    print("q")
     try:
+        print("w")
         while not process.do_terminate:
-            time.sleep(1)
+            #print("r")
+            continue
+            #time.sleep(1)
     except KeyboardInterrupt:
         pass
     except:
         log.exception("error in process loop")
         pass
-
+    print("ot", name)
     process._terminate_process()
 
 
