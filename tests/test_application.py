@@ -7,7 +7,7 @@ def module_loaded(module_name):
     print(module_name)
 
 
-def test_application():
+def xtest_application():
     app = Application()
 
     app.spine.register_event_handler("moduleLoaded", module_loaded)
