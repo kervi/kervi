@@ -34,7 +34,7 @@ class DynamicValueList(object):
         """
         item = value_class(
             name,
-            input_id=self.controller.component_id + "." + value_id,
+            value_id=self.controller.component_id + "." + value_id,
             is_input=self.is_input,
             index=self.count
         )
@@ -70,8 +70,10 @@ class DynamicValue(KerviComponent):
     """
     Generic dynamic value that is use as base class for specialized dynamic values.
     """
-    def __init__(self, name, value_type, input_id=None, is_input=True, parent=None, index=None):
+    def __init__(self, name, value_type, **kwargs):
         global VALUE_COUNTER
+        parent = kwargs.get("parent", None)
+        input_id = kwargs.get("value_id", None)
         if input_id is None:
             VALUE_COUNTER += 1
             if parent:
@@ -81,12 +83,12 @@ class DynamicValue(KerviComponent):
         elif parent:
             input_id = parent.component_id + "." + input_id
 
-        KerviComponent.__init__(self, input_id, value_type, name)
+        KerviComponent.__init__(self, input_id, value_type, name, **kwargs)
         #self.spine = Spine()
         self._unit = ""
         self._default_value = None
-        self._index = index
-        self.is_input = is_input
+        self._index = kwargs.get("index", None)
+        self.is_input = kwargs.get("is_input", True)
         self._value = None
         self._observers = []
         self._value_event_handlers = []
@@ -112,8 +114,8 @@ class DynamicValue(KerviComponent):
             "width":0,
             "height":0
         }
-        self._persist_value = False
-        self._log_values = False
+        self._persist_value = kwargs.get("persist_value", False)
+        self._log_values = kwargs.get("log_values", True)
 
     @property
     def index(self):
@@ -123,7 +125,7 @@ class DynamicValue(KerviComponent):
         return self._index
 
     @property
-    def input_id(self):
+    def value_id(self):
         return self.component_id
 
     @property
@@ -234,9 +236,7 @@ class DynamicValue(KerviComponent):
             Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *size* (``int``) -- The number of dashboard cells the Dynamic should occupy horizontal.
-                If size is 0 (default) the input and label will expand to the width of the panel.
-
+            
             * *link_to_header* (``str``) -- Link this DynamicValue to header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
@@ -398,8 +398,8 @@ class DynamicNumber(DynamicValue):
     If this DynamicValue is an input it is shown as a slider on dashboards.
     If is an output it is possible to specify different kinds of gauges.
     """
-    def __init__(self, name, input_id=None, is_input=True, parent=None, index = None):
-        DynamicValue.__init__(self, name, "dynamic-number", input_id, is_input, parent, index)
+    def __init__(self, name, **kwargs):
+        DynamicValue.__init__(self, name, "dynamic-number", **kwargs)
         #self.spine = Spine()
         self._min_value = -100
         self._max_value = 100
@@ -407,7 +407,6 @@ class DynamicNumber(DynamicValue):
         self._default_value = 0.0
         self._value = 0
         self._delta = None
-        self._save_to_db = False
         self._ui_parameters["type"] = ""
         self._ui_parameters["chart_points"] = 60
         self._ui_parameters["show_sparkline"] = False
@@ -426,11 +425,11 @@ class DynamicNumber(DynamicValue):
         Enter how much a the value should change before it triggers changes events and updates links.
         :type: ``float``
         """
-        return self._store_delta
+        return self._delta
 
     @delta.setter
     def delta(self, value):
-        self._store_delta = value
+        self._delta = value
 
     @property
     def max(self):
@@ -532,8 +531,8 @@ class DynamicNumber(DynamicValue):
 
             
             val = {"value_id":self.component_id, "value":new_value, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
-            if self.persist_value:
-                self.spine.send_command("StoreDynamicValue", val)
+            #if self.persist_value:
+            #    self.spine.send_command("StoreDynamicValue", val)
 
             self.spine.trigger_event(
                 "dynamicValueChanged",
@@ -600,8 +599,8 @@ class DynamicString(DynamicValue):
     """
     DynamicValue that holds a string.
     """
-    def __init__(self, name, input_id=None, is_input=True, parent=None, index = None):
-        DynamicValue.__init__(self, name, "dynamic-string", input_id, is_input, parent, index)
+    def __init__(self, name, **kwargs):
+        DynamicValue.__init__(self, name, "dynamic-string", **kwargs)
         #self.spine = Spine()
         self._value = ""
         self._ui_parameters["type"] = "text"
@@ -651,8 +650,8 @@ class DynamicDateTime(DynamicValue):
     """
     A DynamicValue that holds a date and/or time.
     """
-    def __init__(self, name, input_type="datetime", input_id=None, index = None):
-        DynamicValue.__init__(self, name, "dynamic-datetime", input_id, index)
+    def __init__(self, name, input_type="datetime", **kwargs):
+        DynamicValue.__init__(self, name, "dynamic-datetime", **kwargs)
         #self.spine = Spine()
         self._value = ""
         self._ui_parameters["type"] = input_type
@@ -662,8 +661,8 @@ class DynamicBoolean(DynamicValue):
     A DynamicValue that holds a boolean.
     When linked to a dashboard it is represented as a switch button or push button.
     """
-    def __init__(self, name, input_id=None, is_input=True, parent=None, index = None):
-        DynamicValue.__init__(self, name, "dynamic-boolean", input_id, is_input, parent, index)
+    def __init__(self, name, **kwargs):
+        DynamicValue.__init__(self, name, "dynamic-boolean", **kwargs)
         self._value = False
         self._ui_parameters["type"] = "switch"
         self._ui_parameters["on_text"] = "On"
@@ -692,9 +691,7 @@ class DynamicBoolean(DynamicValue):
             Use the kwargs below to override default values for ui parameters
 
         :Keyword Arguments:
-            * *size* (``int``) -- The number of dashboard cells the value should occupy horizontal.
-                If size is 0 (default) the DynamicValue and label will expand to the width of the panel.
-
+            
             * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
@@ -743,8 +740,8 @@ class DynamicEnum(DynamicValue):
             self.framerate.addOption("15", "15 / sec", True)
 
     """
-    def __init__(self, name, input_id=None, is_input=True, parent=None, index = None):
-        DynamicValue.__init__(self, name, "dynamic-enum", input_id, is_input, parent, index)
+    def __init__(self, name, **kwargs):
+        DynamicValue.__init__(self, name, "dynamic-enum", **kwargs)
 
         self.options = []
         self.selected_options = []

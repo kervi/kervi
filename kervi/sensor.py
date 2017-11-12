@@ -20,17 +20,16 @@ class Sensor(DynamicNumber):
     The Sensor class polls the associated sensor device and updates it self when
     the value of the sensor device change.
 
-    All the possibilities for linking to other dynamic values and dashboards is inherit from DynamicNumber.
+    All the possibilities for linking to other dynamic values and dashboards are inherited from DynamicNumber.
 
     Some sensor devices are multi dimensional and each dimension are reached by a numeric index of the sensor it self.
 
     :param sensor_id:
-            Id of the sensor.
-            This id is used in other components to reference this sesnor.
+            Id of the sensor. This id is never displayed it is used to reference the sensor in code.
     :type sensor_id: ``str``
 
     :param name:
-            Name of the sensor. Used in web dashboards
+            Name of the sensor.
     :type name: ``str``
 
     :param device:
@@ -38,15 +37,12 @@ class Sensor(DynamicNumber):
         or a sensor device driver that inherits from kervi.hal.SensorDeviceDriver
     :type device: ``SensorDeviceDriver``
 
-    :param polling_interval:
-        Polling interval in seconds. Set to zero to disable polling.        
-    :type device: ``float``
-
-    (self, name, input_id=None, is_input=True, parent=None, index = None):
+    :Keyword Arguments:
+        * **polling_interval** (``float``) --  Polling interval in seconds. Zero disables polling.        
 
     """
-    def __init__(self, sensor_id, name, device=None, use_thread=True, parent=None, index=None, polling_interval=1):
-        DynamicNumber.__init__(self, name, sensor_id, False, parent, index)
+    def __init__(self, sensor_id, name, device=None, **kwargs):
+        DynamicNumber.__init__(self, name, value_id=sensor_id, is_input=False, **kwargs)
         self._device = device
         self._component_type = "sensor"
         self._type = None
@@ -67,7 +63,8 @@ class Sensor(DynamicNumber):
                             label,
                             use_thread=False,
                             parent=self,
-                            index=count
+                            index=count,
+                            **kwargs
                         )
                     sub_sensor.unit = self.unit
                     self._sub_sensors += [
@@ -75,12 +72,11 @@ class Sensor(DynamicNumber):
                     ]
                     count += 1
 
-        self._save_to_db = True
         self._ui_parameters["type"] = "value"
         self._ui_parameters["show_value"] = True
         self._ui_parameters["show_sparkline"] = True
-        if use_thread:
-            self._sensor_thread = _SensorThread(self, polling_interval)
+        if kwargs.get("use_thread", True):
+            self._sensor_thread = _SensorThread(self, kwargs.get("polling_interval", 1))
         else:
             self._sensor_thread = None
 
@@ -145,38 +141,27 @@ class Sensor(DynamicNumber):
                 system panels *sys-header*, *header* or *footer*
         :type panel_id: ``str``
 
-        :param \**kwargs:
-                See below
-
         :Keyword Arguments:
-            :Keyword Arguments:
-            * *size* (``int``) -- The number of dashboard cells the sensor should occupy horizontal or vertical.
-                If size is 0 (default) the input and label will expand to the width of the panel.
+                        
+            * **link_to_header** (``str``) -- Link this input to header of the panel.
 
-            * *link_to_header* (``str``) -- Link this input to header of the panel.
+            * **label_icon** (``str``) -- Icon that should be displayed together with label. All Font Awesome icons are valid just enter the name of the icon without *fa-*
 
-            * *label_icon* (``str``) -- Icon that should be displayed together with label. 
-                All Font Awesome icons are valid just enter the name of the icon without *fa-*
+            * **label** (``str``) -- Label text, default value is the name of the sensor.
 
-            * *label* (``str``) -- Label text, default value is the name of the sensor.
+            * **flat** (``bool``) -- Flat look and feel.
 
-            * *flat* (``bool``) -- Flat look and feel.
+            * **inline** (``bool``) -- Display value, sparkline and label in its actual size otherwise it occupys the entire with of the panel 
 
-            * *inline* (``bool``) -- Display value, sparkline and label in its actual size
-                If you set inline to true the size parameter is ignored.
-                The input will only occupy as much space as the label and sensor takes.
+            * **type** (``str``) -- One of the following values *radial_gauge*, *vertical_gauge*, *horizontal_gauge*, *chart* or *value*.
 
-            * *type* (``str``) -- One of the following values *radial_gauge*, *vertical_gauge*, *horizontal_gauge*, *chart* or *value*.
+            * **show_sparkline** (``bool``) -- Show a sparkline next to the value.
 
-            * *chart_points* (``int``) -- Maximun number of points in the chart.
+            * **icon** (``bool``) -- Icon to show. All Font Awesome icons are valid just enter the name of the icon without *fa-*.
 
-            * *show_sparkline* (``bool``) -- Show a sparkline next to the value.
+            * **show_value** (``bool``) -- Show the numeric value and unit.
 
-            * *icon* (``bool``) -- Icon to show. All Font Awesome icons are valid just enter the name of the icon without *fa-*.
-
-            * *show_value* (``bool``) -- Show the numeric value and unit.
-
-            * *label* (``bool``) -- Show the numeric value and unit.
+            * **label** (``str``) -- Label to show default is the name of the sensor.
         """
 
         KerviComponent.link_to_dashboard(self, dashboard_id, panel_id, **kwargs)

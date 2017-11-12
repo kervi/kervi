@@ -20,9 +20,9 @@ class KerviComponent(object):
         self.spine = kwargs.get("spine", spine.Spine())
         self._component_id = component_id
         self._component_type = component_type
-        self._user_groups = []
-        self._admin_groups = []
-        
+        self._admin_groups = kwargs.get("admin_groups", [])
+        self._user_groups = kwargs.get("user_groups", [])
+        self._user_groups += self.admin_groups
         self._name = name
         self._icon = None
         self._visible = True

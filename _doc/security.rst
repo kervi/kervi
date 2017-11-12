@@ -43,19 +43,20 @@ I the snippet below the cpu sensor is only visible for users who belongs to the 
 
 .. code:: python
 
-    CPU_SENSOR = Sensor("CPULoadSensor","CPU", CPULoadSensorDeviceDriver())
-    CPU_SENSOR.user_groups = ["admin"]
+    CPU_SENSOR = Sensor("CPULoadSensor","CPU", CPULoadSensorDeviceDriver(), user_groups=["admin"])
 
 In the same way dashboards and panels may be restricted to certain groups as shown below.
 
 .. code:: python
 
-    SYSTEM_DASHBOARD = Dashboard("system", "System")
-    SYSTEM_DASHBOARD.user_groups = ["admins", "users"]
-
-    POWER_PANEL = DashboardPanel("power", columns=2, rows=2, title="Power")
-    POWER_PANEL.user_groups = ["admins"]
-    SYSTEM_DASHBOARD.add_panel(POWER_PANEL)
+    Dashboard(
+        "system",
+        "System",
+        [
+            DashboardPanel("power", title="Power", user_groups=["admins"])
+        ],
+        user_groups=["admins", "users"]
+    )
 
 In the snippet above users that is member of the groups admins or users have access to the system dashboard 
 but it is only members in the admins groups that can see the power panel.
