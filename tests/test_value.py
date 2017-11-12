@@ -44,7 +44,6 @@ def test_set_value_events():
     assert "dynamicValueChanged" in spine.events.keys()
     assert spine.events["dynamicValueChanged"]["args"][0]["value"] == 10
 
-
 def test_set_value_events_delta():
     spine = MockupSpine()
     number = DynamicNumber("Dynamic Number", value_id="dn", spine=spine)
