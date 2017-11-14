@@ -59,15 +59,14 @@ class _KerviSocketIPC(process._KerviProcess):
 
     def init_process(self):
         print("load interprocess communication")
-        import kervi.utility.socket_spine as socketSpine
-        time.sleep(2)
-        socketSpine._start(self.settings)
-        
+        from kervi.utility.socket_spine import SocketSpine
+        self.socket_spine = SocketSpine(self.settings)
+
+    def process_step(self):
+        self.socket_spine.step()
 
     def terminate_process(self):
-        print("E")
-        import kervi.utility.socket_spine as socketSpine
-        socketSpine._stop()
+        pass
 
 class Application(object):
     """ Kervi application class that starts a kervi application and loads all needed modules.
@@ -136,6 +135,8 @@ class Application(object):
         #spine._init_spine("application-" + self.settings["info"]["id"])
         self.spine = spine.Spine()
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
+        self.spine.register_query_handler("getProcessInfo", self.get_process_info)
+
         self._module_processes=[]
         import kervi.utility.storage
         
@@ -149,6 +150,9 @@ class Application(object):
 
     def _get_application_info(self):
         return self.settings["info"]
+
+    def get_process_info(self):
+        return {"id": "application"}
 
     def _start(self):
         self.started = True
@@ -170,7 +174,7 @@ class Application(object):
                     _KerviModuleLoader
                 )
             ]
-            time.sleep(2)
+            time.sleep(1)
 
         module_port += 1
         self._module_processes += [
@@ -181,8 +185,7 @@ class Application(object):
                 _KerviSocketIPC
             )
         ]
-        time.sleep(2)
-        
+        time.sleep(1)
 
         #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
         print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
@@ -191,6 +194,11 @@ class Application(object):
             self.settings["network"]["IPAddress"],
             self.settings["network"]["WebPort"],
             self.settings["network"]["WebSocketPort"]
+        )
+        time.sleep(1)
+        self.spine.trigger_event(
+            "appReady",
+            self.settings["info"]["id"]
         )
 
     def _input_thread(self, list):
@@ -224,11 +232,10 @@ class Application(object):
 
     def stop(self):
         webserver.stop()
-        time.sleep(2)
         print("stopping processes")
         process._stop_processes()
-        time.sleep(2)
+        time.sleep(1)
         process._stop_root_spine()
-        time.sleep(2)
+        time.sleep(1)
 
         print("application stopped")

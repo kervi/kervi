@@ -21,7 +21,6 @@ def _start_root_spine(settings, reset_log=False):
 def _stop_root_spine():
     MAIN_SPINE.close_all_connections()
 
-
 class _KerviProcess(object):
     def __init__(self, name, settings, ipcPort):
         self.name = name
@@ -36,8 +35,12 @@ class _KerviProcess(object):
             "moduleLoaded",
             self.name,
         )
+
+        self.spine.register_query_handler("getProcessInfo", self.get_process_info)
         self.init_process()
-        
+
+    def get_process_info(self):
+        return {"id": self.name}
 
     def terminate(self):
         print("terminate process", self.name)
@@ -59,18 +62,18 @@ class _KerviProcess(object):
     def terminate_process(self):
         pass
 
+    def process_step(self):
+        pass
+
 def _launch(name, process_class, settings, ipc_port):
     k_logging.init_process_logging(name, settings["log"])
     log = k_logging.KerviLog(name)
     log.info('create process:{0} ipc port:{1}:', process_class.__name__, ipc_port)
     process = process_class(name, settings, ipc_port)
-    print("q")
     try:
-        print("w")
         while not process.do_terminate:
-            #print("r")
-            continue
-            #time.sleep(1)
+            process.process_step()
+
     except KeyboardInterrupt:
         pass
     except:

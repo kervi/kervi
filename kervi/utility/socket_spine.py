@@ -12,7 +12,6 @@ import kervi.utility.encryption as encryption
 
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
-DO_TERMINATE = False
 
 class _ObjectEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -99,13 +98,7 @@ class _SpineProtocol(WebSocketServerProtocol):
         self.authenticated = False
         self.session = None
         self.user = None
-        
-
-    def terminate(self):
-        global DO_TERMINATE
-        print("u")
-        DO_TERMINATE = True
-
+    
     def add_command_handler(self, command):
         found = False
         for command_handler in self.handlers["command"]:
@@ -223,69 +216,59 @@ class _SpineProtocol(WebSocketServerProtocol):
             #res={"execptionType":exc_type,"value":exc_value,"traceback":exc_traceback}
             #self.sendResponse(res,"exception")
 
-TERMINATE_SOCKET=False
-def _start(settings):
-    global TERMINATE_SOCKET
-    try:
-        import asyncio
-    except ImportError:
-        ## Trollius >= 0.3 was renamed
-        import trollius as asyncio
 
-    from autobahn.asyncio.websocket import WebSocketServerFactory
+class SocketSpine:
+    def __init__(self, settings):
+        coro = None
 
-    ssl_context = None
-
-    if encryption.enabled():
-        print("socket using ssl")
-        cert_file, key_file = encryption.get_cert()
         try:
-            import ssl
-            ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-            ssl_context.load_cert_chain(cert_file, key_file)
-            print("socket ssl found")
-        except:
-            ssl_context = None
-            print("socket failed to use ssl")
+            import asyncio
+        except ImportError:
+            ## Trollius >= 0.3 was renamed
+            import trollius as asyncio
 
-    factory = WebSocketServerFactory()
-    factory.protocol = _SpineProtocol
+        from autobahn.asyncio.websocket import WebSocketServerFactory
 
-    loop = asyncio.get_event_loop()
-    #print("web socket ip:", settings["network"]["IPAddress"], "port:", settings["network"]["WebSocketPort"])
+        ssl_context = None
 
-    Spine().log.debug(
-        "start websocket on:{0}, port:{1}",
-        settings["network"]["IPAddress"],
-        settings["network"]["WebSocketPort"]
-    )
-    coro = loop.create_server(
-        factory,
-        settings["network"]["IPAddress"],
-        settings["network"]["WebSocketPort"],
-        ssl=ssl_context
-    )
+        if encryption.enabled():
+            print("socket using ssl")
+            cert_file, key_file = encryption.get_cert()
+            try:
+                import ssl
+                ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+                ssl_context.load_cert_chain(cert_file, key_file)
+                print("socket ssl found")
+            except:
+                ssl_context = None
+                print("socket failed to use ssl")
 
-    coro_local = loop.create_server(
-        factory,
-        "localhost",
-        settings["network"]["WebSocketPort"]
-    )
+        factory = WebSocketServerFactory()
+        factory.protocol = _SpineProtocol
 
-    #loop.run_until_complete(coro)
-    #loop.run_until_complete(coro_local)
-    try:
-        while not DO_TERMINATE:
-            loop.run_until_complete(coro)
-            print("p")
-            #loop.run_until_complete(coro_local)
-            time.sleep(.001)
-           
-    except KeyboardInterrupt:
-            pass
-    #loop.run_forever()
+        self.loop = asyncio.get_event_loop()
+        #print("web socket ip:", settings["network"]["IPAddress"], "port:", settings["network"]["WebSocketPort"])
 
-def _stop():
-    global TERMINATE_SOCKET
-    TERMINATE_SOCKET=True
-    print("y")
+        Spine().log.debug(
+            "start websocket on:{0}, port:{1}",
+            settings["network"]["IPAddress"],
+            settings["network"]["WebSocketPort"]
+        )
+
+        self.coro = self.loop.create_server(
+            factory,
+            settings["network"]["IPAddress"],
+            settings["network"]["WebSocketPort"],
+            ssl=ssl_context
+        )
+
+        coro_local = self.loop.create_server(
+            factory,
+            "localhost",
+            settings["network"]["WebSocketPort"]
+        )
+
+    def step(self):
+        self.loop.run_until_complete(self.coro)
+        #loop.run_until_complete(coro_local)
+        time.sleep(.001)
