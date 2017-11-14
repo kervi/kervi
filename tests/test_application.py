@@ -30,6 +30,7 @@ def test_application():
     process_info = app.spine.send_query("getProcessInfo")
     
     app.stop()
+    
 
     assert APP_READY
     assert MODULE_LOADED == "test_x"
