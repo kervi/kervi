@@ -27,15 +27,15 @@ def test_application():
     assert app.settings["modules"] == ["app_module"]
     assert app.settings["network"]["IPAddress"] ==  nethelper.get_ip_address()
 
-    app._xrun()
+    #app._xrun()
 
     process_info = app.spine.send_query("getProcessInfo")
     
-    app.stop()
-    # 
-
+    #app.stop()
+ 
     assert APP_READY
     assert MODULE_LOADED == "test_x"
+    assert len(process_info) == 3
     assert process_info[0]["id"] == "application"
     assert process_info[1]["id"] == "app_module"
     assert process_info[2]["id"] == "IPC"
