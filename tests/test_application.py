@@ -1,6 +1,7 @@
+#import time
+import pytest
 from kervi.application import Application
 import kervi.utility.nethelper as nethelper
-import time
 
 APP_READY = False
 MODULE_LOADED = None
@@ -13,6 +14,7 @@ def module_loaded(value):
     global MODULE_LOADED
     MODULE_LOADED = value
 
+@pytest.mark.slow
 def test_application():
     app = Application(
     {
@@ -30,7 +32,7 @@ def test_application():
     process_info = app.spine.send_query("getProcessInfo")
     
     app.stop()
-    
+    # 
 
     assert APP_READY
     assert MODULE_LOADED == "test_x"
