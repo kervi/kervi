@@ -215,6 +215,7 @@ class _ProcessSpine(object):
                 try:
                     conn = Client(process, authkey=self.settings["network"]["IPCSecret"])
                     self.add_process_connection(conn, process)
+                    print("ok connection to:", process, "from:", self.address)
                 except:
                     self.spine.log.exception("error add_process_connection")
                     print("error connection to:", process, "from:", self.address)
@@ -383,12 +384,15 @@ class _ProcessSpine(object):
         try:
             self.spine.log.debug("message from:{0} on:{1} message:{2}", src, self.port, message)
             if message["messageType"] == "query":
+                #print("query:", src, self.port,message["query"])
+            
                 res = self.spine.send_query(
                     message["query"],
                     *message["args"],
                     injected="processSpine",
                     session=message["session"]
                 )
+                #print("query:result", res)
                 connection.send({"messageType":"queryResponse", "id":message["id"], "response":res})
 
             elif message["messageType"] == "queryResponse":

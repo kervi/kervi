@@ -154,7 +154,7 @@ class DashboardPanel(object):
 
     def _get_info(self, **kwargs):
         self.spine.log.debug("Query dashboard components:{0} - {1}", self.dashboard.dashboard_id, self.panel_id)
-        
+
         session = kwargs.get("session", None)
         authorized = True
         if session and len(self.user_groups) > 0:
@@ -163,8 +163,9 @@ class DashboardPanel(object):
                     break
             else:
                 authorized = False
-            
+
         if authorized:
+            components = []
             components = self.spine.send_query(
                 "getDashboardComponents",
                 self.dashboard.dashboard_id,

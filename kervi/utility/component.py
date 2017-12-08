@@ -222,6 +222,7 @@ class KerviComponent(object):
 
     def _get_dashboard_components(self, dashboard_id, section_id):
         result = []
+        #print("gdc", self._component_id, dashboard_id, section_id)
         for link in self._dashboard_links:
             if ((link.dashboard_id == "*" or link.dashboard_id == dashboard_id)
                     and link.section_id == section_id):

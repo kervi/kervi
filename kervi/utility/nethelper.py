@@ -13,7 +13,7 @@ def get_ip_address():
         _socket.connect(('google.com', 0))
         return _socket.getsockname()[0]
     except:
-        return "localhost"
+        return "127.0.0.1"
 def get_free_port(preferred_ports = None):
     """ returns a free port """
 

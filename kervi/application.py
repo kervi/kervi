@@ -42,6 +42,7 @@ class _KerviModuleLoader(process._KerviProcess):
             import kervi.hal as hal
             hal._load()
             __import__(self.name, fromlist=[''])
+            
         except ImportError:
             self.spine.log.exception("load module:{0}", self.name)
         #import kervi.utility.storage
@@ -61,6 +62,7 @@ class _KerviSocketIPC(process._KerviProcess):
         print("load interprocess communication")
         from kervi.utility.socket_spine import SocketSpine
         self.socket_spine = SocketSpine(self.settings)
+        self.spine.send_command("startThreads", scope="process")
 
     def process_step(self):
         self.socket_spine.step()
@@ -111,7 +113,7 @@ class Application(object):
                 "appKey":"",
             },
             "log" : {
-                "level":"info",
+                "level":"debug",
                 "file":"kervi.log",
                 "resetLog":False
             },
@@ -156,11 +158,16 @@ class Application(object):
 
     def _start(self):
         self.started = True
-        self.spine.send_command("startThreads", scope="process")
+        
         try:
             import dashboards
         except ImportError:
             pass
+        
+        self.spine.run()
+        self.spine.send_command("startThreads", scope="process")
+        time.sleep(2)
+        
 
         module_port = self.settings["network"]["IPCRootPort"]
         
@@ -174,18 +181,9 @@ class Application(object):
                     _KerviModuleLoader
                 )
             ]
-            time.sleep(1)
+            time.sleep(2)
 
-        module_port += 1
-        self._module_processes += [
-            process._start_process(
-                "IPC",
-                self.settings,
-                module_port,
-                _KerviSocketIPC
-            )
-        ]
-        time.sleep(1)
+        
 
         #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
         print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
@@ -196,6 +194,19 @@ class Application(object):
             self.settings["network"]["WebSocketPort"]
         )
         time.sleep(1)
+
+        module_port += 1
+        self._module_processes += [
+            process._start_process(
+                "IPC",
+                self.settings,
+                module_port,
+                _KerviSocketIPC
+            )
+        ]
+        time.sleep(2)
+
+
         self.spine.trigger_event(
             "appReady",
             self.settings["info"]["id"]
@@ -205,6 +216,8 @@ class Application(object):
         try:
             raw_input()
             list.append(None)
+        except KeyboardInterrupt:
+            pass
         except:
             pass
 

@@ -150,8 +150,8 @@ class _CQRSBus(object):
     def send_command(self, command, *args, **kwargs):
         injected = kwargs.get("injected", "")
         scope = kwargs.get("scope", "global")
-        session = kwargs.get("session", None)
-        self.log.debug("sendcommand:{0} injected:{1} scope:{2}", command, injected, scope)
+            session = kwargs.get("session", None)
+            self.log.debug("sendcommand:{0} injected:{1} scope:{2}", command, injected, scope)
         self.cmd_queue.add(
             {"command":command, "args":args, "injected":injected, "scope":scope, "session":session}, kwargs.get("priority", 2)
         )
@@ -198,7 +198,7 @@ class _CQRSBus(object):
             self.log.debug("sendQuery thread done:{0}", query_thread)
             return query_thread.result
         else:
-            print( "xxx", query, injected, scope, session)
+            print( "Time out in query", query, injected, scope, session)
             self.log.debug("sendQuery thread timeout, query:{0}", query)
             return []
 
@@ -240,6 +240,7 @@ class _CQRSBus(object):
             if len(result) == 1:
                 return result[0]
         except:
+            print("Exception in query:", query)
             self.log.exception("Exception in query:" + query)
 
         return result

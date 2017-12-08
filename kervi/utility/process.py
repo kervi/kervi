@@ -15,11 +15,12 @@ def _start_root_spine(settings, reset_log=False):
     global MAIN_SPINE
     k_logging.init_process_logging("kervi-main", settings["log"])
     k_logging.KerviLog("kervi main")
-    spine._init_spine("kervi-main")
-    MAIN_SPINE = _ProcessSpine(settings["network"]["IPCRootPort"], settings, is_root=True)
+    spine._init_spine("kervi-main", settings["network"]["IPCRootPort"])
+    #MAIN_SPINE = _ProcessSpine(settings["network"]["IPCRootPort"], settings, is_root=True)
 
 def _stop_root_spine():
-    MAIN_SPINE.close_all_connections()
+    #MAIN_SPINE.close_all_connections()
+    pass
 
 class _KerviProcess(object):
     def __init__(self, name, settings, ipcPort):
@@ -27,17 +28,20 @@ class _KerviProcess(object):
         self.do_terminate = False
         self.port = ipcPort
         self.settings = settings
-        spine._init_spine(name)
+        spine._init_spine(name, ipcPort, "tcp://" + settings["network"]["IPRootAddress"] + ":" + str(settings["network"]["IPCRootPort"]))
         self.spine = spine.Spine()
-        self.process_spine = _ProcessSpine(ipcPort, settings)
+        #self.process_spine = _ProcessSpine(ipcPort, settings)
+        #self.spine.send_command("startThreads", scope="process")
+        #time.sleep(1)
         self.spine.register_command_handler("terminateProcess", self.terminate)
-        self.spine.trigger_event(
-            "moduleLoaded",
-            self.name,
-        )
-
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
         self.init_process()
+        self.spine.run()
+        self.spine.send_command("startThreads", scope="process")
+        
+
+    def __del__(self):
+        print("pd", self.name)
 
     def get_process_info(self):
         return {"id": self.name}
@@ -55,7 +59,7 @@ class _KerviProcess(object):
         self.terminate_process()
         self.spine.trigger_event("processTerminating", None, scope="process")
         #time.sleep(5)
-        self.process_spine.close_all_connections()
+        #self.process_spine.close_all_connections()
         self.spine.log.info("process terminated:{0}", self.port)
         self.spine.stop()
 

@@ -14,19 +14,30 @@ spine = Spine()
 spine.sendCommand("SetMyValue",myValue)
 """
 
-from kervi.utility.bus import _CQRSBus
+#from kervi.utility.bus import _CQRSBus
 
-class _KerviSpine(_CQRSBus):
-    def version(self):
-        return 1.0
+# class _KerviSpine(_CQRSBus):
+#     def version(self):
+#         return 1.0
 
 S = None
-def _init_spine(spine_name="roboSys"):
+# def _init_spine(spine_name="roboSys"):
+#     global S
+#     S = _KerviSpine()
+#     S.set_log(spine_name)
+#     S.reset()
+#     S.start_queues()
+from kervi.utility.zmqbus import ZMQBus
+
+class _KerviSpine(ZMQBus):
+    def version(self):
+        return 2.0
+
+def _init_spine(process_id, spine_port, root_address = None, ip="127.0.0.1"):
     global S
     S = _KerviSpine()
-    S.set_log(spine_name)
-    S.reset()
-    S.start_queues()
+    S.set_log(process_id)
+    S.reset_bus(process_id, spine_port, ip, root_address)
 
 def Spine():
     """
