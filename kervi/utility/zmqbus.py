@@ -44,6 +44,7 @@ class ProcessConnection:
         self.is_root_connection = is_root
         self._bus = bus
         self._signal_socket = self._bus._context.socket(zmq.PUB)
+        self._lock = threading.Lock()
         #self._signal_socket.setsockopt(zmq.SNDHWM, 1)
 
     def connect(self, address):
@@ -97,10 +98,13 @@ class ProcessConnection:
 
     def send_package(self, package):
         #print("send_package", self.address, package)
+        self._lock.acquire()
         try:
             self._signal_socket.send_multipart(package)
-        except:
-            print("send package exception")
+        except Exception as ex:
+            print("send package exception", ex.message)
+        finally:
+            self._lock.release()
 
 
 class ZMQPingThread(threading.Thread):
@@ -162,8 +166,11 @@ class ZMQMessageThread(threading.Thread):
         
     def run(self):
         while not self._terminate:
+            connection_message = None
             try:
-                [tag, json_message] = self._socket.recv_multipart(zmq.NOBLOCK)
+                
+                connection_message = self._socket.recv_multipart()
+                [tag, json_message] = connection_message
                 message = pickle.loads(json_message)
                 #print("t", self._address, tag, message)
                 if tag == b"queryResponse":
@@ -182,7 +189,7 @@ class ZMQMessageThread(threading.Thread):
                 else:
                     print("message zmq exception:", self._address, e, e.errno)
             except Exception as e:
-                print("message exception:", e)
+                print("message exception:", self._address, e, connection_message)
         #print("message thread terminated:", self._address)
 
 class ZMQBus():
@@ -243,6 +250,9 @@ class ZMQBus():
         self._query_handler.register("query:")
 
         self._ping_thread = ZMQPingThread(self)
+        self._command_lock = threading.Lock()
+        self._event_lock = threading.Lock()
+        self._query_lock = threading.Lock()
 
     def _register_handler(self, tag, func, **kwargs):
         groups = kwargs.get("groups", None)
@@ -489,7 +499,11 @@ class ZMQBus():
         p = pickle.dumps(command_message, -1)
         command_tag = "command:" + command
         package = [command_tag.encode(), p]
-        self._command_socket.send_multipart(package)
+        self._command_lock.acquire()
+        try:
+            self._command_socket.send_multipart(package)
+        finally:
+            self._command_lock.release()
 
         if scope == "global":
             for connection in self._connections:
@@ -521,7 +535,11 @@ class ZMQBus():
         if id:
             event_tag += id
         package = [event_tag.encode(), p]
-        self._event_socket.send_multipart(package)
+        self._event_lock.acquire()
+        try:
+            self._event_socket.send_multipart(package)
+        finally:
+            self._event_lock.release()
 
         if scope == "global":
             for connection in self._connections:
@@ -592,7 +610,11 @@ class ZMQBus():
         p = pickle.dumps(query_message, -1)
         query_tag = "query:" + query
         package = [query_tag.encode(), p]
-        self._query_socket.send_multipart(package)
+        self._query_lock.acquire()
+        try:
+            self._query_socket.send_multipart(package)
+        finally:
+            self._query_lock.release()
 
         if scope == "global" and len(self._connections) > 0:
             query_message["responseAddress"] = self._signal_address

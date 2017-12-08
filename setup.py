@@ -49,7 +49,8 @@ setup(
         'kervi-hal-generic',
         'kervi-device-library',
         'autobahn',
-        'pillow'
+        'pillow',
+        'pyzmq'
     ],
     extras_require={
         'rpi':  ['kervi-hal-rpi'],
