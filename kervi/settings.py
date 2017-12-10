@@ -24,7 +24,7 @@ class Settings(object):
 
     def retrieve_value(self, name, default_value=None):
         """Retrieve a value from DB"""
-        value = self.spine.send_query("retrieveSetting", self.group, name)
+        value = None # self.spine.send_query("retrieveSetting", self.group, name, processes=["kervi-main"])
         if value is None:
             return default_value
         elif isinstance(value, list) and len(value) == 0:

@@ -75,9 +75,9 @@ class _WebEventHandler(object):
         injected = kwargs.get("injected", "")
         groups = kwargs.get("groups", None)
         self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
-        
+
         authorized = True
-        
+
         if self.protocol.user != None and self.protocol.user["groups"] != None and groups != None and len(groups) > 0:
             for group in groups:
                 if group in self.protocol.user["groups"]:
@@ -135,7 +135,6 @@ class _SpineProtocol(WebSocketServerProtocol):
         jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
         self.sendMessage(jsonres, False)
 
-    
     def onConnect(self, request):
         #print("Web socket Client connecting: {}".format(request.peer))
         pass
@@ -181,7 +180,7 @@ class _SpineProtocol(WebSocketServerProtocol):
                 self.session = None
                 authorization.remove_session(obj["session"])
                 res = {
-                        "messageType":"session_logoff"
+                    "messageType":"session_logoff"
                 }
                 jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
                 self.sendMessage(jsonres, False)
@@ -212,7 +211,7 @@ class _SpineProtocol(WebSocketServerProtocol):
                 elif obj["messageType"] == "registerEventHandler":
                     self.add_event_handler(obj["event"], obj["eventId"])
                     self.send_response(obj["id"], None)
-        except :
+        except:
             self.spine.log.exception("WS onMessage exception")
             #res={"execptionType":exc_type,"value":exc_value,"traceback":exc_traceback}
             #self.sendResponse(res,"exception")
@@ -220,6 +219,10 @@ class _SpineProtocol(WebSocketServerProtocol):
 class SocketSpine:
     def __init__(self, settings):
         coro = None
+        self._started = False
+        self._settings = settings
+        self._spine = Spine()
+        self._spine.register_event_handler("dynamicValueChanged", None)
 
         try:
             import asyncio
@@ -243,30 +246,28 @@ class SocketSpine:
                 ssl_context = None
                 print("socket failed to use ssl")
 
+        self._spine.log.debug(
+            "start websocket on:{0}, port:{1}",
+            self._settings["network"]["IPAddress"],
+            self._settings["network"]["WebSocketPort"]
+        )
         self.factory = WebSocketServerFactory()
         self.factory.protocol = _SpineProtocol
 
         self.loop = asyncio.get_event_loop()
-        #print("web socket ip:", settings["network"]["IPAddress"], "port:", settings["network"]["WebSocketPort"])
-        spine = Spine()
-        spine.log.debug(
-            "start websocket on:{0}, port:{1}",
-            settings["network"]["IPAddress"],
-            settings["network"]["WebSocketPort"]
-        )
-        spine.register_event_handler("dynamicValueChanged", None)
-
         self.coro = self.loop.create_server(
             self.factory,
-            settings["network"]["IPAddress"],
-            settings["network"]["WebSocketPort"],
+            self._settings["network"]["IPAddress"],
+            self._settings["network"]["WebSocketPort"],
             ssl=ssl_context
         )
+
+    def start_socket(self): 
         self.loop.run_until_complete(self.coro)
-        
-        
+        self._started = True
 
     def step(self):
-        self.loop.run_until_complete(self.coro)
+        if self._started:
+            self.loop.run_until_complete(self.coro)
         #loop.run_until_complete(coro_local)
         time.sleep(.001)

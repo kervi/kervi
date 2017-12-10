@@ -28,6 +28,7 @@ S = None
 #     S.reset()
 #     S.start_queues()
 from kervi.utility.zmqbus import ZMQBus
+import threading
 
 class _KerviSpine(ZMQBus):
     def version(self):
@@ -37,7 +38,17 @@ def _init_spine(process_id, spine_port, root_address = None, ip="127.0.0.1"):
     global S
     S = _KerviSpine()
     S.set_log(process_id)
-    S.reset_bus(process_id, spine_port, ip, root_address)
+    event = None
+
+    if root_address:
+        event = threading.Event()
+    S.reset_bus(process_id, spine_port, ip, root_address, event)
+    S.run()
+
+    if event:
+        print("wait for root", process_id)
+        event.wait(5)
+        print("root connected", process_id)
 
 def Spine():
     """

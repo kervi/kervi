@@ -3,6 +3,7 @@
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
 import time
+import threading
 try:
     import thread
 except ImportError:
@@ -61,11 +62,15 @@ class _KerviSocketIPC(process._KerviProcess):
     def init_process(self):
         print("load interprocess communication")
         from kervi.utility.socket_spine import SocketSpine
-        self.socket_spine = SocketSpine(self.settings)
+        self._socket_spine = SocketSpine(self.settings)
         self.spine.send_command("startThreads", scope="process")
+        self.spine.register_command_handler("startWebSocket", self._start_socket)
+
+    def _start_socket(self):
+        self._socket_spine.start_socket()
 
     def process_step(self):
-        self.socket_spine.step()
+        self._socket_spine.step()
 
     def terminate_process(self):
         pass
@@ -139,9 +144,9 @@ class Application(object):
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
 
-        self._module_processes=[]
+        self._module_processes = []
         import kervi.utility.storage
-        
+
         import kervi.hal as hal
         hal_driver = hal._load()
         if hal_driver:
@@ -158,42 +163,17 @@ class Application(object):
 
     def _start(self):
         self.started = True
-        
+
         try:
             import dashboards
         except ImportError:
             pass
-        
-        self.spine.run()
+
+        #self.spine.run()
         self.spine.send_command("startThreads", scope="process")
-        time.sleep(2)
-        
+        time.sleep(.5)
 
         module_port = self.settings["network"]["IPCRootPort"]
-        
-        for module in self.settings["modules"]:
-            module_port += 1
-            self._module_processes+=[
-                process._start_process(
-                    module,
-                    self.settings,
-                    module_port,
-                    _KerviModuleLoader
-                )
-            ]
-            time.sleep(2)
-
-        
-
-        #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
-        print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
-        print("Press ctrl + c to stop your application")
-        webserver.start(
-            self.settings["network"]["IPAddress"],
-            self.settings["network"]["WebPort"],
-            self.settings["network"]["WebSocketPort"]
-        )
-        time.sleep(1)
 
         module_port += 1
         self._module_processes += [
@@ -204,13 +184,33 @@ class Application(object):
                 _KerviSocketIPC
             )
         ]
-        time.sleep(2)
 
+        for module in self.settings["modules"]:
+            module_port += 1
+            self._module_processes+=[
+                process._start_process(
+                    module,
+                    self.settings,
+                    module_port,
+                    _KerviModuleLoader
+                )
+            ]
+            time.sleep(.25)
 
+        time.sleep( len(self._module_processes))
+        #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
+        print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
+        print("Press ctrl + c to stop your application")
+        webserver.start(
+            self.settings["network"]["IPAddress"],
+            self.settings["network"]["WebPort"],
+            self.settings["network"]["WebSocketPort"]
+        )
         self.spine.trigger_event(
             "appReady",
             self.settings["info"]["id"]
         )
+        self.spine.send_command("startWebSocket")
 
     def _input_thread(self, list):
         try:
@@ -249,6 +249,6 @@ class Application(object):
         process._stop_processes()
         time.sleep(1)
         process._stop_root_spine()
-        time.sleep(1)
-
+        #for thread in threading.enumerate():
+        #    print("running thread",thread.name)
         print("application stopped")

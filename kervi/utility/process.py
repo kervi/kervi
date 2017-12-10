@@ -16,6 +16,7 @@ def _start_root_spine(settings, reset_log=False):
     k_logging.init_process_logging("kervi-main", settings["log"])
     k_logging.KerviLog("kervi main")
     spine._init_spine("kervi-main", settings["network"]["IPCRootPort"])
+    #spine.run()
     #MAIN_SPINE = _ProcessSpine(settings["network"]["IPCRootPort"], settings, is_root=True)
 
 def _stop_root_spine():
@@ -23,9 +24,9 @@ def _stop_root_spine():
     pass
 
 class _KerviProcess(object):
-    def __init__(self, name, settings, ipcPort):
+    def __init__(self, name, settings, ipcPort, root_close):
         self.name = name
-        self.do_terminate = False
+        self._do_terminate = False
         self.port = ipcPort
         self.settings = settings
         spine._init_spine(name, ipcPort, "tcp://" + settings["network"]["IPRootAddress"] + ":" + str(settings["network"]["IPCRootPort"]))
@@ -36,9 +37,8 @@ class _KerviProcess(object):
         self.spine.register_command_handler("terminateProcess", self.terminate)
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
         self.init_process()
-        self.spine.run()
+        #self.spine.run()
         self.spine.send_command("startThreads", scope="process")
-        
 
     def __del__(self):
         print("pd", self.name)
@@ -46,11 +46,15 @@ class _KerviProcess(object):
     def get_process_info(self):
         return {"id": self.name}
 
+    @property
+    def do_terminate(self):
+        return self.spine.root_gone or self._do_terminate
+
     def terminate(self):
         print("terminate process", self.name)
         self.spine.log.debug("do terminate:{0}", self.port)
         #print("terminate:", self.port)
-        self.do_terminate = True
+        self._do_terminate = True
 
     def init_process(self):
         self.spine.log.error("abstract init_process called in KerviProcess")
@@ -69,11 +73,11 @@ class _KerviProcess(object):
     def process_step(self):
         pass
 
-def _launch(name, process_class, settings, ipc_port):
+def _launch(name, process_class, settings, ipc_port, root_close):
     k_logging.init_process_logging(name, settings["log"])
     log = k_logging.KerviLog(name)
     log.info('create process:{0} ipc port:{1}:', process_class.__name__, ipc_port)
-    process = process_class(name, settings, ipc_port)
+    process = process_class(name, settings, ipc_port, root_close)
     try:
         while not process.do_terminate:
             process.process_step()
@@ -83,12 +87,12 @@ def _launch(name, process_class, settings, ipc_port):
     except:
         log.exception("error in process loop")
         pass
-    print("ot", name)
+    print("leave process", name, spine.Spine().root_gone)
     process._terminate_process()
 
 
-def _start_process(name, settings, port_idx, process_class):
-    process = Process(target=_launch, args=(name, process_class, settings, port_idx))
+def _start_process(name, settings, port_idx, process_class, root_close=True):
+    process = Process(target=_launch, args=(name, process_class, settings, port_idx, root_close))
     process.start()
     return process
 
