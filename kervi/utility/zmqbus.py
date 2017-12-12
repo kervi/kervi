@@ -199,8 +199,8 @@ class ZMQBus():
     def root_gone(self):
         return not self._is_root and time.time() - self._last_ping > 10
     
-    def reset_bus(self, process_id, signal_port, ip="127.0.0.1", root_address=None, event_port=None, root_event=None):
-        print("reset bus", process_id, signal_port, ip,root_address, event_port, root_event)
+    def reset_bus(self, process_id, signal_port, ip="127.0.0.1", root_address=None, event_port=None):
+        print("reset bus", process_id, signal_port, ip,root_address, event_port)
         self._handlers = NamedLists()
         self._process_id = process_id
         self._query_id_count = 0
@@ -211,8 +211,10 @@ class ZMQBus():
         self._context = zmq.Context()
         self._response_events = []
         self._last_ping = time.time()
-        self._root_event = root_event
+        self._connections_lock = threading.Lock()
 
+        self._root_event = None
+        
         self._event_socket = self._context.socket(zmq.PUB)
         self._event_socket.bind(_KERVI_EVENT_ADDRESS)
 
@@ -387,55 +389,81 @@ class ZMQBus():
         
 
     def _on_connect(self, address, process_id):
-        #print("on_connect", self._signal_address, address, process_id)
-        result = None
-        new_connection = True
-        connection_list = []
-        for connection in self._connections:
-            if self._is_root:
-                connection_list += [{"address":connection.address, "processId":connection.process_id}]
-            if connection.process_id == process_id:
-                connection.reconnect(address)
-                new_connection = False
-                result = connection
-
-        if new_connection:
-            #print("new connection", self._signal_address, address, process_id)
-        
-            connection = ProcessConnection(self)
-            connection.register(address, process_id, connection_list)
-            self._connections += [connection]
-            #print("scn", self._signal_address, self.get_connection_info())
-            result = connection
-
-        return result
-
-    def _on_register(self, address, process_id, process_list):
-        #print("on_register", self._signal_address, address, process_id, process_list)
-        connection_ids = []
-        for connection in self._connections:
-            connection_ids += [connection.address]
-
-        for process in process_list:
+        print("on_connect", self._signal_address, address, process_id)
+        self._connections_lock.acquire()
+        try:
             new_connection = True
-            for connection_id in connection_ids:
-                if connection_id == process["processId"]:
+            connection_list = []
+            if self._is_root:
+                connection_list = [{"address":self._signal_address, "processId":self._process_id}]
+
+            for connection in self._connections:
+                if self._is_root:
+                    connection_list += [{"address":connection.address, "processId":connection.process_id}]
+                if connection.process_id == process_id:
+                    connection.reconnect(address)
                     new_connection = False
-                    break
+        
 
             if new_connection:
+                print("new connection", self._signal_address, address, process_id)
                 connection = ProcessConnection(self)
-                connection.process_id = process["processId"]
-                connection.connect(process["address"])
+                connection.register(address, process_id, connection_list)
                 self._connections += [connection]
-                if self._root_event:
-                    self._root_event.set()
+                #print("scn", self._signal_address, self.get_connection_info())
+
+        finally:
+            self._connections_lock.release()
+
+    def _on_register(self, address, process_id, process_list):
+        print("on_register", self._signal_address, address, process_id, process_list)
+        self._connections_lock.acquire()
+        try:
+        
+            connection_addresses = []
+            for connection in self._connections:
+                connection_addresses += [connection.address]
+
+            for process in process_list:
+                new_connection = True
+                for connection_address in connection_addresses:
+                    if connection_address == process["address"]:
+                        new_connection = False
+                        #if self._root_address == process["address"]:
+                        #    self._connections[0].process_id = process["processId"]
+                        break
+
+                if new_connection:
+                    connection = ProcessConnection(self)
+                    connection.process_id = process["processId"]
+                    connection.connect(process["address"])
+                    self._connections += [connection]
+
+        finally:
+            self._connections_lock.release()
+            if self._root_event and address == self._root_address:
+                self._root_event.set()
 
     def connect_to_root(self):
         #print("connect to root", self._signal_address, self._root_address)
-        connection = ProcessConnection(self, True)
-        connection.connect(self._root_address)
-        self._connections += [connection]
+        self._connections_lock.acquire()
+        try:
+            self._root_event = threading.Event()
+            connection = ProcessConnection(self, True)
+            connection.process_id = "kervi-main"
+            connection.connect(self._root_address)
+            self._connections += [connection]
+        finally:
+            self._connections_lock.release()
+
+    def wait_for_root(self, timeout=5):
+        if self._root_event:
+            print("wait for root", self._process_id)
+            if self._root_event.wait(timeout):
+                print("root connected", self._process_id)
+            else:
+                print("root not found", self._process_id)
+            self._root_event = None
 
     def send_connection_message(self, address, tag, message):
         for connection in self._connections:
@@ -450,7 +478,7 @@ class ZMQBus():
         self._last_ping = time.time()
         for connection in self._connections:
             if connection.process_id == process_id:
-                connection.reconnect(address)
+                #connection.reconnect(address)
                 return
 
     def _ping_connections(self):
@@ -554,64 +582,73 @@ class ZMQBus():
                     event["eventSignal"].set()
 
     def send_query(self, query, *args, **kwargs):
-        self._query_id_count += 1
-        result = []
-        injected = kwargs.get("injected", "")
-        scope = kwargs.get("scope", "global")
-        groups = kwargs.get("groups", None)
-        session = kwargs.get("session", None)
-        processes = kwargs.get("processes", None)
-        self._query_id_count += 1
-        query_id = self._uuid_handler + "-" + str(self._query_id_count)
-
-        process_count = 1
-        if scope == "global":
-            process_count += len(self._connections)
-
-        event = threading.Event()
-        event_data = {
-            "id":query_id,
-            "eventSignal":event,
-            "response":[],
-            "processed":False,
-            "process_count": process_count,
-            "process_id": self._process_id,
-            "query": query,
-            "handled_by": []
-        }
-        self._response_events += [event_data]
-        #print("rs", self._response_events)
-        query_message = {
-            'query':query,
-            "id":query_id,
-            "responseAddress":"inproc_query",
-            'args':args,
-            "injected":injected,
-            "scope":scope,
-            "groups":groups,
-            "session":session
-        }
-        #jsonres = json.dumps(query_message)
-        p = pickle.dumps(query_message, -1)
-        query_tag = "query:" + query
-        package = [query_tag.encode(), p]
-        self._query_lock.acquire()
+        self._connections_lock.acquire()
         try:
-            self._query_socket.send_multipart(package)
-        finally:
-            self._query_lock.release()
+            self._query_id_count += 1
+            result = []
+            injected = kwargs.get("injected", "")
+            scope = kwargs.get("scope", "global")
+            groups = kwargs.get("groups", None)
+            session = kwargs.get("session", None)
+            processes = kwargs.get("processes", None)
+            self._query_id_count += 1
+            query_id = self._uuid_handler + "-" + str(self._query_id_count)
 
-        if scope == "global" and len(self._connections) > 0:
-            query_message["responseAddress"] = self._signal_address
+            process_count = 1
+            if scope == "global":
+                for connection in self._connections:
+                    if not processes or (connection.process_id in processes):
+                        process_count += 1
+                    
+
+            event = threading.Event()
+            event_data = {
+                "id":query_id,
+                "eventSignal":event,
+                "response":[],
+                "processed":False,
+                "process_count": process_count,
+                "process_id": self._process_id,
+                "query": query,
+                "handled_by": []
+            }
+            self._response_events += [event_data]
+            #print("rs", self._response_events)
+            query_message = {
+                'query':query,
+                "id":query_id,
+                "responseAddress":"inproc_query",
+                'args':args,
+                "injected":injected,
+                "scope":scope,
+                "groups":groups,
+                "session":session
+            }
+            #jsonres = json.dumps(query_message)
             p = pickle.dumps(query_message, -1)
+            query_tag = "query:" + query
             package = [query_tag.encode(), p]
-        
-            for connection in self._connections:
-                if not processes or (connection.process_id in processes):
-                    connection.send_package(package)
-                else:
-                    event_data["process_count"] - 1
-                    print("process ignored", processes)
+            self._query_lock.acquire()
+            try:
+                self._query_socket.send_multipart(package)
+            finally:
+                self._query_lock.release()
+
+            
+            if scope == "global" and len(self._connections) > 0:
+                query_message["responseAddress"] = self._signal_address
+                p = pickle.dumps(query_message, -1)
+                package = [query_tag.encode(), p]
+            
+                if query == "retrieveSetting":
+                    print("rt", processes, len(self._connections))
+                for connection in self._connections:
+                    if not processes or (connection.process_id in processes):
+                        connection.send_package(package)
+                    else:
+                        print("process ignored", connection.address, connection.process_id, processes)
+        finally:
+            self._connections_lock.release()
 
         event.wait(10)
         if not event_data["processed"]:

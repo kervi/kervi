@@ -195,7 +195,7 @@ class Application(object):
                     _KerviModuleLoader
                 )
             ]
-            time.sleep(.25)
+            time.sleep(1)
 
         time.sleep( len(self._module_processes))
         #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
