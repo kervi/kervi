@@ -3,51 +3,48 @@
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
 import time
+#import threading
 try:
     import thread
 except ImportError:
     import _thread as thread
 
+#import sys
+#import uuid
 import kervi.utility.process as process
 import kervi.spine as spine
-from kervi.utility.process_spine import _ProcessSpine
-import kervi.kervi_logging as logging
-from kervi.application import _deep_update
+#from kervi.utility.process_spine import _ProcessSpine
+#import kervi.kervi_logging as logging
+import kervi_ui.webserver as webserver
 import kervi.utility.nethelper as nethelper
+import kervi.utility.encryption as encryption
+import kervi.utility.application_helpers as app_helpers
 
 class Module(object):
-    """
-    Kervi application module that is used to start a module that connects to at running instance of
-    a Kervi application. Settings for amodule is a dictionary on the following form:
+    """ Kervi application class that starts a kervi application and loads all needed modules.
+        This class should be used by it self like:
 
-    MODULE=Module(
-        "info":{
-                "id":"kervi_module",
-                "name":"Kervi module",
-                "appKey":"",
-            },
-            "log" : {
-                "level":"debug",
-                "file":"kervi.log",
-                "resetLog":False
-            },
-            "modules":[],
-            "network":{
-                "IPRootAddress": nethelper.get_ip_address(),
-                "IPCRootPort":9500,
-                "IPAddress": nethelper.get_ip_address(),
-                "IPCPort":nethelper.get_free_port([9600]),
-                "IPCSecret":b"12345"
-            }
-    )
+    ```python
+    MODULE=Module({
+        "modules":["sensors","controllers"],
+        "network":{
+            "IPAddress": "ip address of device",
+            "IPRootAddress": nethelper.get_ip_address(),
+            "IPCRootPort": 9500),
+            "IPCSecret":b"The secret"
+        }
+    })
+    MODULE.run()
+    ```
 
     """
-    def __init__(self, settings=None):
+    def __init__(self, settings = None):
+        """ Settings is a dictionary with the following content
+        """
         self.settings = {
             "info":{
-                "id":"kervi_module",
-                "name":"Kervi module",
-                "appKey":"",
+                "id":"module",
+                "name": "Module"
             },
             "log" : {
                 "level":"debug",
@@ -56,50 +53,86 @@ class Module(object):
             },
             "modules":[],
             "network":{
-                "IPRootAddress": nethelper.get_ip_address(),
-                "IPCRootPort":9500,
                 "IPAddress": nethelper.get_ip_address(),
-                "IPCPort":nethelper.get_free_port([9600]),
-                "IPCSecret":b"12345"
+                "ModulePort": nethelper.get_free_port([9600]),
+                "IPRootAddress": nethelper.get_ip_address(),
+                "IPCRootPort":nethelper.get_free_port([9500]),
+                "IPCSecret":b"12345",
             }
         }
 
         print("Starting kervi module, please wait")
         if settings:
-            self.settings = _deep_update(self.settings, settings)
-        #self._validateSettings()
+            self.settings = app_helpers._deep_update(self.settings, settings)
+        self._validateSettings()
         self.started = False
-        #logging.init_process_logging("kervi-main", self.settings["log"])
-        #logging.KerviLog("kervi main")
-        spine._init_spine("kervi-main")
-        self.process_spine = _ProcessSpine(self.settings["network"]["IPCPort"], self.settings)
+        self._root_address = "tcp://" + settings["network"]["IPRootAddress"] + ":" + str(settings["network"]["IPCRootPort"])
+        spine._init_spine(settings["info"]["id"], settings["network"]["ModulePort"], self._root_address, settings["network"]["IPAddress"])
+        
         self.spine = spine.Spine()
+        
+        self._module_processes = []
+        
         import kervi.hal as hal
         hal_driver = hal._load()
         if hal_driver:
             print("Using HAL driver:", hal_driver)
 
+    def _validateSettings(self):
+        pass
+
+    def get_process_info(self):
+        return {"id": "application"}
+
     def _start(self):
         self.started = True
-        self.spine.send_command("startThreads", scope="process")
+
         try:
             import dashboards
         except ImportError:
             pass
 
-        time.sleep(2)
-        self.spine.trigger_event("moduleStarted", self.settings["info"]["id"])
-        time.sleep(2)
-        print("Module started")
+        #self.spine.run()
+        self.spine.send_command("startThreads", scope="process")
+        time.sleep(.5)
+
+        module_port = self.settings["network"]["ModulePort"]
+
+        for module in self.settings["modules"]:
+            module_port += 1
+            self._module_processes += [
+                process._start_process(
+                    "module-" + self.settings["info"]["id"]
+                    module,
+                    self.settings,
+                    module_port,
+                    app_helpers._KerviModuleLoader,
+                    process_id=self.settings["info"]["id"] + "-"+module
+                )
+            ]
+            #time.sleep(1)
+
+        time.sleep(2*len(self._module_processes))
+        #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
+        print("module connected to application at:", self._root_address)
+        print("Press ctrl + c to stop your module")
+        self.spine.trigger_event(
+            "moduleReady",
+            self.settings["info"]["id"]
+        )
+        
 
     def _input_thread(self, list):
         try:
             raw_input()
             list.append(None)
+        except KeyboardInterrupt:
+            pass
         except:
             pass
 
     def run(self):
+        """Run the application loop. The application will continue until termination with ctrl-c"""
 
         if not self.started:
             self._start()
@@ -112,11 +145,19 @@ class Module(object):
         except KeyboardInterrupt:
             pass
 
+        self.stop()
 
-        print("stopping module")
+    def _xrun(self):
+        """Used in tests"""
 
-        self.spine.trigger_event("moduleStopped", self.settings["info"]["id"])
+        if not self.started:
+            self._start()
+
+    def stop(self):
+        print("stopping processes")
+        process._stop_processes("module-" + self.settings["info"]["id"])
         time.sleep(1)
-        self.process_spine.close_all_connections()
-        process._stop_processes()
-        time.sleep(1)
+        spine.Spine().stop()
+        #for thread in threading.enumerate():
+        #    print("running thread",thread.name)
+        print("module stopped")

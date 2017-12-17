@@ -7,5 +7,8 @@ def active():
 
 def is_session_valid(headers):
     spine = Spine()
-    res = spine.send_query("validSessionHeader", headers)
+    json_header = {}
+    for header in headers:
+        json_header[header] = headers[header]
+    res = spine.send_query("validSessionHeader", json_header)
     return res

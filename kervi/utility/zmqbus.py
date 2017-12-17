@@ -5,7 +5,6 @@ import time
 import inspect
 import threading
 import json
-import pickle
 import uuid
 from kervi.utility.named_lists import NamedLists
 import kervi.utility.nethelper as nethelper
@@ -52,13 +51,13 @@ class ProcessConnection:
         self._signal_socket.connect(address)
         time.sleep(.5)
         signal_message = {"address": self._bus._signal_address, "processId": self._bus._process_id}
-        p = pickle.dumps(signal_message, -1)
+        p = json.dumps(signal_message, ensure_ascii=False).encode('utf8')
         signal_tag = "signal:connect"
         self.send_package([signal_tag.encode(), p])
 
     def connect_to(self, address, process_id):
         signal_message = {"address": address, "processId": process_id}
-        p = pickle.dumps(signal_message, -1)
+        p = json.dumps(signal_message, ensure_ascii=False).encode('utf8')
         signal_tag = "signal:connect"
         self.send_package([signal_tag.encode(), p])
 
@@ -71,13 +70,13 @@ class ProcessConnection:
         if process_list:
             time.sleep(.5)
             signal_message = {"address": self._bus._signal_address, "processId": self._bus._process_id, "processList": process_list}
-            p = pickle.dumps(signal_message, -1)
+            p = json.dumps(signal_message, ensure_ascii=False).encode('utf8')
             signal_tag = "signal:register"
             self.send_package([signal_tag.encode(), p])
 
     def disconnect(self):
         if self._signal_socket:
-            self._lock.acquire(timeout=2)
+            self._lock.acquire()
             try:
                 self._signal_socket.setsockopt( zmq.LINGER, 0 )
                 self._signal_socket.close()
@@ -142,25 +141,20 @@ class ZMQMessageThread(threading.Thread):
 
     def stop(self):
         self._terminate = True
-        #if self._socket:
-        #    self._socket.setsockopt( zmq.LINGER, 0 )
-        #    self._socket.close()
-            
-        #self._socket.close()
+
     def connect(self):
         if self._bind:
             self._socket.bind(self._address)
-        else:    
+        else:
             self._socket.connect(self._address)
-        
+
     def run(self):
         while not self._terminate:
             connection_message = None
             try:
                 connection_message = self._socket.recv_multipart(zmq.NOBLOCK)
                 [tag, json_message] = connection_message
-                message = pickle.loads(json_message)
-                #print("t", self._address, tag, message)
+                message = json.loads(json_message.decode('utf8'))
                 if tag == b"queryResponse":
                     self._bus.resolve_response(message)
                 else:
@@ -169,7 +163,7 @@ class ZMQMessageThread(threading.Thread):
                 #time.sleep(0.001)
             except zmq.ZMQError as e:
                 if e.errno == zmq.EAGAIN:
-                    time.sleep(.01)
+                    time.sleep(.001)
                     pass
                 elif e.errno == zmq.ETERM:
                     #print("terminate", self._address)
@@ -198,9 +192,9 @@ class ZMQBus():
     @property
     def root_gone(self):
         return not self._is_root and time.time() - self._last_ping > 10
-    
+
     def reset_bus(self, process_id, signal_port, ip="127.0.0.1", root_address=None, event_port=None):
-        print("reset bus", process_id, signal_port, ip,root_address, event_port)
+        #print("reset bus", process_id, signal_port, ip,root_address, event_port)
         self._handlers = NamedLists()
         self._process_id = process_id
         self._query_id_count = 0
@@ -252,8 +246,10 @@ class ZMQBus():
 
     def _register_handler(self, tag, func, **kwargs):
         groups = kwargs.get("groups", None)
+        scopes = kwargs.get("scopes", [])
+
         argspec = inspect.getargspec(func)
-        self._handlers.add(tag, (func, groups, argspec.keywords != None))
+        self._handlers.add(tag, (func, groups, scopes, argspec.keywords != None))
 
     def get_handler_info(self):
         return self._handlers.get_list_names()
@@ -280,12 +276,16 @@ class ZMQBus():
         result = []
         session = None
         session_groups = None
+        message_scopes = None
         if "session" in message:
             session = message["session"]
             if session:
                 session_groups = session['groups']
             else:
                 session_groups = None
+
+        if "scopes" in message:
+            message_scopes = message["scope"]
 
         if "injected" in message:
             injected = message["injected"]
@@ -314,12 +314,18 @@ class ZMQBus():
 
         try:
             if func_list:
-                for func, groups, has_keywords in func_list:
+                for func, groups, handler_scopes, has_keywords in func_list:
                     authorized = True
-                    #print("ma", has_keywords, message_args, func)
                     if session_groups != None and groups and len(groups) > 0:
                         for group in groups:
                             if group in session_groups:
+                                break
+                        else:
+                            authorized = False
+
+                    if message_scopes:
+                        for message_scope in message_scopes:
+                            if message_scope in handler_scopes:
                                 break
                         else:
                             authorized = False
@@ -330,7 +336,7 @@ class ZMQBus():
                             if sub_result:
                                 result += [sub_result]
                         else:
-                            sub_result = func(*message_args, injected=message["injected"], scope=message["scope"])
+                            sub_result = func(*message_args, injected=message["injected"])
                             if sub_result:
                                 result += [sub_result]
             if len(result) == 1:
@@ -381,15 +387,13 @@ class ZMQBus():
         self._event_handler.join()
         self._command_handler.join()
         self._query_handler.join()
-        
+
         self._event_socket.close()
         self._command_socket.close()
         self._query_socket.close()
 
-        
-
     def _on_connect(self, address, process_id):
-        print("on_connect", self._signal_address, address, process_id)
+        #print("on_connect", self._signal_address, address, process_id)
         self._connections_lock.acquire()
         try:
             new_connection = True
@@ -401,12 +405,12 @@ class ZMQBus():
                 if self._is_root:
                     connection_list += [{"address":connection.address, "processId":connection.process_id}]
                 if connection.process_id == process_id:
-                    connection.reconnect(address)
+                    #connection.reconnect(address)
                     new_connection = False
         
 
             if new_connection:
-                print("new connection", self._signal_address, address, process_id)
+                #print("new connection", self._signal_address, address, process_id)
                 connection = ProcessConnection(self)
                 connection.register(address, process_id, connection_list)
                 self._connections += [connection]
@@ -416,10 +420,9 @@ class ZMQBus():
             self._connections_lock.release()
 
     def _on_register(self, address, process_id, process_list):
-        print("on_register", self._signal_address, address, process_id, process_list)
+        #print("on_register", self._signal_address, address, process_id, process_list)
         self._connections_lock.acquire()
         try:
-        
             connection_addresses = []
             for connection in self._connections:
                 connection_addresses += [connection.address]
@@ -429,8 +432,6 @@ class ZMQBus():
                 for connection_address in connection_addresses:
                     if connection_address == process["address"]:
                         new_connection = False
-                        #if self._root_address == process["address"]:
-                        #    self._connections[0].process_id = process["processId"]
                         break
 
                 if new_connection:
@@ -458,9 +459,10 @@ class ZMQBus():
 
     def wait_for_root(self, timeout=5):
         if self._root_event:
-            print("wait for root", self._process_id)
+            #print("wait for root", self._process_id)
             if self._root_event.wait(timeout):
-                print("root connected", self._process_id)
+                pass
+                #print("root connected", self._process_id)
             else:
                 print("root not found", self._process_id)
             self._root_event = None
@@ -468,7 +470,7 @@ class ZMQBus():
     def send_connection_message(self, address, tag, message):
         for connection in self._connections:
             if connection.address == address:
-                p = pickle.dumps(message, -1)
+                p = json.dumps(message, ensure_ascii=False).encode('utf8')
                 connection.send_package([tag.encode(), p])
                 return
         print("connection not found", address, tag, message)
@@ -487,7 +489,7 @@ class ZMQBus():
                 'address':self._signal_address,
                 'processId':self._process_id
             }
-            p = pickle.dumps(ping_message, -1)
+            p = json.dumps(ping_message, ensure_ascii=False).encode('utf8')
             ping_tag = "signal:ping"
             package = [ping_tag.encode(), p]
             
@@ -507,8 +509,7 @@ class ZMQBus():
             "session":session,
             "groups": groups
         }
-        #jsonres = json.dumps(command_message)
-        p = pickle.dumps(command_message, -1)
+        p = json.dumps(command_message, ensure_ascii=False).encode('utf8')
         command_tag = "command:" + command
         package = [command_tag.encode(), p]
         self._command_lock.acquire()
@@ -541,8 +542,7 @@ class ZMQBus():
             "groups":groups,
             "session":session
         }
-        #jsonres = json.dumps(event_message)
-        p = pickle.dumps(event_message, -1)
+        p = json.dumps(event_message, ensure_ascii=False).encode('utf8')
         event_tag = "event:" + event + ":"
         if id:
             event_tag += id
@@ -591,6 +591,7 @@ class ZMQBus():
             groups = kwargs.get("groups", None)
             session = kwargs.get("session", None)
             processes = kwargs.get("processes", None)
+            timeout = kwargs.get("timeout", 10)
             self._query_id_count += 1
             query_id = self._uuid_handler + "-" + str(self._query_id_count)
 
@@ -599,7 +600,6 @@ class ZMQBus():
                 for connection in self._connections:
                     if not processes or (connection.process_id in processes):
                         process_count += 1
-                    
 
             event = threading.Event()
             event_data = {
@@ -624,8 +624,7 @@ class ZMQBus():
                 "groups":groups,
                 "session":session
             }
-            #jsonres = json.dumps(query_message)
-            p = pickle.dumps(query_message, -1)
+            p = json.dumps(query_message, ensure_ascii=False).encode('utf8')
             query_tag = "query:" + query
             package = [query_tag.encode(), p]
             self._query_lock.acquire()
@@ -637,23 +636,25 @@ class ZMQBus():
             
             if scope == "global" and len(self._connections) > 0:
                 query_message["responseAddress"] = self._signal_address
-                p = pickle.dumps(query_message, -1)
+                p = json.dumps(query_message, ensure_ascii=False).encode('utf8')
                 package = [query_tag.encode(), p]
             
-                if query == "retrieveSetting":
-                    print("rt", processes, len(self._connections))
+                #if query == "retrieveSetting":
+                #    print("rt", processes, len(self._connections))
                 for connection in self._connections:
                     if not processes or (connection.process_id in processes):
                         connection.send_package(package)
                     else:
                         print("process ignored", connection.address, connection.process_id, processes)
+        except Exception as ex:
+            print("error send query", query, ex)
         finally:
             self._connections_lock.release()
 
-        event.wait(10)
+        event.wait(timeout)
         if not event_data["processed"]:
-            print("sq timeout", self._signal_address, query, event_data["handled_by"])
-        result += [event_data["response"]]
+            print("send query timeout", self._signal_address, query, event_data["handled_by"])
+        result = event_data["response"]
         self._response_events.remove(event_data)
         #print("qr", len(self._response_events), result)
         if isinstance(result, list) and not isinstance(result, dict) and len(result) == 1:
@@ -663,27 +664,3 @@ class ZMQBus():
 
     def register_query_handler(self, query, func, **kwargs):
         self._register_handler("query:"+query, func, **kwargs)
-
-# S = None
-# def _init_spine(process_id, spine_port, root_address = None, ip="127.0.0.1"):
-#     global S
-#     print("yx")
-#     S = ZMQBus()
-#     event = None
-    
-#     if root_address:
-#         print("x")
-#         event = threading.Event()
-#     S.reset_bus(process_id, spine_port, ip, root_address, event)
-#     s.run()
-
-#     if event:
-#         print("wait for root")
-#         event.wait(5)
-#         print("root connected", process_id)
-
-    
-
-# def Spine():
-#     print("S", S)
-#     return S

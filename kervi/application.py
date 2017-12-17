@@ -3,77 +3,22 @@
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
 import time
-import threading
+#import threading
 try:
     import thread
 except ImportError:
     import _thread as thread
 
 #import sys
-import collections
-import uuid
+#import uuid
 import kervi.utility.process as process
 import kervi.spine as spine
-from kervi.utility.process_spine import _ProcessSpine
-import kervi.kervi_logging as logging
+#from kervi.utility.process_spine import _ProcessSpine
+#import kervi.kervi_logging as logging
 import kervi_ui.webserver as webserver
 import kervi.utility.nethelper as nethelper
 import kervi.utility.encryption as encryption
-
-def _deep_update(d, u):
-    """Update a nested dictionary or similar mapping.
-
-    Modify ``source`` in place.
-    """
-
-    for k, v in u.items():
-        if isinstance(v, collections.Mapping):
-            r = _deep_update(d.get(k, {}), v)
-            d[k] = r
-        else:
-            d[k] = u[k]
-    return d
-
-class _KerviModuleLoader(process._KerviProcess):
-    """ Private class that starts a seperate process that loads a module in the Kervi application """
-    def init_process(self):
-        print("load:", self.name)
-        #import kervi.core_sensors.cpu_sensors
-        try:
-            import kervi.hal as hal
-            hal._load()
-            __import__(self.name, fromlist=[''])
-            
-        except ImportError:
-            self.spine.log.exception("load module:{0}", self.name)
-        #import kervi.utility.storage
-        self.spine.send_command("startThreads", scope="process")
-        self.spine.trigger_event(
-            "moduleLoaded",
-            self.name,
-        )
-
-    def terminate_process(self):
-        pass
-
-class _KerviSocketIPC(process._KerviProcess):
-    """ Private class that starts a seperate process for IPC communication in the Kervi application """
-
-    def init_process(self):
-        print("load interprocess communication")
-        from kervi.utility.socket_spine import SocketSpine
-        self._socket_spine = SocketSpine(self.settings)
-        self.spine.send_command("startThreads", scope="process")
-        self.spine.register_command_handler("startWebSocket", self._start_socket)
-
-    def _start_socket(self):
-        self._socket_spine.start_socket()
-
-    def process_step(self):
-        self._socket_spine.step()
-
-    def terminate_process(self):
-        pass
+import kervi.utility.application_helpers as app_helpers
 
 class Application(object):
     """ Kervi application class that starts a kervi application and loads all needed modules.
@@ -135,7 +80,7 @@ class Application(object):
 
         print("Starting kervi application, please wait")
         if settings:
-            self.settings = _deep_update(self.settings, settings)
+            self.settings = app_helpers._deep_update(self.settings, settings)
         self._validateSettings()
         self.started = False
         process._start_root_spine(self.settings, True)
@@ -178,10 +123,11 @@ class Application(object):
         module_port += 1
         self._module_processes += [
             process._start_process(
+                "app-" + self.settings["info"]["id"]
                 "IPC",
                 self.settings,
                 module_port,
-                _KerviSocketIPC
+                app_helpers._KerviSocketIPC
             )
         ]
 
@@ -192,12 +138,12 @@ class Application(object):
                     module,
                     self.settings,
                     module_port,
-                    _KerviModuleLoader
+                    app_helpers._KerviModuleLoader
                 )
             ]
-            time.sleep(1)
+            #time.sleep(1)
 
-        time.sleep( len(self._module_processes))
+        time.sleep(2*len(self._module_processes))
         #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
         print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
         print("Press ctrl + c to stop your application")
@@ -246,7 +192,7 @@ class Application(object):
     def stop(self):
         webserver.stop()
         print("stopping processes")
-        process._stop_processes()
+        process._stop_processes("app-" + self.settings["info"]["id"])
         time.sleep(1)
         process._stop_root_spine()
         #for thread in threading.enumerate():
