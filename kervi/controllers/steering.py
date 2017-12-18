@@ -1,9 +1,9 @@
 # Copyright (c) 2017, Tim Wentzlau
 # Licensed under MIT
 
-from kervi.controller import Controller
-from kervi.tasks import TaskHandler
-from kervi.values import *
+from kervi.controllers.controller import Controller
+from kervi.controllers.tasks import TaskHandler
+from kervi.values import DynamicNumber, DynamicBoolean
 
 class MotorSteering(TaskHandler):
     """

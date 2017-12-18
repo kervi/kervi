@@ -11,12 +11,12 @@ In your application you access GPIO via:
     #define channel 23 as input
     GPIO.define_as_input(23)
 """
-from kervi.values import DynamicValueList, DynamicNumber, DynamicBoolean 
+from kervi.values import DynamicNumber, DynamicBoolean
+from kervi.values.dynamic_value_list import DynamicValueList
 
 CHANNEL_TYPE_ANALOG_IN = 1
 CHANNEL_TYPE_ANALOG_OUT = 2
 CHANNEL_TYPE_GPIO = 3
-
 
 class LogicIOChannel(DynamicBoolean):
     def __init__(self, gpio_device, channel):

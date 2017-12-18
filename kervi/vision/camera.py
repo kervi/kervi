@@ -12,7 +12,7 @@ except ImportError:
     from StringIO import StringIO as BytesIO
 
 import socket
-from kervi.controller import Controller
+from kervi.controllers.controller import Controller
 from kervi.values import *
 from kervi.utility.thread import KerviThread
 import kervi.utility.nethelper as nethelper
@@ -379,10 +379,10 @@ class CameraStreamer(CameraBase):
         Returns a font that can be used by pil image functions.
         This default font is "Fanwood" that is available on all platforms.
         """
-        import kervi
+        import kervi.vision as vision
         from PIL import ImageFont
-        kervipath = os.path.dirname(kervi.__file__)
-        fontpath = os.path.join(kervipath, "fonts", name + ".otf")
+        vision_path = os.path.dirname(vision.__file__)
+        fontpath = os.path.join(vision_path, "fonts", name + ".otf")
         font = ImageFont.truetype(fontpath, size)
         return font
 

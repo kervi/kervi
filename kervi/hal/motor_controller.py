@@ -1,7 +1,7 @@
 import time
 from kervi.utility.thread import KerviThread
 from kervi.values import *
-from kervi.controller import Controller
+from kervi.controllers.controller import Controller
 
 class _MotorNumOutOfBoundsError(Exception):
     def __init__(self, device_name, motor):

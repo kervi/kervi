@@ -123,7 +123,7 @@ class Application(object):
         module_port += 1
         self._module_processes += [
             process._start_process(
-                "app-" + self.settings["info"]["id"]
+                "app-" + self.settings["info"]["id"],
                 "IPC",
                 self.settings,
                 module_port,
@@ -135,6 +135,7 @@ class Application(object):
             module_port += 1
             self._module_processes+=[
                 process._start_process(
+                    "app-" + self.settings["info"]["id"],
                     module,
                     self.settings,
                     module_port,

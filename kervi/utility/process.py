@@ -8,7 +8,7 @@ import time
 import kervi.spine as spine
 from kervi.utility.process_spine import _ProcessSpine
 #import sys
-import kervi.kervi_logging as k_logging
+import kervi.utility.kervi_logging as k_logging
 
 MAIN_SPINE = None
 def _start_root_spine(settings, reset_log=False):

@@ -6,9 +6,9 @@ import inspect
 import threading
 import json
 import uuid
-from kervi.utility.named_lists import NamedLists
+from kervi.spine.named_lists import NamedLists
 import kervi.utility.nethelper as nethelper
-from  kervi.kervi_logging import KerviLog
+from  kervi.utility.kervi_logging import KerviLog
 
 _KERVI_COMMAND_ADDRESS = "inproc://kervi_commands"
 _KERVI_QUERY_ADDRESS = "inproc://kervi_query"

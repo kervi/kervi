@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 import kervi.spine as spine
-from kervi.settings import Settings
+from kervi.utility.settings import Settings
 
 class DasboardSectionLink(object):
     def __init__(self, dashboard_id, section_id, param, component):

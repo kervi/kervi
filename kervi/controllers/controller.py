@@ -3,12 +3,13 @@
 """
 A Kervi controller is a class that acts upon input from users or events or the underlaying os.
 """
-import inspect
+#import inspect
 from kervi.spine import Spine
 from kervi.utility.thread import KerviThread
 from kervi.utility.component import KerviComponent
-from kervi.hal import GPIO
-from kervi.values import DynamicValueList, DynamicValue
+#from kervi.hal import GPIO
+from kervi.values.dynamic_value_list import DynamicValueList
+from kervi.values.dynamic_value import DynamicValue
 from kervi.values import DynamicNumber
 
 class Controller(KerviComponent):

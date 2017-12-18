@@ -27,7 +27,7 @@ S = None
 #     S.set_log(spine_name)
 #     S.reset()
 #     S.start_queues()
-from kervi.utility.zmqbus import ZMQBus
+from zmqbus import ZMQBus
 import threading
 
 class _KerviSpine(ZMQBus):

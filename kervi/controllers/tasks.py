@@ -1,6 +1,6 @@
-from kervi.controller import Controller
+from kervi.controllers.controller import Controller
 from kervi.spine import Spine
-import inspect
+#import inspect
 
 
 def run_task_async(task_name, *args):
