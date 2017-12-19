@@ -10,8 +10,6 @@ class MockupSpine(object):
         self.events={}
         self.log = MockupSpineLog()
 
-        
-
     def register_query_handler(self, query, func, **kwargs):
         self.queryHandlers[query] = func
 
