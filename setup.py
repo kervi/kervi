@@ -12,13 +12,15 @@ setup(
     name='kervi',
     packages=[
         'kervi',
-        'kervi/sensors',
+        'kervi/application',
+        'kervi/dashboards',
         'kervi/controllers',
-        'kervi/core',
         'kervi/hal',
-        'kervi/ipc',
-        'kervi/process',
+        'kervi/module',
+        'kervi/sensors',
+        'kervi/spine',
         'kervi/utility',
+        'kervi/values',
         'kervi/vision',
     ],
     version=VERSION,
@@ -69,7 +71,7 @@ setup(
     include_package_data=True,
     package_data={
         "kervi":[
-            "fonts/*.*"
+            "vision/fonts/*.*"
         ]
     }
 )
