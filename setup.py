@@ -1,7 +1,7 @@
 """ Setup module for kervi generating setup package used with pip """
 from distutils.core import setup
 import distutils
-from kervi.core.version import VERSION
+from version import VERSION
 
 try:
     distutils.dir_util.remove_tree("dist")
