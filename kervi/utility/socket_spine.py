@@ -1,5 +1,23 @@
-# Copyright (c) 2016, Tim Wentzlau
-# Licensed under MIT
+#MIT License
+#Copyright (c) 2017 Tim Wentzlau
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 """ Web socket ipc used by the web ui to comunicate with Kervi """
 import time
@@ -39,6 +57,7 @@ class _WebCommandHandler(object):
         self.protocol = protocol
         self.command = command
         spine = Spine()
+        #print("rc", command)
         spine.register_command_handler(command, self.on_command, injected="socketSpine")
 
     def on_command(self, *args, **kwargs):
@@ -52,6 +71,7 @@ class _WebQueryHandler(object):
         self.protocol = protocol
         self.query = query
         spine = Spine()
+        #print("rq:", query)
         spine.register_query_handler(query, self.on_query, injected="socketSpine")
 
     def on_query(self, *args, **kwargs):
@@ -66,13 +86,14 @@ class _WebEventHandler(object):
         self.event = event
         self.id_event = id_event
         self.spine = Spine()
+        #print("re", event, id_event)
         self.spine.register_event_handler(event, self.on_event, id_event, injected="socketSpine")
 
     def on_event(self, id_event, *args, **kwargs):
         injected = kwargs.get("injected", "")
         groups = kwargs.get("groups", None)
         self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
-        
+
         authorized = True
 
         if self.protocol.user != None and self.protocol.user["groups"] != None and groups != None and len(groups) > 0:
@@ -132,7 +153,6 @@ class _SpineProtocol(WebSocketServerProtocol):
         jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
         self.sendMessage(jsonres, False)
 
-    
     def onConnect(self, request):
         #print("Web socket Client connecting: {}".format(request.peer))
         pass
@@ -178,7 +198,7 @@ class _SpineProtocol(WebSocketServerProtocol):
                 self.session = None
                 authorization.remove_session(obj["session"])
                 res = {
-                        "messageType":"session_logoff"
+                    "messageType":"session_logoff"
                 }
                 jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
                 self.sendMessage(jsonres, False)
@@ -209,71 +229,63 @@ class _SpineProtocol(WebSocketServerProtocol):
                 elif obj["messageType"] == "registerEventHandler":
                     self.add_event_handler(obj["event"], obj["eventId"])
                     self.send_response(obj["id"], None)
-        except :
+        except:
             self.spine.log.exception("WS onMessage exception")
             #res={"execptionType":exc_type,"value":exc_value,"traceback":exc_traceback}
             #self.sendResponse(res,"exception")
 
-TERMINATE_SOCKET=False
-def _start(settings):
-    global TERMINATE_SOCKET
-    try:
-        import asyncio
-    except ImportError:
-        ## Trollius >= 0.3 was renamed
-        import trollius as asyncio
+class SocketSpine:
+    def __init__(self, settings):
+        coro = None
+        self._started = False
+        self._settings = settings
+        self._spine = Spine()
+        self._spine.register_event_handler("dynamicValueChanged", None)
 
-    from autobahn.asyncio.websocket import WebSocketServerFactory
-
-    ssl_context = None
-
-    if encryption.enabled():
-        print("socket using ssl")
-        cert_file, key_file = encryption.get_cert()
         try:
-            import ssl
-            ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-            ssl_context.load_cert_chain(cert_file, key_file)
-            print("socket ssl found")
-        except:
-            ssl_context = None
-            print("socket failed to use ssl")
+            import asyncio
+        except ImportError:
+            ## Trollius >= 0.3 was renamed
+            import trollius as asyncio
 
-    factory = WebSocketServerFactory()
-    factory.protocol = _SpineProtocol
+        from autobahn.asyncio.websocket import WebSocketServerFactory
 
-    loop = asyncio.get_event_loop()
-    #print("web socket ip:", settings["network"]["IPAddress"], "port:", settings["network"]["WebSocketPort"])
+        ssl_context = None
 
-    Spine().log.debug(
-        "start websocket on:{0}, port:{1}",
-        settings["network"]["IPAddress"],
-        settings["network"]["WebSocketPort"]
-    )
-    coro = loop.create_server(
-        factory,
-        settings["network"]["IPAddress"],
-        settings["network"]["WebSocketPort"],
-        ssl=ssl_context
-    )
+        if encryption.enabled():
+            print("socket using ssl")
+            cert_file, key_file = encryption.get_cert()
+            try:
+                import ssl
+                ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+                ssl_context.load_cert_chain(cert_file, key_file)
+                print("socket ssl found")
+            except:
+                ssl_context = None
+                print("socket failed to use ssl")
 
-    coro_local = loop.create_server(
-        factory,
-        "localhost",
-        settings["network"]["WebSocketPort"]
-    )
+        self._spine.log.debug(
+            "start websocket on:{0}, port:{1}",
+            self._settings["network"]["IPAddress"],
+            self._settings["network"]["WebSocketPort"]
+        )
+        self.factory = WebSocketServerFactory()
+        self.factory.protocol = _SpineProtocol
 
-    loop.run_until_complete(coro)
-    #loop.run_until_complete(coro_local)
-    try:
-        while not TERMINATE_SOCKET:
-            loop.run_until_complete(coro)
-            #loop.run_until_complete(coro_local)
-            time.sleep(.001)
-    except KeyboardInterrupt:
-            pass
-    #loop.run_forever()
+        self.loop = asyncio.get_event_loop()
+        self.coro = self.loop.create_server(
+            self.factory,
+            self._settings["network"]["IPAddress"],
+            self._settings["network"]["WebSocketPort"],
+            ssl=ssl_context
+        )
 
-def _stop():
-    global TERMINATE_SOCKET
-    TERMINATE_SOCKET=True
+    def start_socket(self): 
+        self.loop.run_until_complete(self.coro)
+        self._started = True
+
+    def step(self):
+        if self._started:
+            self.loop.run_until_complete(self.coro)
+        #loop.run_until_complete(coro_local)
+        time.sleep(.001)

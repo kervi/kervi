@@ -1,7 +1,7 @@
 """ Setup module for kervi generating setup package used with pip """
 from distutils.core import setup
 import distutils
-from kervi.version import VERSION
+from version import VERSION
 
 try:
     distutils.dir_util.remove_tree("dist")
@@ -13,8 +13,15 @@ setup(
     packages=[
         'kervi',
         'kervi/application',
+        'kervi/dashboards',
+        'kervi/controllers',
+        'kervi/hal',
+        'kervi/module',
+        'kervi/sensors',
+        'kervi/spine',
         'kervi/utility',
-        'kervi/hal'
+        'kervi/values',
+        'kervi/vision',
     ],
     version=VERSION,
     description="""
@@ -50,7 +57,8 @@ setup(
         'kervi-hal-generic',
         'kervi-device-library',
         'autobahn',
-        'pillow'
+        'pillow',
+        'pyzmq'
     ],
     extras_require={
         'rpi':  ['kervi-hal-rpi'],
@@ -63,7 +71,7 @@ setup(
     include_package_data=True,
     package_data={
         "kervi":[
-            "fonts/*.*"
+            "vision/fonts/*.*"
         ]
     }
 )

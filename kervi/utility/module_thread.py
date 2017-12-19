@@ -1,3 +1,5 @@
+# Copyright (c) 2016, Tim Wentzlau
+# Licensed under MIT
 #MIT License
 #Copyright (c) 2017 Tim Wentzlau
 
@@ -19,19 +21,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-try:
-    from encryption import settings
-    SETTINGS = settings
-except ImportError:
-    SETTINGS = {
-        "useSSL": False,
-        "certFile": None,
-        "keyFile" : None
-    }
+""" Module that holds a general kervi application module threading class"""
 
-def enabled():
-    return SETTINGS["useSSL"]
+from kervi.utility.thread import KerviThread
+from kervi.spine import Spine
 
-def get_cert():
-    return (SETTINGS["certFile"], SETTINGS["keyFile"])
+class ModuleThread(KerviThread):
+    def __init__(self):
+        KerviThread.__init__(self)
+        self.spine = Spine()
+        self.spine.register_command_handler("startThreads", self._startCommand)
 
+    def _step(self):
+        self.moduleStep()
+
+    def _startCommand(self):
+        if not self.isAlive():
+            super(KerviThread, self).start()
+
+    def _stopCommand(self):
+        self.stop()

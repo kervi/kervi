@@ -1,7 +1,7 @@
 from kervi.utility.component import KerviComponent
 #from kervi.spine import Spine
 
-from kervi.sensor import Sensor
+from kervi.sensors.sensor import Sensor
 from mockup_spine import MockupSpine
 from mockup_sensor_device import MockupSensorDeviceDriver, MockupMultiDimSensorDeviceDriver
 

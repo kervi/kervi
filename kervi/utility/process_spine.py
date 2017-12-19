@@ -1,5 +1,23 @@
-# Copyright (c) 2016, Tim Wentzlau
-# Licensed under MIT
+#MIT License
+#Copyright (c) 2017 Tim Wentzlau
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 """ Module that handles IPC between python processes  """
 import uuid
@@ -215,6 +233,7 @@ class _ProcessSpine(object):
                 try:
                     conn = Client(process, authkey=self.settings["network"]["IPCSecret"])
                     self.add_process_connection(conn, process)
+                    print("ok connection to:", process, "from:", self.address)
                 except:
                     self.spine.log.exception("error add_process_connection")
                     print("error connection to:", process, "from:", self.address)
@@ -319,9 +338,10 @@ class _ProcessSpine(object):
         self.listener.close()
         for conn_thread in self.process_connections:
             conn_thread.terminate = True
-            #connThread.join()
+            #conn_thread.join()
         self.client_connection_thread.terminate = True
-        time.sleep(1)
+        self.client_connection_thread.join()
+        #time.sleep(1)
 
     def add_command_handler(self, command, connection, src):
         found = False
@@ -382,12 +402,15 @@ class _ProcessSpine(object):
         try:
             self.spine.log.debug("message from:{0} on:{1} message:{2}", src, self.port, message)
             if message["messageType"] == "query":
+                #print("query:", src, self.port,message["query"])
+            
                 res = self.spine.send_query(
                     message["query"],
                     *message["args"],
                     injected="processSpine",
                     session=message["session"]
                 )
+                #print("query:result", res)
                 connection.send({"messageType":"queryResponse", "id":message["id"], "response":res})
 
             elif message["messageType"] == "queryResponse":
