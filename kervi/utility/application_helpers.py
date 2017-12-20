@@ -47,7 +47,7 @@ class _KerviModuleLoader(process._KerviProcess):
             import kervi.hal as hal
             hal._load()
             __import__(self.name, fromlist=[''])
-            
+
         except ImportError:
             self.spine.log.exception("load module:{0}", self.name)
         #import kervi.utility.storage

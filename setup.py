@@ -1,7 +1,10 @@
 """ Setup module for kervi generating setup package used with pip """
 from distutils.core import setup
 import distutils
-from kervi.core.version import VERSION
+try:
+    from kervi.version import VERSION
+except:
+    VERSION = "0.0"
 
 try:
     distutils.dir_util.remove_tree("dist")
@@ -15,7 +18,7 @@ setup(
         'kervi/application',
         'kervi/dashboards',
         'kervi/controllers',
-        'kervi/core',
+        'kervi/version',
         'kervi/hal',
         'kervi/module',
         'kervi/sensors',
@@ -76,4 +79,3 @@ setup(
         ]
     }
 )
-

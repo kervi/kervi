@@ -162,7 +162,7 @@ class Application(object):
             ]
             #time.sleep(1)
 
-        time.sleep(2*len(self._module_processes))
+        time.sleep(3 + 2*len(self._module_processes))
         #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
         print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
         print("Press ctrl + c to stop your application")

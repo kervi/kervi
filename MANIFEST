@@ -5,8 +5,6 @@ kervi/application\__init__.py
 kervi/controllers\controller.py
 kervi/controllers\steering.py
 kervi/controllers\tasks.py
-kervi/core\__init__.py
-kervi/core\version.py
 kervi/dashboards\__init__.py
 kervi/hal\__init__.py
 kervi/hal\gpio.py
@@ -39,6 +37,7 @@ kervi/utility\thread.py
 kervi/values\__init__.py
 kervi/values\dynamic_value.py
 kervi/values\dynamic_value_list.py
+kervi/version\__init__.py
 kervi/vision\__init__.py
 kervi/vision\camera.py
 kervi/vision\vision.py
