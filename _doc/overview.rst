@@ -22,7 +22,7 @@ myapp.py
         from kervi.application import Application
         APP = Application()
         
-        from kervi.dashboard import Dashboard, DashboardPanel
+        from kervi.dashboards.dashboard import Dashboard, DashboardPanel
         
         #Define dashboards and panels
         Dashboard(
@@ -43,9 +43,9 @@ myapp.py
             ]
         )
         
-        from kervi.sensor import Sensor
-        from kervi_devices.platforms.common.sensors.cpu_use import CPULoadSensorDeviceDriver
-        from kervi_devices.platforms.common.sensors.cpu_temp import CPUTempSensorDeviceDriver
+        from kervi.sensors.sensor import Sensor
+        from kervi.devices.platforms.common.sensors.cpu_use import CPULoadSensorDeviceDriver
+        from kervi.devices.platforms.common.sensors.cpu_temp import CPUTempSensorDeviceDriver
         
         #build in sensor that measures cpu use
         SENSOR_CPU_LOAD = Sensor("CPULoadSensor", "CPU", CPULoadSensorDeviceDriver())
@@ -59,7 +59,7 @@ myapp.py
         SENSOR_CPU_TEMP = Sensor("CPUTempSensor", "", CPUTempSensorDeviceDriver())
         
         #define a fan controller
-        from kervi.controller import Controller
+        from kerv.controllers.controller import Controller
         from kervi.values import DynamicNumber, DynamicBoolean
         class FanController(Controller):
             def __init__(self):

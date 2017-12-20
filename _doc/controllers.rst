@@ -19,8 +19,7 @@ and calculates the speed of the left and right motors.
 .. code-block:: python
    :linenos:
 
-    from kervi.controller import Controller
-    from kervi.tasks import TaskHandler
+    from kervi.controllers.controller import Controller
     from kervi.values import *
 
     class MotorSteering(Controller):

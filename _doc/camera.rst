@@ -9,7 +9,7 @@ The snippet below shows how to create a camera stream server and link it to a da
 
 .. code:: python
     
-    from kervi.camera import CameraStreamer
+    from kervi.vision.camera import CameraStreamer
     from kervi_devices.motors.PCA9685_i2c_servo import PCA9685ServoBoard
 
     #Create a streaming camera server
@@ -34,7 +34,7 @@ It is possible to pass values for size and frames per second when you create the
 
 .. code:: python
     
-    from kervi.camera import CameraStreamer
+    from kervi.vision.camera import CameraStreamer
     CAMERA = CameraStreamer("cam1", "camera 1", size=1024, width=800, fps=30)
 
 
@@ -46,7 +46,7 @@ the on board camera. If you want to use another camera source than the default y
 
 .. code:: python
     
-    from kervi.camera import CameraStreamer
+    from kervi.vision.camera import CameraStreamer
     CAMERA = CameraStreamer("cam1", "camera 1", camera_source="/dev/video0")
 
 **Pan and tilt**
@@ -58,7 +58,7 @@ by using the following code.
 .. code:: python
 
     import datetime
-    from kervi.camera import CameraStreamer
+    from kervi.vision.camera import CameraStreamer
     from kervi_devices.motors.PCA9685_i2c_servo import PCA9685ServoBoard
 
     #Create a streaming camera server

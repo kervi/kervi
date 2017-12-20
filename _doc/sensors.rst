@@ -13,8 +13,8 @@ To use a device from the library you need to import the device module and apply 
 
 .. code:: python
 
-    from kervi.sensor import Sensor
-    from kervi_devices.sensors import BMP085
+    from kervi.sensors.sensor import Sensor
+    from kervi.devices.sensors import BMP085
     SENSOR_1 = Sensor("roomtemp1", "Room 1", BMP085.BMP085DeviceDriver(BMP085.TEMPERATURE_SENSOR))
 
 Linking sensors

@@ -30,7 +30,7 @@ for installed Kervi platform drivers and loads the GPIO driver.
     APP = Application()
 
     #add dashboard and panel
-    from kervi.dashboard import Dashboard, DashboardPanel
+    from kervi.dashboards.dashboard import Dashboard, DashboardPanel
     DASHBOARD = Dashboard("main", "Controller Buttons", is_default=True)
     DASHBOARD.add_panel(DashboardPanel("gpio", columns=3, rows=3, title="GPIO"))
 
@@ -154,14 +154,13 @@ For a complete list take a look at github <https://github.com/kervi/kervi-device
 .. code-block:: python
 
     """ Module for a sensor """
-    from kervi.sensor import Sensor, SensorThread
-    from kervi_devices.sensors.TSL2561 import TSL2561Device
+    from kervi.sensors.sensor import Sensor
+    from kervi.devices.sensors.TSL2561 import TSL2561Device
 
     lux=Sensor("lux_sensor","Lux sensor", device=TSL2561Device()
     lux.link_to_dashboard("system", "light", type="radial_gauge")
         
-    #Add sensor to a SensorThread that polls the sensor by the specified interval 
-    LUX_SENSOR_THREAD = SensorThread(Lux,1)
+    
 
 
 Hal API

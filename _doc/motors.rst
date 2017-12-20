@@ -18,7 +18,7 @@ a user to set the speed and direction of the motor via the web UI.
     APP = Application()
 
     #add dashboard and panel
-    from kervi.dashboard import Dashboard, DashboardPanel
+    from kervi.dashboards.dashboard import Dashboard, DashboardPanel
     
     Dashboard(
         "dashboard",
@@ -30,7 +30,7 @@ a user to set the speed and direction of the motor via the web UI.
     )
     
     #import motor device driver
-    from kervi_devices.motors.adafruit_i2c_motor_hat import AdafruitMotorHAT
+    from kervi.devices.motors.adafruit_i2c_motor_hat import AdafruitMotorHAT
 
     motor_controller = AdafruitMotorHAT()
     motor_controller.dc_motors[0].speed.link_to_dashboard("dashboard")

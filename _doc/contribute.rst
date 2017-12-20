@@ -103,7 +103,7 @@ Below is a sample app settings that show how to set the settings IPAddress and I
 
 .. code:: python
 
-    from kervi.bootstrap import Application
+    from kervi.application import Application
     import kervi.utility.nethelper as nethelper
 
     if __name__ == '__main__':
@@ -115,8 +115,8 @@ Below is a sample app settings that show how to set the settings IPAddress and I
             },
             "modules":["sensors", "controllers", "cams"],
             "network":{
-                "IPAddress": "localhost",
-                "IPRootAddress": "localhost",
+                "IPAddress": "127.0.0.1",
+                "IPRootAddress": "127.0.0.1",
                 "IPCRootPort":9500,
                 "WebSocketPort":9000,
                 "WebPort": 8080,
