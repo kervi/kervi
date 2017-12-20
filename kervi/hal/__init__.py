@@ -35,16 +35,16 @@ GPIO = None
 HAL_DRIVER_ID = None
 
 def _load():
-    global GPIO, _DRIVER
+    global GPIO, _DRIVER, HAL_DRIVER_ID
 
     if not _DRIVER:
         installed_packages = pip.get_installed_distributions()
         flat_installed_packages = [package.project_name for package in installed_packages]
         known_drivers = [
-            ("kervi-hal-win", "kervi_hal_win"),
-            ("kervi-hal-linux", "kervi_hal_linux"),
-            ("kervi-hal-rpi", "kervi_hal_rpi"),
-            ("kervi-hal-generic", "kervi_hal_generic")
+            ("kervi-hal-win", "kervi.platforms.windows"),
+            ("kervi-hal-linux", "kervi.platforms.linux"),
+            ("kervi-hal-rpi", "kervi.platforms.raspberry"),
+            ("kervi-hal-generic", "kervi.platforms.generic")
         ]
         for driver_name, module_name in known_drivers:
             if driver_name in flat_installed_packages:
