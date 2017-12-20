@@ -33,7 +33,7 @@ import kervi.utility.process as process
 import kervi.spine as spine
 #from kervi.utility.process_spine import _ProcessSpine
 #import kervi.kervi_logging as logging
-import kervi_ui.webserver as webserver
+import kervi.ui.webserver as webserver
 import kervi.utility.nethelper as nethelper
 import kervi.utility.encryption as encryption
 import kervi.utility.application_helpers as app_helpers

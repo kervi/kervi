@@ -33,7 +33,7 @@ def _start_root_spine(settings, reset_log=False):
     global MAIN_SPINE
     k_logging.init_process_logging("kervi-main", settings["log"])
     k_logging.KerviLog("kervi main")
-    spine._init_spine("kervi-main", settings["network"]["IPCRootPort"])
+    spine._init_spine("kervi-main", settings["network"]["IPCRootPort"], None, settings["network"]["IPRootAddress"])
     #spine.run()
     #MAIN_SPINE = _ProcessSpine(settings["network"]["IPCRootPort"], settings, is_root=True)
 
