@@ -46,6 +46,7 @@ class _KerviProcess(object):
         process_id = groups = kwargs.get("process_id", name)
         self.name = name
         self._do_terminate = False
+        self._is_connected = False
         self.port = ipcPort
         self.settings = settings
         spine._init_spine(name, ipcPort, "tcp://" + settings["network"]["IPRootAddress"] + ":" + str(settings["network"]["IPCRootPort"]))
@@ -60,7 +61,8 @@ class _KerviProcess(object):
         self.spine.send_command("startThreads", scope="process")
 
     def __del__(self):
-        print("pd", self.name)
+        #print("pd", self.name)
+        pass
 
     def get_process_info(self):
         return {"id": self.name}
@@ -99,6 +101,9 @@ def _launch(scope, name, process_class, settings, ipc_port, root_close, **kwargs
     process = process_class(scope, name, settings, ipc_port, root_close, **kwargs)
     try:
         while not process.do_terminate:
+            if not process._is_connected and process.spine.is_connected:
+                process._is_connected = True
+                process.spine.trigger_event("processReady", scope, name)
             process.process_step()
 
     except KeyboardInterrupt:
@@ -106,7 +111,7 @@ def _launch(scope, name, process_class, settings, ipc_port, root_close, **kwargs
     except:
         log.exception("error in process loop")
         pass
-    print("leave process", name, spine.Spine().root_gone)
+    #print("leave process", name, spine.Spine().root_gone)
     process._terminate_process()
 
 

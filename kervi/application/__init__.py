@@ -21,7 +21,7 @@
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
 import time
-#import threading
+import threading
 try:
     import thread
 except ImportError:
@@ -101,13 +101,17 @@ class Application(object):
             self.settings = app_helpers._deep_update(self.settings, settings)
         self._validateSettings()
         self.started = False
+        
         process._start_root_spine(self.settings, True)
         #spine._init_spine("application-" + self.settings["info"]["id"])
         self.spine = spine.Spine()
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
-
+        self.spine.register_event_handler("processReady", self._process_ready, scope="app-" + self.settings["info"]["id"])
         self._module_processes = []
+        self._process_info = []
+        self._process_info_lock = threading.Lock()
+
         import kervi.utility.storage
 
         import kervi.hal as hal
@@ -124,6 +128,27 @@ class Application(object):
     def get_process_info(self):
         return {"id": "application"}
 
+    def _process_ready(self, scope, process_id):
+        self._process_info_lock.acquire()
+        try:
+            for process in self._process_info:
+                if process["id"] == process_id:
+                    process["ready"] = True
+        finally:
+            self._process_info_lock.release()
+
+    def _is_ready(self):
+        result = True
+        self._process_info_lock.acquire()
+        try:
+            for process in self._process_info:
+                if not process["ready"]:
+                    result = False
+        finally:
+            self._process_info_lock.release()
+
+        return result
+
     def _start(self):
         self.started = True
 
@@ -138,6 +163,10 @@ class Application(object):
 
         module_port = self.settings["network"]["IPCRootPort"]
 
+        self._process_info_lock.acquire()
+        self._process_info = [{"id":"IPC", "ready":False}]
+        self._process_info_lock.release()
+
         module_port += 1
         self._module_processes += [
             process._start_process(
@@ -147,9 +176,14 @@ class Application(object):
                 module_port,
                 app_helpers._KerviSocketIPC
             )
+            
         ]
-
+        
         for module in self.settings["modules"]:
+            self._process_info_lock.acquire()
+            self._process_info += [{"id":module, "ready":False}]
+            self._process_info_lock.release()
+            
             module_port += 1
             self._module_processes+=[
                 process._start_process(
@@ -160,10 +194,9 @@ class Application(object):
                     app_helpers._KerviModuleLoader
                 )
             ]
-            #time.sleep(1)
 
-        time.sleep(3 + 2*len(self._module_processes))
-        #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
+        while not self._is_ready():
+            time.sleep(1)
         print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
         print("Press ctrl + c to stop your application")
         webserver.start(

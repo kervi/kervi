@@ -269,17 +269,17 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
                             self.server.camera.current_frame.save(buf, format='png')
                         finally:
                             self.server.mutex.release()
-                        
+
                         data = buf.getvalue()
                         self.wfile.write(b"--jpgboundary\r\n")
                         self.send_header('Content-type', 'image/png')
                         self.send_header('Content-length', len(data))
                         self.end_headers()
                         self.wfile.write(data)
-                        
+
                         #first_frame = False
                     time.sleep(1.0 / 30)
-                print("exit cam thread")
+
             else:
                 print("camera streamer, invalid session id")
                 self.send_response(403)
@@ -376,7 +376,6 @@ class CameraStreamer(CameraBase):
         self.frame_thread = _CameraFrameThread(self, self.mutex)
 
     def exit(self):
-        print("stop cam")
         self.terminate = True
         self._terminate = True
         self.server.shutdown()

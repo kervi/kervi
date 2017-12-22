@@ -61,6 +61,7 @@ class ProcessConnection:
     def __init__(self, bus, is_root=False):
         self.address = None
         self.process_id = None
+        self.is_connected = False
         self.is_root_connection = is_root
         self._bus = bus
         self._signal_socket = self._bus._context.socket(zmq.PUB)
@@ -87,7 +88,7 @@ class ProcessConnection:
         self.address = address
         self.process_id = process_id
         self._signal_socket.connect(address)
-        
+
         if process_list:
             time.sleep(.5)
             signal_message = {"address": self._bus._signal_address, "processId": self._bus._process_id, "processList": process_list}
@@ -99,11 +100,11 @@ class ProcessConnection:
         if self._signal_socket:
             self._lock.acquire()
             try:
-                self._signal_socket.setsockopt( zmq.LINGER, 0 )
+                self._signal_socket.setsockopt( zmq.LINGER, 0)
                 self._signal_socket.close()
                 self._signal_socket = None
             finally:
-                self._lock.release()    
+                self._lock.release()
 
     def send_package(self, package):
         self._lock.acquire()
@@ -264,6 +265,8 @@ class ZMQBus():
         self._command_lock = threading.Lock()
         self._event_lock = threading.Lock()
         self._query_lock = threading.Lock()
+
+        
 
     def _register_handler(self, tag, func, **kwargs):
         groups = kwargs.get("groups", None)
@@ -447,6 +450,8 @@ class ZMQBus():
             connection_addresses = []
             for connection in self._connections:
                 connection_addresses += [connection.address]
+                if connection.address == address:
+                    connection.is_connected = True
 
             for process in process_list:
                 new_connection = True
@@ -458,6 +463,7 @@ class ZMQBus():
                 if new_connection:
                     connection = ProcessConnection(self)
                     connection.process_id = process["processId"]
+                    connection.is_connected = True
                     connection.connect(process["address"])
                     self._connections += [connection]
 
@@ -487,6 +493,22 @@ class ZMQBus():
             else:
                 print("root not found", self._process_id)
             self._root_event = None
+
+    @property
+    def is_connected(self):
+        result = True
+        self._connections_lock.acquire()
+        try:
+            if not self._is_root and len(self._connections) == 0:
+                return False
+
+            for connection in self._connections:
+                if not connection.is_connected:
+                    result = False
+        finally:
+            self._connections_lock.release()
+
+        return result
 
     def send_connection_message(self, address, tag, message):
         for connection in self._connections:

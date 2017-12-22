@@ -103,6 +103,27 @@ class Module(object):
     def get_process_info(self):
         return {"id": "application"}
 
+    def _process_ready(self, scope, process_id):
+        self._process_info_lock.acquire()
+        try:
+            for process in self._process_info:
+                if process["id"] == process_id:
+                    process["ready"] = True
+        finally:
+            self._process_info_lock.release()
+
+    def _is_ready(self):
+        result = True
+        self._process_info_lock.acquire()
+        try:
+            for process in self._process_info:
+                if not process["ready"]:
+                    result = False
+        finally:
+            self._process_info_lock.release()
+
+        return result
+
     def _start(self):
         self.started = True
 
@@ -120,6 +141,10 @@ class Module(object):
         for module in self.settings["modules"]:
             module_port += 1
             self._module_processes += [
+                self._process_info_lock.acquire()
+                self._process_info += [{"id":module, "ready":False}]
+                self._process_info_lock.release()
+                
                 process._start_process(
                     "module-" + self.settings["info"]["id"]
                     module,
@@ -130,9 +155,9 @@ class Module(object):
                 )
             ]
             #time.sleep(1)
-
-        time.sleep(2*len(self._module_processes))
-        #http_address = (self.settings["network"]["IPAddress"], self.settings["network"]["WebPort"])
+         while not self._is_ready():
+            time.sleep(1)
+        
         print("module connected to application at:", self._root_address)
         print("Press ctrl + c to stop your module")
         self.spine.trigger_event(
