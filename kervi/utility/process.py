@@ -49,7 +49,7 @@ class _KerviProcess(object):
         self._is_connected = False
         self.port = ipcPort
         self.settings = settings
-        spine._init_spine(name, ipcPort, "tcp://" + settings["network"]["IPRootAddress"] + ":" + str(settings["network"]["IPCRootPort"]))
+        spine._init_spine(name, ipcPort, "tcp://" + settings["network"]["IPRootAddress"] + ":" + str(settings["network"]["IPCRootPort"]), settings["network"]["IPAddress"])
         self.spine = spine.Spine()
         #self.process_spine = _ProcessSpine(ipcPort, settings)
         #self.spine.send_command("startThreads", scope="process")
@@ -92,6 +92,7 @@ class _KerviProcess(object):
         pass
 
     def process_step(self):
+        time.sleep(0.01)
         pass
 
 def _launch(scope, name, process_class, settings, ipc_port, root_close, **kwargs):

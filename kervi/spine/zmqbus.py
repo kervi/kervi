@@ -27,6 +27,7 @@ import inspect
 import threading
 import json
 import uuid
+import queue
 from kervi.spine.named_lists import NamedLists
 import kervi.utility.nethelper as nethelper
 from  kervi.utility.kervi_logging import KerviLog
@@ -63,44 +64,33 @@ class ProcessConnection:
         self.process_id = None
         self.is_connected = False
         self.is_root_connection = is_root
+        self.include_ping = False
         self._bus = bus
         self._signal_socket = self._bus._context.socket(zmq.PUB)
         self._lock = threading.Lock()
-        #self._signal_socket.setsockopt(zmq.SNDHWM, 1)
+        #self._signal_socket.setsockopt(zmq.SNDHWM, 25)
 
     def connect(self, address):
         self.address = address
         self._signal_socket.connect(address)
-        time.sleep(.5)
-        signal_message = {"address": self._bus._signal_address, "processId": self._bus._process_id}
-        p = json.dumps(signal_message, ensure_ascii=False).encode('utf8')
-        signal_tag = "signal:connect"
-        self.send_package([signal_tag.encode(), p])
+        
+    # def connect_to(self, address, process_id):
+    #     signal_message = {"address": address, "processId": process_id}
+    #     p = json.dumps(signal_message, ensure_ascii=False).encode('utf8')
+    #     signal_tag = "signal:connect"
+    #     self.send_package([signal_tag.encode(), p])
 
-    def connect_to(self, address, process_id):
-        signal_message = {"address": address, "processId": process_id}
-        p = json.dumps(signal_message, ensure_ascii=False).encode('utf8')
-        signal_tag = "signal:connect"
-        self.send_package([signal_tag.encode(), p])
-
-    def register(self, address, process_id, process_list):
+    def register(self, address, process_id):
         #print("register", address, process_id)
         self.address = address
         self.process_id = process_id
         self._signal_socket.connect(address)
 
-        if process_list:
-            time.sleep(.5)
-            signal_message = {"address": self._bus._signal_address, "processId": self._bus._process_id, "processList": process_list}
-            p = json.dumps(signal_message, ensure_ascii=False).encode('utf8')
-            signal_tag = "signal:register"
-            self.send_package([signal_tag.encode(), p])
-
     def disconnect(self):
         if self._signal_socket:
             self._lock.acquire()
             try:
-                self._signal_socket.setsockopt( zmq.LINGER, 0)
+                self._signal_socket.setsockopt(zmq.LINGER, 0)
                 self._signal_socket.close()
                 self._signal_socket = None
             finally:
@@ -116,7 +106,6 @@ class ProcessConnection:
         finally:
             self._lock.release()
 
-
 class ZMQPingThread(threading.Thread):
     def __init__(self, bus):
         threading.Thread.__init__(self)
@@ -130,9 +119,9 @@ class ZMQPingThread(threading.Thread):
     def run(self):
         while not self._terminate:
             self._bus._ping_connections()
-            time.sleep(1)
+            time.sleep(.5)
 
-class ZMQHandlerThread(threading.Thread):
+class ZMQQueryThread(threading.Thread):
     def __init__(self, bus, tag, message):
         threading.Thread.__init__(self)
         self._bus = bus
@@ -146,6 +135,29 @@ class ZMQHandlerThread(threading.Thread):
 
     def run(self):
         self._bus._handle_message(self._tag, self._message)
+
+class ZMQHandlerThread(threading.Thread):
+    def __init__(self, bus):
+        threading.Thread.__init__(self)
+        self._bus = bus
+        self.daemon = True
+        self._terminate = False
+        self._messages = queue.Queue()
+
+    def add_message(self, tag, message):
+        self._messages.put((tag, message))
+
+    def stop(self):
+        self._terminate = True
+
+    def run(self):
+        while not self._terminate:
+            try:
+                tag, message = self._messages.get(True, 1)
+                self._bus._handle_message(tag, message)
+                self._messages.task_done()
+            except queue.Empty:
+                pass
 
 class ZMQMessageThread(threading.Thread):
     def __init__(self, bus, address, bind=False):
@@ -174,15 +186,15 @@ class ZMQMessageThread(threading.Thread):
         while not self._terminate:
             connection_message = None
             try:
-                connection_message = self._socket.recv_multipart(zmq.NOBLOCK)
+                connection_message = self._socket.recv_multipart()
                 [tag, json_message] = connection_message
                 message = json.loads(json_message.decode('utf8'))
-                if tag == b"queryResponse":
+                if tag == b"signal:exit":
+                    break
+                elif tag == b"queryResponse":
                     self._bus.resolve_response(message)
                 else:
-                    handler_thread = ZMQHandlerThread(self._bus, tag.decode('utf-8'), message)
-                    handler_thread.start()
-                #time.sleep(0.001)
+                    self._bus._add_message(tag.decode('utf-8'), message)
             except zmq.ZMQError as e:
                 if e.errno == zmq.EAGAIN:
                     time.sleep(.001)
@@ -195,6 +207,7 @@ class ZMQMessageThread(threading.Thread):
             except Exception as e:
                 print("message exception:", self._address, e, connection_message)
         #print("message thread terminated:", self._address)
+        self._socket.close()
 
 class ZMQBus():
     _context = None
@@ -229,8 +242,13 @@ class ZMQBus():
         self._last_ping = time.time()
         self._connections_lock = threading.Lock()
 
+        self._message_threads = []
+        self._message_thread = 0
+        self._message_threads_lock = threading.Lock()
+        for i in range(5):
+            self._message_threads += [ZMQHandlerThread(self)]
+
         self._root_event = None
-        
         self._event_socket = self._context.socket(zmq.PUB)
         self._event_socket.bind(_KERVI_EVENT_ADDRESS)
 
@@ -245,28 +263,24 @@ class ZMQBus():
         self._event_handler = ZMQMessageThread(self, _KERVI_EVENT_ADDRESS)
         self._command_handler = ZMQMessageThread(self, _KERVI_COMMAND_ADDRESS)
 
-        self._register_handler("signal:connect", self._on_connect)
         self._register_handler("signal:ping", self._on_ping)
-        #self._register_handler("signal:notify", self._on_notify)
-        self._register_handler("signal:register", self._on_register)
-        self._register_handler("queryResponse", self.resolve_response)
-
-        self._message_handler.register("signal:connect")
         self._message_handler.register("signal:ping")
-        self._message_handler.register("signal:notify")
-        self._message_handler.register("signal:register")
-
+        self._message_handler.register("signal:exit")
+        
         self._message_handler.register("queryResponse")
         self._message_handler.register("query:")
 
         self._query_handler.register("query:")
 
+        self._message_handler.register("signal:exit")
+        self._query_handler.register("signal:exit")
+        self._event_handler.register("signal:exit")
+        self._command_handler.register("signal:exit")
+
         self._ping_thread = ZMQPingThread(self)
         self._command_lock = threading.Lock()
         self._event_lock = threading.Lock()
         self._query_lock = threading.Lock()
-
-        
 
     def _register_handler(self, tag, func, **kwargs):
         groups = kwargs.get("groups", None)
@@ -283,6 +297,17 @@ class ZMQBus():
         for connection in self._connections:
             result += [{"process": connection.process_id, "address": connection.address}]
         return result
+
+    def _add_message(self, tag, message):
+        with self._message_threads_lock:
+            if tag.startswith("query:"):
+                query = ZMQQueryThread(self, tag, message)
+                query.start()
+            else:
+                self._message_threads[self._message_thread].add_message(tag, message)
+                self._message_thread += 1
+                if self._message_thread >= len(self._message_threads):
+                    self._message_thread = 0
 
     def _handle_message(self, tag, message):
         func_list = []
@@ -372,6 +397,7 @@ class ZMQBus():
             #print("qrr", tag, response_address, message)
             message = {"messageType":"queryResponse", "address": self._signal_address, "id":message["id"], "response":result}
             if response_address == "inproc_query":
+                #print("c", tag, self._signal_address, message)
                 self.resolve_response(message)
             else:
                 self.send_connection_message(response_address, "queryResponse", message)
@@ -379,9 +405,12 @@ class ZMQBus():
         return result
 
     def run(self):
+        for message_thread in self._message_threads:
+            message_thread.start()
+
         self._message_handler.connect()
         self._message_handler.start()
-        time.sleep(1)
+        #time.sleep(1)
         self._event_handler.connect()
         self._command_handler.connect()
         self._query_handler.connect()
@@ -394,104 +423,77 @@ class ZMQBus():
             self.connect_to_root()
 
         self._ping_thread.start()
-        #print("start bus", self._process_id, self._root_address, self._is_root)
+        if self._is_root:
+            print("root ready:", self._process_id, self._signal_address)
     def stop(self):
+        #print("stop zmq")
+        exit_tag = "signal:exit"
+        package = [exit_tag.encode(), json.dumps({}, ensure_ascii=False).encode('utf8')]
 
+        for connection in self._connections:
+            connection.send_package(package)
+
+        self._command_lock.acquire()
+        try:
+            self._command_socket.send_multipart(package)
+        finally:
+            self._command_lock.release()
+
+        self._query_lock.acquire()
+        try:
+            self._query_socket.send_multipart(package)
+        finally:
+            self._query_lock.release()
+
+        self._event_lock.acquire()
+        try:
+            self._event_socket.send_multipart(package)
+        finally:
+            self._event_lock.release()
+
+        time.sleep(1)
         self._ping_thread.stop()
         self._ping_thread.join()
+        
         self._message_handler.stop()
         self._event_handler.stop()
+
         self._command_handler.stop()
         self._query_handler.stop()
-
+        
         for connection in self._connections:
             connection.disconnect()
 
-        self._message_handler.join()
-        self._event_handler.join()
-        self._command_handler.join()
-        self._query_handler.join()
+        #self._event_handler.join()
+        #self._command_handler.join()
+        #self._query_handler.join()
+        #self._message_handler.join()
 
-        self._event_socket.close()
-        self._command_socket.close()
-        self._query_socket.close()
+        #self._event_socket.close()
+        #self._command_socket.close()
+        #self._query_socket.close()
 
-    def _on_connect(self, address, process_id):
-        #print("on_connect", self._signal_address, address, process_id)
-        self._connections_lock.acquire()
-        try:
-            new_connection = True
-            connection_list = []
-            if self._is_root:
-                connection_list = [{"address":self._signal_address, "processId":self._process_id}]
-
-            for connection in self._connections:
-                if self._is_root:
-                    connection_list += [{"address":connection.address, "processId":connection.process_id}]
-                if connection.process_id == process_id:
-                    #connection.reconnect(address)
-                    new_connection = False
-        
-
-            if new_connection:
-                #print("new connection", self._signal_address, address, process_id)
-                connection = ProcessConnection(self)
-                connection.register(address, process_id, connection_list)
-                self._connections += [connection]
-                #print("scn", self._signal_address, self.get_connection_info())
-
-        finally:
-            self._connections_lock.release()
-
-    def _on_register(self, address, process_id, process_list):
-        #print("on_register", self._signal_address, address, process_id, process_list)
-        self._connections_lock.acquire()
-        try:
-            connection_addresses = []
-            for connection in self._connections:
-                connection_addresses += [connection.address]
-                if connection.address == address:
-                    connection.is_connected = True
-
-            for process in process_list:
-                new_connection = True
-                for connection_address in connection_addresses:
-                    if connection_address == process["address"]:
-                        new_connection = False
-                        break
-
-                if new_connection:
-                    connection = ProcessConnection(self)
-                    connection.process_id = process["processId"]
-                    connection.is_connected = True
-                    connection.connect(process["address"])
-                    self._connections += [connection]
-
-        finally:
-            self._connections_lock.release()
-            if self._root_event and address == self._root_address:
-                self._root_event.set()
+        #self._context.destroy()
 
     def connect_to_root(self):
-        #print("connect to root", self._signal_address, self._root_address)
-        self._connections_lock.acquire()
-        try:
-            self._root_event = threading.Event()
-            connection = ProcessConnection(self, True)
-            connection.process_id = "kervi-main"
-            connection.connect(self._root_address)
-            self._connections += [connection]
-        finally:
-            self._connections_lock.release()
+        #print("connect to root", self._process_id, self._root_address)
 
-    def wait_for_root(self, timeout=5):
+        self._root_event = threading.Event()
+        connection = ProcessConnection(self, True)
+        connection.process_id = "kervi-main"
+        self._connections_lock.acquire()
+        self._connections += [connection]
+        connection.connect(self._root_address)
+        self._connections_lock.release()
+
+    def wait_for_root(self, timeout=20):
         if self._root_event:
             #print("wait for root", self._process_id)
             if self._root_event.wait(timeout):
                 pass
                 #print("root connected", self._process_id)
             else:
-                print("root not found", self._process_id)
+                print("root not found", self._process_id, self._root_address)
             self._root_event = None
 
     @property
@@ -499,15 +501,15 @@ class ZMQBus():
         result = True
         self._connections_lock.acquire()
         try:
-            if not self._is_root and len(self._connections) == 0:
-                return False
+            if not self._is_root and not self._connections:
+                result = False
 
-            for connection in self._connections:
-                if not connection.is_connected:
-                    result = False
+            if result:
+                for connection in self._connections:
+                    if not connection.is_connected:
+                        result = False
         finally:
             self._connections_lock.release()
-
         return result
 
     def send_connection_message(self, address, tag, message):
@@ -518,26 +520,79 @@ class ZMQBus():
                 return
         print("connection not found", address, tag, message)
 
-    def _on_ping(self, address, process_id):
-        #print("on_ping", self._signal_address, address, process_id)
-        self._last_ping = time.time()
-        for connection in self._connections:
-            if connection.process_id == process_id:
-                #connection.reconnect(address)
-                return
+    def _on_ping(self, address, process_id, process_list):
+        #print("on_ping", self._process_id, address, process_id, process_list)
+        self._connections_lock.acquire()
+        new_connection = True
+        connection_list = []
+        try:
+            #print("on_ping enter list")
+            is_connected = False
+            for process in process_list:
+                if process["processId"] == self._process_id:
+                    is_connected = True
+                    break
+            #if self._is_root:
+            #    connection_list = [{"address":self._signal_address, "processId":self._process_id}]
+
+            for connection in self._connections:
+                if connection.process_id == process_id:
+                    #print("ic", connection.process_id, connection.is_connected, is_connected)
+                    if not connection.is_connected and is_connected:
+                        #print("connected", self._process_id, connection.process_id)
+                        connection.is_connected = True
+                        connection.include_ping = True
+                        if connection.is_root_connection and self._root_event:
+                            self._root_event.set()
+
+                    new_connection = False
+
+            if new_connection:
+                #print("new connection", self._process_id, address, process_id)
+                connection = ProcessConnection(self)
+                connection.include_ping = True
+                self._connections += [connection]
+                connection.register(address, process_id)
+
+            if not self._is_root and address == self._root_address:
+                self._last_ping = time.time()
+                for process in process_list:
+                    if process["processId"] == self._process_id:
+                        break
+                    for connection in self._connections:
+                        if connection.process_id == process["processId"]:
+                            break
+                    else:
+                        #print("new connection (from root)", self._process_id, process["address"], process["processId"])
+                        connection = ProcessConnection(self)
+                        self._connections += [connection]
+                        connection.register(process["address"], process["processId"])
+
+        finally:
+            self._connections_lock.release()
 
     def _ping_connections(self):
-        if self._is_root:
+        self._connections_lock.acquire()
+        try:
+            connection_list = []
+            for connection in self._connections:
+                if connection.include_ping:
+                    connection_list += [{"address":connection.address, "processId":connection.process_id}]
+
             ping_message = {
                 'address':self._signal_address,
-                'processId':self._process_id
+                'processId':self._process_id,
+                'processList': connection_list
             }
             p = json.dumps(ping_message, ensure_ascii=False).encode('utf8')
             ping_tag = "signal:ping"
             package = [ping_tag.encode(), p]
-            
+
             for connection in self._connections:
                 connection.send_package(package)
+        
+        finally:
+            self._connections_lock.release()
 
     def send_command(self, command, *args, **kwargs):
         injected = kwargs.get("injected", "")
@@ -613,7 +668,8 @@ class ZMQBus():
     def resolve_response(self, message):
         #print("m", message)
         for event in self._response_events:
-            #print("e", event["id"], event["id"] == message["id"], event["process_count"])
+            #if self._is_root:
+            #    print("e", event["id"], event["id"] == message["id"], event["process_count"])
             if event["id"] == message["id"] and not event["processed"]:
                 if message["response"]:
                     event["response"] += [message["response"]]
@@ -635,7 +691,6 @@ class ZMQBus():
             session = kwargs.get("session", None)
             processes = kwargs.get("processes", None)
             timeout = kwargs.get("timeout", 10)
-            self._query_id_count += 1
             query_id = self._uuid_handler + "-" + str(self._query_id_count)
 
             process_count = 1
@@ -665,7 +720,7 @@ class ZMQBus():
                 "injected":injected,
                 "scope":scope,
                 "groups":groups,
-                "session":session
+                "session":session,
             }
             p = json.dumps(query_message, ensure_ascii=False).encode('utf8')
             query_tag = "query:" + query
@@ -676,19 +731,16 @@ class ZMQBus():
             finally:
                 self._query_lock.release()
 
-            
             if scope == "global" and len(self._connections) > 0:
                 query_message["responseAddress"] = self._signal_address
                 p = json.dumps(query_message, ensure_ascii=False).encode('utf8')
                 package = [query_tag.encode(), p]
-            
-                #if query == "retrieveSetting":
-                #    print("rt", processes, len(self._connections))
+
                 for connection in self._connections:
                     if not processes or (connection.process_id in processes):
                         connection.send_package(package)
-                    else:
-                        print("process ignored", connection.address, connection.process_id, processes)
+                    #else:
+                    #    print("process ignored", connection.address, connection.process_id, processes)
         except Exception as ex:
             print("error send query", query, ex)
         finally:
@@ -696,7 +748,7 @@ class ZMQBus():
 
         event.wait(timeout)
         if not event_data["processed"]:
-            print("send query timeout", self._signal_address, query, event_data["handled_by"])
+            print("send query timeout", self._signal_address, query, event_data["handled_by"], event_data["id"])
         result = event_data["response"]
         self._response_events.remove(event_data)
         #print("qr", len(self._response_events), result)

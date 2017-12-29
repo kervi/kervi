@@ -173,7 +173,7 @@ class Application(object):
                 "app-" + self.settings["info"]["id"],
                 "IPC",
                 self.settings,
-                module_port,
+                nethelper.get_free_port([module_port]),
                 app_helpers._KerviSocketIPC
             )
             
@@ -190,7 +190,7 @@ class Application(object):
                     "app-" + self.settings["info"]["id"],
                     module,
                     self.settings,
-                    module_port,
+                    nethelper.get_free_port([module_port]),
                     app_helpers._KerviModuleLoader
                 )
             ]

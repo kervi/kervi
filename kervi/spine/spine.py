@@ -60,7 +60,7 @@ def _init_spine(process_id, spine_port, root_address = None, ip="127.0.0.1"):
     S.run()
 
     if root_address:
-        S.wait_for_root(10)
+        S.wait_for_root()
 
 def Spine():
     """

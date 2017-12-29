@@ -78,4 +78,3 @@ class _KerviSocketIPC(process._KerviProcess):
 
     def terminate_process(self):
         pass
-
