@@ -1,5 +1,5 @@
 Sensors API
 -----------
 
-.. automodule:: kervi.sensor
+.. automodule:: kervi.sensors.sensor
    :members:

@@ -1,4 +1,4 @@
 Controllers api
 =================================
-.. automodule:: kervi.controller
+.. automodule:: kervi.controllers.controller
    :members:

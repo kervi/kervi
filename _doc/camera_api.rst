@@ -1,5 +1,5 @@
 Camera api
 ==========
 
-.. automodule:: kervi.camera
+.. automodule:: kervi.vision.camera
    :members:

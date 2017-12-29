@@ -1,4 +1,4 @@
 Dashboards api
 =================================
-.. automodule:: kervi.dashboard
+.. automodule:: kervi.dashboards
    :members:
