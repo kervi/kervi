@@ -43,7 +43,7 @@ class Controller(KerviComponent):
         KerviComponent.__init__(self, controller_id, "controller", name, **kwargs)
         self.inputs = DynamicValueList(self, True)
         self.outputs = DynamicValueList(self, False)
-        self._active = True
+        self._active = False
         self.type = "unknown"
         self.parameters = {}
         self._ui_parameters = {
@@ -55,6 +55,8 @@ class Controller(KerviComponent):
             "inline": False
         }
         self.spine.register_event_handler("processTerminating",self._on_terminate)
+        self.spine.register_event_handler("appReady",self._on_app_ready)
+        self.spine.register_event_handler("moduleStarted",self._on_app_ready)
 
     @property
     def controller_id(self):
@@ -94,6 +96,10 @@ class Controller(KerviComponent):
             *kwargs
             )
 
+    def _on_app_ready(self, id):
+        self._active = True
+        self.on_start()
+
     def _on_terminate(self, id):
         if self._active:
             self._active = False
@@ -110,9 +116,14 @@ class Controller(KerviComponent):
         """
         pass
 
+    def on_start(self):
+        """
+        Abstract method that is called when the entire application is loaded.
+        """
+    
     def dynamic_value_changed(self, dynamic_value, value):
-        self.input_changed(dynamic_value)
-        pass
+        if self._active:
+            self.input_changed(dynamic_value)
 
     def input_changed(self, input_id):
         """

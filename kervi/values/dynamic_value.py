@@ -134,7 +134,9 @@ class DynamicValue(KerviComponent):
 
     def _load_persisted(self):
         if self._persist_value:
-            self._set_value(self.settings.retrieve_value("value", self._default_value), False)
+            value = self.settings.retrieve_value("value", self._default_value)
+            print("v", value)
+            self._set_value(value, False)
 
     def link_to(self, dynamic_value, transformation=None):
         """

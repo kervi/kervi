@@ -217,9 +217,9 @@ def store_dynamic_value(value_id, value, persist=False):
             MEMORY_LOCK.release()
 
 def store_setting(group, name, value):
+    setting = retrieve_setting_db(group, name)
     FILE_LOCK.acquire()
     try:
-        setting = retrieve_setting_db(group, name)
         json_value = json.dumps(value, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
         if setting:
             cur = FILE_CON.cursor()
@@ -229,16 +229,18 @@ def store_setting(group, name, value):
             )
             FILE_CON.commit()
         else:
-            con = lite.connect('kervi.db')
-            cur = con.cursor()
+            cur = FILE_CON.cursor()
             cur.execute(
                 "INSERT INTO settings ('setting_group','name','value')  VALUES (?, ?, ?)",
                 (group, name, json_value)
             )
-            con.commit()
+            FILE_CON.commit()
 
     except lite.Error as er:
         SPINE.log.error('error store settings data:{0}', er)
+        print("error stire setting", er)
+    except Exception as er:
+        print("error stire setting", er)
     finally:
         FILE_LOCK.release()
 

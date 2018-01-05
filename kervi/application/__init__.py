@@ -29,6 +29,7 @@ except ImportError:
 
 #import sys
 #import uuid
+from kervi.application.kervi_module import KerviModule
 import kervi.utility.process as process
 import kervi.spine as spine
 #from kervi.utility.process_spine import _ProcessSpine
@@ -107,10 +108,14 @@ class Application(object):
         self.spine = spine.Spine()
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
+        self.spine.register_event_handler("modulePing", self._module_ping)
         self.spine.register_event_handler("processReady", self._process_ready, scope="app-" + self.settings["info"]["id"])
         self._module_processes = []
         self._process_info = []
         self._process_info_lock = threading.Lock()
+
+        self._kervi_modules = []
+        self._kervi_modules_lock = threading.Lock()
 
         import kervi.utility.storage
 
@@ -127,6 +132,36 @@ class Application(object):
 
     def get_process_info(self):
         return {"id": "application"}
+
+    def _module_ping(self, module_id):
+        with self._kervi_modules_lock:
+            for module in self._kervi_modules:
+                if module.module_id == module_id:
+                    if not module.is_alive:
+                        self.spine.trigger_event(
+                            "moduleStarted",
+                            module_id
+                        )
+                    module.ping()
+                    break
+            else:
+                print("module started", module_id)
+                self._kervi_modules += [KerviModule(module_id)]
+                self.spine.trigger_event(
+                    "moduleStarted",
+                    module_id
+                )
+
+    def _check_kervi_modules(self):
+        with self._kervi_modules_lock:
+            for module in self._kervi_modules:
+                if not module.is_alive and module.connected:
+                    print("module stopped", module.module_id)
+                    module.connected = False
+                    self.spine.trigger_event(
+                        "moduleStopped",
+                        module.module_id
+                    )
 
     def _process_ready(self, scope, process_id):
         self._process_info_lock.acquire()
@@ -176,16 +211,15 @@ class Application(object):
                 nethelper.get_free_port([module_port]),
                 app_helpers._KerviSocketIPC
             )
-            
         ]
-        
+
         for module in self.settings["modules"]:
             self._process_info_lock.acquire()
             self._process_info += [{"id":module, "ready":False}]
             self._process_info_lock.release()
-            
+
             module_port += 1
-            self._module_processes+=[
+            self._module_processes += [
                 process._start_process(
                     "app-" + self.settings["info"]["id"],
                     module,
@@ -228,6 +262,7 @@ class Application(object):
             char_list = []
             thread.start_new_thread(self._input_thread, (char_list,))
             while not char_list:
+                self._check_kervi_modules()
                 time.sleep(1)
 
         except KeyboardInterrupt:

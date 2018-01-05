@@ -68,12 +68,13 @@ class ProcessConnection:
         self._bus = bus
         self._signal_socket = self._bus._context.socket(zmq.PUB)
         self._lock = threading.Lock()
+        self.last_ping = None
         #self._signal_socket.setsockopt(zmq.SNDHWM, 25)
 
     def connect(self, address):
         self.address = address
         self._signal_socket.connect(address)
-        
+
     # def connect_to(self, address, process_id):
     #     signal_message = {"address": address, "processId": process_id}
     #     p = json.dumps(signal_message, ensure_ascii=False).encode('utf8')
@@ -95,6 +96,16 @@ class ProcessConnection:
                 self._signal_socket = None
             finally:
                 self._lock.release()
+
+    def ping(self):
+        self.last_ping = time.time()
+
+    @property
+    def is_alive(self):
+        if self.is_connected:
+            if time.time() - self.last_ping < 2:
+                return True
+        return False
 
     def send_package(self, package):
         self._lock.acquire()
@@ -190,7 +201,8 @@ class ZMQMessageThread(threading.Thread):
                 [tag, json_message] = connection_message
                 message = json.loads(json_message.decode('utf8'))
                 if tag == b"signal:exit":
-                    break
+                    if not self._bind:
+                        break
                 elif tag == b"queryResponse":
                     self._bus.resolve_response(message)
                 else:
@@ -544,6 +556,8 @@ class ZMQBus():
                         connection.include_ping = True
                         if connection.is_root_connection and self._root_event:
                             self._root_event.set()
+                    if connection.is_connected:
+                        connection.ping()
 
                     new_connection = False
 
@@ -696,7 +710,7 @@ class ZMQBus():
             process_count = 1
             if scope == "global":
                 for connection in self._connections:
-                    if not processes or (connection.process_id in processes):
+                    if connection.is_alive and (not processes or (connection.process_id in processes)):
                         process_count += 1
 
             event = threading.Event()
@@ -737,7 +751,7 @@ class ZMQBus():
                 package = [query_tag.encode(), p]
 
                 for connection in self._connections:
-                    if not processes or (connection.process_id in processes):
+                    if connection.is_alive and (not processes or (connection.process_id in processes)):
                         connection.send_package(package)
                     #else:
                     #    print("process ignored", connection.address, connection.process_id, processes)

@@ -240,8 +240,7 @@ class SocketSpine:
         self._started = False
         self._settings = settings
         self._spine = Spine()
-        self._spine.register_event_handler("dynamicValueChanged", None)
-
+        
         try:
             import asyncio
         except ImportError:
@@ -280,7 +279,7 @@ class SocketSpine:
             ssl=ssl_context
         )
 
-    def start_socket(self): 
+    def start_socket(self):
         self.loop.run_until_complete(self.coro)
         self._started = True
 

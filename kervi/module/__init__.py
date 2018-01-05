@@ -22,7 +22,7 @@
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
 import time
-#import threading
+import threading
 try:
     import thread
 except ImportError:
@@ -34,7 +34,7 @@ import kervi.utility.process as process
 import kervi.spine as spine
 #from kervi.utility.process_spine import _ProcessSpine
 #import kervi.kervi_logging as logging
-import kervi_ui.webserver as webserver
+#import kervi_ui.webserver as webserver
 import kervi.utility.nethelper as nethelper
 import kervi.utility.encryption as encryption
 import kervi.utility.application_helpers as app_helpers
@@ -87,11 +87,13 @@ class Module(object):
         self.started = False
         self._root_address = "tcp://" + settings["network"]["IPRootAddress"] + ":" + str(settings["network"]["IPCRootPort"])
         spine._init_spine(settings["info"]["id"], settings["network"]["ModulePort"], self._root_address, settings["network"]["IPAddress"])
-        
+
         self.spine = spine.Spine()
-        
+
         self._module_processes = []
-        
+        self._process_info = []
+        self._process_info_lock = threading.Lock()
+
         import kervi.hal as hal
         hal_driver = hal._load()
         if hal_driver:
@@ -140,22 +142,22 @@ class Module(object):
 
         for module in self.settings["modules"]:
             module_port += 1
-            self._module_processes += [
-                self._process_info_lock.acquire()
-                self._process_info += [{"id":module, "ready":False}]
-                self._process_info_lock.release()
+            self._process_info_lock.acquire()
+            self._process_info += [{"id":module, "ready":False}]
+            self._process_info_lock.release()
                 
+            self._module_processes += [
                 process._start_process(
-                    "module-" + self.settings["info"]["id"]
+                    "module-" + self.settings["info"]["id"],
                     module,
                     self.settings,
-                    module_port,
+                    nethelper.get_free_port([module_port]),
                     app_helpers._KerviModuleLoader,
                     process_id=self.settings["info"]["id"] + "-"+module
                 )
             ]
             #time.sleep(1)
-         while not self._is_ready():
+        while not self._is_ready():
             time.sleep(1)
         
         print("module connected to application at:", self._root_address)
@@ -164,7 +166,6 @@ class Module(object):
             "moduleReady",
             self.settings["info"]["id"]
         )
-        
 
     def _input_thread(self, list):
         try:
@@ -184,6 +185,7 @@ class Module(object):
             char_list = []
             thread.start_new_thread(self._input_thread, (char_list,))
             while not char_list:
+                self.spine.trigger_event("modulePing", self.settings["info"]["id"])
                 time.sleep(1)
 
         except KeyboardInterrupt:
@@ -198,6 +200,10 @@ class Module(object):
             self._start()
 
     def stop(self):
+        self.spine.trigger_event(
+            "moduleStopped",
+            self.settings["info"]["id"]
+        )
         print("stopping processes")
         process._stop_processes("module-" + self.settings["info"]["id"])
         time.sleep(1)
