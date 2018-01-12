@@ -29,6 +29,8 @@ from kervi.utility.component import KerviComponent
 from kervi.values.dynamic_value_list import DynamicValueList
 from kervi.values.dynamic_value import DynamicValue
 from kervi.values import DynamicNumber
+from kervi.actions import Actions
+from kervi.actions.action import Action 
 
 class Controller(KerviComponent):
     """
@@ -57,6 +59,12 @@ class Controller(KerviComponent):
         self.spine.register_event_handler("processTerminating",self._on_terminate)
         self.spine.register_event_handler("appReady",self._on_app_ready)
         self.spine.register_event_handler("moduleStarted",self._on_app_ready)
+
+        method_list = [func for func in dir(self) if callable(getattr(self, func)) and not func.startswith("__")]
+        for method_name in method_list:
+            method = getattr(self, method_name)
+            if Actions().is_unbound(method.__qualname__):
+                Actions().add(Action(method))
 
     @property
     def controller_id(self):
