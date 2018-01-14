@@ -15,6 +15,7 @@ setup(
     name='kervi',
     packages=[
         'kervi',
+        'kervi/actions',
         'kervi/application',
         'kervi/dashboards',
         'kervi/controllers',
