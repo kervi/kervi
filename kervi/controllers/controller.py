@@ -59,12 +59,21 @@ class Controller(KerviComponent):
         self.spine.register_event_handler("processTerminating",self._on_terminate)
         self.spine.register_event_handler("appReady",self._on_app_ready)
         self.spine.register_event_handler("moduleStarted",self._on_app_ready)
+        self.actions = {}
 
-        method_list = [func for func in dir(self) if callable(getattr(self, func)) and not func.startswith("__")]
+        method_list = [func for func in dir(self) if hasattr(self, func) and callable(getattr(self, func)) and not func.startswith("__") and not func.startswith("_")]
         for method_name in method_list:
             method = getattr(self, method_name)
-            if Actions().is_unbound(method.__qualname__):
-                Actions().add(Action(method))
+            #print("c", method_name, method.__qualname__, Actions().is_unbound(method.__qualname__))
+            if Actions.is_unbound(method.__qualname__):
+                action_id, name = Actions.get_unbound(method.__qualname__)
+                #print("b", method_name, method.__qualname__, action_id)
+                setattr(self, "kervi_action_"+ method.__name__, method)
+                copy_method = getattr(self, "kervi_action_"+ method.__name__)
+                action = Action(copy_method, self.controller_id + "." + action_id, name)
+                Actions.add(action)
+                self.actions[action_id] = action
+                setattr(self, method.__name__, action)
 
     @property
     def controller_id(self):

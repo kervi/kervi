@@ -191,6 +191,7 @@ class DashboardPanel(object):
                 self.panel_id
             )
             panel_components = self._get_panel_components(components)
+            
             return {
                 "id": self.panel_id,
                 "type": "panel",

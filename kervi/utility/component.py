@@ -254,4 +254,5 @@ class KerviComponent(object):
                     "componentId":self.component_id,
                     "parameters":param
                 }]
+        
         return result

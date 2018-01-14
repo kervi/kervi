@@ -1,44 +1,35 @@
 import inspect
 import sys
 
-from kervi.actions.action import Action, _LinkedAction
+from kervi.actions.action import Action
+from kervi.actions.actions_list import Actions as _Actions
+
+Actions = None
+
+if not Actions:
+    Actions = _Actions()
+
 #from kervi.actions.action_list import _Actions
-_modules_before = [str(m) for m in sys.modules]
-class Actions(object):
-    __actions = {}
-    __unbound_actions = []
-    def __init__(self):
-        #self._actions = {}
-        pass
-
-    def add(self, action):
-        Actions.__actions[action.action_id] = action
-
-    
-    def add_unbound(self, handler_name):
-        Actions.__unbound_actions += [handler_name]
-
-    def is_unbound(self, handler_name):
-        return handler_name in Actions.__unbound_actions
-
-    def __getitem__(self, action_id):
-        if action_id in Actions.__actions:
-            return Actions.__actions[action_id]
-        else:
-            linked_action = _LinkedAction(action_id)
-            Actions.__actions[action_id] = linked_action
-            return linked_action
-
-def action(f):
+def action(method=None, **kwargs):
     """Turn function into an action"""
-    from functools import wraps
-    @wraps(f)
-    def wrapper(*args, **kw):
-        return f(*args, **kw)
-
-    if not "." in f.__qualname__:
-        Actions().add(Action(wrapper))
+    
+    def action_wrap(f):
+        from functools import wraps
+        @wraps(f)
+        def wrapper(*args, **kw):
+            return f(*args, **kw)
+        action_id = kwargs.get("action_id", f.__name__)
+        name = kwargs.get("name", action_id)
+        #print("w", action_id, f)
+        if not "." in f.__qualname__:
+            action = Action(f, action_id, name)
+            Actions.add(action)
+            return action
+        else:
+            Actions.add_unbound(f.__qualname__, action_id, name)
+            return f
+    
+    if method:
+        return action_wrap(method)
     else:
-        Actions().add_unbound(f.__qualname__)
-
-    return f
+        return action_wrap

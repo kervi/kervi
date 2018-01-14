@@ -37,7 +37,7 @@ class DCMotor(object):
     @property
     def speed(self):
         return self._speed
-    
+
 class DCMotorControllerBase(Controller):
     def __init__(self, controller_id, device_name, num_motors):
         Controller.__init__(self, controller_id, device_name + "-DC motors")
