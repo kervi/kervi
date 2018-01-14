@@ -10,13 +10,18 @@ class XController(Controller):
         self.input_2 = self.inputs.add("controller_input_2", "input 2", DynamicNumber)
         self.output = self.outputs.add("controller_output", "output", DynamicNumber)
 
+        self.last_input = None
 
     def input_changed(self, changed_input):
+        self.last_input = changed_input
         self.output.value = self.input_1.value + self.input_2.value
 
 
 def test_controller():
     controller = XController()
+
+    #simulate app ready event
+    controller._on_app_ready(True)
 
     assert controller.controller_id == "test_controller"
 
@@ -25,6 +30,7 @@ def test_controller():
     assert controller.output.value == 0
 
     controller.input_1.value = 1
+    assert controller.last_input == controller.input_1
     assert controller.output.value == 1
 
     controller.input_2.value = 2
