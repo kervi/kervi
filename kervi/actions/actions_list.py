@@ -1,6 +1,7 @@
 from kervi.actions.action import _LinkedAction
 
 class Actions(object):
+    
     __actions = {}
     __unbound_actions = {}
     def __init__(self):
@@ -9,7 +10,7 @@ class Actions(object):
 
     def add(self, action):
         Actions.__actions[action.action_id] = action
-    
+
     def add_unbound(self, handler_name, action_id, name):
         Actions.__unbound_actions[handler_name] = (action_id, name)
 

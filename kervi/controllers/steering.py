@@ -18,10 +18,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import time
 from kervi.controllers.controller import Controller
 from kervi.controllers.tasks import TaskHandler
 from kervi.values import DynamicNumber, DynamicBoolean
+from kervi.actions import action
 
 class MotorSteering(TaskHandler):
     """
@@ -35,15 +36,13 @@ class MotorSteering(TaskHandler):
 
         self.inputs.add("left_encoder", "Left encoder", DynamicNumber)
         self.inputs.add("right_encoder", "Right encoder", DynamicNumber)
-        
-        self._adjust = 0
 
+        self._adjust = 0
 
         self.speed = self.inputs.add("speed", "Speed", DynamicNumber)
         self.adaptive_speed = self.inputs.add("adaptive_speed", "Adaptive speed", DynamicNumber)
         self.direction = self.inputs.add("direction", "Direction", DynamicNumber)
         self.adaptive_direction = self.inputs.add("Adaptive direction", "Adaptive direction", DynamicNumber)
-        self.all_off = self.inputs.add("all_off", "All off", DynamicBoolean)
 
     @property
     def adjust(self):
@@ -53,6 +52,19 @@ class MotorSteering(TaskHandler):
     def adjust(self, value):
         self._adjust = value
 
+    @action
+    def move(self, speed, direction=None, duration=None, wheel_rotations=None):
+        if direction:
+            self.direction.value = direction
+
+        self.speed.value = speed
+
+    @action
+    def stop(self, coast=False):
+        self.outputs["left_speed"].value = 0
+        self.outputs["right_speed"].value = 0
+
+    @action
     def rotate(self, speed, wheel_rotations=None, duration=None ):
         print("steering rotate:", speed)
         new_direction = self._adjust
@@ -61,6 +73,8 @@ class MotorSteering(TaskHandler):
 
         self.outputs["left_speed"].value = left_speed
         self.outputs["right_speed"].value = right_speed
+        if duration:
+            time.sleep(duration)
 
     def update(self):
         print("steering update:", self.speed.value, self.direction.value)
@@ -82,9 +96,5 @@ class MotorSteering(TaskHandler):
 
     def input_changed(self, changed_input):
         #print("steering input changed:", changed_input.input_id, changed_input.value)
-        if changed_input == self.all_off and self.all_off.value:
-            self.left_speed.value = 0
-            self.right_speed.value = 0
-
         if changed_input in [self.speed, self.direction, self.adaptive_speed]:
             self.update()
