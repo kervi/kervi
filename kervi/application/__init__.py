@@ -243,6 +243,7 @@ class Application(object):
             self.settings["info"]["id"]
         )
         self.spine.send_command("startWebSocket")
+        self.spine.send_command("kervi_action_app_main")
 
     def _input_thread(self, list):
         try:
