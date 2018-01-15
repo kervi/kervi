@@ -54,6 +54,7 @@ Below is a complete example that shows how to display a sensor on a dashboard wi
    sensors_api
    controllers
    dynamic_values
+   actions
    camera
    motors
    security
