@@ -354,6 +354,7 @@ class ZMQBus():
             injected = None
 
         message_args = []
+        message_kwargs = dict()
         if "id" in message and not tag.startswith("query:"):
             message_args += [message["id"]]
 
@@ -372,6 +373,11 @@ class ZMQBus():
 
         if "args" in message:
             message_args += message["args"]
+
+        if "kwargs" in message:
+            message_kwargs = message["kwargs"]
+
+        message_kwargs = dict(message_kwargs, injected=injected)
 
         try:
             if func_list:
@@ -397,7 +403,7 @@ class ZMQBus():
                             if sub_result:
                                 result += [sub_result]
                         else:
-                            sub_result = func(*message_args, injected=message["injected"])
+                            sub_result = func(*message_args, **message_kwargs)
                             if sub_result:
                                 result += [sub_result]
             if len(result) == 1:
@@ -609,17 +615,18 @@ class ZMQBus():
             self._connections_lock.release()
 
     def send_command(self, command, *args, **kwargs):
-        injected = kwargs.get("injected", "")
-        scope = kwargs.get("scope", "global")
-        groups = kwargs.get("groups", None)
-        session = kwargs.get("session", None)
+        injected = kwargs.pop("injected", "")
+        scope = kwargs.pop("scope", "global")
+        groups = kwargs.pop("groups", None)
+        session = kwargs.pop("session", None)
         command_message = {
             "command":command,
             "args":args,
             "injected":injected,
             "scope":scope,
             "session":session,
-            "groups": groups
+            "groups": groups,
+            "kwargs": kwargs
         }
         p = json.dumps(command_message, ensure_ascii=False).encode('utf8')
         command_tag = "command:" + command
@@ -641,10 +648,10 @@ class ZMQBus():
         self._message_handler.register(tag)
 
     def trigger_event(self, event, id, *args, **kwargs):
-        injected = kwargs.get("injected", "")
-        scope = kwargs.get("scope", "global")
-        groups = kwargs.get("groups", None)
-        session = kwargs.get("session", None)
+        injected = kwargs.pop("injected", "")
+        scope = kwargs.pop("scope", "global")
+        groups = kwargs.pop("groups", None)
+        session = kwargs.pop("session", None)
         event_message = {
             'event':event,
             'id':id,
@@ -652,7 +659,8 @@ class ZMQBus():
             "injected":injected,
             "scope":scope,
             "groups":groups,
-            "session":session
+            "session":session,
+            "kwargs": kwargs
         }
         p = json.dumps(event_message, ensure_ascii=False).encode('utf8')
         event_tag = "event:" + event + ":"
@@ -699,12 +707,12 @@ class ZMQBus():
         try:
             self._query_id_count += 1
             result = []
-            injected = kwargs.get("injected", "")
-            scope = kwargs.get("scope", "global")
-            groups = kwargs.get("groups", None)
-            session = kwargs.get("session", None)
-            processes = kwargs.get("processes", None)
-            timeout = kwargs.get("timeout", 10)
+            injected = kwargs.pop("injected", "")
+            scope = kwargs.pop("scope", "global")
+            groups = kwargs.pop("groups", None)
+            session = kwargs.pop("session", None)
+            processes = kwargs.pop("processes", None)
+            timeout = kwargs.pop("timeout", 10)
             query_id = self._uuid_handler + "-" + str(self._query_id_count)
 
             process_count = 1
@@ -735,6 +743,7 @@ class ZMQBus():
                 "scope":scope,
                 "groups":groups,
                 "session":session,
+                "kwargs": kwargs
             }
             p = json.dumps(query_message, ensure_ascii=False).encode('utf8')
             query_tag = "query:" + query

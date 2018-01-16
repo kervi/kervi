@@ -57,7 +57,7 @@ class Module(object):
     ```
 
     """
-    def __init__(self, settings = None):
+    def __init__(self, settings = None, **kwargs):
         """ Settings is a dictionary with the following content
         """
         self.settings = {
@@ -83,6 +83,7 @@ class Module(object):
         print("Starting kervi module, please wait")
         if settings:
             self.settings = app_helpers._deep_update(self.settings, settings)
+        settings["network"]["IPRootAddress"] = kwargs.get("app_address", settings["network"]["IPRootAddress"])
         self._validateSettings()
         self.started = False
         self._root_address = "tcp://" + settings["network"]["IPRootAddress"] + ":" + str(settings["network"]["IPCRootPort"])

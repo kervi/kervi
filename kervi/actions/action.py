@@ -54,7 +54,7 @@ class _LinkedAction(object):
 
     def execute(self, *args, **kwargs):
         """Executes the action."""
-        timeout = kwargs.get("timeout", -1)
+        timeout = kwargs.pop("timeout", -1)
         self._is_running = True
         result = None
         if self._action_lock.acquire(False):
@@ -130,6 +130,7 @@ class Action(KerviComponent):
         self._ui_parameters["run_command"] = "kervi_action_" + action_id
 
     def _execute(self, *args, **kwargs):
+        kwargs.pop("injected", None) # signaling from zmq bus
         self._state = ACTION_RUNNING
         self._is_running = True
         result = None
@@ -174,8 +175,8 @@ class Action(KerviComponent):
 
             * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
          """
-        
-        timeout = kwargs.get("timeout", -1)
+
+        timeout = kwargs.pop("timeout", -1)
         result = None
         if self._action_lock.acquire(False):
             try:
