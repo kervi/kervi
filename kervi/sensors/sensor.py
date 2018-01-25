@@ -184,7 +184,7 @@ class Sensor(DynamicNumber):
 
         KerviComponent.link_to_dashboard(self, dashboard_id, panel_id, **kwargs)
 
-    def _get_info(self):
+    def _get_info(self, **kwargs):
         dimensions = []
         if self._dimensions > 1:
             for dimension in range(0, self._dimensions):

@@ -18,6 +18,7 @@ setup(
         'kervi/actions',
         'kervi/application',
         'kervi/dashboards',
+        'kervi/config',
         'kervi/controllers',
         'kervi/version',
         'kervi/hal',
@@ -63,7 +64,7 @@ setup(
         'kervi-device-library',
         'autobahn',
         'pillow',
-        'pyzmq'
+        'pyzmq',
     ],
     extras_require={
         'rpi':  ['kervi-hal-rpi'],

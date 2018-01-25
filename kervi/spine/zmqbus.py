@@ -377,7 +377,7 @@ class ZMQBus():
         if "kwargs" in message:
             message_kwargs = message["kwargs"]
 
-        message_kwargs = dict(message_kwargs, injected=injected)
+        message_kwargs = dict(message_kwargs, injected=injected, session=session)
 
         try:
             if func_list:

@@ -66,7 +66,7 @@ class _KerviSocketIPC(process._KerviProcess):
     def init_process(self):
         print("load interprocess communication")
         from kervi.utility.socket_spine import SocketSpine
-        self._socket_spine = SocketSpine(self.settings)
+        self._socket_spine = SocketSpine(self.config)
         self.spine.send_command("startThreads", scope="process")
         self.spine.register_command_handler("startWebSocket", self._start_socket)
 

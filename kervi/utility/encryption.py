@@ -19,19 +19,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-try:
-    from encryption import settings
-    SETTINGS = settings
-except ImportError:
-    SETTINGS = {
-        "useSSL": False,
-        "certFile": None,
-        "keyFile" : None
-    }
-
+from kervi.config import configuration, Configuration
+#_Configuration().list()
 def enabled():
-    return SETTINGS["useSSL"]
+    return Configuration().encryption.useSSL
 
 def get_cert():
-    return (SETTINGS["certFile"], SETTINGS["keyFile"])
-
+    return (Configuration().encryption.certFile, Configuration().encryption.keyFile)

@@ -61,19 +61,23 @@ class Controller(KerviComponent):
         self.spine.register_event_handler("moduleStarted",self._on_app_ready)
         self.actions = {}
 
-        method_list = [func for func in dir(self) if hasattr(self, func) and callable(getattr(self, func)) and not func.startswith("__") and not func.startswith("_")]
+        method_list = [func for func in dir(self)] # if hasattr(self, func) and callable(getattr(self, func)) and not func.startswith("__") and not func.startswith("_")]
         for method_name in method_list:
-            method = getattr(self, method_name)
-            #print("c", method_name, method.__qualname__, Actions().is_unbound(method.__qualname__))
-            if Actions.is_unbound(method.__qualname__):
-                action_id, name = Actions.get_unbound(method.__qualname__)
-                #print("b", method_name, method.__qualname__, action_id)
-                setattr(self, "kervi_action_"+ method.__name__, method)
-                copy_method = getattr(self, "kervi_action_"+ method.__name__)
-                action = Action(copy_method, self.controller_id + "." + action_id, name)
-                Actions.add(action)
-                self.actions[action_id] = action
-                setattr(self, method.__name__, action)
+            try:
+                if hasattr(self, method_name):
+                    method = getattr(self, method_name)
+                    #print("c", method_name, method.__qualname__, Actions().is_unbound(method.__qualname__))
+                    if hasattr(method, "__qualname__") and Actions.is_unbound(method.__qualname__):
+                        action_id, name = Actions.get_unbound(method.__qualname__)
+                        #print("b", method_name, method.__qualname__, action_id)
+                        setattr(self, "kervi_action_"+ method.__name__, method)
+                        copy_method = getattr(self, "kervi_action_"+ method.__name__)
+                        action = Action(copy_method, self.controller_id + "." + action_id, name)
+                        Actions.add(action)
+                        self.actions[action_id] = action
+                        setattr(self, method.__name__, action)
+            except KeyError:
+                pass
 
     @property
     def controller_id(self):
@@ -157,7 +161,7 @@ class Controller(KerviComponent):
         """
         pass
 
-    def _get_info(self):
+    def _get_info(self, **kwargs):
         inputs = []
         for key in self.inputs.keys:
             if self.inputs[key]:

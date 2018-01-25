@@ -102,7 +102,7 @@ class DynamicNumber(DynamicValue):
     def unit(self, value):
         self._unit = value
 
-    def _get_info(self):
+    def _get_info(self, **kwargs):
         return {
             "isInput":self.is_input,
             "unit":self._unit,
@@ -396,7 +396,7 @@ class DynamicEnum(DynamicValue):
             if self._persist_value:
                 self.settings.store_value("selected_options", self.selected_options)
 
-    def _get_info(self):
+    def _get_info(self, **kwargs):
         return {
             "options": self.options,
             "command":self.command

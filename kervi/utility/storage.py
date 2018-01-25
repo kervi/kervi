@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" general DB handling in Kervi, store sensor values  """
+""" general DB handling in Kervi, store sensor values and settings """
 import os
 import time
 from datetime import datetime
@@ -36,11 +36,11 @@ MEMORY_CON = None
 MEMORY_LOCK = threading.Lock()
 FILE_LOCK = threading.Lock()
 
-def create_file_con():
-    return lite.connect('kervi.db', check_same_thread=False)
+def create_file_con(db_name):
+    return lite.connect(db_name + '.db', check_same_thread=False)
 
-def create_memory_con():
-    return lite.connect("kervi_mem.db", check_same_thread=False)
+def create_memory_con(db_name):
+    return lite.connect(db_name + "_mem.db", check_same_thread=False)
     #return lite.connect(":memory:", check_same_thread=False)
 
 
@@ -61,8 +61,8 @@ class MemoryCleanThread(KerviThread):
             rows = cursor.execute("select count(*) from dynamicData")
             values = rows.fetchone()
             row_count = values[0]
-            if row_count>20000:
-                limit = row_count - 20000 
+            if row_count > 20000:
+                limit = row_count - 20000
                 cursor.execute("DELETE FROM dynamicData WHERE id IN (SELECT id FROM dynamicData ORDER BY id ASC LIMIT "+ str(limit) +");")
         except lite.Error as msg:
             SPINE.log.error("clean memory db, Command skipped: {0}, command{1}", msg)
@@ -77,10 +77,6 @@ class MemoryCleanThread(KerviThread):
         if self.alive:
             self.alive = False
             self.stop()
-
-    
-
-
 
 DB_CREATE_SQL = """
         CREATE TABLE `log` (
@@ -163,11 +159,11 @@ def execute_sql(con, sql):
             SPINE.log.error("create db, Command skipped: {0}, command{1}", msg, command)
 
 
-def init_db():
+def init_db(db_name):
     global FILE_CON, MEMORY_CON
 
-    MEMORY_CON = create_memory_con()
-    FILE_CON = create_file_con()
+    MEMORY_CON = create_memory_con(db_name)
+    FILE_CON = create_file_con(db_name)
 
     for con in [FILE_CON, MEMORY_CON]:
         cursor = con.cursor()
@@ -183,7 +179,7 @@ def init_db():
 
     MemoryCleanThread()
 
-init_db()
+#init_db()
 TS_START = datetime.utcnow()
 
 def store_dynamic_value(value_id, value, persist=False):

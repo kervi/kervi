@@ -235,10 +235,10 @@ class _SpineProtocol(WebSocketServerProtocol):
             #self.sendResponse(res,"exception")
 
 class SocketSpine:
-    def __init__(self, settings):
+    def __init__(self, config):
         coro = None
         self._started = False
-        self._settings = settings
+        self._config = config
         self._spine = Spine()
         
         try:
@@ -265,17 +265,18 @@ class SocketSpine:
 
         self._spine.log.debug(
             "start websocket on:{0}, port:{1}",
-            self._settings["network"]["IPAddress"],
-            self._settings["network"]["WebSocketPort"]
+            self._config.network.ip,
+            self._config.network.ws_port
         )
+        print("start websocket: ", self._config.network.ip, self._config.network.ws_port)
         self.factory = WebSocketServerFactory()
         self.factory.protocol = _SpineProtocol
 
         self.loop = asyncio.get_event_loop()
         self.coro = self.loop.create_server(
             self.factory,
-            self._settings["network"]["IPAddress"],
-            self._settings["network"]["WebSocketPort"],
+            self._config.network.ip,
+            self._config.network.ws_port,
             ssl=ssl_context
         )
 

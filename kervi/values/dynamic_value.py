@@ -340,7 +340,7 @@ class DynamicValue(KerviComponent):
                 ranges += [{"start":value, "end":None, "type":event_type}]
         return ranges
 
-    def _get_info(self):
+    def _get_info(self, **kwargs):
         return {
             "unit":self._unit,
             "value":self.value,

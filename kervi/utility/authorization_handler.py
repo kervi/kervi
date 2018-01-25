@@ -22,20 +22,14 @@
 import uuid
 import http.cookies as Cookie
 from  kervi.spine import Spine
-
-try:
-    from users import settings
-    USERS = settings
-except ImportError:
-    USERS ={}
-
+from kervi.config import Configuration
 SESSIONS = {}
 
 def active():
-    return len(USERS.keys())>0
+    return Configuration().authorization.enabled and len(Configuration().authorization.users)>0
 
 def allow_anonymous():
-    return "anonymous" in USERS
+    return "anonymous" in Configuration().authorization.users
 
 def is_session_valid(headers):
     if active():
@@ -58,11 +52,12 @@ def _add_session(user_name, user_info):
     return (session, SESSIONS[session])
 
 def authorize(user_name, password):
+    users = Configuration().authorization.users
     if active():
-        if user_name == "anonymous" and user_name in USERS:
-            return _add_session(user_name, USERS[user_name])
-        elif user_name in USERS and USERS[user_name]["password"] == password:
-            return _add_session(user_name, USERS[user_name])
+        if user_name == "anonymous" and user_name in users.keys:
+            return _add_session(user_name, users[user_name])
+        elif user_name in users.keys and users[user_name].password == password:
+            return _add_session(user_name, users[user_name])
     return (None, None)
 
 def remove_session(sessionid):

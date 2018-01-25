@@ -196,7 +196,7 @@ class KerviComponent(object):
             "component_type": self.component_type
         }
 
-    def _get_info(self):
+    def _get_info(self, **kwargs):
         """Abstract method that must return properties for the component as a dictionary
         .. document private functions
         """
@@ -218,7 +218,12 @@ class KerviComponent(object):
                     authorized = False
                 
             if authorized:
-                info = self._get_info()
+                try:
+                    info = self._get_info(**kwargs)
+                except:
+                    print("ex", self.component_id)
+                    info = {}
+
                 info["componentType"] = self.component_type
                 info["id"] = self.component_id
                 info["visible"] = self.visible

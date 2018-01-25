@@ -53,19 +53,28 @@ class MotorSteering(TaskHandler):
         self._adjust = value
 
     @action
-    def move(self, speed, direction=None, duration=None, wheel_rotations=None):
+    def move(self, speed, **kwargs):
+        direction= kwargs.pop("direction",None)
+        duration=kwargs.pop("duration",None),
+        wheel_rotations=kwargs.pop("wheel_rotations",None)
+
         if direction:
             self.direction.value = direction
 
         self.speed.value = speed
 
     @action
-    def stop(self, coast=False):
+    def stop(self, **kwargs):
+        coast = kwargs.pop("break", True)
         self.outputs["left_speed"].value = 0
         self.outputs["right_speed"].value = 0
 
     @action
-    def rotate(self, speed, wheel_rotations=None, duration=None ):
+    def rotate(self, **kwargs):
+        speed = kwargs.pop("speed",None)
+        wheel_rotations = kwargs.pop("wheel_rotations",None)
+        duration = kwargs.pop("duration",None)
+        
         print("steering rotate:", speed)
         new_direction = self._adjust
         left_speed = speed * (-new_direction / 100)
@@ -76,7 +85,7 @@ class MotorSteering(TaskHandler):
         if duration:
             time.sleep(duration)
 
-    def update(self):
+    def _update(self):
         print("steering update:", self.speed.value, self.direction.value)
         new_direction = self.direction.value + self.adaptive_direction.value + self._adjust
         speed = self.speed.value + self.adaptive_speed.value
@@ -97,4 +106,4 @@ class MotorSteering(TaskHandler):
     def input_changed(self, changed_input):
         #print("steering input changed:", changed_input.input_id, changed_input.value)
         if changed_input in [self.speed, self.direction, self.adaptive_speed]:
-            self.update()
+            self._update()

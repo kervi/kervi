@@ -139,18 +139,19 @@ class DashboardPanel(object):
         #KerviComponent.__init__(self, panel_id, "Dashboard-panel", name)
         self.spine = spine.Spine()
         self.panel_id = panel_id
+
         self.ui_parameters = {
-            "title":kwargs.get("title", ""),
-            "width":kwargs.get("width", 0),
-            "height":kwargs.get("height", 0),
-            "userLog":kwargs.get("user_log", False),
-            "logLength":kwargs.get("log_length", 5),
-            "gauge_width":kwargs.get("gauge_width", 0),
-            "gauge_height":kwargs.get("gauge_height", 0),
+            "title":kwargs.pop("title", ""),
+            "width":kwargs.pop("width", 0),
+            "height":kwargs.pop("height", 0),
+            "userLog":kwargs.pop("user_log", False),
+            "logLength":kwargs.pop("log_length", 5),
+            "gauge_width":kwargs.pop("gauge_width", 0),
+            "gauge_height":kwargs.pop("gauge_height", 0),
         }
         self.dashboard = None
         self.panel_id = panel_id
-        self._user_groups = kwargs.get("user_groups", [])
+        self._user_groups = kwargs.pop("user_groups", [])
 
     @property
     def user_groups(self):
@@ -242,11 +243,11 @@ class Dashboard(KerviComponent):
     def __init__(self, dashboard_id, name, panels=None, **kwargs):
         KerviComponent.__init__(self, dashboard_id, "dashboard", name, **kwargs)
         self.dashboard_id = dashboard_id
-        self.is_default = kwargs.get("is_default", False)
-        self.gauge_width = kwargs.get("gauge_width", 0)
-        self.gauge_height = kwargs.get("gauge_height", 0)
-        self.panel_width = kwargs.get("panel_width", 0),
-        self.panel_height = kwargs.get("panel_height", 0),
+        self.is_default = kwargs.pop("is_default", False)
+        self.gauge_width = kwargs.pop("gauge_width", 0)
+        self.gauge_height = kwargs.pop("gauge_height", 0)
+        self.panel_width = kwargs.pop("panel_width", 0),
+        self.panel_height = kwargs.pop("panel_height", 0),
         self.panels = []
         self.add_panel(DashboardPanel("header_right"))
         self.add_panel(DashboardPanel("header_center"))
@@ -275,7 +276,7 @@ class Dashboard(KerviComponent):
         panel.dashboard = self
         self.panels += [panel]
 
-    def _get_info(self):
+    def _get_info(self, **kwargs):
         self.spine.log.debug("get dashboard info:{0}", self.dashboard_id)
         template = None
         import os.path
@@ -288,7 +289,7 @@ class Dashboard(KerviComponent):
 
         panels = []
         for panel in self.panels:
-            panels += [panel._get_info()]
+            panels += [panel._get_info(**kwargs)]
 
         self.spine.log.debug("get dashboard info done:{0}", self.dashboard_id)
         return {
