@@ -6,7 +6,6 @@ class Actions(object):
     __unbound_actions = {}
     __unbound_interupts = {}
     def __init__(self):
-        #self._actions = {}
         pass
 
     def add(self, action):

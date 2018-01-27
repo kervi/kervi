@@ -26,7 +26,7 @@ class _LinkedAction(object):
     def _action_done(self, id, state, result):
         if self._state == ACTION_RUNNING:
             self._state = state
-        
+
         self._last_result = result
         if self._action_event:
             self._action_event.set()
@@ -92,18 +92,15 @@ class _ActionThread(threading.Thread):
 
 class _ActionInterupt():
     def __init__(self, interupt):
-        print("ir")
         self._interupt = interupt
         argspec = inspect.getargspec(interupt)
         self._keywords = argspec.keywords != None
 
     def __call__(self, *args, **kwargs):
-        print("interupt")
         if self._keywords:
             self._interupt(*args, **kwargs)
         else:
             self._interupt(*args)
-
 
 class Action(KerviComponent):
     """The Action class is used by the action decorator. A function or method that is marked with @actions os converted to an Action class"""
@@ -225,7 +222,6 @@ class Action(KerviComponent):
             return self._last_result
 
     def interupt(self, *args, **kwargs):
-        print("x", self._interupt)
         self._interupt(*args, **kwargs)
 
     @property
@@ -318,13 +314,8 @@ class Action(KerviComponent):
         """
         
         def action_wrap(f):
-            #from functools import wraps
-            #@wraps(f)
-            #def wrapper(*args, **kw):
-            #    return f(*args, **kw)
             action_id = kwargs.get("action_id", f.__name__)
             name = kwargs.get("name", action_id)
-            print("w", action_id, f)
             if not "." in f.__qualname__:
                 self._interupt = _ActionInterupt(f)
                 self._ui_parameters["interupt_enabled"] = True

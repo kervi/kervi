@@ -56,12 +56,12 @@ class Controller(KerviComponent):
             "flat": False,
             "inline": False
         }
-        self.spine.register_event_handler("processTerminating",self._on_terminate)
-        self.spine.register_event_handler("appReady",self._on_app_ready)
-        self.spine.register_event_handler("moduleStarted",self._on_app_ready)
+        self.spine.register_event_handler("processTerminating", self._on_terminate)
+        self.spine.register_event_handler("appReady", self._on_app_ready)
+        self.spine.register_event_handler("moduleStarted", self._on_app_ready)
         self.actions = {}
 
-        method_list = [func for func in dir(self)] # if hasattr(self, func) and callable(getattr(self, func)) and not func.startswith("__") and not func.startswith("_")]
+        method_list = [func for func in dir(self)]
         for method_name in method_list:
             try:
                 if hasattr(self, method_name):

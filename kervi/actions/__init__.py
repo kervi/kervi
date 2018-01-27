@@ -23,11 +23,9 @@ if not Actions:
 
 class _SetInterupt():
     def __init__(self, action_id):
-        print("si")
         self._action_id = action_id
 
     def __call__(self, f):
-        print("six", f.__qualname__, self._action_id)
         Actions.add_unbound_interupt(f.__qualname__, self._action_id)
         return f
 
