@@ -52,6 +52,9 @@ class _LinkedAction(object):
         """Returns the running state of the action."""
         return self._state
 
+    def interupt(self, *args, **kwargs):
+        self.spine.send_command("kervi_action_interupt" + self._action_id, *args, **kwargs)
+
     def execute(self, *args, **kwargs):
         """Executes the action."""
         timeout = kwargs.pop("timeout", -1)
@@ -87,6 +90,21 @@ class _ActionThread(threading.Thread):
     def run(self):
         self.result = self._action._execute(*self._args, **self._kwargs)
 
+class _ActionInterupt():
+    def __init__(self, interupt):
+        print("ir")
+        self._interupt = interupt
+        argspec = inspect.getargspec(interupt)
+        self._keywords = argspec.keywords != None
+
+    def __call__(self, *args, **kwargs):
+        print("interupt")
+        if self._keywords:
+            self._interupt(*args, **kwargs)
+        else:
+            self._interupt(*args)
+
+
 class Action(KerviComponent):
     """The Action class is used by the action decorator. A function or method that is marked with @actions os converted to an Action class"""
     def __init__(self, handler, action_id, name=None):
@@ -98,10 +116,12 @@ class Action(KerviComponent):
         #print("kw", self.action_id, self._keywords, argspec, handler)
         self.spine = Spine()
         self.spine.register_command_handler("kervi_action_" + action_id, self._handle_command)
+        self.spine.register_command_handler("kervi_action_interupt" + action_id, self.interupt)
         self._state = ACTION_STOPPED
         self._action_lock = threading.Lock()
         self._last_result = None
         self._is_running = False
+        self._interupt = None
 
         self._ui_parameters = {
             "link_to_header": False,
@@ -128,6 +148,9 @@ class Action(KerviComponent):
         self._ui_parameters["input_size"] = 0
         self._ui_parameters["action_parameters"] = []
         self._ui_parameters["run_command"] = "kervi_action_" + action_id
+        self._ui_parameters["interupt_command"] = "kervi_action_" + action_id
+        self._ui_parameters["interupt_parameters"] = []
+        self._ui_parameters["interupt_enabled"] = False
 
     def _execute(self, *args, **kwargs):
         kwargs.pop("injected", None) # signaling from zmq bus
@@ -201,6 +224,10 @@ class Action(KerviComponent):
             self._action_lock.release()
             return self._last_result
 
+    def interupt(self, *args, **kwargs):
+        print("x", self._interupt)
+        self._interupt(*args, **kwargs)
+
     @property
     def is_running(self):
         """"Is true if the action is executing. You can use it together with the timeout parameter in the call to execute"""
@@ -250,7 +277,11 @@ class Action(KerviComponent):
             * *button_icon* (``string``) -- Icon to display on button.
             * *button_text* (``string``) -- Text to display on button, default is name.
 
-            * *action_parameters* (``list``) -- list of parameters to pass to the action.
+            * *action_parameters* (``list``) -- List of parameters to pass to the action.
+            
+            * *interupt_enabled* (``bool``) -- If true the button will send interupt to action on off. Default true if an interupt is specified for the action.
+            * *interupt_parameters* (``list``) -- List of parameters to pass to the interupt function of the action.
+            
         """
         KerviComponent.link_to_dashboard(
             self,
@@ -258,3 +289,51 @@ class Action(KerviComponent):
             section_id,
             **kwargs
             )
+
+
+    def set_interupt(self, method=None, **kwargs):
+        """
+            Decorator that turns a function or controller method into an kervi action.
+            it is possible to call the action in other kervi processes or modules.
+
+            @action
+            def my_action(p)
+                ...
+
+            call it via Actions["my_action"](10)
+
+            @action(action_id="action_1", name="This is my action")
+            def my_action(p)
+                ...
+            
+            call it via Actions["action_1"](10)
+
+            :Keyword Arguments:
+
+                * *action_id* (``str``) -- 
+                    The action_id is the id you use when you call the action.
+                    By default the action takes the name of function but you can override it with action_id.
+
+                * *name* (``str``) -- Name to show in UI if the action is linked to a panel.
+        """
+        
+        def action_wrap(f):
+            #from functools import wraps
+            #@wraps(f)
+            #def wrapper(*args, **kw):
+            #    return f(*args, **kw)
+            action_id = kwargs.get("action_id", f.__name__)
+            name = kwargs.get("name", action_id)
+            print("w", action_id, f)
+            if not "." in f.__qualname__:
+                self._interupt = _ActionInterupt(f)
+                self._ui_parameters["interupt_enabled"] = True
+                return self._interupt
+            else:
+                Actions.add_unbound_interupt(f.__qualname__, self)
+                return f
+        
+        if method:
+            return action_wrap(method)
+        else:
+            return action_wrap

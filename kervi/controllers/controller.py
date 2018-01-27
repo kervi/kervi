@@ -30,7 +30,7 @@ from kervi.values.dynamic_value_list import DynamicValueList
 from kervi.values.dynamic_value import DynamicValue
 from kervi.values import DynamicNumber
 from kervi.actions import Actions
-from kervi.actions.action import Action 
+from kervi.actions.action import Action, _ActionInterupt
 
 class Controller(KerviComponent):
     """
@@ -66,16 +66,26 @@ class Controller(KerviComponent):
             try:
                 if hasattr(self, method_name):
                     method = getattr(self, method_name)
-                    #print("c", method_name, method.__qualname__, Actions().is_unbound(method.__qualname__))
                     if hasattr(method, "__qualname__") and Actions.is_unbound(method.__qualname__):
                         action_id, name = Actions.get_unbound(method.__qualname__)
-                        #print("b", method_name, method.__qualname__, action_id)
                         setattr(self, "kervi_action_"+ method.__name__, method)
                         copy_method = getattr(self, "kervi_action_"+ method.__name__)
                         action = Action(copy_method, self.controller_id + "." + action_id, name)
                         Actions.add(action)
                         self.actions[action_id] = action
                         setattr(self, method.__name__, action)
+            except KeyError:
+                pass
+
+        for method_name in method_list:
+            try:
+                if hasattr(self, method_name):
+                    method = getattr(self, method_name)
+                    if hasattr(method, "__qualname__") and Actions.is_unbound_interupt(method.__qualname__):
+                        action_id = Actions.get_unbound_interupt(method.__qualname__)
+                        action = self.actions[action_id]
+                        action.interupt = _ActionInterupt(method)
+                        action.set_ui_parameter("interupt_enabled", True)
             except KeyError:
                 pass
 

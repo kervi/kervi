@@ -37,6 +37,7 @@ import kervi.utility.nethelper as nethelper
 import kervi.spine as spine
 import kervi.hal as hal
 import kervi.utility.authorization as authorization
+from kervi.actions import action 
 
 try:
     from SimpleHTTPServer import SimpleHTTPRequestHandler
@@ -64,14 +65,11 @@ class CameraBase(Controller):
         self.inputs.add("fps", "FPS", DynamicEnum)
         self.inputs["fps"].set_ui_parameter("inline", True)
 
-        self.inputs.add("save", "Save picture", DynamicBoolean)
-        self.inputs["save"].set_ui_parameter("button_icon", "camera")
-        self.inputs["save"].set_ui_parameter("inline", True)
+        self.actions["take_picture"].set_ui_parameter("button_icon", "camera")
+        self.actions["take_picture"].set_ui_parameter("inline", True)
 
-        self.inputs.add("record", "Record video", DynamicBoolean)
-        self.inputs["record"].set_ui_parameter("on_icon", "video-camera")
-        self.inputs["record"].set_ui_parameter("off_icon", "video-camera")
-        self.inputs["record"].set_ui_parameter("inline", True)
+        self.actions["record"].set_ui_parameter("button_icon", "video-camera")
+        self.actions["record"].set_ui_parameter("inline", True)
 
         self._ui_parameters["height"] = kwargs.get("height", 480)
         self._ui_parameters["width"] = kwargs.get("width", 640)
@@ -153,27 +151,24 @@ class CameraBase(Controller):
             self.component_id
         )
 
-    def save_picture(self):
+    def _take_picture(self):
         """abstract method"""
-        self.spine.log.debug(
-            "abstract method save_picture reached:{0}",
-            self.component_id
-        )
+        raise NotImplementedError
 
-    def start_record(self):
+
+    def _record(self):
         """abstract method"""
-        self.spine.log.debug(
-            "abstract method start_record reached:{0}",
-            self.component_id
-        )
+        raise NotImplementedError
 
-    def stop_record(self):
-        """abstract method"""
-        self.spine.log.debug(
-            "abstract method stop_record reached:{0}",
-            self.component_id
-        )
 
+    @action
+    def take_picture(self):
+        self._take_picture()
+
+    @action
+    def record(self):
+        self._record()
+    
     def link_to_dashboard(self, dashboard_id, section_id = None, **kwargs):
         r"""
         Links this camera to a dashboard section or to the background of a dashboard.
@@ -420,6 +415,11 @@ class CameraStreamer(CameraBase):
         """
         pass
 
+    def _take_picture(self):
+        pass
+
+    def _record(self):
+        pass
 
 class IPCamera(CameraBase):
     def __init__(self, camera_id, name, dashboards, source):
@@ -478,4 +478,16 @@ class FrameCameraDeviceDriver(object):
         Call this method when a frame is ready
         """
         self.camera._frame_ready(frame)
-        
+
+    def start_record(self, file_name):
+        """
+        Abstract method that should initiate a recording and save it to file_name
+        """
+        raise NotImplementedError
+
+    def stop_record(self):
+        """
+        Abstract method that should stop active recording
+        """
+        raise NotImplementedError
+    
