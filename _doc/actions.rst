@@ -4,7 +4,7 @@ Actions
 
 Actions are distributed functions that may be called from anywhere in your kervi application.
 The framework handles process and network boundaries for you if your application
-is a kervi multiprocess application and/or uses kervi modules. 
+is a kervi multiprocess/multi device application and/or uses kervi modules. 
 
 Define actions
 --------------
@@ -71,16 +71,92 @@ And call the action
 
     Actions["gate_controller.open"](100)
 
+Actions with timeout
+--------------------
 
-When the kervi application has loaded and started all processes it calls the app_main action this is your hook where you can
-start your application logic.
+By default an action is called synchronius and first returns with the result when the action is completed.
+If you expect your action to operate within a special time interval you can add the keyword parameter timeout to
+the action call. If the execution time exceeds the timeout a TimeoutError exception is raised.
 
 .. code:: python
 
     @action
-    def app_main():
-        #start your application logic here
+    def my_action():
+        print("started")
+        time.sleep(10)
+        print("done")
 
+    try:
+        my_action(timeout=5)
+    except TimeoutError:
+        print("Timout occured")
+
+If the action is defined in another process or module call this way:
+
+.. code:: python
+
+    try:
+        Actions["my_action"](timeout=5)
+    except TimeoutError:
+        print("time out in action")
+
+Asynchronous action call
+------------------------
+
+It is possible to call an action asynchronously if your don't want to wait for the action to finish execution.
+Just set the keyword argument run_async to true.
+
+.. code:: python
+
+    Actions["my_action"](run_async=True)
+
+
+Interupts
+---------
+
+Sometimes you need to signal a running action during execution. 
+To handle this situation you need to specify an interupt function for an action.
+
+.. code:: python
+
+    terminate = False
+    @action
+    def my_action():
+        print("my_action start")
+        
+        while not terminate:
+            time.sleep(.1)
+
+        print("my_action done")
+
+    @my_action.set_interupt
+    def my_action_interupt():
+        global terminate
+        terminate = True
+        print("interupt my_action")
+
+    
+    #call action
+    Actions["my_action"]()
+
+    #wait for five seconds
+    time.sleep(5)
+
+    #signal that the action should terminate
+    Actions["my_action"].interupt() 
+
+
+Interupts support parameters
+
+.. code:: python
+
+    @my_action.set_interupt
+    def my_action_interupt(p1):
+        global terminate
+        terminate = True
+        print("interupt my_action:", p1)
+
+    Actions["my_action"].interupt("P 1")
 
 Linking to dashboards
 ---------------------
@@ -109,6 +185,38 @@ You can send parameters to the action.
     my_action.link_to_dashboard("app", "gate", action_parameters=["x"])
 
 
+If an interupt function is set for the action it will be called when the button is released. 
+
+.. code:: python 
+
+    from kervi.actions import action
+
+    @action(name="My action")
+    def my_action(p):
+        print("my_action is called with:", p)
+
+    @my_action.set_interupt
+    def my_action_interupt():
+        print("my_action interupt called")
+
+    my_action.link_to_dashboard("app", "gate", action_parameters=["x"])
+
+You are able to specify parameters that should be send in the interupt.
+
+.. code:: python 
+
+    from kervi.actions import action
+
+    @action(name="My action")
+    def my_action(p):
+        print("my_action is called with:", p)
+
+    @my_action.set_interupt
+    def my_action_interupt(p):
+        print("my_action interupt called: ", p)
+
+    my_action.link_to_dashboard("app", "gate", action_parameters=["x"], interupt_parameters=["i"])
+
 Other keyword parameters you can use in link_to_dashboard:
 
     * *link_to_header* (``str``) -- Link this action to the header of the panel.
@@ -134,6 +242,46 @@ Other keyword parameters you can use in link_to_dashboard:
     * *button_text* (``string``) -- Text to display on button, default is name.
 
     * *action_parameters* (``list``) -- list of parameters to pass to the action.
+
+    * *interupt_enabled* (``bool``) -- If true the button will send interupt to action on off. Default true if an interupt is specified for the action.
+    * *interupt_parameters* (``list``) -- List of parameters to pass to the interupt function of the action.
+
+
+System actions
+--------------
+
+When the kervi application has loaded and started all processes it calls the app_main action this is your hook where you can
+start your application logic. In the way app_exit action is called upon termination of the kervi application.
+
+It is optional for you to define these actions in your application.
+
+.. code:: python
+
+    @action
+    def app_main():
+        #start your application logic here
+
+
+    @action
+    def app_exit():
+        #application logic that cleans up
+
+You can control the application via the following actions
+
+.. code:: python
+
+    #stop the application
+    Actions["app.stop"]
+
+    #restart the application
+    Actions["app.restart"]
+
+    #shut down application device (Raspberry pi)
+    Actions["app.shutdown"]
+
+    #reboot application device (Raspberry pi)
+    Actions["app.reboot"]
+
 
 Complete example
 -----------------
@@ -215,8 +363,8 @@ There are to two actions move_gate and stop_gate these are linked to the "gate" 
                     else:
                         print("Gate stopped")
 
-            @action(name="Stop gate")
-            def stop_gate(self):
+            @move_gate.set_interupt
+            def move_gate_interrupt(self):
                 print("stop gate:")
                 self._stop_move = True
 
@@ -228,10 +376,9 @@ There are to two actions move_gate and stop_gate these are linked to the "gate" 
                 pass
 
         gate_controller = GateController()
-        gate_controller.move_gate.link_to_dashboard("app", "gate", inline=True, button_text=None, button_icon="arrow-up", label=None, action_parameters=[True])
+        gate_controller.move_gate.link_to_dashboard("app", "gate", inline=True, button_text=None, button_icon="arrow-up", label=None, action_parameters=[True], )
         gate_controller.move_gate.link_to_dashboard("app", "gate", inline=True, button_text=None, button_icon="arrow-down", label=None, action_parameters=[False])
-        gate_controller.stop_gate.link_to_dashboard("app", "gate", inline=True, button_text=None, button_icon="stop", label=None)
-
+        
         gate_controller.link_to_dashboard("settings", "gate")
 
         from kervi.devices.motors.dummy_motor_driver import DummyMotorBoard
@@ -289,14 +436,18 @@ robot.py is a kervi application that you should execute on your Raspberry pi, wh
 
 The other python script robot_tasks.py is a kervi module that connects to the
 kervi application in robot.py. You can run it on the robot itself or another computer
-on your network.
+on your local network.
 
 .. code:: python
 
     if __name__ == '__main__':
         from kervi.module import Module
         from kervi.actions import action, Actions
-        module = module(app_address="")
+        module = Module({
+            "network" : {
+                "ipc_root_address": "#Enter the ip that is displayed when running robot.py#"
+            }
+        })
         
         @action
         def module_main():

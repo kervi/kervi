@@ -53,22 +53,26 @@ class _LinkedAction(object):
         return self._state
 
     def interupt(self, *args, **kwargs):
-        self.spine.send_command("kervi_action_interupt" + self._action_id, *args, **kwargs)
+        self.spine.send_command("kervi_action_interupt_" + self._action_id, *args, **kwargs)
 
     def execute(self, *args, **kwargs):
         """Executes the action."""
         timeout = kwargs.pop("timeout", -1)
+        run_async = kwargs.pop("run_async", False)
         self._is_running = True
         result = None
         if self._action_lock.acquire(False):
             self._state = ACTION_PENDING
             self._action_event = threading.Event()
             self.spine.send_command("kervi_action_" + self._action_id, *args, **kwargs)
-            if self._action_event.wait(timeout):
-
-                self._state = ACTION_FAILED
-            self._action_event = None
-            result = self._last_result
+            
+            if not run_async:
+                if self._action_event.wait(timeout):
+                    self._state = ACTION_FAILED
+                    raise TimeoutError("Timeout in call to action: " + self._action_id)
+                self._action_event = None
+                result = self._last_result
+            
         else:
             if not self._action_lock.acquire(True, timeout):
                 return None
@@ -113,7 +117,7 @@ class Action(KerviComponent):
         #print("kw", self.action_id, self._keywords, argspec, handler)
         self.spine = Spine()
         self.spine.register_command_handler("kervi_action_" + action_id, self._handle_command)
-        self.spine.register_command_handler("kervi_action_interupt" + action_id, self.interupt)
+        self.spine.register_command_handler("kervi_action_interupt_" + action_id, self.interupt)
         self._state = ACTION_STOPPED
         self._action_lock = threading.Lock()
         self._last_result = None
@@ -145,7 +149,7 @@ class Action(KerviComponent):
         self._ui_parameters["input_size"] = 0
         self._ui_parameters["action_parameters"] = []
         self._ui_parameters["run_command"] = "kervi_action_" + action_id
-        self._ui_parameters["interupt_command"] = "kervi_action_" + action_id
+        self._ui_parameters["interupt_command"] = "kervi_action_interupt_" + action_id
         self._ui_parameters["interupt_parameters"] = []
         self._ui_parameters["interupt_enabled"] = False
 
@@ -197,20 +201,25 @@ class Action(KerviComponent):
          """
 
         timeout = kwargs.pop("timeout", -1)
+        execute_async = kwargs.pop("run_async", False)
         result = None
         if self._action_lock.acquire(False):
             try:
                 self.spine.trigger_event("actionStarted", self.action_id)
-                if timeout == -1:
+                if timeout == -1 and not execute_async:
                     result = self._execute(*args, **kwargs)
                 else:
                     thread = _ActionThread(self, args, kwargs)
                     thread.start()
-                    thread.join(timeout)
-                    if thread.is_alive():
-                        result = None
+                    if not execute_async:
+                        thread.join(timeout)
+                        if thread.is_alive():
+                            result = None
+                            raise TimeoutError("Timeout in call to action: " + self.action_id)
+                        else:
+                            result = thread.result
                     else:
-                        result = thread.result
+                        result = thread
                 return result
             finally:
                 pass
@@ -222,7 +231,9 @@ class Action(KerviComponent):
             return self._last_result
 
     def interupt(self, *args, **kwargs):
-        self._interupt(*args, **kwargs)
+        print("interupt; ", self.action_id)
+        if self._interupt:
+            self._interupt(*args, **kwargs)
 
     @property
     def is_running(self):

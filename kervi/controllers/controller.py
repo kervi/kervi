@@ -84,7 +84,7 @@ class Controller(KerviComponent):
                     if hasattr(method, "__qualname__") and Actions.is_unbound_interupt(method.__qualname__):
                         action_id = Actions.get_unbound_interupt(method.__qualname__)
                         action = self.actions[action_id]
-                        action.interupt = _ActionInterupt(method)
+                        action._interupt = _ActionInterupt(method)
                         action.set_ui_parameter("interupt_enabled", True)
             except KeyError:
                 pass
