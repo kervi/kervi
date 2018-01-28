@@ -27,7 +27,7 @@ import kervi.spine as spine
 from kervi.utility.process_spine import _ProcessSpine
 #import sys
 import kervi.utility.kervi_logging as k_logging
-from kervi.config import load_config
+
 
 MAIN_SPINE = None
 def _start_root_spine(config, reset_log=False):
@@ -52,6 +52,8 @@ class _KerviProcess(object):
         self.spine = spine.Spine()
         self.spine.register_command_handler("terminateProcess", self.terminate, scope=scope)
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
+        from kervi.messaging import Messaging
+        Messaging.load()
         self.init_process()
         self.spine.send_command("startThreads", scope="process")
 
@@ -91,12 +93,12 @@ class _KerviProcess(object):
         pass
 
 def _launch(scope, name, process_class, config_data, ipc_port, root_close, **kwargs):
-    config = load_config(json_data=config_data)
-    
-    k_logging.init_process_logging(name, config.log)
+    from kervi import config
+    process_config = config.load(json_data=config_data)
+    k_logging.init_process_logging(name, process_config.log)
     log = k_logging.KerviLog(name)
     log.info('create process:{0} ipc port:{1}:', process_class.__name__, ipc_port)
-    process = process_class(scope, name, config, ipc_port, root_close, **kwargs)
+    process = process_class(scope, name, process_config, ipc_port, root_close, **kwargs)
     try:
         while not process.do_terminate:
             if not process._is_connected and process.spine.is_connected:

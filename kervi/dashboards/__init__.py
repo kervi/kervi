@@ -104,7 +104,7 @@ class DashboardPanelGroup(object):
         if authorized:
             panels = []
             for panel in self._panels:
-                panels += [panel._get_info(*kwargs)]
+                panels += [panel._get_info(**kwargs)]
             
             return {
                 "id": self.group_id,

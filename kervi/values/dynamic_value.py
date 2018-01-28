@@ -22,7 +22,7 @@
 from datetime import datetime
 from kervi.utility.component import KerviComponent
 
-
+from kervi.actions import Actions
 VALUE_COUNTER = 0
 class DynamicValue(KerviComponent):
     """
@@ -281,12 +281,12 @@ class DynamicValue(KerviComponent):
         :param event_value:
             A single value or range specified as a tuple.
 
-            If it is a range the function specified in func is called when the value enters the range. 
+            If it is a range the function specified in func is called when the value enters the range.
 
-        :type event_value: ``float``, ``string``, ``boolean`` or a tuple of these types. 
+        :type event_value: ``float``, ``string``, ``boolean`` or a tuple of these types.
 
         :param func:
-            Function or lambda expression to be called. 
+            Function or lambda expression to be called.
             This function will receive the dynamcic value as a parameter.
 
         :param event_type:
@@ -299,7 +299,9 @@ class DynamicValue(KerviComponent):
         self._value_event_handlers += [(event_value, func, event_type, parameters)]
 
     def _handle_range_event(self, value, message, func, level):
-        self.user_log_message(message, level=level)
+        if message:
+            from kervi.messaging import Messaging
+            Messaging.send_message(message, source_id=self.component_id, source_name=self.name, level=level)
         if func:
             func(self)
 

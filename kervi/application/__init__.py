@@ -72,7 +72,6 @@ class Application(object):
         """ Settings is a dictionary with the following content
         """
 
-        from kervi.config import load_config
         import inspect
         import getopt
         import sys
@@ -103,7 +102,8 @@ class Application(object):
         else:
             print("no config file found, revert to defaults")
 
-        self.config = load_config(
+        from kervi.config import load
+        self.config = load(
             config_file=selected_config_file,
             config_user=user_config,
             config_base={
@@ -112,6 +112,7 @@ class Application(object):
                     "id": "kervi"
                 },
                 "log" : {
+                    "levels":["fatal", "error", "warning", "information", "debug"],
                     "level":"debug",
                     "file":"kervi.log",
                     "resetLog": False
@@ -124,7 +125,6 @@ class Application(object):
                     "ipc_root_port": nethelper.get_free_port([9500]),
                     "ipc_root_address": nethelper.get_ip_address()
                 },
-
                 "authorization": {
                     "enabled": False,
                     "users" : {
@@ -133,11 +133,33 @@ class Application(object):
                         },
                         "admin":{
                             "password":"",
-                            "groups":["admin"]
+                            "groups":["admin"],
+                            "name": "",
+                            "email": "",
+                            "phone": ""
                         }
                     }
                 },
+                "messaging": {
+                    "default_channels": ["user_log"],
+                    "channels":{
+                        "user_log":{
 
+                        },
+                        "email": {
+                            "enabled": False,
+                            "smtp": {
+                                "sender_name": "Kervi",
+                                "sender_address": "kervi@example.com",
+                                "server": "localhost",
+                                "port": "25",
+                                "user": "",
+                                "password": "",
+                                "tls": False
+                            }
+                        }
+                    }
+                },
                 "encryption" :{
                     "ipc_secret":"",
                     "useSSL": False,
@@ -146,29 +168,6 @@ class Application(object):
                 },
             }
         )
-        
-        # self.settings = {
-        #     "info":{
-        #         "id":"kervi_app",
-        #         "name":"Kervi application",
-        #         "appKey":"",
-        #         "settingsFolder": os.path.basename(__file__) + "_settings"
-        #     },
-        #     "log" : {
-        #         "level":"debug",
-        #         "file":"kervi.log",
-        #         "resetLog":False
-        #     },
-        #     "modules":[],
-        #     "network":{
-        #         "IPAddress": nethelper.get_ip_address(),
-        #         "IPRootAddress": nethelper.get_ip_address(),
-        #         "IPCRootPort":nethelper.get_free_port([9500]),
-        #         "WebSocketPort":nethelper.get_free_port([9000]),
-        #         "WebPort": nethelper.get_free_port(def_ports),
-        #         "IPCSecret":b"12345",
-        #     }
-        # }
 
         print("Starting kervi application:", self.config.application.name)
         #if settings:
@@ -193,6 +192,9 @@ class Application(object):
         from kervi.utility.storage import init_db
 
         init_db(script_name)
+
+        from kervi.messaging import Messaging
+        Messaging.load()
 
         import kervi.hal as hal
         hal_driver = hal._load()

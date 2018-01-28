@@ -142,33 +142,6 @@ class KerviComponent(object):
         else:
             raise ValueError("invalid ui parameter name:" + name)
 
-    def user_log_message(self, topic, **kwargs):
-        """"
-        Adds a message to the user log.
-        """
-        persist = kwargs.get("persist", False)
-        body = kwargs.get("body", None)
-        data = kwargs.get("data", None)
-        area = kwargs.get("area", None)
-        log_type = kwargs.get("log_type", "information")
-        level = kwargs.get("level", 3)
-        deleteable = kwargs.get("deleteable", False)
-
-
-        timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
-        self.spine.trigger_event("userLogMessage", None, {
-            "source_id": self.component_id,
-            "source_name": self.name,
-            "area": area,
-            "data": data,
-            "level": level,
-            "topic": topic,
-            "body": body,
-            "timestamp": timestamp,
-            "type": log_type,
-            "persist": persist
-        })
-
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         ui_param = {}
         for key, value in self._ui_parameters.items():
@@ -218,11 +191,11 @@ class KerviComponent(object):
                     authorized = False
                 
             if authorized:
-                try:
-                    info = self._get_info(**kwargs)
-                except:
-                    print("ex", self.component_id)
-                    info = {}
+                #try:
+                info = self._get_info(**kwargs)
+                #except Exception as ex:
+                #    print("ex", self.component_id, ex)
+                #    info = {}
 
                 info["componentType"] = self.component_type
                 info["id"] = self.component_id

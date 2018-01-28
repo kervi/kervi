@@ -300,28 +300,8 @@ class Action(KerviComponent):
 
     def set_interupt(self, method=None, **kwargs):
         """
-            Decorator that turns a function or controller method into an kervi action.
-            it is possible to call the action in other kervi processes or modules.
+            Decorator that turns a function or controller method into an action interupt.
 
-            @action
-            def my_action(p)
-                ...
-
-            call it via Actions["my_action"](10)
-
-            @action(action_id="action_1", name="This is my action")
-            def my_action(p)
-                ...
-            
-            call it via Actions["action_1"](10)
-
-            :Keyword Arguments:
-
-                * *action_id* (``str``) -- 
-                    The action_id is the id you use when you call the action.
-                    By default the action takes the name of function but you can override it with action_id.
-
-                * *name* (``str``) -- Name to show in UI if the action is linked to a panel.
         """
         
         def action_wrap(f):

@@ -26,10 +26,10 @@ from kervi.config import Configuration
 SESSIONS = {}
 
 def active():
-    return Configuration().authorization.enabled and len(Configuration().authorization.users)>0
+    return Configuration.authorization.enabled and len(Configuration.authorization.users)>0
 
 def allow_anonymous():
-    return "anonymous" in Configuration().authorization.users
+    return "anonymous" in Configuration.authorization.users
 
 def is_session_valid(headers):
     if active():
@@ -52,7 +52,7 @@ def _add_session(user_name, user_info):
     return (session, SESSIONS[session])
 
 def authorize(user_name, password):
-    users = Configuration().authorization.users
+    users = Configuration.authorization.users
     if active():
         if user_name == "anonymous" and user_name in users.keys:
             return _add_session(user_name, users[user_name])
