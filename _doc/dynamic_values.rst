@@ -124,8 +124,3 @@ the screen.
 .. code:: python 
 
     motor_board.servo_motors[0].position.link_to(CAM1.pan, lambda x: -x)
-
-.. toctree::
-   :hidden:
-
-   dynamic_values_api

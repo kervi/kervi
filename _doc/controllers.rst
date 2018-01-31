@@ -103,12 +103,3 @@ In that way it is easy to change hardware and make changes to UI without re-codi
     motor_board = AdafruitMotorHAT()
     motor_board.dc_motors[2].speed.link_to(steering.left_speed)
     motor_board.dc_motors[3].speed.link_to(steering.right_speed)
-
-
-Controller api
-==============
-
-.. toctree::
-   :hidden:
-
-   controllers_api

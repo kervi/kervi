@@ -77,7 +77,3 @@ by using the following code.
     motor_board.servo_motors[1].position.link_to(CAM1.tilt)
 
 
-.. toctree::
-   :hidden:
-
-   camera_api

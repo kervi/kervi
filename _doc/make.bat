@@ -30,7 +30,7 @@ if errorlevel 9009 (
 goto end
 
 :help
-%SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS%
+%SPHINXBUILD% -M  -E help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS%
 
 :end
 popd

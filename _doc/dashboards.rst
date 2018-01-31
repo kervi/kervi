@@ -183,9 +183,3 @@ by using the panel names left_pad_x, left_pad_y, right_pad_x, right_pad_y.
 
     motor_controller.dc_motors[0].speed.link_to_dashboard("main", "left_pad_x")
 
-.. rubric:: 
-
-.. toctree::
-   :hidden:
-
-   dashboards_api

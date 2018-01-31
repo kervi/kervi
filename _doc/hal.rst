@@ -159,16 +159,3 @@ For a complete list take a look at github <https://github.com/kervi/kervi-device
 
     lux=Sensor("lux_sensor","Lux sensor", device=TSL2561Device()
     lux.link_to_dashboard("system", "light", type="radial_gauge")
-        
-    
-
-
-Hal API
--------
-
-.. toctree::
-   :hidden:
-
-   hal_gpio_api
-   hal_i2c_api
-   hal_devices_api

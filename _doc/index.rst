@@ -49,9 +49,9 @@ Below is a complete example that shows how to display a sensor on a dashboard wi
 
    getstarted
    overview
+   configuration
    dashboards
    sensors
-   sensors_api
    controllers
    dynamic_values
    actions
@@ -62,3 +62,4 @@ Below is a complete example that shows how to display a sensor on a dashboard wi
    ipc
    cli
    contribute
+   kervi_api
