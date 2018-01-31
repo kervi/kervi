@@ -182,6 +182,11 @@ class Controller(KerviComponent):
             if self.outputs[key]:
                 outputs += [self.outputs[key].get_reference()]
 
+        actions=[]
+        for action in self.actions:
+            print("a", action)
+            actions += [self.actions[action].get_reference()]
+
         template = None
         try:
             import os.path
@@ -198,6 +203,7 @@ class Controller(KerviComponent):
         return {
             "inputs":inputs,
             "outputs":outputs,
+            "actions":actions,
             "template" : template,
             "type": self.type
         }

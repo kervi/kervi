@@ -23,7 +23,7 @@ import os
 import threading
 import time
 import kervi.utility.encryption as encryption
-
+from kervi.config import Configuration
 try:
     from io import BytesIO
 except ImportError:
@@ -53,6 +53,7 @@ class CameraBase(Controller):
     def __init__(self, camera_id, name, **kwargs):
         Controller.__init__(self, camera_id, name)
         self.type = "camera"
+        self.media_config = Configuration.media
         self.inputs.add("pan", "Pan", DynamicNumber)
         self.inputs.add("tilt", "Tilt", DynamicNumber)
 
@@ -416,7 +417,10 @@ class CameraStreamer(CameraBase):
         pass
 
     def _take_picture(self):
-        pass
+        if self.current_frame:
+            image_name = "/img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
+            image_path = self.media_config.image + image_name
+            self.current_frame.save(image_path, "PNG")
 
     def _record(self):
         pass

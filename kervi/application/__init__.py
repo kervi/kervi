@@ -168,6 +168,12 @@ class Application(object):
                     "cert_file": "kervi.cert",
                     "key_file": "kervi.key"
                 },
+                "media":{
+                    "folders":{
+                        "image":"images",
+                        "video":"video"
+                    }
+                }
             }
         )
 
