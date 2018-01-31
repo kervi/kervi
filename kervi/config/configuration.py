@@ -51,6 +51,12 @@ class _KerviConfig:
     def __len__(self):
         return len(self._keys)
 
+    def get(self, name, default_value=None):
+            if hasattr(self, name):
+                return getattr(self, name)
+            else:
+                return default_value
+
     @property
     def keys(self):
         return self._keys
@@ -110,6 +116,12 @@ class _Configuration:
 
         def to_json(self):
             return json.dumps(self._config)
+
+        def get(self, name, default_value=None):
+            if hasattr(self, name):
+                return getattr(self, name)
+            else:
+                return default_value
 
         @property
         def is_loaded(self):

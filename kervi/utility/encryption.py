@@ -19,9 +19,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from kervi.config import Configuration
+
 def enabled():
-    return False# Configuration.encryption.useSSL
+    from kervi.config import Configuration
+    return Configuration.encryption.use_ssl
 
 def get_cert():
-    return (Configuration.encryption.certFile, Configuration.encryption.keyFile)
+    from kervi.config import Configuration
+    return (Configuration.encryption.cert_file, Configuration.encryption.key_file)

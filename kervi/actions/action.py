@@ -137,7 +137,7 @@ class Action(KerviComponent):
             "height":0
         }
 
-        self._ui_parameters["type"] = "switch"
+        self._ui_parameters["type"] = "button"
         self._ui_parameters["on_text"] = "On"
         self._ui_parameters["off_text"] = "Off"
         self._ui_parameters["on_icon"] = None
@@ -148,8 +148,8 @@ class Action(KerviComponent):
         self._ui_parameters["button_height"] = None,
         self._ui_parameters["input_size"] = 0
         self._ui_parameters["action_parameters"] = []
-        self._ui_parameters["run_command"] = "kervi_action_" + action_id
-        self._ui_parameters["interupt_command"] = "kervi_action_interupt_" + action_id
+        #self._ui_parameters["run_command"] = "kervi_action_" + action_id
+        #self._ui_parameters["interupt_command"] = "kervi_action_interupt_" + action_id
         self._ui_parameters["interupt_parameters"] = []
         self._ui_parameters["interupt_enabled"] = False
 
@@ -243,6 +243,13 @@ class Action(KerviComponent):
     @property
     def state(self):
         return self._state
+
+    def _get_info(self, **kwargs):
+        return {
+            "runCommand":"kervi_action_" + self.action_id,
+            "interuptCommand":"kervi_action_interupt_" + self.action_id,
+            "running":self._is_running
+        }
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""

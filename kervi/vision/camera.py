@@ -363,7 +363,7 @@ class CameraStreamer(CameraBase):
             if key_file and cert_file:
                 import ssl
                 self.server.socket = ssl.wrap_socket (self.server.socket, keyfile=key_file, certfile=cert_file, server_side=True)
-                
+
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.daemon = True
         self.server_thread.start()

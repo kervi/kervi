@@ -30,7 +30,7 @@ class _SetInterupt():
         return f
 
 #from kervi.actions.action_list import _Actions
-def action(method=None, **kwargs):
+def action(method=None, **kwargs)  -> Action:
     """
         Decorator that turns a function or controller method into an kervi action.
         it is possible to call the action in other kervi processes or modules.
@@ -56,7 +56,7 @@ def action(method=None, **kwargs):
             * *name* (``str``) -- Name to show in UI if the action is linked to a panel.
     """
     
-    def action_wrap(f):
+    def action_wrap(f): 
         action_id = kwargs.get("action_id", f.__name__)
         name = kwargs.get("name", action_id)
         if not "." in f.__qualname__:

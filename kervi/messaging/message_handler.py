@@ -7,17 +7,18 @@ from kervi.config import Configuration
 
 
 class MessageHandler(object):
-    
+
     def __init__(self):
         self._channels = {}
 
     def load(self):
+
         self.add_channel("user_log", UserLogHandler())
         self.add_channel("email", EmailHandler())
-        self._users = Configuration.authorization.users
+        self._users = Configuration.authentication.users
         self._config = Configuration.messaging
         self._levels = Configuration.log.levels
-    
+
     def add_channel(self, channel_id, handler):
         self._channels[channel_id] = handler
 

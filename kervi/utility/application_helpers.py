@@ -71,6 +71,7 @@ class _KerviSocketIPC(process._KerviProcess):
         self.spine.register_command_handler("startWebSocket", self._start_socket)
 
     def _start_socket(self):
+        #print("start socket")
         self._socket_spine.start_socket()
 
     def process_step(self):

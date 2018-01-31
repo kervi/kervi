@@ -125,13 +125,15 @@ class Application(object):
                     "ipc_root_port": nethelper.get_free_port([9500]),
                     "ipc_root_address": nethelper.get_ip_address()
                 },
-                "authorization": {
+                "authentication": {
                     "enabled": False,
                     "users" : {
                         "anonymous":{
+                            "enabled": True,
                             "groups":[]
                         },
                         "admin":{
+                            "enabled": True,
                             "password":"",
                             "groups":["admin"],
                             "name": "",
@@ -162,9 +164,9 @@ class Application(object):
                 },
                 "encryption" :{
                     "ipc_secret":"",
-                    "useSSL": False,
-                    "certFile": "kervi.cert",
-                    "keyFile": "kervi.key"
+                    "use_ssl": False,
+                    "cert_file": "kervi.cert",
+                    "key_file": "kervi.key"
                 },
             }
         )
