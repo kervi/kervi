@@ -184,7 +184,6 @@ class Controller(KerviComponent):
 
         actions=[]
         for action in self.actions:
-            print("a", action)
             actions += [self.actions[action].get_reference()]
 
         template = None
