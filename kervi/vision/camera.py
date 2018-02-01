@@ -68,9 +68,17 @@ class CameraBase(Controller):
 
         self.actions["take_picture"].set_ui_parameter("button_icon", "camera")
         self.actions["take_picture"].set_ui_parameter("inline", True)
+        self.actions["take_picture"].set_ui_parameter("type", "button")
+        self.actions["take_picture"].set_ui_parameter("label", None)
+        self.actions["take_picture"].set_ui_parameter("button_text", None)
+
 
         self.actions["record"].set_ui_parameter("button_icon", "video-camera")
         self.actions["record"].set_ui_parameter("inline", True)
+        self.actions["record"].set_ui_parameter("type", "button")
+        self.actions["record"].set_ui_parameter("label", None)
+        self.actions["record"].set_ui_parameter("button_text", None)
+
 
         self._ui_parameters["height"] = kwargs.get("height", 480)
         self._ui_parameters["width"] = kwargs.get("width", 640)
@@ -419,7 +427,7 @@ class CameraStreamer(CameraBase):
     def _take_picture(self):
         if self.current_frame:
             image_name = "/img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
-            image_path = self.media_config.image + image_name
+            image_path = self.media_config.folders.images + image_name
             self.current_frame.save(image_path, "PNG")
 
     def _record(self):
