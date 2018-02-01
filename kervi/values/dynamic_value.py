@@ -274,7 +274,7 @@ class DynamicValue(KerviComponent):
     def value_changed(self, new_value, old_value):
         pass
 
-    def add_value_event(self, event_value, func, event_type=None, parameters=None):
+    def add_value_event(self, event_value, func, event_type=None, parameters=None, **kwargs):
         """
         Add a function that is called when the dynamic value reach or pass the event_value.
 
@@ -296,45 +296,46 @@ class DynamicValue(KerviComponent):
         :type event_type: ``str``
 
         """
-        self._value_event_handlers += [(event_value, func, event_type, parameters)]
+        self._value_event_handlers += [(event_value, func, event_type, parameters, kwargs)]
 
-    def _handle_range_event(self, value, message, func, level):
+    def _handle_range_event(self, value, message, func, level, **kwargs):
         if message:
             from kervi.messaging import Messaging
-            Messaging.send_message(message, source_id=self.component_id, source_name=self.name, level=level)
+            kwargs = dict(kwargs, source_id=self.component_id, source_name=self.name, level=level)
+            Messaging.send_message(message, **kwargs)
         if func:
             func(self)
 
-    def add_normal_range(self, value, message=None, func=None):
-        self.add_value_event(value, self._handle_range_event, parameters=[message, func, 3])
+    def add_normal_range(self, value, message=None, func=None, **kwargs):
+        self.add_value_event(value, self._handle_range_event, parameters=[message, func, 3], **kwargs)
 
-    def add_warning_range(self, value, message=None, func=None):
-        self.add_value_event(value, self._handle_range_event, event_type="warning", parameters=[message, func, 2])
+    def add_warning_range(self, value, message=None, func=None, **kwargs):
+        self.add_value_event(value, self._handle_range_event, event_type="warning", parameters=[message, func, 2], **kwargs)
 
-    def add_error_range(self, value, message=None, func=None):
-        self.add_value_event(value, self._handle_range_event, event_type="error", parameters=[message, func, 1])
+    def add_error_range(self, value, message=None, func=None, **kwargs):
+        self.add_value_event(value, self._handle_range_event, event_type="error", parameters=[message, func, 1], **kwargs)
 
     def _check_value_events(self, new_value, old_value):
         for event in self._value_event_handlers:
-            value, func, event_type, parameters = event
+            value, func, event_type, parameters, kwargs = event
             if func:
                 if isinstance(value, tuple):
                     value_start, value_end = value
                     if old_value < value_start and new_value >= value_start:
-                        func(self, *parameters)
+                        func(self, *parameters, **kwargs)
                     elif old_value > value_end and new_value <= value_end:
-                        func(self, *parameters)
+                        func(self, *parameters, **kwargs)
                 else:
                     if old_value < value and new_value >= value:
-                        func(self, *parameters)
+                        func(self, *parameters, **kwargs)
                     elif old_value > value and new_value <= value:
-                        func(self, *parameters)
+                        func(self, *parameters, **kwargs)
 
     @property
     def _event_ranges(self):
         ranges = []
         for event in self._value_event_handlers:
-            value, func, event_type, parameters = event
+            value, func, event_type, parameters, kwargs = event
             if isinstance(value, tuple):
                 value_start, value_end = value
                 ranges += [{"start":value_start, "end":value_end, "type":event_type}]

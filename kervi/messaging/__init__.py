@@ -1,18 +1,14 @@
 
 
-from kervi.messaging.message_handler import MessageHandler
 from kervi.config import Configuration
+from kervi.actions import Actions
+
 class _Messaging(object):
-    instance = None
-    def __new__(cls): # __new__ always a classmethod
-        if not _Messaging.instance:
-            _Messaging.instance = MessageHandler()
-        return _Messaging.instance
+    def __init__(self):
+        pass
 
-    def __getattr__(self, name):
-        return getattr(self.instance, name)
-
-    def __setattr__(self, name, value):
-        return setattr(self.instance, name, value)
+    def send_message(self, subject, **kwargs):
+        kwargs = dict(kwargs, run_async=True)
+        Actions["message_handler.send_message"](subject, **kwargs)
 
 Messaging = _Messaging()

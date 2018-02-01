@@ -52,8 +52,6 @@ class _KerviProcess(object):
         self.spine = spine.Spine()
         self.spine.register_command_handler("terminateProcess", self.terminate, scope=scope)
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
-        from kervi.messaging import Messaging
-        Messaging.load()
         self.init_process()
         self.spine.send_command("startThreads", scope="process")
 

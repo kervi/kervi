@@ -1,5 +1,4 @@
 
-from datetime import datetime
 from kervi.messaging.message_device import MessageDevice
 from kervi.config import Configuration
 import kervi.spine as spine
@@ -29,8 +28,8 @@ class UserLogHandler(MessageDevice):
         source_name = kwargs.get("source_name", None)
         log_type = kwargs.get("log_type", "information")
         level = kwargs.get("level", 3)
-
-        timestamp = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+        timestamp = kwargs.get("timestamp", 0)
+        
         self.spine.trigger_event("userLogMessage", None, {
             "source_id": source_id,
             "source_name": source_name,

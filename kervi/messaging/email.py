@@ -18,16 +18,14 @@ class EmailHandler(MessageDevice):
         return "email"
 
     def create_address(self, user):
-        if "email" in user:
-            name = None
-            if "name" in user:
-                name = user.name
-            return Address(name, user.email)
+        email = user.get("email", None)
+        if email:
+            name = user.get("name", None)
+            return user.email
 
         return None
 
     def send_message(self, addresses, topic, **kwargs):
-
         body = kwargs.get("body", None)
         body_html = kwargs.get("body_html", None)
         source_name = kwargs.get("source_name", None)
@@ -44,8 +42,8 @@ class EmailHandler(MessageDevice):
 
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
-        msg['From'] = Address(self._config.sender, self._config.sender_address)
-        msg['Bcc'] = addresses
+        msg['From'] = self._config.sender_address
+        msg['Bcc'] = "".join(addresses)
 
         if body:
             part1 = MIMEText(body, 'plain')
@@ -58,5 +56,8 @@ class EmailHandler(MessageDevice):
             if self._config.tls:
                 smtp.starttls()
 
-            smtp.login(self._config.user, self._config.password)
+            if self._config.user and self._config.password:
+                smtp.login(self._config.user, self._config.password)
+
             smtp.send_message(msg)
+       
