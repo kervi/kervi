@@ -170,8 +170,8 @@ class Application(object):
                 },
                 "media":{
                     "folders":{
-                        "image":"images",
-                        "video":"video"
+                        "images":"images",
+                        "videos":"videos"
                     }
                 }
             }
@@ -201,20 +201,20 @@ class Application(object):
 
         init_db(script_name)
 
-        from kervi.messaging import Messaging
-        Messaging.load()
+        from kervi.messaging.message_handler import MessageHandler
+        self._message_handler = MessageHandler()
 
         import kervi.hal as hal
         hal_driver = hal._load()
         if hal_driver:
             print("Using HAL driver:", hal_driver)
 
-        self._app_actions = _AppActions(self)    
+        self._app_actions = _AppActions(self)
 
     @property
     def actions(self):
         return self._app_actions
-    
+
     def _validateSettings(self):
         pass
 
