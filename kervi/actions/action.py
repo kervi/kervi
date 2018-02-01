@@ -65,14 +65,16 @@ class _LinkedAction(object):
             self._state = ACTION_PENDING
             self._action_event = threading.Event()
             self.spine.send_command("kervi_action_" + self._action_id, *args, **kwargs)
-            
+
             if not run_async:
                 if self._action_event.wait(timeout):
                     self._state = ACTION_FAILED
                     raise TimeoutError("Timeout in call to action: " + self._action_id)
                 self._action_event = None
                 result = self._last_result
-            
+            else:
+                self._action_lock.release()
+
         else:
             if not self._action_lock.acquire(True, timeout):
                 return None
