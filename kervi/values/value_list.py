@@ -19,9 +19,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-class DynamicValueList(object):
+
+class ValueList(object):
     """
-    List that holds dynamic values
+    List that holds kervi values
 
     :param parent: Parent component that holds this list. 
 
@@ -37,11 +38,11 @@ class DynamicValueList(object):
 
     def add(self, value_id, name, value_class):
         """
-        Factory function that creates a dynamic value.
+        Factory function that creates a value.
 
         :param value_id: id of the value, used to reference the value within this list.BaseException
 
-        :param value_class: The class of the dynamic value that should be created with this function.
+        :param value_class: The class of the value that should be created with this function.
         """
         item = value_class(
             name,

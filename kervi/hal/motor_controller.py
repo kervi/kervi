@@ -45,7 +45,7 @@ class DCMotorControllerBase(Controller):
         self._device_name = device_name
 
         for motor in range(0, num_motors):
-            self.inputs.add("motor_" +  str(motor), "Motor " + str(motor), DynamicNumber)
+            self.inputs.add("motor_" +  str(motor), "Motor " + str(motor), NumberValue)
 
     def __getitem__(self, motor):
         return DCMotor(self.inputs["motor_" + str(motor)])
@@ -255,7 +255,7 @@ class ServoMotor(object):
     def __init__(self, device, motor):
         self._device = device
         self._motor = motor
-        self._position = DynamicNumber(
+        self._position = NumberValue(
             "Servo " +str(motor),
             input_id="servo_" + str(motor),
             parent=self._device,

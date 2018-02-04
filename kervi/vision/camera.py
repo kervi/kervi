@@ -54,16 +54,16 @@ class CameraBase(Controller):
         Controller.__init__(self, camera_id, name)
         self.type = "camera"
         self.media_config = Configuration.media
-        self.inputs.add("pan", "Pan", DynamicNumber)
-        self.inputs.add("tilt", "Tilt", DynamicNumber)
+        self.inputs.add("pan", "Pan", NumberValue)
+        self.inputs.add("tilt", "Tilt", NumberValue)
 
-        self.pan = self.outputs.add("pan", "Pan", DynamicNumber)
-        self.tilt = self.outputs.add("tilt", "Tilt", DynamicNumber)
+        self.pan = self.outputs.add("pan", "Pan", NumberValue)
+        self.tilt = self.outputs.add("tilt", "Tilt", NumberValue)
 
         self.flip_vertical = kwargs.get("flip_vertical", False)
         self.flip_horizontal = kwargs.get("flip_horizontal", False)
 
-        self.inputs.add("fps", "FPS", DynamicEnum)
+        self.inputs.add("fps", "FPS", EnumValue)
         self.inputs["fps"].set_ui_parameter("inline", True)
 
         self.actions["take_picture"].set_ui_parameter("button_icon", "camera")

@@ -199,7 +199,7 @@ class Action(KerviComponent):
 
             :Keyword Arguments:
 
-            * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
+            * *link_to_header* (``str``) -- Link this action to the header of the panel.
          """
 
         timeout = kwargs.pop("timeout", -1)
@@ -267,17 +267,17 @@ class Action(KerviComponent):
 
         :Keyword Arguments:
             
-            * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
+            * *link_to_header* (``str``) -- Link this acton to the header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
 
-            * *label* (``str``) -- Label text, default value is the name of the DynamicValue.
+            * *label* (``str``) -- Label text, default value is the name of the action.
 
             * *flat* (``bool``) -- Flat look and feel.
 
-            * *inline* (``bool``) -- Display DynamicValue and label in its actual size
+            * *inline* (``bool``) -- Display button and label in its actual size
                 If you set inline to true the size parameter is ignored.
-                The DynamicValue will only occupy as much space as the label and input takes.
+                The action will only occupy as much space as the label and input takes.
 
             * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
 

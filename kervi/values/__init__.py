@@ -21,17 +21,17 @@
 
 import time
 from datetime import datetime
-from kervi.values.dynamic_value import DynamicValue
+from kervi.values.kervi_value import KerviValue
 from kervi.utility.component import KerviComponent
 
-class DynamicNumber(DynamicValue):
+class NumberValue(KerviValue):
     """
-    DynamicValue that holds a float value.
-    If this DynamicValue is an input it is shown as a slider on dashboards.
+    Value that holds a float value.
+    If this value is an input it is shown as a slider on dashboards.
     If is an output it is possible to specify different kinds of gauges.
     """
     def __init__(self, name, **kwargs):
-        DynamicValue.__init__(self, name, "dynamic-number", **kwargs)
+        KerviValue.__init__(self, name, "number-value", **kwargs)
         #self.spine = Spine()
         self._min_value = -100
         self._max_value = 100
@@ -48,7 +48,6 @@ class DynamicNumber(DynamicValue):
         self._ui_parameters["chart_interval"] = "5min"
         self._ui_parameters["tick"] = 1.0
 
-        self._sparkline = []
         self._last_reading = None
 
     @property
@@ -143,31 +142,30 @@ class DynamicNumber(DynamicValue):
                 if isinstance(observer, tuple):
                     item, transformation = observer
                     if transformation:
-                        item.dynamic_value_changed(self, transformation(new_value))
+                        item.value_changed(self, transformation(new_value))
                     else:
-                        item.dynamic_value_changed(self, new_value)
+                        item.value_changed(self, new_value)
                 else:
-                    observer.dynamic_value_changed(self, new_value)
+                    observer.value_changed(self, new_value)
 
             self._check_value_events(new_value, old_value)
 
             if self._persist_value and allow_persist:
                 self.settings.store_value("value", self.value)
 
+            timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             if len(self._sparkline) == 0:
-                self._sparkline += [new_value]
+                self._sparkline += [{"timestamp":timestamp, "value":new_value}]
             elif len(self._sparkline) >= 10:
                 self._sparkline.pop(0)
-            self._sparkline += [new_value]
+            self._sparkline += [{"timestamp":timestamp, "value":new_value}]
             self._last_reading = time.clock()
 
             
             val = {"value_id":self.component_id, "value":new_value, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
-            #if self.persist_value:
-            #    self.spine.send_command("StoreDynamicValue", val)
-
+            
             self.spine.trigger_event(
-                "dynamicValueChanged",
+                "valueChanged",
                 self.component_id,
                 {"id":self.component_id, "value":new_value, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")},
                 self._log_values,
@@ -191,16 +189,16 @@ class DynamicNumber(DynamicValue):
 
         :Keyword Arguments:
             
-            * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
+            * *link_to_header* (``str``) -- Link this value to the header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
 
-            * *label* (``str``) -- Label text, default value is the name of the DynamicValue.
+            * *label* (``str``) -- Label text, default value is the name of the value.
 
             * *flat* (``bool``) -- Flat look and feel.
 
-            * *inline* (``bool``) -- Display DynamicValue and label in its actual size
-                The DynamicValue will only occupy as much space as the label and input takes.
+            * *inline* (``bool``) -- Display value and label in its actual size
+                The value will only occupy as much space as the label and input takes.
 
             * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
 
@@ -227,12 +225,12 @@ class DynamicNumber(DynamicValue):
             )
 
 
-class DynamicString(DynamicValue):
+class StringValue(KerviValue):
     """
-    DynamicValue that holds a string.
+    Value that holds a string.
     """
     def __init__(self, name, **kwargs):
-        DynamicValue.__init__(self, name, "dynamic-string", **kwargs)
+        KerviValue.__init__(self, name, "string-value", **kwargs)
         #self.spine = Spine()
         self._value = ""
         self._ui_parameters["type"] = "text"
@@ -254,16 +252,16 @@ class DynamicString(DynamicValue):
 
         :Keyword Arguments:
             
-            * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
+            * *link_to_header* (``str``) -- Link this value to the header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
 
-            * *label* (``str``) -- Label text, default value is the name of the DynamicValue.
+            * *label* (``str``) -- Label text, default value is the name of the value.
 
             * *flat* (``bool``) -- Flat look and feel.
 
-            * *inline* (``bool``) -- Display DynamicValue and label in its actual size
-                The DynamicValue will only occupy as much space as the label and input takes.
+            * *inline* (``bool``) -- Display value and label in its actual size
+                The value will only occupy as much space as the label and input takes.
 
             * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
 
@@ -278,23 +276,23 @@ class DynamicString(DynamicValue):
             )
 
 
-class DynamicDateTime(DynamicValue):
+class DateTimeValue(KerviValue):
     """
-    A DynamicValue that holds a date and/or time.
+    A value that holds a date and/or time.
     """
     def __init__(self, name, input_type="datetime", **kwargs):
-        DynamicValue.__init__(self, name, "dynamic-datetime", **kwargs)
+        KerviValue.__init__(self, name, "datetime-value", **kwargs)
         #self.spine = Spine()
         self._value = ""
         self._ui_parameters["type"] = input_type
 
-class DynamicBoolean(DynamicValue):
+class BooleanValue(KerviValue):
     """
-    A DynamicValue that holds a boolean.
+    A value that holds a boolean.
     When linked to a dashboard it is represented as a switch button or push button.
     """
     def __init__(self, name, **kwargs):
-        DynamicValue.__init__(self, name, "dynamic-boolean", **kwargs)
+        KerviValue.__init__(self, name, "boolean-value", **kwargs)
         self._value = False
         self._ui_parameters["type"] = "switch"
         self._ui_parameters["on_text"] = "On"
@@ -324,17 +322,17 @@ class DynamicBoolean(DynamicValue):
 
         :Keyword Arguments:
             
-            * *link_to_header* (``str``) -- Link this DynamicValue to the header of the panel.
+            * *link_to_header* (``str``) -- Link this value to the header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
 
-            * *label* (``str``) -- Label text, default value is the name of the DynamicValue.
+            * *label* (``str``) -- Label text, default value is the name of the value.
 
             * *flat* (``bool``) -- Flat look and feel.
 
-            * *inline* (``bool``) -- Display DynamicValue and label in its actual size
+            * *inline* (``bool``) -- Display value and label in its actual size
                 If you set inline to true the size parameter is ignored.
-                The DynamicValue will only occupy as much space as the label and input takes.
+                The value will only occupy as much space as the label and input takes.
 
             * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
 
@@ -357,23 +355,23 @@ class DynamicBoolean(DynamicValue):
             **kwargs
             )
 
-class DynamicEnum(DynamicValue):
+class EnumValue(KerviValue):
     r"""
-    A DynamicEnum value holds a selection of predefined values to select between.
-    The DynamicValue is presented as a dropdown on dashboards.
+    A value that holds a selection of predefined values to select between.
+    The value is presented as a dropdown on dashboards.
 
     Usage:
 
     .. code-block:: python
 
-            self.framerate = self.inputs.add("frame_rate", "Frame rate", DynamicEnum)
+            self.framerate = self.inputs.add("frame_rate", "Frame rate", EnumSignal)
             self.framerate.addOption("5", "5 / sec")
             self.framerate.addOption("10", "10 / sec")
             self.framerate.addOption("15", "15 / sec", True)
 
     """
     def __init__(self, name, **kwargs):
-        DynamicValue.__init__(self, name, "dynamic-enum", **kwargs)
+        KerviValue.__init__(self, name, "enum-value", **kwargs)
 
         self.options = []
         self.selected_options = []
@@ -424,7 +422,7 @@ class DynamicEnum(DynamicValue):
             self.settings.store_value("value", self.selected_options)
 
         self.spine.trigger_event(
-            "dynamicValueChanged",
+            "valueChanged",
             self.component_id,
             {"select":self.component_id, "value":self.options}
         )

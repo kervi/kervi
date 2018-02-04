@@ -1,9 +1,9 @@
 from mockup_spine import MockupSpine
-from kervi.values import DynamicValue, DynamicNumber, DynamicBoolean
+from kervi.values import KerviValue, NumberValue, BooleanValue
 
 def test_value_instantitation_input():
     spine = MockupSpine()
-    value = DynamicValue("Dynamic Value", "Dynamic-test-value", value_id="dv", spine=spine)
+    value = KerviValue("Dynamic Value", "Dynamic-test-value", value_id="dv", spine=spine)
 
     assert value.value_id == "dv"
     assert value.name == "Dynamic Value"
@@ -12,7 +12,7 @@ def test_value_instantitation_input():
 
 def test_value_instantitation_output():
     spine = MockupSpine()
-    value = DynamicValue("Dynamic Value", "Dynamic-test-value", is_input=False, value_id="dv", spine=spine)
+    value = KerviValue("Dynamic Value", "Dynamic-test-value", is_input=False, value_id="dv", spine=spine)
 
     assert value.value_id == "dv"
     assert value.name == "Dynamic Value"
@@ -21,7 +21,7 @@ def test_value_instantitation_output():
 
 def test_number_instantiation():
     spine = MockupSpine()
-    number = DynamicNumber("Dynamic Number", value_id="dn", spine=spine)
+    number = NumberValue("Dynamic Number", value_id="dn", spine=spine)
 
     assert number.value_id == "dn"
     assert number.name == "Dynamic Number"
@@ -30,14 +30,14 @@ def test_number_instantiation():
 
 def test_number_set_value():
     spine = MockupSpine()
-    number = DynamicNumber("Dynamic Number", value_id="dn", spine=spine)
+    number = NumberValue("Dynamic Number", value_id="dn", spine=spine)
 
     number.value = 10
     assert number.value == 10
 
 def test_set_value_events():
     spine = MockupSpine()
-    number = DynamicNumber("Dynamic Number", value_id="dn", spine=spine)
+    number = NumberValue("Dynamic Number", value_id="dn", spine=spine)
    
     number.value = 10
 
@@ -46,7 +46,7 @@ def test_set_value_events():
 
 def test_set_value_events_delta():
     spine = MockupSpine()
-    number = DynamicNumber("Dynamic Number", value_id="dn", spine=spine)
+    number = NumberValue("Dynamic Number", value_id="dn", spine=spine)
     number.delta =10
 
     assert number.value == 0
@@ -73,7 +73,7 @@ def test_set_value_events_delta():
 
 def test_boolean_instantiation():
     spine = MockupSpine()
-    number = DynamicBoolean("Dynamic Boolean", value_id="db", spine=spine)
+    number = BooleanValue("Dynamic Boolean", value_id="db", spine=spine)
 
     assert number.value_id == "db"
     assert number.name == "Dynamic Boolean"
@@ -81,7 +81,7 @@ def test_boolean_instantiation():
 
 def test_boolean_set_value():
     spine = MockupSpine()
-    number = DynamicBoolean("Dynamic Boolean", value_id="db", spine=spine)
+    number = BooleanValue("Dynamic Boolean", value_id="db", spine=spine)
 
     number.value = True
     assert number.value == True
@@ -91,8 +91,8 @@ def test_boolean_set_value():
 
 def test_linking_in_to_out():
     spine = MockupSpine()
-    number_out = DynamicNumber("Dynamic Number", is_input=False, value_id="dn", spine=spine)
-    number_in = DynamicNumber("Dynamic Number", value_id="dn", spine=spine)
+    number_out = NumberValue("Dynamic Number", is_input=False, value_id="dn", spine=spine)
+    number_in = NumberValue("Dynamic Number", value_id="dn", spine=spine)
 
     assert number_out.value == 0
     assert number_in.value == 0
@@ -105,8 +105,8 @@ def test_linking_in_to_out():
 
 def test_linking_out_to_in():
     spine = MockupSpine()
-    number_out = DynamicNumber("Dynamic Number", is_input=False, value_id="dn", spine=spine)
-    number_in = DynamicNumber("Dynamic Number", value_id="dn", spine=spine)
+    number_out = NumberValue("Dynamic Number", is_input=False, value_id="dn", spine=spine)
+    number_in = NumberValue("Dynamic Number", value_id="dn", spine=spine)
 
     assert number_out.value == 0
     assert number_in.value == 0
@@ -119,8 +119,8 @@ def test_linking_out_to_in():
 
 def test_linking_transformation():
     spine = MockupSpine()
-    number_out = DynamicNumber("Dynamic Number", is_input=False, value_id="dn", spine=spine)
-    number_in = DynamicNumber("Dynamic Number", value_id="dn", spine=spine)
+    number_out = NumberValue("Dynamic Number", is_input=False, value_id="dn", spine=spine)
+    number_in = NumberValue("Dynamic Number", value_id="dn", spine=spine)
 
     assert number_out.value == 0
     assert number_in.value == 0

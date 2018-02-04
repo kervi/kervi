@@ -24,9 +24,9 @@ from kervi.utility.component import KerviComponent
 
 from kervi.actions import Actions
 VALUE_COUNTER = 0
-class DynamicValue(KerviComponent):
+class KerviValue(KerviComponent):
     """
-    Generic dynamic value that is use as base class for specialized dynamic values.
+    Generic value that is use as base class for specialized  kervi values.
     """
     def __init__(self, name, value_type, **kwargs):
         global VALUE_COUNTER
@@ -35,9 +35,9 @@ class DynamicValue(KerviComponent):
         if input_id is None:
             VALUE_COUNTER += 1
             if parent:
-                input_id = parent.component_id + ".DV_" + str(VALUE_COUNTER)
+                input_id = parent.component_id + ".VALUE_" + str(VALUE_COUNTER)
             else:
-                input_id = "DV_" + str(VALUE_COUNTER)
+                input_id = "VALUE_" + str(VALUE_COUNTER)
         elif parent:
             input_id = parent.component_id + "." + input_id
 
@@ -48,6 +48,7 @@ class DynamicValue(KerviComponent):
         self._index = kwargs.get("index", None)
         self.is_input = kwargs.get("is_input", True)
         self._value = None
+        self._sparkline = []
         self._observers = []
         self._value_event_handlers = []
         if parent:
@@ -55,7 +56,7 @@ class DynamicValue(KerviComponent):
         self._spine_observers = {}
         self.command = self.component_id + ".setValue"
         self.spine.register_command_handler(self.command, self._set_value, groups=self.admin_groups)
-        self.spine.register_query_handler("getDynamicValue", self._query_value, groups=self.user_groups)
+        self.spine.register_query_handler("getKerviValue", self._query_value, groups=self.user_groups)
 
         self._ui_parameters = {
             "size": 0,
@@ -95,7 +96,7 @@ class DynamicValue(KerviComponent):
     def value(self, new_value):
         """
         Updates the value.
-        If the change exceeds the delta for the dynamic number controllers and linked values are notified.  
+        If the change exceeds the change delta observers and linked values are notified.  
         """
         self._set_value(new_value)
 
@@ -138,27 +139,27 @@ class DynamicValue(KerviComponent):
             print("v", value)
             self._set_value(value, False)
 
-    def link_to(self, dynamic_value, transformation=None):
+    def link_to(self, source, transformation=None):
         """
-        Dynamic values may be linked together. 
-        A dynamic value is configured to be an input or output.
+        Kervi values may be linked together. 
+        A KerviValue is configured to be either an input or output.
         When an output value is linked to an input value the input will become
         an observer of the output. Every time the output value change it will notify the input 
         about the change.
 
-        :param dynamic_value:
+        :param source:
             It is possible to make direct and indirect link.
 
-            If the type of the parameter dynamic_value is of type DynamicValue a direct link is created.
-            this is a fast link where the output can signal directly to input.
+            If the type of the source parameter is of type KerviValue a direct link is created.
+            this is a fast link where the output can notify directly to input.
             This type of link is possible if both output and input resides in the same process.
 
-            If the type of the dynamic_value is a string it is expected to hold the id of a dynamic value.
+            If the type of the source parameter is a string it is expected to hold the id of a another KerviValue.
             In this mode the input value will listen on the kervi spine for events from the output value.
             This mode is useful if the output and input does not exists in the same process.
             This type of link must be made by the input.
 
-        :type dynamic_value: ``str`` or ``DynamicValue``
+        :type source: ``str`` or ``KerviValue``
 
         :param transformation:
             A function or lambda expression that transform the value before the output is update.
@@ -166,23 +167,22 @@ class DynamicValue(KerviComponent):
             or need to change the sign of the value.
 
         """
-        source = dynamic_value
-        if isinstance(source, DynamicValue):
+        if isinstance(source, KerviValue):
             if source.is_input and not self.is_input:
                 self.add_observer(source, transformation)
             elif not source.is_input and self.is_input:
                 source.add_observer(self, transformation)
             else:
-                raise Exception("input/output mismatch in dynamic value link:{0} - {1}".format(source.name, self.name))
+                raise Exception("input/output mismatch in kervi value link:{0} - {1}".format(source.name, self.name))
         elif isinstance(source, str):
             if len(self._spine_observers) == 0:
-                self.spine.register_event_handler("dynamicValueChanged", self._value_changed_event)
+                self.spine.register_event_handler("valueChanged", self._link_changed_event)
 
             self._spine_observers[source] = transformation
 
     def link_to_dashboard(self, dashboard_id, section_id, **kwargs):
         r"""
-        Links this DynamicValue to a dashboard panel.
+        Links this value to a dashboard panel.
 
         :param dashboard_id:
             Id of the dashboard to link to.
@@ -197,17 +197,17 @@ class DynamicValue(KerviComponent):
 
         :Keyword Arguments:
             
-            * *link_to_header* (``str``) -- Link this DynamicValue to header of the panel.
+            * *link_to_header* (``str``) -- Link this value to header of the panel.
 
             * *label_icon* (``str``) -- Icon that should be displayed together with label.
 
-            * *label* (``str``) -- Label text, default value is the name of the DynamicValue.
+            * *label* (``str``) -- Label text, default value is the name of the value.
 
             * *flat* (``bool``) -- Flat look and feel.
 
-            * *inline* (``bool``) -- Display DynamicValue and label in its actual size
+            * *inline* (``bool``) -- Display value and label in its actual size
                 If you set inline to true the size parameter is ignored.
-                The DynamicValue will only occupy as much space as the label and input takes.
+                The value  will only occupy as much space as the label and input takes.
 
             * *input_size* (``int``) -- width of the slider as a percentage of the total container it sits in.
 
@@ -223,17 +223,17 @@ class DynamicValue(KerviComponent):
     def add_observer(self, observer, transformation=None):
         """
         Adds an observer to this value.
-        The observer must implement the function dynamic_value_changed. 
+        The observer must implement the function value_changed. 
         """
         self._observers += [(observer, transformation)]
 
-    def _value_changed_event(self, id, value, old_value ):
-        if value["id"] in self._spine_observers.keys():
-            transformation = self._spine_observers[value["id"]]
+    def _link_changed_event(self, id, source, old_value):
+        if source["id"] in self._spine_observers.keys():
+            transformation = self._spine_observers[source["id"]]
             if transformation:
-                self.value = transformation(value["value"])
+                self.value = transformation(source["value"])
             else:
-                self.value = value["value"]
+                self.value = source["value"]
 
     def _set_value(self, nvalue, allow_persist=True):
         if self._value != nvalue:
@@ -250,9 +250,9 @@ class DynamicValue(KerviComponent):
             for observer in self._observers:
                 item, transformation = observer
                 if transformation:
-                    item.dynamic_value_changed(self, transformation(nvalue))
+                    item.value_changed(self, transformation(nvalue))
                 else:
-                    item.dynamic_value_changed(self, nvalue)
+                    item.value_changed(self, nvalue)
 
             self._check_value_events(nvalue, old_value)
 
@@ -261,22 +261,22 @@ class DynamicValue(KerviComponent):
 
             val = {"id":self.component_id, "value":nvalue, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
             self.spine.trigger_event(
-                "dynamicValueChanged",
+                "valueChanged",
                 self.component_id,
                 val,
                 self._log_values,
                 groups=self.user_groups
             )
 
-    def dynamic_value_changed(self, dynamic_value, value):
-        self.value = value
+    #def signal_changed(self, signal, value):
+    #    self.value = value
 
     def value_changed(self, new_value, old_value):
         pass
 
     def add_value_event(self, event_value, func, event_type=None, parameters=None, **kwargs):
         """
-        Add a function that is called when the dynamic value reach or pass the event_value.
+        Add a function that is called when the value reach or pass the event_value.
 
         :param event_value:
             A single value or range specified as a tuple.
@@ -301,7 +301,23 @@ class DynamicValue(KerviComponent):
     def _handle_range_event(self, value, message, func, level, **kwargs):
         if message:
             from kervi.messaging import Messaging
-            kwargs = dict(kwargs, source_id=self.component_id, source_name=self.name, level=level)
+            from kervi.utility.superformatter import SuperFormatter
+            sf = SuperFormatter()
+
+            body_template = '''
+                Hi {user_name}
+
+                {message}
+
+                Value: {value}
+
+                Latest values
+                {sparkline:repeat: Time: {{item[timestamp}} value:{{"value"}}}
+            '''
+
+            body = None #sf.format(body_template, message=message, value=self.value, sparkline=self._sparkline, user_name="{user_name}") 
+
+            kwargs = dict(kwargs, source_id=self.component_id, source_name=self.name, level=level, body=body)
             Messaging.send_message(message, **kwargs)
         if func:
             func(self)

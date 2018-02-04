@@ -30,23 +30,23 @@ In your application you access GPIO via:
     #define channel 23 as input
     GPIO.define_as_input(23)
 """
-from kervi.values import DynamicNumber, DynamicBoolean
-from kervi.values.dynamic_value_list import DynamicValueList
+from kervi.values import NumberValue, BooleanValue
+from kervi.values.value_list import ValueList
 
 CHANNEL_TYPE_ANALOG_IN = 1
 CHANNEL_TYPE_ANALOG_OUT = 2
 CHANNEL_TYPE_GPIO = 3
 
-class LogicIOChannel(DynamicBoolean):
+class LogicIOChannel(BooleanValue):
     def __init__(self, gpio_device, channel):
-        DynamicBoolean.__init__(self, gpio_device.name +" " + str(channel), input_id=str(channel))
+        BooleanValue.__init__(self, gpio_device.name +" " + str(channel), input_id=str(channel))
         self._device = gpio_device
         self._channel = channel
 
-        self.pwm = DynamicValueList(self, True)
-        self.pwm.add("duty_cycle", "Duty cycle", DynamicNumber)
-        self.pwm.add("frequency", "Frequency", DynamicNumber)
-        self.pwm.add("active", "Active", DynamicBoolean)
+        self.pwm = ValueList(self, True)
+        self.pwm.add("duty_cycle", "Duty cycle", NumberValue)
+        self.pwm.add("frequency", "Frequency", NumberValue)
+        self.pwm.add("active", "Active", BooleanValue)
 
         self.pwm["duty_cycle"].min = 0
         self.pwm["duty_cycle"].max = 100
@@ -115,9 +115,9 @@ class LogicIOChannel(DynamicBoolean):
             else:
                 self._device.pwm_stop(self._channel)
 
-class AnalogIOChannel(DynamicNumber):
+class AnalogIOChannel(NumberValue):
     def __init__(self, gpio_device, channel, is_input):
-        DynamicNumber.__init__(self, str(channel), is_input=is_input)
+        NumberValue.__init__(self, str(channel), is_input=is_input)
         self._device = gpio_device
         self._channel = channel
         self.min = 0

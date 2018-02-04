@@ -29,16 +29,16 @@ import time
 from kervi.utility.thread import KerviThread
 from kervi.spine import Spine
 from kervi.utility.component import KerviComponent
-from kervi.values import DynamicNumber
+from kervi.values import NumberValue
 #from kervi.settings import Settings
 
-class Sensor(DynamicNumber):
+class Sensor(NumberValue):
     r"""
     Sensor is a class that exposes a sensor device as a dynamic value.
     The Sensor class polls the associated sensor device and updates it self when
     the value of the sensor device change.
 
-    All the possibilities for linking to other dynamic values and dashboards are inherited from DynamicNumber.
+    All the possibilities for linking to other dynamic values and dashboards are inherited from NumberValue.
 
     Some sensor devices are multi dimensional and each dimension are reached by a numeric index of the sensor it self.
 
@@ -60,7 +60,7 @@ class Sensor(DynamicNumber):
 
     """
     def __init__(self, sensor_id, name, device=None, **kwargs):
-        DynamicNumber.__init__(self, name, value_id=sensor_id, is_input=False, **kwargs)
+        NumberValue.__init__(self, name, value_id=sensor_id, is_input=False, **kwargs)
         self._device = device
         self._component_type = "sensor"
         self._type = None

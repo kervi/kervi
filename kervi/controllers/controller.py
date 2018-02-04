@@ -26,9 +26,9 @@ A Kervi controller is a class that acts upon input from users or events or the u
 #from kervi.utility.thread import KerviThread
 from kervi.utility.component import KerviComponent
 #from kervi.hal import GPIO
-from kervi.values.dynamic_value_list import DynamicValueList
-from kervi.values.dynamic_value import DynamicValue
-from kervi.values import DynamicNumber
+from kervi.values.value_list import ValueList
+from kervi.values.kervi_value import KerviValue
+from kervi.values import NumberValue
 from kervi.actions import Actions
 from kervi.actions.action import Action, _ActionInterupt
 
@@ -43,8 +43,8 @@ class Controller(KerviComponent):
     """
     def __init__(self, controller_id, name, **kwargs):
         KerviComponent.__init__(self, controller_id, "controller", name, **kwargs)
-        self.inputs = DynamicValueList(self, True)
-        self.outputs = DynamicValueList(self, False)
+        self.inputs = ValueList(self, True)
+        self.outputs = ValueList(self, False)
         self._active = False
         self.type = "unknown"
         self.parameters = {}
@@ -152,9 +152,9 @@ class Controller(KerviComponent):
         Abstract method that is called when the entire application is loaded.
         """
     
-    def dynamic_value_changed(self, dynamic_value, value):
+    def value_changed(self, source, value):
         if self._active:
-            self.input_changed(dynamic_value)
+            self.input_changed(source)
 
     def input_changed(self, input_id):
         """
@@ -167,7 +167,7 @@ class Controller(KerviComponent):
             Input that has changed. You can read the value of the changed input
             via the inputs value property.
 
-        :type changed_input: DynamicValue
+        :type changed_input: KerviValue
         """
         pass
 
@@ -217,7 +217,7 @@ class Controller(KerviComponent):
                     Controller.__init__(self, controller_id, name)
                     for key in cls.__dict__.keys():
                         prop = cls.__dict__[key]
-                        if isinstance(prop, DynamicValue):
+                        if isinstance(prop, KerviValue):
                             if prop.is_input:
                                 self.inputs._add_internal(key, prop)
                             else:
@@ -227,7 +227,7 @@ class Controller(KerviComponent):
         return _decorator
 
     @staticmethod
-    def input(input_id, name, value_class=DynamicNumber):
+    def input(input_id, name, value_class=NumberValue):
         """Add input to controller"""
         def _init():
             return value_class(
@@ -242,7 +242,7 @@ class Controller(KerviComponent):
         return _decorator
 
     @staticmethod
-    def output(output_id, name, value_class=DynamicNumber):
+    def output(output_id, name, value_class=NumberValue):
         """Add output to controller"""
         def _init():
             return value_class(

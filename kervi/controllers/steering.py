@@ -21,7 +21,7 @@
 import time
 from kervi.controllers.controller import Controller
 from kervi.controllers.tasks import TaskHandler
-from kervi.values import DynamicNumber, DynamicBoolean
+from kervi.values import NumberValue, BooleanValue
 from kervi.actions import action
 
 class MotorSteering(TaskHandler):
@@ -31,18 +31,18 @@ class MotorSteering(TaskHandler):
     def __init__(self, controller_id="steering", name="Steering"):
         TaskHandler.__init__(self, controller_id, name)
         self.type = "steering"
-        self.left_speed = self.outputs.add("left_speed", "Left speed", DynamicNumber)
-        self.right_speed = self.outputs.add("right_speed", "Right speed", DynamicNumber)
+        self.left_speed = self.outputs.add("left_speed", "Left speed", NumberValue)
+        self.right_speed = self.outputs.add("right_speed", "Right speed", NumberValue)
 
-        self.inputs.add("left_encoder", "Left encoder", DynamicNumber)
-        self.inputs.add("right_encoder", "Right encoder", DynamicNumber)
+        self.inputs.add("left_encoder", "Left encoder", NumberValue)
+        self.inputs.add("right_encoder", "Right encoder", NumberValue)
 
         self._adjust = 0
 
-        self.speed = self.inputs.add("speed", "Speed", DynamicNumber)
-        self.adaptive_speed = self.inputs.add("adaptive_speed", "Adaptive speed", DynamicNumber)
-        self.direction = self.inputs.add("direction", "Direction", DynamicNumber)
-        self.adaptive_direction = self.inputs.add("Adaptive direction", "Adaptive direction", DynamicNumber)
+        self.speed = self.inputs.add("speed", "Speed", NumberValue)
+        self.adaptive_speed = self.inputs.add("adaptive_speed", "Adaptive speed", NumberValue)
+        self.direction = self.inputs.add("direction", "Direction", NumberValue)
+        self.adaptive_direction = self.inputs.add("Adaptive direction", "Adaptive direction", NumberValue)
 
     @property
     def adjust(self):

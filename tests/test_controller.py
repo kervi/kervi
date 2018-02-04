@@ -1,14 +1,14 @@
 from kervi.controllers.controller import Controller
-from kervi.values import DynamicNumber
+from kervi.values import NumberValue
 from mockup_spine import MockupSpine
 
 class XController(Controller):
     def __init__(self):
         Controller.__init__(self, "test_controller", "Test controller", spine = MockupSpine())
 
-        self.input_1 = self.inputs.add("controller_input_1", "input 1", DynamicNumber)
-        self.input_2 = self.inputs.add("controller_input_2", "input 2", DynamicNumber)
-        self.output = self.outputs.add("controller_output", "output", DynamicNumber)
+        self.input_1 = self.inputs.add("controller_input_1", "input 1", NumberValue)
+        self.input_2 = self.inputs.add("controller_input_2", "input 2", NumberValue)
+        self.output = self.outputs.add("controller_output", "output", NumberValue)
 
         self.last_input = None
 
