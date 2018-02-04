@@ -1,4 +1,7 @@
 {
   "tests/test_application.py::test_application_run": true,
-  "tests/test_controller.py::TestController": true
+  "tests/test_controller.py::TestController": true,
+  "tests/test_value.py::test_linking_in_to_out": true,
+  "tests/test_value.py::test_linking_out_to_in": true,
+  "tests/test_value.py::test_linking_transformation": true
 }

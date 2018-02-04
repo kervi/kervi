@@ -20,21 +20,15 @@ def test_application():
     {
         "modules":["app_module"],
         "network":{
-            "IPAddress": "localhost",
-            "IPRootAddress": "localhost",
-            "IPCRootPort":9500,
-            "WebSocketPort":9000,
-            "WebPort": 8080,
-            "IPCSecret":b"fd9969b3-9748-46b6-a69d-119ec2773352",
-            
-        },            
+            "ip": "127.0.0.1"
+        }
     })
 
     app.spine.register_event_handler("appReady", app_ready)
     app.spine.register_command_handler("signalModuleLoad", module_loaded)
-    assert app.settings["info"]["id"] == "kervi_app"
-    assert app.settings["modules"] == ["app_module"]
-    assert app.settings["network"]["IPAddress"] ==  "localhost"
+    assert app.confi.application.id == "kervi"
+    assert app.config.modules == ["app_module"]
+    assert app.config.network.ip ==  "127.0.0.1"
 
     app._xrun()
 

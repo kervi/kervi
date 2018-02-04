@@ -41,8 +41,8 @@ def test_set_value_events():
    
     number.value = 10
 
-    assert "dynamicValueChanged" in spine.events.keys()
-    assert spine.events["dynamicValueChanged"]["args"][0]["value"] == 10
+    assert "valueChanged" in spine.events.keys()
+    assert spine.events["valueChanged"]["args"][0]["value"] == 10
 
 def test_set_value_events_delta():
     spine = MockupSpine()
@@ -53,23 +53,23 @@ def test_set_value_events_delta():
 
     number.value = 5
     assert number.value == 0
-    assert "dynamicValueChanged"  not in spine.events.keys()
+    assert "valueChanged"  not in spine.events.keys()
 
     spine.events = {}
     number.value = 10
     assert number.value == 10
-    assert spine.events["dynamicValueChanged"]["args"][0]["value"] == 10
+    assert spine.events["valueChanged"]["args"][0]["value"] == 10
 
     spine.events = {}
     number.value = 7
 
     assert number.value == 10
-    assert "dynamicValueChanged" not in spine.events.keys()
+    assert "valueChanged" not in spine.events.keys()
 
     spine.events = {}
     number.value = 0
     assert number.value == 0
-    assert spine.events["dynamicValueChanged"]["args"][0]["value"] == 0
+    assert spine.events["valueChanged"]["args"][0]["value"] == 0
 
 def test_boolean_instantiation():
     spine = MockupSpine()
