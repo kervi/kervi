@@ -142,11 +142,11 @@ class NumberValue(KerviValue):
                 if isinstance(observer, tuple):
                     item, transformation = observer
                     if transformation:
-                        item.value_changed(self, transformation(new_value))
+                        item.kervi_value_changed(self, transformation(new_value))
                     else:
-                        item.value_changed(self, new_value)
+                        item.kervi_value_changed(self, new_value)
                 else:
-                    observer.value_changed(self, new_value)
+                    observer.kervi_value_changed(self, new_value)
 
             self._check_value_events(new_value, old_value)
 

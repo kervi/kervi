@@ -91,8 +91,8 @@ def test_boolean_set_value():
 
 def test_linking_in_to_out():
     spine = MockupSpine()
-    number_out = NumberValue("Dynamic Number", is_input=False, value_id="dn", spine=spine)
-    number_in = NumberValue("Dynamic Number", value_id="dn", spine=spine)
+    number_out = NumberValue("Dynamic Number", is_input=False, value_id="dno", spine=spine)
+    number_in = NumberValue("Dynamic Number", value_id="dni", spine=spine)
 
     assert number_out.value == 0
     assert number_in.value == 0

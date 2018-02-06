@@ -152,7 +152,7 @@ class Controller(KerviComponent):
         Abstract method that is called when the entire application is loaded.
         """
     
-    def value_changed(self, source, value):
+    def kervi_value_changed(self, source, value):
         if self._active:
             self.input_changed(source)
 

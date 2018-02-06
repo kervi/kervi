@@ -249,10 +249,11 @@ class KerviValue(KerviComponent):
 
             for observer in self._observers:
                 item, transformation = observer
+                print("o", item, transformation)
                 if transformation:
-                    item.value_changed(self, transformation(nvalue))
+                    item.kervi_value_changed(self, transformation(nvalue))
                 else:
-                    item.value_changed(self, nvalue)
+                    item.kervi_value_changed(self, nvalue)
 
             self._check_value_events(nvalue, old_value)
 
@@ -268,8 +269,8 @@ class KerviValue(KerviComponent):
                 groups=self.user_groups
             )
 
-    #def signal_changed(self, signal, value):
-    #    self.value = value
+    def kervi_value_changed(self, source, value):
+        self._set_value(value, False)
 
     def value_changed(self, new_value, old_value):
         pass
