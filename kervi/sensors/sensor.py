@@ -30,6 +30,7 @@ from kervi.utility.thread import KerviThread
 from kervi.spine import Spine
 from kervi.utility.component import KerviComponent
 from kervi.values import NumberValue
+from kervi.config import Configuration
 #from kervi.settings import Settings
 
 class Sensor(NumberValue):
@@ -63,12 +64,11 @@ class Sensor(NumberValue):
         NumberValue.__init__(self, name, value_id=sensor_id, is_input=False, **kwargs)
         self._device = device
         self._component_type = "sensor"
-        self._type = None
         self._sub_sensors = []
         self._dimensions = 1
         if self._device:
-            self._type = self._device.type
-            self.unit = self._device.unit
+            self.value_type = self._device.type
+            self.value_unit = self._device.unit
             self.min = self._device.min
             self.max = self._device.max
             self._dimensions = self._device.dimensions
@@ -84,7 +84,7 @@ class Sensor(NumberValue):
                             index=count,
                             **kwargs
                         )
-                    sub_sensor.unit = self.unit
+                    sub_sensor.value_unit = self.value_unit
                     self._sub_sensors += [
                         sub_sensor
                     ]
@@ -115,19 +115,6 @@ class Sensor(NumberValue):
     @polling_interval.setter
     def reading_interval(self, interval):
         self._sensor_thread.reading_interval = interval
-
-    @property
-    def type(self):
-        """
-        Sensor type enter values like temperature, pressure, counter.
-
-        :type: ``str``
-        """
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        self._type = value
 
     @property
     def sensor_id(self):
@@ -190,12 +177,12 @@ class Sensor(NumberValue):
             for dimension in range(0, self._dimensions):
                 dimensions += [self._sub_sensors[dimension]._get_component_info()]
         return {
-            "type":self.type,
+            "type":self.value_type,
             "subSensors": dimensions,
             "isInput": False,
             "maxValue":self.max,
             "minValue":self.min,
-            "unit":self.unit,
+            "unit":self.value_unit,
             "value":self._value,
             "ranges":self._event_ranges,
             "sparkline":self._sparkline

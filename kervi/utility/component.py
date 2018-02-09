@@ -179,6 +179,9 @@ class KerviComponent(object):
         )
         return {}
 
+    def _get_ui_parameters(self, ui_parameters):
+        return ui_parameters
+
     def _get_component_info(self, component_id=None, **kwargs):
         if  component_id is None or component_id == self.component_id:
             session = kwargs.get("session", None)
@@ -196,12 +199,12 @@ class KerviComponent(object):
                 #except Exception as ex:
                 #    print("ex", self.component_id, ex)
                 #    info = {}
-
+                ui_parameters = self._get_ui_parameters(self._ui_parameters)
                 info["componentType"] = self.component_type
                 info["id"] = self.component_id
                 info["visible"] = self.visible
                 info["name"] = self.name
-                info["ui"] = self._camel_case_parameters(self._ui_parameters)
+                info["ui"] = self._camel_case_parameters(ui_parameters)
                 return info
 
     def _underscore_to_camelcase(self, value):

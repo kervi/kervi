@@ -52,7 +52,9 @@ class _KerviConfig:
         return len(self._keys)
 
     def get(self, name, default_value=None):
-            if hasattr(self, name):
+            if not name:
+                return default_value
+            elif hasattr(self, name):
                 return getattr(self, name)
             else:
                 return default_value

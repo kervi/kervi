@@ -43,7 +43,6 @@ class KerviValue(KerviComponent):
 
         KerviComponent.__init__(self, input_id, value_type, name, **kwargs)
         #self.spine = Spine()
-        self._unit = ""
         self._default_value = None
         self._index = kwargs.get("index", None)
         self.is_input = kwargs.get("is_input", True)
@@ -72,6 +71,7 @@ class KerviValue(KerviComponent):
             "value_size":3,
             "width":0,
             "height":0
+
         }
         self._persist_value = kwargs.get("persist_value", False)
         self._log_values = kwargs.get("log_values", True)
@@ -362,7 +362,6 @@ class KerviValue(KerviComponent):
 
     def _get_info(self, **kwargs):
         return {
-            "unit":self._unit,
             "value":self.value,
             "command":self.command,
             "ranges":self._event_ranges,

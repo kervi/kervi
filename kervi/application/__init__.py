@@ -41,6 +41,7 @@ import kervi.utility.encryption as encryption
 import kervi.utility.application_helpers as app_helpers
 from kervi.controllers.controller import Controller
 from kervi.actions import action
+from kervi.application.default_config import get_default_config
 
 class _AppActions(Controller):
     def __init__(self, app):
@@ -106,75 +107,7 @@ class Application(object):
         self.config = load(
             config_file=selected_config_file,
             config_user=user_config,
-            config_base={
-                "application" : {
-                    "name": "Kervi",
-                    "id": "kervi"
-                },
-                "log" : {
-                    "levels":["fatal", "error", "warning", "information", "debug"],
-                    "level":"debug",
-                    "file":"kervi.log",
-                    "resetLog": False
-                },
-                "modules":[],
-                "network" : {
-                    "ip": nethelper.get_ip_address(),
-                    "http_port": nethelper.get_free_port([80, 8080, 8081]),
-                    "ws_port": nethelper.get_free_port([9000]),
-                    "ipc_root_port": nethelper.get_free_port([9500]),
-                    "ipc_root_address": nethelper.get_ip_address()
-                },
-                "authentication": {
-                    "enabled": False,
-                    "users" : {
-                        "anonymous":{
-                            "enabled": True,
-                            "groups":[]
-                        },
-                        "admin":{
-                            "enabled": True,
-                            "password":"",
-                            "groups":["admin"],
-                            "name": "",
-                            "email": "",
-                            "phone": ""
-                        }
-                    }
-                },
-                "messaging": {
-                    "default_channels": ["user_log"],
-                    "channels":{
-                        "user_log":{
-
-                        },
-                        "email": {
-                            "enabled": False,
-                            "smtp": {
-                                "sender_name": "Kervi",
-                                "sender_address": "kervi@example.com",
-                                "server": "localhost",
-                                "port": "25",
-                                "user": "",
-                                "password": "",
-                                "tls": False
-                            }
-                        }
-                    }
-                },
-                "encryption" :{
-                    "ipc_secret":"",
-                    "use_ssl": False,
-                    "cert_file": "kervi.cert",
-                    "key_file": "kervi.key"
-                },
-                "media":{
-                    "folders":{
-                        "images":"images",
-                        "videos":"videos"
-                    }
-                }
-            }
+            config_base=get_default_config()
         )
 
         print("Starting kervi application:", self.config.application.name)

@@ -23,6 +23,7 @@ import time
 from datetime import datetime
 from kervi.values.kervi_value import KerviValue
 from kervi.utility.component import KerviComponent
+from kervi.config import Configuration
 
 class NumberValue(KerviValue):
     """
@@ -35,18 +36,23 @@ class NumberValue(KerviValue):
         #self.spine = Spine()
         self._min_value = -100
         self._max_value = 100
-        self._unit = ""
+        self._value_unit = ""
+        self._value_type = None
+        self._display_unit = ""
         self._default_value = 0.0
         self._value = 0
         self._delta = None
         self._ui_parameters["type"] = ""
-        self._ui_parameters["chart_points"] = 60
+        self._ui_parameters["min_integer_digits"] = 1
+        self._ui_parameters["min_fraction_digits"] = 1
+        self._ui_parameters["max_fraction_digits"] = 1
         self._ui_parameters["show_sparkline"] = False
         self._ui_parameters["pad_auto_center"] = False
         self._ui_parameters["chart_buttons"] = True
         self._ui_parameters["chart_grid"] = True
         self._ui_parameters["chart_interval"] = "5min"
         self._ui_parameters["tick"] = 1.0
+        self._ui_parameters["display_unit"] = None
 
         self._last_reading = None
 
@@ -89,22 +95,62 @@ class NumberValue(KerviValue):
         self._min_value = value
 
     @property
-    def unit(self):
+    def value_unit(self):
         """
-        Unit of value. Enter values like C, F, hPa
+        Metric Unit of value.
 
         :type: ``str``
         """
-        return self._unit
+        return self._value_unit
 
-    @unit.setter
-    def unit(self, value):
-        self._unit = value
+    @value_unit.setter
+    def value_unit(self, value):
+        self._value_unit = value
 
+    @property
+    def value_type(self):
+        """
+        Value type.
+
+        :type: ``str``
+        """
+        return self._value_type
+
+    @value_type.setter
+    def value_type(self, value):
+        self._value_unit = value
+
+    @property
+    def display_unit(self):
+        """
+        Display unit of value.
+
+        :type: ``str``
+        """
+        if self._display_unit:
+            return self._display_unit
+        else:
+            config = Configuration.display.unit_systems
+            default_system = config.default
+            units = config.systems[default_system]
+
+            display_unit = units.get(self._value_type, self._value_unit)
+            print()
+            return display_unit
+
+    @display_unit.setter
+    def display_unit(self, value):
+        self._display_unit = value
+
+    def _get_ui_parameters(self, ui_parameters):
+        ui_parameters["display_unit"] = self.display_unit
+        return ui_parameters
+
+    
     def _get_info(self, **kwargs):
         return {
             "isInput":self.is_input,
-            "unit":self._unit,
+            "value_unit":self._value_unit,
             "value":self.value,
             "maxValue":self._max_value,
             "minValue":self._min_value,
