@@ -32,7 +32,7 @@ except ImportError:
 import socket
 from kervi.controllers.controller import Controller
 from kervi.values import *
-from kervi.utility.thread import KerviThread
+from kervi.core.utility.thread import KerviThread
 import kervi.utility.nethelper as nethelper
 import kervi.spine as spine
 import kervi.hal as hal

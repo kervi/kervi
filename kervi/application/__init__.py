@@ -28,10 +28,8 @@ try:
 except ImportError:
     import _thread as thread
 
-#import sys
-#import uuid
 from kervi.application.kervi_module import KerviModule
-import kervi.utility.process as process
+import kervi.core.utility.process as process
 import kervi.spine as spine
 #from kervi.utility.process_spine import _ProcessSpine
 #import kervi.kervi_logging as logging
@@ -115,8 +113,11 @@ class Application(object):
         #    self.settings = app_helpers._deep_update(self.settings, settings)
         #self._validateSettings()
         self.started = False
-        
-        process._start_root_spine(self.config, True)
+        from kervi.zmq_spine import _ZMQSpine
+        self.spine = _ZMQSpine()
+        self.spine._init_spine("kervi-main", self.config.network.ipc_root_port, None, self.config.network.ipc_root_address)
+        spine.set_spine(self.spine)
+        #process._start_root_spine(self.config, True, _ZMQSpine)
         #spine._init_spine("application-" + self.settings["info"]["id"])
         self.spine = spine.Spine()
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
@@ -309,7 +310,7 @@ class Application(object):
         print("stopping processes")
         process._stop_processes("app-" + self.config.application.id)
         time.sleep(1)
-        process._stop_root_spine()
+        #process._stop_root_spine()
         #for thread in threading.enumerate():
         #    print("running thread",thread.name)
         print("application stopped")

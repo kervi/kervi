@@ -20,8 +20,8 @@
 # SOFTWARE.
 
 import collections
-import kervi.utility.process as process
-
+import kervi.core.utility.process as process
+from kervi.zmq_spine import _ZMQSpine
 
 def _deep_update(d, u):
     """Update a nested dictionary or similar mapping.
@@ -60,6 +60,11 @@ class _KerviModuleLoader(process._KerviProcess):
     def terminate_process(self):
         pass
 
+    def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+        spine = _ZMQSpine()
+        spine._init_spine(process_id, spine_port, root_address, ip)
+        return spine
+
 class _KerviSocketIPC(process._KerviProcess):
     """ Private class that starts a seperate process for IPC communication in the Kervi application """
 
@@ -70,6 +75,12 @@ class _KerviSocketIPC(process._KerviProcess):
         self.spine.send_command("startThreads", scope="process")
         self.spine.register_command_handler("startWebSocket", self._start_socket)
 
+    def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+        spine = _ZMQSpine()
+        spine._init_spine(process_id, spine_port, root_address, ip)
+
+        return spine
+    
     def _start_socket(self):
         #print("start socket")
         self._socket_spine.start_socket()

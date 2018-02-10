@@ -28,9 +28,9 @@ import threading
 import json
 import uuid
 import queue
-from kervi.spine.named_lists import NamedLists
+from kervi.zmq_spine.named_lists import NamedLists
 import kervi.utility.nethelper as nethelper
-from  kervi.utility.kervi_logging import KerviLog
+from  kervi.core.utility.kervi_logging import KerviLog
 
 _KERVI_COMMAND_ADDRESS = "inproc://kervi_commands"
 _KERVI_QUERY_ADDRESS = "inproc://kervi_query"

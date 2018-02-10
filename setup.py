@@ -15,18 +15,11 @@ setup(
     name='kervi',
     packages=[
         'kervi',
-        'kervi/actions',
         'kervi/application',
-        'kervi/config',
-        'kervi/controllers',
-        'kervi/dashboards',
-        'kervi/hal',
         'kervi/module',
         'kervi/messaging',
-        'kervi/sensors',
-        'kervi/spine',
+        'kervi/spine/kervi_zmq',
         'kervi/utility',
-        'kervi/values',
         'kervi/version',
         'kervi/vision',
     ],
@@ -59,6 +52,7 @@ setup(
         "Programming Language :: Python :: 3.4"
     ],
     install_requires=[
+        'kervi-core',
         'kervi-ui',
         'kervi-cli',
         'kervi-hal-generic',

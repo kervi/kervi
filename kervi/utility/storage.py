@@ -28,7 +28,7 @@ import inspect
 import threading
 import sqlite3 as lite
 import kervi.spine as spine
-from kervi.utility.thread import KerviThread
+from kervi.core.utility.thread import KerviThread
 
 SPINE = spine.Spine()
 FILE_CON = None
