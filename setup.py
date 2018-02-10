@@ -18,7 +18,7 @@ setup(
         'kervi/application',
         'kervi/module',
         'kervi/messaging',
-        'kervi/spine/kervi_zmq',
+        'kervi/zmq_spine',
         'kervi/utility',
         'kervi/version',
         'kervi/vision',
