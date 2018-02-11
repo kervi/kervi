@@ -75,17 +75,19 @@ class Application(object):
         import getopt
         import sys
 
+        
+
         config_files = []
 
-        opts, args = getopt.getopt(sys.argv[1:], "c", ["config_file="])
+        opts, args = getopt.getopt(sys.argv[1:], "c", ["config_file=", "service_install", "service_uninstall", "service_start", "service_stop"])
         for opt, arg in opts:
             if opt in ("-c", "--config_file"):
                 if os.path.isfile(arg):
                     config_files += [arg]
                 else:
                     print("Specified config file not found:", arg)
-
-        script_name = os.path.basename(os.path.abspath(inspect.stack()[1][1]))
+        script_path = os.path.abspath(inspect.stack()[1][1])
+        script_name = os.path.basename(script_path)
         script_name, script_ext = os.path.splitext(script_name)
         
         config_files += [script_name +".config.json"]
@@ -105,6 +107,37 @@ class Application(object):
             config_user=user_config,
             config_base=get_default_config()
         )
+
+        service_commands = []
+        for opt, arg in opts:
+            if opt in ("--service_install"):
+                service_commands += ["install"]
+
+            if opt in ("--service_uninstall"):
+                service_commands += ["uninstall"]
+
+            if opt in ("--service_start"):
+                service_commands += ["start"]
+
+            if opt in ("--service_stop"):
+                service_commands = "stop"
+            
+            if opt in ("--service_restart"):
+                service_commands = "restart"
+
+        if service_commands:
+            import kervi.hal as hal
+            hal_driver = hal._load()
+            if hal_driver:
+                hal.service_commands(
+                    service_commands,
+                    self.config.application.name,
+                    self.config.application.id,
+                    script_path
+                )
+            exit()
+
+
 
         print("Starting kervi application:", self.config.application.name)
         #if settings:
