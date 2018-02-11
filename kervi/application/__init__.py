@@ -96,9 +96,7 @@ class Application(object):
             if os.path.isfile(config_file):
                 selected_config_file = config_file
                 break
-        if selected_config_file:
-            print("using config file:", selected_config_file)
-        else:
+        if not selected_config_file:
             print("no config file found, revert to defaults")
 
         from kervi.config import load

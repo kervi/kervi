@@ -58,7 +58,6 @@ setup(
         'kervi-hal-generic',
         'kervi-device-library',
         'autobahn',
-        'pillow',
         'pyzmq',
     ],
     extras_require={
@@ -67,7 +66,7 @@ setup(
         'win':  ['kervi-hal-win'],
         'windows':  ['kervi-hal-win'],
         'linux':  ['kervi-hal-linux'],
-        'mac':  ['kervi-hal-linux'],
+        'mac':  ['kervi-hal-linux']
     },
     include_package_data=True,
     package_data={
