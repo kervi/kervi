@@ -30,7 +30,7 @@ except ImportError:
 
 #import sys
 #import uuid
-import kervi.utility.process as process
+import kervi.core.utility.process as process
 import kervi.spine as spine
 #from kervi.utility.process_spine import _ProcessSpine
 #import kervi.kervi_logging as logging
@@ -40,6 +40,7 @@ import kervi.utility.encryption as encryption
 import kervi.utility.application_helpers as app_helpers
 from kervi.actions import action, Actions
 from kervi.controllers.controller import Controller
+from kervi.module.default_config import get_default_config
 
 class _ModuleActions(Controller):
     def __init__(self, module):
@@ -76,7 +77,7 @@ class Module(object):
         """ Settings is a dictionary with the following content
         """
 
-        from kervi.config import load_config
+        from kervi.config import load
         import inspect
         #import sys
         import os
@@ -98,31 +99,26 @@ class Module(object):
         else:
             print("no config file found, revert to defaults")
 
-        self.config = load_config(
+        self.config = load(
             config_file=selected_config_file,
             config_user=user_config,
-            config_base={
-                "module" : {
-                    "name": "test",
-                    "id": ""
-                },
-                "modules": [],
-                "network" : {
-                    "ip": nethelper.get_ip_address(),
-                    "ipc_module_port": nethelper.get_free_port([9600]),
-                    "ipc_root_port": 9500,
-                    "ipc_root_address": nethelper.get_ip_address()
-                },
-                "encryption" :{
-                    "ipc_secret":"",
-                },
-            }
+            config_base= get_default_config()
         )
 
         print("Starting kervi module, please wait")
         self.started = False
         self._root_address = "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port)
-        spine._init_spine(self.config.module.id, self.config.network.ipc_module_port, self._root_address, self.config.network.ip)
+        
+        
+        from kervi.zmq_spine import _ZMQSpine
+        self.spine = _ZMQSpine()
+        if self.config.module.app_connection_local:
+            self.spine._init_spine("kervi-module", self.config.network.ipc_module_port, "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port), self.config.network.ip)
+        else:
+            # self.spine._init_spine("kervi-module-main", self.config.network.ipc_module_port, None, self.config.network.ip)
+        spine.set_spine(self.spine)
+        
+        #spine._init_spine(self.config.module.id, self.config.network.ipc_module_port, self._root_address, self.config.network.ip)
 
         self.spine = spine.Spine()
 
@@ -196,6 +192,19 @@ class Module(object):
                     nethelper.get_free_port([module_port]),
                     app_helpers._KerviModuleLoader,
                     process_id=self.config.module.id + "-" + module
+                )
+            ]
+
+
+        if self.config.routing.kervi_io.enabled:
+            module_port += 1
+            self._module_processes += [
+                process._start_process(
+                    "module-" + self.config.module.id,
+                    "kervi_io",
+                    self.config,
+                    nethelper.get_free_port([module_port]),
+                    app_helpers._KerviIORouterProcess
                 )
             ]
             #time.sleep(1)

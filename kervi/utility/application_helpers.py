@@ -23,6 +23,7 @@ import collections
 import kervi.core.utility.process as process
 from kervi.zmq_spine import _ZMQSpine
 
+
 def _deep_update(d, u):
     """Update a nested dictionary or similar mapping.
 
@@ -87,6 +88,33 @@ class _KerviSocketIPC(process._KerviProcess):
 
     def process_step(self):
         self._socket_spine.step()
+
+    def terminate_process(self):
+        pass
+
+
+class _KerviIORouterProcess(process._KerviProcess):
+    """ Private class that starts a seperate process for IPC communication in the Kervi application """
+
+    def init_process(self):
+        print("load interprocess communication")
+        from kervi.routing.kervi_io.io_router import KerviIORouter
+        self._router = KerviIORouter(self.config)
+        self.spine.send_command("startThreads", scope="process")
+        self.spine.register_command_handler("startRouter", self._start_router)
+
+    def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+        spine = _ZMQSpine()
+        spine._init_spine(process_id, spine_port, root_address, ip)
+        return spine
+    
+    def _start_router(self):
+        #print("start socket")
+        self._router.start_router()
+
+    def process_step(self):
+        if self._is_connected and self._router._route_table_ready:
+            self._router.start_router()
 
     def terminate_process(self):
         pass

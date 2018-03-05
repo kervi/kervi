@@ -322,6 +322,8 @@ class ZMQBus():
                     self._message_thread = 0
 
     def _handle_message(self, tag, message):
+        #if not tag.startswith("signal:"):
+        #    print("t", tag)
         func_list = []
         functions = self._handlers.get_list_data(tag)
         if functions:
@@ -377,7 +379,7 @@ class ZMQBus():
         if "kwargs" in message:
             message_kwargs = message["kwargs"]
 
-        message_kwargs = dict(message_kwargs, injected=injected, session=session)
+        message_kwargs = dict(message_kwargs, injected=injected, session=session, topic_tag=tag)
 
         try:
             if func_list:

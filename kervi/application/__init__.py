@@ -75,8 +75,6 @@ class Application(object):
         import getopt
         import sys
 
-        
-
         config_files = []
 
         opts, args = getopt.getopt(sys.argv[1:], "c", ["config_file=", "service_install", "service_uninstall", "service_start", "service_stop"])
@@ -196,7 +194,9 @@ class Application(object):
         with self._kervi_modules_lock:
             for module in self._kervi_modules:
                 if module.module_id == module_id:
+                    
                     if not module.is_alive:
+                        print("module started", module_id)
                         self.spine.trigger_event(
                             "moduleStarted",
                             module_id
@@ -287,8 +287,21 @@ class Application(object):
                 )
             ]
 
+        if self.config.routing.kervi_io.enabled:
+            module_port += 1
+            self._module_processes += [
+                process._start_process(
+                    "app-" + self.config.application.id,
+                    "kervi_io",
+                    self.config,
+                    nethelper.get_free_port([module_port]),
+                    app_helpers._KerviIORouterProcess
+                )
+            ]
+
         while not self._is_ready():
             time.sleep(1)
+
         print("Your Kervi application is ready at http://" + self.config.network.ip + ":" + str(self.config.network.http_port))
         print("Press ctrl + c to stop your application")
         webserver.start(
