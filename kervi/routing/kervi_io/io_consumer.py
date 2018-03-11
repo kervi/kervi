@@ -122,6 +122,7 @@ class _IOConsumerChannel(object):
         """
         LOGGER.info('Declaring queue %s', queue_name)
         #passive=False, durable=False, exclusive=False, auto_delete=False, nowait=False
+        self._channel.basic_qos(prefetch_count=50)
         self._channel.queue_declare(
             self.on_queue_declareok, #callback 
             queue_name, #queue
@@ -178,7 +179,7 @@ class _IOConsumerChannel(object):
         """
         LOGGER.info('Issuing consumer related RPC commands')
         self.add_on_cancel_callback()
-        self._consumer_tag = self._channel.basic_consume(self.on_message, self._queue)
+        self._consumer_tag = self._channel.basic_consume(self.on_message, self._queue, no_ack=True)
 
     def add_on_cancel_callback(self):
         """Add a callback that will be invoked if RabbitMQ cancels the consumer
@@ -218,9 +219,9 @@ class _IOConsumerChannel(object):
         #print("rv", basic_deliver.delivery_tag, properties, body)
         LOGGER.info('Received message # %s from %s: %s',
                     basic_deliver.delivery_tag, properties.app_id, body)
-        self.acknowledge_message(basic_deliver.delivery_tag)
+        #self.acknowledge_message(basic_deliver.delivery_tag)
         
-        print("bd", basic_deliver)
+        #print("bd", basic_deliver.routing_key == "ping", basic_deliver)
         if basic_deliver.routing_key == "ping":
             self._router.on_ping(properties.headers)
         else:

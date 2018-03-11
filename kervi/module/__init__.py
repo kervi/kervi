@@ -115,11 +115,9 @@ class Module(object):
         if self.config.module.app_connection_local:
             self.spine._init_spine("kervi-module", self.config.network.ipc_module_port, "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port), self.config.network.ip)
         else:
-            # self.spine._init_spine("kervi-module-main", self.config.network.ipc_module_port, None, self.config.network.ip)
+            self.spine._init_spine("kervi-main", self.config.network.ipc_root_port, None, self.config.network.ipc_root_address)
         spine.set_spine(self.spine)
-        
-        #spine._init_spine(self.config.module.id, self.config.network.ipc_module_port, self._root_address, self.config.network.ip)
-
+        self.spine.register_event_handler("processReady", self._process_ready, scope="app-" + self.config.application.id)
         self.spine = spine.Spine()
 
         self._module_processes = []
@@ -196,11 +194,16 @@ class Module(object):
             ]
 
 
-        if self.config.routing.kervi_io.enabled:
+        if not self.config.module.app_connection_local and self.config.routing.kervi_io.enabled:
+            print("x")
             module_port += 1
+            self._process_info_lock.acquire()
+            self._process_info = [{"id":"kervi_io", "ready":False}]
+            self._process_info_lock.release()
+
             self._module_processes += [
                 process._start_process(
-                    "module-" + self.config.module.id,
+                    "module-routing" + self.config.module.id,
                     "kervi_io",
                     self.config,
                     nethelper.get_free_port([module_port]),

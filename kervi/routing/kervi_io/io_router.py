@@ -37,10 +37,6 @@ class KerviIORouter(Router):
 
     def start_router(self):
         self._connection.run()
-        #print("connect to router:", address)
-        #parameters = pika.URLParameters(address)
-        
-        pass
 
     def register_route(self, route):
         pass

@@ -55,7 +55,7 @@ class _IOPublisherChannel(object):
     def register_bus_connection(self, connection):
         #if 
         #self._publisher_channel.register_bus_connection(connection)
-        self._bus_topic = ".".join(self._router._connections.keys())
+        self._bus_topic = ".Q.".join(self._router._connections.keys()) + ".Q"
         pass
     
     def open_channel(self):
@@ -184,7 +184,7 @@ class _IOPublisherChannel(object):
 
         """
         LOGGER.info('Issuing Confirm.Select RPC command')
-        self._channel.confirm_delivery(self.on_delivery_confirmation)
+        #self._channel.confirm_delivery(self.on_delivery_confirmation)
 
     def on_delivery_confirmation(self, method_frame):
         """Invoked by pika when RabbitMQ responds to a Basic.Publish RPC
@@ -254,10 +254,10 @@ class _IOPublisherChannel(object):
             headers=hdrs
         )
 
-        print("px")
+        #print("px")
         self._channel.basic_publish(self._exchange, "ping", "", properties)
-        #self._message_number += 1
-        #self._deliveries.append(self._message_number)
+        self._message_number += 1
+        self._deliveries.append(self._message_number)
         #LOGGER.info('Published message # %i', self._message_number)
         self.schedule_ping()
 
@@ -274,6 +274,8 @@ class _IOPublisherChannel(object):
         class.
 
         """
+        #print("sm", topic, self._bus_topic)
+        
         if self._channel is None or not self._channel.is_open or not self._bus_topic:
             return
 
@@ -281,11 +283,14 @@ class _IOPublisherChannel(object):
                                           content_type='application/json',
                                           headers=headers)
 
-        
-        self._channel.basic_publish(self._exchange, topic + "." + self._bus_topic,
-                                    json.dumps(payload, ensure_ascii=False),
-                                    properties)
-        #self._message_number += 1
-        #self._deliveries.append(self._message_number)
+        #print("sm", topic + "." + self._bus_topic)
+        self._channel.basic_publish(
+            exchange = self._exchange,
+            routing_key = topic + "." + self._bus_topic,
+            body = json.dumps(payload, ensure_ascii=False),
+            properties = properties
+        )
+        self._message_number += 1
+        self._deliveries.append(self._message_number)
         #LOGGER.info('Published message # %i', self._message_number)
         #self.schedule_next_message()

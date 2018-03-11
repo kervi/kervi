@@ -2,6 +2,7 @@ import kervi.spine as spine
 import threading
 import uuid
 import datetime
+import time
 
 class _PrepareThread(threading.Thread):
     def __init__(self, router):
@@ -31,7 +32,7 @@ class Router(object):
 
         self._spine.register_event_handler("moduleReady", self._module_ready)
         self._spine.register_event_handler("appReady", self._app_ready)
-        
+        print("rr")
         self._routes_in = []
         self._routes_out = []
         self._ids = []
@@ -75,13 +76,21 @@ class Router(object):
         self._internal_ids = []
         routes = self._spine.send_query("getComponentRoutes")
         self._read_routes(routes)
-        
+        self._spine._add_linked_handler(self._spine_handler)
+        self._spine._add_linked_response_handler(self._on_response)     
         for route in self._routes_out:
             if route.topic_type == "event":
                 self._spine.register_event_handler(route.topic, self._event_handler)
             if route.topic_type == "command":
                 self._spine.register_command_handler(route.topic, self._command_handler)
         self._route_table_ready = True
+
+    def _spine_handler(self, *args, **kwargs):
+        #print("sh", *args, kwargs)
+        topic = kwargs.get("topic_tag", None)
+        if topic:
+            if topic.startswith("query"):
+                return self._query_handler(*args, **kwargs)    
 
     def _event_handler(self, event, *args, **kwargs):
         #print("eh", event, *args, kwargs)
@@ -98,15 +107,44 @@ class Router(object):
                 "router_id": self._router_id
             }
             self.send_message(topic, message, headers)
-
     
     def _command_handler(self, command, *args, **kwargs):
-        #print("ch", command, *args)
-        pass
+        topic = kwargs.pop("topic_tag", "command:")
+        injected = kwargs.pop("injected", None)
+        if injected != "KIO_" + self._router_id:
+            message = {
+                "args": args,
+                "kwargs": kwargs
+            }
+            headers = {
+                "type": "command",
+                "topic": topic,
+                "router_id": self._router_id
+            }
+            self.send_message(topic, message, headers)
     
-    def _query_handler(self, query, *args, **kwargs):
-        #print("qh", query)
-        pass
+    def _query_handler(self, *args, **kwargs):
+        topic = kwargs.pop("topic_tag", "query:")
+        query_id = kwargs.pop("query_id", "0")
+        response_address = kwargs.pop("response_address", None)
+        injected = kwargs.pop("injected", None)
+        print("qh", topic, query_id, injected, injected != "KIO_" + self._router_id)
+        if injected != "KIO_" + self._router_id:
+            message = {
+                "args": args,
+                "kwargs": kwargs
+            }
+            headers = {
+                "type": "query",
+                "query_id": query_id,
+                "response_address": response_address,
+                "topic": topic,
+                "router_id": self._router_id,
+                "qts": str(time.time())
+            }
+            self.send_message(topic, message, headers)
+            return "****no_response****"
+        return None
 
     def start_router(self):
         raise NotImplementedError
@@ -116,20 +154,29 @@ class Router(object):
 
     
     def on_ping(self, headers):
+        #print("p", self._connection_id, headers)
         if headers["connection_id"] == self._connection_id:
             pass
         elif not headers["connection_id"] in self._connections:
+            print("new cloud connection:", headers["connection_id"])
             self._connections[headers["connection_id"]] = _Connection(headers["connection_id"])
             self.register_bus_connection(self._connections[headers["connection_id"]])
         else:
             self._connections[headers["connection_id"]].last_ping = datetime.datetime.now()
 
     def register_bus_connection(self, connection):
+        
         pass
     
+    def _on_response(self, event):
+        
+        self.send_message("query_response:", event["response"], event["headers"])
+        print("oqd", time.time()- float(event["headers"]["qts"]), event["headers"]["topic"])
+
     def on_message(self, headers, payload):
-        print("om", self._router_id, headers)
         if headers["router_id"] != self._router_id:
+            #print("om", self._router_id, headers)
+        
             topic = headers["topic"].split(":")
             if topic[0] == "event":
                 #print("te", topic[1])
@@ -137,4 +184,37 @@ class Router(object):
                 if len(topic) > 2:
                     event_id = topic[2]
                 message_kwargs = dict(payload["kwargs"], injected="KIO_" + self._router_id)
-                self._spine.trigger_event(topic[1], event_id, payload["args"], message_kwargs)
+
+                self._spine.trigger_event(topic[1], event_id, *payload["args"], **message_kwargs)
+            elif topic[0] == "command":
+                print("c", topic)
+                message_kwargs = dict(payload["kwargs"], injected="KIO_" + self._router_id)
+                self._spine.send_command(topic[1], *payload["args"], **message_kwargs)
+            elif topic[0] == "query":
+                print("oq", time.time()- float(headers["qts"]), topic, payload)
+                headers = {
+                    "type": "query_response",
+                    "topic": "query_response:",
+                    "response_address": headers["response_address"],
+                    "query_id": headers["query_id"],
+                    "router_id": self._router_id,
+                    "qts": headers["qts"]
+                }
+                message_kwargs = dict(payload["kwargs"], injected="KIO_" + self._router_id, wait=False, headers=headers)
+                res = self._spine.send_query(topic[1], *payload["args"], **message_kwargs)
+                
+                # headers = {
+                #     "type": "query_response",
+                #     "topic": "query_response:",
+                #     "response_address": headers["response_address"],
+                #     "query_id": headers["query_id"],
+                #     "router_id": self._router_id,
+                #     "qts": headers["qts"]
+                # }
+                # self.send_message("query_response:", res, headers)
+                # print("oqd", time.time()- float(headers["qts"]), topic)
+            elif topic[0] == "query_response":
+                print("oqr", time.time()- float(headers["qts"]))
+                self._spine.send_query_response(headers["response_address"],headers["query_id"], payload)
+        else:
+            print("kervi io error, receiving own messages")

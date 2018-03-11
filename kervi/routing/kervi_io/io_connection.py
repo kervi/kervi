@@ -78,7 +78,7 @@ class _IOConnection(object):
         """
         LOGGER.info('Connection opened')
         self.add_on_connection_close_callback()
-        self._consumer_channel = _IOConsumerChannel(self._connection, self._router, self._app_id, "KIO_1")
+        self._consumer_channel = _IOConsumerChannel(self._connection, self._router, self._app_id, self._router._router_id)
         self._consumer_channel.open_channel()
 
         self._publisher_channel = _IOPublisherChannel(self._connection, self._app_id, self._router)

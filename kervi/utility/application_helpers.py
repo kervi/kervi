@@ -97,7 +97,7 @@ class _KerviIORouterProcess(process._KerviProcess):
     """ Private class that starts a seperate process for IPC communication in the Kervi application """
 
     def init_process(self):
-        print("load interprocess communication")
+        print("load kervi io ipc")
         from kervi.routing.kervi_io.io_router import KerviIORouter
         self._router = KerviIORouter(self.config)
         self.spine.send_command("startThreads", scope="process")

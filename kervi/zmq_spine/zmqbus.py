@@ -254,6 +254,9 @@ class ZMQBus():
         self._last_ping = time.time()
         self._connections_lock = threading.Lock()
 
+        self._linked_handlers = []
+        self._linked_response_handlers = []
+
         self._message_threads = []
         self._message_thread = 0
         self._message_threads_lock = threading.Lock()
@@ -294,6 +297,17 @@ class ZMQBus():
         self._event_lock = threading.Lock()
         self._query_lock = threading.Lock()
 
+    def _add_linked_handler(self, func, **kwargs):
+        groups = kwargs.get("groups", None)
+        scopes = kwargs.get("scopes", [])
+        print("alh", func)
+        argspec = inspect.getargspec(func)
+        self._linked_handlers.append((func, groups, scopes, argspec.keywords != None))
+
+
+    def _add_linked_response_handler(self, handler):
+        self._linked_response_handlers.append(handler)
+
     def _register_handler(self, tag, func, **kwargs):
         groups = kwargs.get("groups", None)
         scopes = kwargs.get("scopes", [])
@@ -323,11 +337,13 @@ class ZMQBus():
 
     def _handle_message(self, tag, message):
         #if not tag.startswith("signal:"):
-        #    print("t", tag)
-        func_list = []
+        #print("t", self._linked_handlers)
+        func_list = [] 
+        func_list += self._linked_handlers
         functions = self._handlers.get_list_data(tag)
         if functions:
             func_list += functions
+        
         if tag.startswith("event:"):
             tag_parts = tag.split(":")
             event = "event:" + tag_parts[1] +":"
@@ -357,8 +373,14 @@ class ZMQBus():
 
         message_args = []
         message_kwargs = dict()
-        if "id" in message and not tag.startswith("query:"):
-            message_args += [message["id"]]
+        if "kwargs" in message:
+            message_kwargs = message["kwargs"]
+
+        if "id" in message:
+            if tag.startswith("query:"):
+                message_kwargs["query_id"] = message["id"]
+            else:
+                message_args += [message["id"]]
 
         response_address = None
         if "responseAddress" in message:
@@ -376,11 +398,10 @@ class ZMQBus():
         if "args" in message:
             message_args += message["args"]
 
-        if "kwargs" in message:
-            message_kwargs = message["kwargs"]
+        
 
-        message_kwargs = dict(message_kwargs, injected=injected, session=session, topic_tag=tag)
-
+        message_kwargs = dict(message_kwargs, injected=injected, session=session, topic_tag=tag, response_address=response_address)
+        send_response = True
         try:
             if func_list:
                 for func, groups, handler_scopes, has_keywords in func_list:
@@ -402,27 +423,34 @@ class ZMQBus():
                     if authorized:
                         if not has_keywords:
                             sub_result = func(*message_args)
+                            if sub_result and sub_result == "****no_response****":
+                                send_response = False
                             if sub_result:
                                 result += [sub_result]
                         else:
                             sub_result = func(*message_args, **message_kwargs)
-                            if sub_result:
+                            if sub_result and sub_result == "****no_response****":
+                                send_response = False
+                            elif sub_result:
                                 result += [sub_result]
             if len(result) == 1:
                 result = result[0]
         except Exception as e:
             raise e
 
-        if response_address:
+        
+        if response_address and send_response:
             #print("qrr", tag, response_address, message)
-            message = {"messageType":"queryResponse", "address": self._signal_address, "id":message["id"], "response":result}
-            if response_address == "inproc_query":
-                #print("c", tag, self._signal_address, message)
-                self.resolve_response(message)
-            else:
-                self.send_connection_message(response_address, "queryResponse", message)
-
+            self.send_query_response(response_address, message["id"], result)
         return result
+
+    def send_query_response(self, response_address, query_id, result):
+        message = {"messageType":"queryResponse", "address": self._signal_address, "id":query_id, "response":result}
+        if response_address == "inproc_query":
+            #print("c", tag, self._signal_address, message)
+            self.resolve_response(message)
+        else:
+            self.send_connection_message(response_address, "queryResponse", message)
 
     def run(self):
         for message_thread in self._message_threads:
@@ -483,17 +511,6 @@ class ZMQBus():
         
         for connection in self._connections:
             connection.disconnect()
-
-        #self._event_handler.join()
-        #self._command_handler.join()
-        #self._query_handler.join()
-        #self._message_handler.join()
-
-        #self._event_socket.close()
-        #self._command_socket.close()
-        #self._query_socket.close()
-
-        #self._context.destroy()
 
     def connect_to_root(self):
         #print("connect to root", self._process_id, self._root_address)
@@ -703,6 +720,8 @@ class ZMQBus():
                 if  event["process_count"] <= 0:
                     event["processed"] = True
                     event["eventSignal"].set()
+                    for handler in self._linked_response_handlers:
+                        handler(event)
 
     def send_query(self, query, *args, **kwargs):
         self._connections_lock.acquire()
@@ -715,6 +734,8 @@ class ZMQBus():
             session = kwargs.pop("session", None)
             processes = kwargs.pop("processes", None)
             timeout = kwargs.pop("timeout", 10)
+            wait = kwargs.pop("wait", True)
+            headers = kwargs.pop("headers", None)
             query_id = self._uuid_handler + "-" + str(self._query_id_count)
 
             process_count = 1
@@ -732,7 +753,8 @@ class ZMQBus():
                 "process_count": process_count,
                 "process_id": self._process_id,
                 "query": query,
-                "handled_by": []
+                "handled_by": [],
+                "headers": headers
             }
             self._response_events += [event_data]
             #print("rs", self._response_events)
@@ -771,16 +793,18 @@ class ZMQBus():
         finally:
             self._connections_lock.release()
 
-        event.wait(timeout)
-        if not event_data["processed"]:
-            print("send query timeout", self._signal_address, query, event_data["handled_by"], event_data["id"])
-        result = event_data["response"]
-        self._response_events.remove(event_data)
-        #print("qr", len(self._response_events), result)
-        if isinstance(result, list) and not isinstance(result, dict) and len(result) == 1:
-            return result[0]
-        else:
-            return result
+        if wait:
+            event.wait(timeout)
+            if not event_data["processed"]:
+                print("send query timeout", self._signal_address, query, event_data["handled_by"], event_data["id"])
+            result = event_data["response"]
+            self._response_events.remove(event_data)
+            #print("qr", len(self._response_events), result)
+            if isinstance(result, list) and not isinstance(result, dict) and len(result) == 1:
+                return result[0]
+            else:
+                return result
+        return None
 
     def register_query_handler(self, query, func, **kwargs):
         self._register_handler("query:"+query, func, **kwargs)
