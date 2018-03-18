@@ -28,7 +28,7 @@ class KerviIORouter(Router):
         self._api_key = self._config.api_key
         self._app_id = config.application.id
         self._enabled = self._config.enabled
-        print("xz", self._address, self._api_key, self._app_id)
+        print("xz2", self._address, self._api_key, self._app_id)
         self._connection = _IOConnection(self, "user_1", "1234", self._address, self._port, self._api_key, self._app_id)
 
     def connect(self):

@@ -98,7 +98,7 @@ class _KerviIORouterProcess(process._KerviProcess):
 
     def init_process(self):
         print("load kervi io ipc")
-        from kervi.routing.kervi_io.io_router import KerviIORouter
+        from kervi.routing.kervi_io.mq_router import KerviIORouter
         self._router = KerviIORouter(self.config)
         self.spine.send_command("startThreads", scope="process")
         self.spine.register_command_handler("startRouter", self._start_router)
@@ -110,11 +110,15 @@ class _KerviIORouterProcess(process._KerviProcess):
     
     def _start_router(self):
         #print("start socket")
-        self._router.start_router()
+        
+        #self._router.start_router()
+        pass
 
     def process_step(self):
         if self._is_connected and self._router._route_table_ready:
-            self._router.start_router()
+            if not self._router.connected:
+                self._router.start_router()
 
     def terminate_process(self):
+        self._router.stop()
         pass
