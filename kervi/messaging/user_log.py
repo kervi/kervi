@@ -13,8 +13,12 @@ class UserLogHandler(MessageDevice):
     def message_type(self):
         return "user_log"
 
+    @property
+    def address_based(self):
+        return False
+
     def create_address(self, user):
-        return True
+        pass
 
     def send_message(self, addresses, subject, **kwargs):
         """"
@@ -29,7 +33,6 @@ class UserLogHandler(MessageDevice):
         log_type = kwargs.get("log_type", "information")
         level = kwargs.get("level", 3)
         timestamp = kwargs.get("timestamp", 0)
-        
         self.spine.trigger_event("userLogMessage", None, {
             "source_id": source_id,
             "source_name": source_name,

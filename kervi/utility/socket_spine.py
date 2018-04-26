@@ -88,10 +88,11 @@ class _WebEventHandler(object):
         self.spine = Spine()
         #print("re", event, id_event)
         self.spine.register_event_handler(event, self.on_event, id_event, injected="socketSpine")
-
+        
     def on_event(self, id_event, *args, **kwargs):
         injected = kwargs.get("injected", "")
         groups = kwargs.get("groups", None)
+        process_id = kwargs.get("process_id", None)
         self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
 
         authorized = True
@@ -104,8 +105,11 @@ class _WebEventHandler(object):
                 authorized = False
 
         if authorized and self.protocol.authenticated and not injected == "socketSpine":
+            
             cmd = {"messageType":"event", "event":self.event, "id":id_event, "args":args}
             jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
+            #if self.event=="userLogMessage":
+            #    print("wum", id_event, process_id, injected, jsonres)
             self.protocol.sendMessage(jsonres, False)
 
 class _SpineProtocol(WebSocketServerProtocol):
@@ -135,6 +139,7 @@ class _SpineProtocol(WebSocketServerProtocol):
             self.handlers["query"] += [_WebQueryHandler(query, self)]
 
     def add_event_handler(self, event, id_event):
+        #print("ah", event, id_event)
         found = False
         for event_handler in self.handlers["event"]:
             if event_handler.event == event and event_handler.id_event == id_event:

@@ -44,9 +44,12 @@ class MessageHandler(Controller):
                 if message_channel in self._channels.keys():
                     channel = self._channels[message_channel]
                     addresses = []
-                    for user in users:
-                        address = channel.create_address(user)
-                        if address:
-                            addresses += [address]
-                    if addresses:
+                    if channel.address_based:
+                        for user in users:
+                            address = channel.create_address(user)
+                            if address:
+                                addresses += [address]
+                        if addresses:
+                            channel.send_message(addresses, subject, **kwargs)
+                    else:
                         channel.send_message(addresses, subject, **kwargs)

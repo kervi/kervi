@@ -251,11 +251,17 @@ def retrieve_setting_db(group, name):
 
         all_rows = cur.fetchall()
         if len(all_rows) > 0:
+            value = None
+            try:
+                value = json.loads(all_rows[0][3])
+            except:
+                SPINE.log.debug("retrieve setting failed:{0}/{1}", group, name)
+
             return {
                 "id": all_rows[0][0],
                 "group": all_rows[0][1],
                 "name": all_rows[0][2],
-                "value": json.loads(all_rows[0][3])
+                "value": value
             }
     finally:
         FILE_LOCK.release()

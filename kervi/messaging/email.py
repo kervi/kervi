@@ -17,6 +17,10 @@ class EmailHandler(MessageDevice):
     def message_type(self):
         return "email"
 
+    @property
+    def address_based(self):
+        return True
+    
     def create_address(self, user):
         email = user.get("email", None)
         if email:

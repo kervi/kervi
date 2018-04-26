@@ -11,6 +11,7 @@ kervi/messaging\message_handler.py
 kervi/messaging\sms.py
 kervi/messaging\user_log.py
 kervi/module\__init__.py
+kervi/module\default_config.py
 kervi/utility\__init__.py
 kervi/utility\application_helpers.py
 kervi/utility\authorization.py

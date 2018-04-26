@@ -347,15 +347,23 @@ class ZMQBus():
         if tag.startswith("event:"):
             tag_parts = tag.split(":")
             event = "event:" + tag_parts[1] +":"
-            functions = self._handlers.get_list_data(event)
-            if functions:
-                func_list += functions
-            #print("eh", tag, event, self._signal_address)
+            if event!=tag:
+                functions = self._handlers.get_list_data(event)
+                if functions:
+                    func_list += functions
+                
+                #if event.startswith("event:userLogMessage"):
+                #    print("eh", tag, event, func_list)
 
         result = []
         session = None
         session_groups = None
         message_scopes = None
+        process_id = None
+
+        if "process_id" in message:
+            process_id = message["process_id"]
+
         if "session" in message:
             session = message["session"]
             if session:
@@ -400,7 +408,7 @@ class ZMQBus():
 
         
 
-        message_kwargs = dict(message_kwargs, injected=injected, session=session, topic_tag=tag, response_address=response_address)
+        message_kwargs = dict(message_kwargs, injected=injected, session=session, topic_tag=tag, response_address=response_address, process_id=process_id)
         send_response = True
         try:
             if func_list:
@@ -679,7 +687,8 @@ class ZMQBus():
             "scope":scope,
             "groups":groups,
             "session":session,
-            "kwargs": kwargs
+            "kwargs": kwargs,
+            "process_id": self._process_id
         }
         p = json.dumps(event_message, ensure_ascii=False).encode('utf8')
         event_tag = "event:" + event + ":"
@@ -695,6 +704,8 @@ class ZMQBus():
         if scope == "global":
             for connection in self._connections:
                 connection.send_package(package)
+                #if event=="userLogMessage":
+                #    print("tcwum", connection.address)
 
     def register_event_handler(self, event, func, component_id=None, **kwargs):
         tag = "event:"+event +":"
