@@ -302,6 +302,9 @@ class Application(object):
         while not self._is_ready():
             time.sleep(1)
 
+        from kervi.dashboards import Dashboard
+        Dashboard._add_default()
+
         print("Your Kervi application is ready at http://" + self.config.network.ip + ":" + str(self.config.network.http_port))
         print("Press ctrl + c to stop your application")
         webserver.start(
