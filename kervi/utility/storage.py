@@ -409,7 +409,7 @@ if (SPINE):
     SPINE.register_command_handler("storeSetting", store_setting)
     SPINE.register_query_handler("retrieveSetting", retrieve_setting)
     SPINE.register_query_handler("getLogItems", get_log_items)
-    SPINE.register_event_handler("dynamicValueChanged", store_dynamic_value)
+    SPINE.register_event_handler("valueChanged", store_dynamic_value)
     SPINE.register_event_handler("userLogMessage", store_log_item)
     SPINE.register_command_handler("createCronJob", create_cron_job)
     SPINE.register_command_handler("deleteCronJob", delete_cron_job)
