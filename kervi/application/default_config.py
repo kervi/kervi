@@ -70,6 +70,11 @@ def get_default_config():
             }
         },
         "display":{
+            "datetime":{
+                "time": "HH:MM",
+                "date": "DD-MM-YYYY",
+                "datetime": "HH:MM DD-MM-YYYY"
+            },
             "unit_systems":{
                 "default": "metric",
                 "systems":{
@@ -78,7 +83,7 @@ def get_default_config():
                         "temperature": "C",
                         "speed": "m/s",
                         "volumne": "l",
-                        "weight": "g"
+                        "weight": "g",
                     },
                     "uk-imperial":{
                         "length": "ft",
