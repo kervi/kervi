@@ -190,12 +190,10 @@ def store_dynamic_value(value_id, value, persist=False):
         else:
             FILE_LOCK.acquire()
             cur = FILE_CON.cursor()
-
-        #print("vt", value["timestamp"])
-        #timestamp = (value["timestamp"] - datetime(1970, 1, 1)).total_seconds()
+        json_value = json.dumps(value["value"], cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
         cur.execute(
             "INSERT INTO dynamicData ('dynamicValue','value','timeStamp')  VALUES (?, ?, ?)",
-            (value["id"], value["value"], value["timestamp"])
+            (value["id"], json_value, value["timestamp"])
         )
         if not persist:
 
@@ -310,7 +308,7 @@ def get_dynamic_data(dynamic_value, date_from=None, date_to=None, limit=60):
                 for row in all_rows:
                     result += [
                         {
-                            "value":row[2],
+                            "value":json.loads(row[2]),
                             "ts": row[3]
                         }
                     ]
