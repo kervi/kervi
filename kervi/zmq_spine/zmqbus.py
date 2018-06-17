@@ -28,6 +28,7 @@ import threading
 import json
 import uuid
 import queue
+import datetime
 from kervi.zmq_spine.named_lists import NamedLists
 import kervi.utility.nethelper as nethelper
 from  kervi.core.utility.kervi_logging import KerviLog
@@ -38,25 +39,11 @@ _KERVI_QUERY_RESPONSE_ADDRESS = "inproc://kervi_query_response"
 _KERVI_EVENT_ADDRESS = "inproc://kervi_events"
 
 class _ObjectEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if hasattr(obj, "to_json"):
-            return self.default(obj.to_json())
-        elif hasattr(obj, "__dict__"):
-            data = dict(
-                (key, value)
-                for key, value in inspect.getmembers(obj)
-                if not key.startswith("__")
-                and not inspect.isabstract(value)
-                and not inspect.isbuiltin(value)
-                and not inspect.isfunction(value)
-                and not inspect.isgenerator(value)
-                and not inspect.isgeneratorfunction(value)
-                and not inspect.ismethod(value)
-                and not inspect.ismethoddescriptor(value)
-                and not inspect.isroutine(value)
-            )
-            return self.default(data)
-        return obj
+    def default(self, o):
+        if o and isinstance(o, datetime.datetime):
+           return o.strftime("%Y-%M-%dT%H:%M:%SZ")
+
+        return json.JSONEncoder.default(self, o)
 
 class ProcessConnection:
     def __init__(self, bus, is_root=False):
@@ -484,7 +471,7 @@ class ZMQBus():
     def stop(self):
         #print("stop zmq")
         exit_tag = "signal:exit"
-        package = [exit_tag.encode(), json.dumps({}, ensure_ascii=False).encode('utf8')]
+        package = [exit_tag.encode(), json.dumps({}, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')]
 
         for connection in self._connections:
             connection.send_package(package)
@@ -560,7 +547,7 @@ class ZMQBus():
     def send_connection_message(self, address, tag, message):
         for connection in self._connections:
             if connection.address == address:
-                p = json.dumps(message, ensure_ascii=False).encode('utf8')
+                p = json.dumps(message, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')
                 connection.send_package([tag.encode(), p])
                 return
         print("connection not found", address, tag, message)
@@ -631,7 +618,7 @@ class ZMQBus():
                 'processId':self._process_id,
                 'processList': connection_list
             }
-            p = json.dumps(ping_message, ensure_ascii=False).encode('utf8')
+            p = json.dumps(ping_message, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')
             ping_tag = "signal:ping"
             package = [ping_tag.encode(), p]
 
@@ -655,7 +642,7 @@ class ZMQBus():
             "groups": groups,
             "kwargs": kwargs
         }
-        p = json.dumps(command_message, ensure_ascii=False).encode('utf8')
+        p = json.dumps(command_message, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')
         command_tag = "command:" + command
         package = [command_tag.encode(), p]
         self._command_lock.acquire()
@@ -690,7 +677,7 @@ class ZMQBus():
             "kwargs": kwargs,
             "process_id": self._process_id
         }
-        p = json.dumps(event_message, ensure_ascii=False).encode('utf8')
+        p = json.dumps(event_message, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')
         event_tag = "event:" + event + ":"
         if id:
             event_tag += id
@@ -780,7 +767,7 @@ class ZMQBus():
                 "session":session,
                 "kwargs": kwargs
             }
-            p = json.dumps(query_message, ensure_ascii=False).encode('utf8')
+            p = json.dumps(query_message, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')
             query_tag = "query:" + query
             package = [query_tag.encode(), p]
             self._query_lock.acquire()
@@ -791,7 +778,7 @@ class ZMQBus():
 
             if scope == "global" and len(self._connections) > 0:
                 query_message["responseAddress"] = self._signal_address
-                p = json.dumps(query_message, ensure_ascii=False).encode('utf8')
+                p = json.dumps(query_message, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')
                 package = [query_tag.encode(), p]
 
                 for connection in self._connections:
