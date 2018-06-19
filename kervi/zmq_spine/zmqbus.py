@@ -32,6 +32,7 @@ import datetime
 from kervi.zmq_spine.named_lists import NamedLists
 import kervi.utility.nethelper as nethelper
 from  kervi.core.utility.kervi_logging import KerviLog
+from kervi.config.configuration import _KerviConfig
 
 _KERVI_COMMAND_ADDRESS = "inproc://kervi_commands"
 _KERVI_QUERY_ADDRESS = "inproc://kervi_query"
@@ -40,10 +41,13 @@ _KERVI_EVENT_ADDRESS = "inproc://kervi_events"
 
 class _ObjectEncoder(json.JSONEncoder):
     def default(self, o):
+        
         if o and isinstance(o, datetime.datetime):
-           return o.strftime("%Y-%M-%dT%H:%M:%SZ")
-
-        return json.JSONEncoder.default(self, o)
+           return o.strftime("%Y-%m-%dT%H:%M:%SZ")
+        elif isinstance(o, _KerviConfig):
+            return o.as_dict()
+        else:
+            return json.JSONEncoder.default(self, o)
 
 class ProcessConnection:
     def __init__(self, bus, is_root=False):
