@@ -71,9 +71,9 @@ def get_default_config():
         },
         "display":{
             "datetime":{
-                "time": "HH:MM",
+                "time": "HH:mm",
                 "date": "DD-MM-YYYY",
-                "datetime": "HH:MM DD-MM-YYYY"
+                "datetime": "HH:mm DD-MM-YYYY"
             },
             "unit_systems":{
                 "default": "metric",
