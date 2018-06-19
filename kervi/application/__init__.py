@@ -185,7 +185,7 @@ class Application(object):
         return {
             "name": self.config.application.name,
             "id": self.config.application.id,
-            "display": self.config.display.to_json()
+            "display": self.config.display
         }
 
     def get_process_info(self):
