@@ -15,17 +15,12 @@ setup(
     name='kervi',
     packages=[
         'kervi',
-        'kervi/actions',
         'kervi/application',
-        'kervi/dashboards',
-        'kervi/controllers',
-        'kervi/version',
-        'kervi/hal',
         'kervi/module',
-        'kervi/sensors',
-        'kervi/spine',
+        'kervi/messaging',
+        'kervi/zmq_spine',
         'kervi/utility',
-        'kervi/values',
+        'kervi/version',
         'kervi/vision',
     ],
     version=VERSION,
@@ -57,13 +52,13 @@ setup(
         "Programming Language :: Python :: 3.4"
     ],
     install_requires=[
+        'kervi-core',
         'kervi-ui',
         'kervi-cli',
         'kervi-hal-generic',
         'kervi-device-library',
         'autobahn',
-        'pillow',
-        'pyzmq'
+        'pyzmq',
     ],
     extras_require={
         'rpi':  ['kervi-hal-rpi'],
@@ -71,7 +66,7 @@ setup(
         'win':  ['kervi-hal-win'],
         'windows':  ['kervi-hal-win'],
         'linux':  ['kervi-hal-linux'],
-        'mac':  ['kervi-hal-linux'],
+        'mac':  ['kervi-hal-linux']
     },
     include_package_data=True,
     package_data={

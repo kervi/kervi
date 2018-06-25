@@ -20,7 +20,8 @@
 # SOFTWARE.
 
 import collections
-import kervi.utility.process as process
+import kervi.core.utility.process as process
+from kervi.zmq_spine import _ZMQSpine
 
 
 def _deep_update(d, u):
@@ -60,21 +61,64 @@ class _KerviModuleLoader(process._KerviProcess):
     def terminate_process(self):
         pass
 
+    def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+        spine = _ZMQSpine()
+        spine._init_spine(process_id, spine_port, root_address, ip)
+        return spine
+
 class _KerviSocketIPC(process._KerviProcess):
     """ Private class that starts a seperate process for IPC communication in the Kervi application """
 
     def init_process(self):
         print("load interprocess communication")
         from kervi.utility.socket_spine import SocketSpine
-        self._socket_spine = SocketSpine(self.settings)
+        self._socket_spine = SocketSpine(self.config)
         self.spine.send_command("startThreads", scope="process")
         self.spine.register_command_handler("startWebSocket", self._start_socket)
 
+    def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+        spine = _ZMQSpine()
+        spine._init_spine(process_id, spine_port, root_address, ip)
+
+        return spine
+    
     def _start_socket(self):
+        #print("start socket")
         self._socket_spine.start_socket()
 
     def process_step(self):
         self._socket_spine.step()
 
     def terminate_process(self):
+        pass
+
+
+class _KerviIORouterProcess(process._KerviProcess):
+    """ Private class that starts a seperate process for IPC communication in the Kervi application """
+
+    def init_process(self):
+        print("load kervi io ipc")
+        from kervi.routing.kervi_io.mq_router import KerviIORouter
+        self._router = KerviIORouter(self.config)
+        self.spine.send_command("startThreads", scope="process")
+        self.spine.register_command_handler("startRouter", self._start_router)
+
+    def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+        spine = _ZMQSpine()
+        spine._init_spine(process_id, spine_port, root_address, ip)
+        return spine
+    
+    def _start_router(self):
+        #print("start socket")
+        
+        #self._router.start_router()
+        pass
+
+    def process_step(self):
+        if self._is_connected and self._router._route_table_ready:
+            if not self._router.connected:
+                self._router.start_router()
+
+    def terminate_process(self):
+        self._router.stop()
         pass

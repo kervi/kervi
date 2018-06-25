@@ -23,7 +23,7 @@ import os
 import threading
 import time
 import kervi.utility.encryption as encryption
-
+from kervi.config import Configuration
 try:
     from io import BytesIO
 except ImportError:
@@ -32,11 +32,12 @@ except ImportError:
 import socket
 from kervi.controllers.controller import Controller
 from kervi.values import *
-from kervi.utility.thread import KerviThread
+from kervi.core.utility.thread import KerviThread
 import kervi.utility.nethelper as nethelper
 import kervi.spine as spine
 import kervi.hal as hal
 import kervi.utility.authorization as authorization
+from kervi.actions import action 
 
 try:
     from SimpleHTTPServer import SimpleHTTPRequestHandler
@@ -52,26 +53,32 @@ class CameraBase(Controller):
     def __init__(self, camera_id, name, **kwargs):
         Controller.__init__(self, camera_id, name)
         self.type = "camera"
-        self.inputs.add("pan", "Pan", DynamicNumber)
-        self.inputs.add("tilt", "Tilt", DynamicNumber)
+        self.media_config = Configuration.media
+        self.inputs.add("pan", "Pan", NumberValue)
+        self.inputs.add("tilt", "Tilt", NumberValue)
 
-        self.pan = self.outputs.add("pan", "Pan", DynamicNumber)
-        self.tilt = self.outputs.add("tilt", "Tilt", DynamicNumber)
+        self.pan = self.outputs.add("pan", "Pan", NumberValue)
+        self.tilt = self.outputs.add("tilt", "Tilt", NumberValue)
 
         self.flip_vertical = kwargs.get("flip_vertical", False)
         self.flip_horizontal = kwargs.get("flip_horizontal", False)
 
-        self.inputs.add("fps", "FPS", DynamicEnum)
+        self.inputs.add("fps", "FPS", EnumValue)
         self.inputs["fps"].set_ui_parameter("inline", True)
 
-        self.inputs.add("save", "Save picture", DynamicBoolean)
-        self.inputs["save"].set_ui_parameter("button_icon", "camera")
-        self.inputs["save"].set_ui_parameter("inline", True)
+        self.actions["take_picture"].set_ui_parameter("button_icon", "camera")
+        self.actions["take_picture"].set_ui_parameter("inline", True)
+        self.actions["take_picture"].set_ui_parameter("type", "button")
+        self.actions["take_picture"].set_ui_parameter("label", None)
+        self.actions["take_picture"].set_ui_parameter("button_text", None)
 
-        self.inputs.add("record", "Record video", DynamicBoolean)
-        self.inputs["record"].set_ui_parameter("on_icon", "video-camera")
-        self.inputs["record"].set_ui_parameter("off_icon", "video-camera")
-        self.inputs["record"].set_ui_parameter("inline", True)
+
+        self.actions["record"].set_ui_parameter("button_icon", "video-camera")
+        self.actions["record"].set_ui_parameter("inline", True)
+        self.actions["record"].set_ui_parameter("type", "button")
+        self.actions["record"].set_ui_parameter("label", None)
+        self.actions["record"].set_ui_parameter("button_text", None)
+
 
         self._ui_parameters["height"] = kwargs.get("height", 480)
         self._ui_parameters["width"] = kwargs.get("width", 640)
@@ -80,6 +87,8 @@ class CameraBase(Controller):
         self._ui_parameters["source"] = kwargs.get("source", "")
         self._ui_parameters["show_pan_tilt"] = kwargs.get("show_pan_tilt", False)
         self._ui_parameters["show_buttons"] = kwargs.get("show_buttons", True)
+
+        self.spine.register_query_handler(camera_id + ".getMedia", self._get_media)
 
     def input_changed(self, changed_input):
         if changed_input == self.inputs["pan"]:
@@ -153,28 +162,25 @@ class CameraBase(Controller):
             self.component_id
         )
 
-    def save_picture(self):
+    def _take_picture(self):
         """abstract method"""
-        self.spine.log.debug(
-            "abstract method save_picture reached:{0}",
-            self.component_id
-        )
+        raise NotImplementedError
 
-    def start_record(self):
+
+    def _record(self):
         """abstract method"""
-        self.spine.log.debug(
-            "abstract method start_record reached:{0}",
-            self.component_id
-        )
+        raise NotImplementedError
 
-    def stop_record(self):
-        """abstract method"""
-        self.spine.log.debug(
-            "abstract method stop_record reached:{0}",
-            self.component_id
-        )
 
-    def link_to_dashboard(self, dashboard_id, section_id = None, **kwargs):
+    @action
+    def take_picture(self):
+        self._take_picture()
+
+    @action
+    def record(self):
+        self._record()
+    
+    def link_to_dashboard(self, dashboard_id=None, panel_id=None, **kwargs):
         r"""
         Links this camera to a dashboard section or to the background of a dashboard.
 
@@ -198,15 +204,18 @@ class CameraBase(Controller):
             * *show_buttons* (``bool``) -- Add this component to header of section.
             * *show_pan_tilt* (``bool``) -- Add this component to header of section.
         """
-        if section_id is None:
-            section_id = "background"
+        if panel_id is None:
+            panel_id = "background"
 
         Controller.link_to_dashboard(
             self,
             dashboard_id,
-            section_id,
+            panel_id,
             **kwargs
-            )
+        )
+
+    def _get_media(self):
+        raise NotImplementedError 
 
 class _CameraFrameThread(KerviThread):
     def __init__(self, camera, mutex):
@@ -254,31 +263,45 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
         try:
             #print("ch", self.headers["Cookie"])
             if authorization.is_session_valid(self.headers):
-                self.send_response(200)
-                self.send_header("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate")
-                self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
-                self.end_headers()
-                #first_frame = True
-                self.frame_number = 0
-                while not self.server.camera._terminate:
-                    if self.server.camera.current_frame and self.server.camera.current_frame_number != self.frame_number:
-                        self.frame_number = self.server.camera.current_frame_number
-                        buf = BytesIO()
-                        self.server.mutex.acquire()
-                        try:
-                            self.server.camera.current_frame.save(buf, format='png')
-                        finally:
-                            self.server.mutex.release()
 
-                        data = buf.getvalue()
-                        self.wfile.write(b"--jpgboundary\r\n")
-                        self.send_header('Content-type', 'image/png')
-                        self.send_header('Content-length', len(data))
-                        self.end_headers()
-                        self.wfile.write(data)
+                #print("img", self.path)
+                cam_id = self.server.camera.component_id
+                if self.path.startswith("/"+ cam_id + "/media"):
+                    self.send_response(200)
+                    self.send_header("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate")
+                    self.send_header('Content-type', 'image/png')
+                    self.end_headers()
+                    image_name =  self.path[len(cam_id) + 8:]
+                    image_path = self.server.camera.media_config.folders.images + '/' + image_name
+                    with open(image_path, 'rb') as ifp:
+                        self.wfile.write(ifp.read())
+                    
+                else:
+                    self.send_response(200)
+                    self.send_header("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate")
+                    self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
+                    self.end_headers()
+                    #first_frame = True
+                    self.frame_number = 0
+                    while not self.server.camera._terminate:
+                        if self.server.camera.current_frame and self.server.camera.current_frame_number != self.frame_number:
+                            self.frame_number = self.server.camera.current_frame_number
+                            buf = BytesIO()
+                            self.server.mutex.acquire()
+                            try:
+                                self.server.camera.current_frame.save(buf, format='png')
+                            finally:
+                                self.server.mutex.release()
 
-                        #first_frame = False
-                    time.sleep(1.0 / 30)
+                            data = buf.getvalue()
+                            self.wfile.write(b"--jpgboundary\r\n")
+                            self.send_header('Content-type', 'image/png')
+                            self.send_header('Content-length', len(data))
+                            self.end_headers()
+                            self.wfile.write(data)
+
+                            #first_frame = False
+                        time.sleep(1.0 / 30)
 
             else:
                 print("camera streamer, invalid session id")
@@ -368,7 +391,7 @@ class CameraStreamer(CameraBase):
             if key_file and cert_file:
                 import ssl
                 self.server.socket = ssl.wrap_socket (self.server.socket, keyfile=key_file, certfile=cert_file, server_side=True)
-                
+
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.daemon = True
         self.server_thread.start()
@@ -420,6 +443,28 @@ class CameraStreamer(CameraBase):
         """
         pass
 
+    def _take_picture(self):
+        if self.current_frame:
+            image_name = "/img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
+            image_path = self.media_config.folders.images + image_name
+            self.current_frame.save(image_path, "PNG")
+
+    def _record(self):
+        pass
+
+    def _get_media(self):
+        import glob
+        media_files = glob.glob(self.media_config.folders.images+"/*.png")
+        result = {
+            "path": self.source["server"] + self.source["path"]+"/media",
+            "files": []
+        }
+        for media in media_files:
+            result["files"].append({
+                "name": media[7:]
+            })
+        #print("mf", result)
+        return result
 
 class IPCamera(CameraBase):
     def __init__(self, camera_id, name, dashboards, source):
@@ -478,4 +523,16 @@ class FrameCameraDeviceDriver(object):
         Call this method when a frame is ready
         """
         self.camera._frame_ready(frame)
-        
+
+    def start_record(self, file_name):
+        """
+        Abstract method that should initiate a recording and save it to file_name
+        """
+        raise NotImplementedError
+
+    def stop_record(self):
+        """
+        Abstract method that should stop active recording
+        """
+        raise NotImplementedError
+    

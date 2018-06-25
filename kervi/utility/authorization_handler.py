@@ -22,20 +22,17 @@
 import uuid
 import http.cookies as Cookie
 from  kervi.spine import Spine
-
-try:
-    from users import settings
-    USERS = settings
-except ImportError:
-    USERS ={}
-
+from kervi.config import Configuration
 SESSIONS = {}
 
 def active():
-    return len(USERS.keys())>0
+    result = Configuration.authentication.enabled and len(Configuration.authentication.users) > 0
+    return result
 
 def allow_anonymous():
-    return "anonymous" in USERS
+    if "anonymous" in Configuration.authentication.users.keys:
+        return Configuration.authentication.users.anonymous.enabled
+    return False
 
 def is_session_valid(headers):
     if active():
@@ -54,15 +51,25 @@ def is_session_valid(headers):
 def _add_session(user_name, user_info):
     global SESSIONS
     session = uuid.uuid4().hex
-    SESSIONS[session]={"user_name": user_name, "groups":user_info["groups"]}
+    groups = user_info.get("groups", [])
+    SESSIONS[session] = {"user_name":user_name, "groups":groups}
     return (session, SESSIONS[session])
 
 def authorize(user_name, password):
     if active():
-        if user_name == "anonymous" and user_name in USERS:
-            return _add_session(user_name, USERS[user_name])
-        elif user_name in USERS and USERS[user_name]["password"] == password:
-            return _add_session(user_name, USERS[user_name])
+        users = Configuration.authentication.users
+        user = users.get(user_name, None)
+        if user:
+            if user_name == "anonymous":
+                if allow_anonymous():
+                    return _add_session(user_name, user)
+            else:
+                user_password = user.get("password", None)
+                enabled = user.get("enabled", False)
+                if user_password and enabled and user_password == password:
+                    return _add_session(user_name, user)
+                elif not user_password and not password:
+                    return _add_session(user_name, user)
     return (None, None)
 
 def remove_session(sessionid):

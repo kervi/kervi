@@ -1,8 +1,9 @@
 # kervi
-Kervi is a Python framework that makes it very easy to create robotic and automation projects with web-based dashboards.
+Kervi is a Python framework that makes it very easy to create robotic and automation projects.
 It runs on all platforms that supports Python and optimized for Raspberry pi. 
 
 Features of the framework are:
+* Web based dashboards that are configured in python.
 * Python classes for handling sensor readings and display on dashboards.
 * Python classes for handling user interactions from controllers on dashboards.
 * Integrated camera handling (Raspberry PI camera at the moment)
@@ -32,11 +33,11 @@ On other systems like windows and linux:
 pip3 install kervi
 ```
 
-After Kervi is installed a commandline tool called *kervi* is available.
+After Kervi is installed, a commandline tool called *kervi* is available.
 Via the commandline interface it is possible scaffold Kervi apps and
 setup image and video handling on Raspberry PI.
 
-Create you first app in an empty folder by executing:
+Create your  first app in an empty folder by executing:
 ```
 kervi create application myapp "My first app"
 ```

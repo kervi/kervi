@@ -20,6 +20,7 @@
 # SOFTWARE.
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
+import os
 import time
 import threading
 try:
@@ -27,10 +28,8 @@ try:
 except ImportError:
     import _thread as thread
 
-#import sys
-#import uuid
 from kervi.application.kervi_module import KerviModule
-import kervi.utility.process as process
+import kervi.core.utility.process as process
 import kervi.spine as spine
 #from kervi.utility.process_spine import _ProcessSpine
 #import kervi.kervi_logging as logging
@@ -38,78 +37,122 @@ import kervi.ui.webserver as webserver
 import kervi.utility.nethelper as nethelper
 import kervi.utility.encryption as encryption
 import kervi.utility.application_helpers as app_helpers
+from kervi.controllers.controller import Controller
+from kervi.actions import action
+from kervi.application.default_config import get_default_config
+
+class _AppActions(Controller):
+    def __init__(self, app):
+        super().__init__("app", "App controller")
+
+        self._app = app
+
+    @action
+    def shutdown(self):
+        print("shutwown app")
+        self._app.stop()
+
+    @action
+    def reboot(self):
+        print("reboot app device")
+        self._app.stop()
+
+    @action
+    def restart(self):
+        print("restart app")
+        self._app.stop()
 
 class Application(object):
     """ Kervi application class that starts a kervi application and loads all needed modules.
         This class should be used by it self like:
 
-    ```python
-    APP=Application({
-        "info":{
-            "id":"myRobot",
-            "name":"My first robot",
-            "appKey":"1234",
-        },
-        "log" : {
-            "level":"debug",
-            "file":"robot.log"
-        },
-        "modules":["sensors","controllers"],
-        "network":{
-            "IPAddress": "ip address of device",
-            "IPRootAddress": nethelper.get_ip_address(),
-            "IPCRootPort": 9500),
-            "WebSocketPort":9000),
-            "WebPort": 80,
-            "IPCSecret":b"The secret"
-        }
-    })
-    APP.run()
-    ```
-
     """
-    def __init__(self, settings = None):
+    def __init__(self, user_config = None):
         """ Settings is a dictionary with the following content
         """
-        def_ports = [80, 8080, 8081]
-        if encryption.enabled():
-            def_ports = [443, 8443]
 
-        self.settings = {
-            "info":{
-                "id":"kervi_app",
-                "name":"Kervi application",
-                "appKey":"",
-            },
-            "log" : {
-                "level":"debug",
-                "file":"kervi.log",
-                "resetLog":False
-            },
-            "modules":[],
-            "network":{
-                "IPAddress": nethelper.get_ip_address(),
-                "IPRootAddress": nethelper.get_ip_address(),
-                "IPCRootPort":nethelper.get_free_port([9500]),
-                "WebSocketPort":nethelper.get_free_port([9000]),
-                "WebPort": nethelper.get_free_port(def_ports),
-                "IPCSecret":b"12345",
-            }
-        }
+        import inspect
+        import getopt
+        import sys
 
-        print("Starting kervi application, please wait")
-        if settings:
-            self.settings = app_helpers._deep_update(self.settings, settings)
-        self._validateSettings()
-        self.started = False
+        config_files = []
+
+        opts, args = getopt.getopt(sys.argv[1:], "c", ["config_file=", "service_install", "service_uninstall", "service_start", "service_stop"])
+        for opt, arg in opts:
+            if opt in ("-c", "--config_file"):
+                if os.path.isfile(arg):
+                    config_files += [arg]
+                else:
+                    print("Specified config file not found:", arg)
+        script_path = os.path.abspath(inspect.stack()[1][1])
+        script_name = os.path.basename(script_path)
+        script_name, script_ext = os.path.splitext(script_name)
         
-        process._start_root_spine(self.settings, True)
+        config_files += [script_name +".config.json"]
+        config_files += ["kervi.config.json"]
+
+        selected_config_file = None
+        for config_file in config_files:
+            if os.path.isfile(config_file):
+                selected_config_file = config_file
+                break
+        if not selected_config_file:
+            print("no config file found, revert to defaults")
+
+        from kervi.config import load
+        self.config = load(
+            config_file=selected_config_file,
+            config_user=user_config,
+            config_base=get_default_config()
+        )
+
+        service_commands = []
+        for opt, arg in opts:
+            if opt in ("--service_install"):
+                service_commands += ["install"]
+
+            if opt in ("--service_uninstall"):
+                service_commands += ["uninstall"]
+
+            if opt in ("--service_start"):
+                service_commands += ["start"]
+
+            if opt in ("--service_stop"):
+                service_commands = "stop"
+            
+            if opt in ("--service_restart"):
+                service_commands = "restart"
+
+        if service_commands:
+            import kervi.hal as hal
+            hal_driver = hal._load()
+            if hal_driver:
+                hal.service_commands(
+                    service_commands,
+                    self.config.application.name,
+                    self.config.application.id,
+                    script_path
+                )
+            exit()
+
+
+
+        print("Starting kervi application:", self.config.application.name)
+        #if settings:
+        #    self.settings = app_helpers._deep_update(self.settings, settings)
+        #self._validateSettings()
+        self.started = False
+        from kervi.zmq_spine import _ZMQSpine
+        self.spine = _ZMQSpine()
+        self.spine._init_spine("kervi-main", self.config.network.ipc_root_port, None, self.config.network.ipc_root_address)
+        spine.set_spine(self.spine)
+        #process._start_root_spine(self.config, True, _ZMQSpine)
         #spine._init_spine("application-" + self.settings["info"]["id"])
         self.spine = spine.Spine()
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
         self.spine.register_event_handler("modulePing", self._module_ping)
-        self.spine.register_event_handler("processReady", self._process_ready, scope="app-" + self.settings["info"]["id"])
+        self.spine.register_event_handler("processReady", self._process_ready, scope="app-" + self.config.application.id)
         self._module_processes = []
         self._process_info = []
         self._process_info_lock = threading.Lock()
@@ -117,18 +160,37 @@ class Application(object):
         self._kervi_modules = []
         self._kervi_modules_lock = threading.Lock()
 
-        import kervi.utility.storage
+        from kervi.utility.storage import init_db
+
+        init_db(script_name)
+
+        from kervi.messaging.message_handler import MessageHandler
+        self._message_handler = MessageHandler()
 
         import kervi.hal as hal
         hal_driver = hal._load()
         if hal_driver:
             print("Using HAL driver:", hal_driver)
 
+        self._app_actions = _AppActions(self)
+
+    @property
+    def actions(self):
+        return self._app_actions
+
     def _validateSettings(self):
         pass
 
     def _get_application_info(self):
-        return self.settings["info"]
+        unit_system = self.config.display.unit_systems.default
+        display = {}
+        display["unit_system"] = self.config.display.unit_systems.systems[unit_system]
+
+        return {
+            "name": self.config.application.name,
+            "id": self.config.application.id,
+            "display": display
+        }
 
     def get_process_info(self):
         return {"id": "application"}
@@ -137,7 +199,9 @@ class Application(object):
         with self._kervi_modules_lock:
             for module in self._kervi_modules:
                 if module.module_id == module_id:
+                    
                     if not module.is_alive:
+                        print("module started", module_id)
                         self.spine.trigger_event(
                             "moduleStarted",
                             module_id
@@ -195,8 +259,7 @@ class Application(object):
         #self.spine.run()
         self.spine.send_command("startThreads", scope="process")
         time.sleep(.5)
-
-        module_port = self.settings["network"]["IPCRootPort"]
+        module_port = self.config.network.ipc_root_port
 
         self._process_info_lock.acquire()
         self._process_info = [{"id":"IPC", "ready":False}]
@@ -205,15 +268,15 @@ class Application(object):
         module_port += 1
         self._module_processes += [
             process._start_process(
-                "app-" + self.settings["info"]["id"],
+                "app-" + self.config.application.id,
                 "IPC",
-                self.settings,
+                self.config,
                 nethelper.get_free_port([module_port]),
                 app_helpers._KerviSocketIPC
             )
         ]
 
-        for module in self.settings["modules"]:
+        for module in self.config.modules:
             self._process_info_lock.acquire()
             self._process_info += [{"id":module, "ready":False}]
             self._process_info_lock.release()
@@ -221,28 +284,45 @@ class Application(object):
             module_port += 1
             self._module_processes += [
                 process._start_process(
-                    "app-" + self.settings["info"]["id"],
+                    "app-" + self.config.application.id,
                     module,
-                    self.settings,
+                    self.config,
                     nethelper.get_free_port([module_port]),
                     app_helpers._KerviModuleLoader
                 )
             ]
 
+        if self.config.routing.kervi_io.enabled:
+            module_port += 1
+            self._module_processes += [
+                process._start_process(
+                    "app-" + self.config.application.id,
+                    "kervi_io",
+                    self.config,
+                    nethelper.get_free_port([module_port]),
+                    app_helpers._KerviIORouterProcess
+                )
+            ]
+
         while not self._is_ready():
             time.sleep(1)
-        print("Your Kervi application is ready at http://" + self.settings["network"]["IPAddress"] + ":" + str(self.settings["network"]["WebPort"]))
+
+        from kervi.dashboards import Dashboard
+        Dashboard._add_default()
+
+        print("Your Kervi application is ready at http://" + self.config.network.ip + ":" + str(self.config.network.http_port))
         print("Press ctrl + c to stop your application")
         webserver.start(
-            self.settings["network"]["IPAddress"],
-            self.settings["network"]["WebPort"],
-            self.settings["network"]["WebSocketPort"]
+            self.config.network.ip,
+            self.config.network.http_port,
+            self.config.network.ws_port
         )
         self.spine.trigger_event(
             "appReady",
-            self.settings["info"]["id"]
+            self.config.application.id
         )
         self.spine.send_command("startWebSocket")
+        self.spine.send_command("kervi_action_app_main")
 
     def _input_thread(self, list):
         try:
@@ -277,11 +357,12 @@ class Application(object):
             self._start()
 
     def stop(self):
+        self.spine.send_command("kervi_action_app_exit")
         webserver.stop()
         print("stopping processes")
-        process._stop_processes("app-" + self.settings["info"]["id"])
+        process._stop_processes("app-" + self.config.application.id)
         time.sleep(1)
-        process._stop_root_spine()
+        #process._stop_root_spine()
         #for thread in threading.enumerate():
         #    print("running thread",thread.name)
         print("application stopped")

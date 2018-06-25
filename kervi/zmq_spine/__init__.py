@@ -19,11 +19,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+""" 
+This module bootstraps the cental messagegin system in Kervi.
+Include this module in all modules where communication is needed.
+"""
 
-def enabled():
-    from kervi.config import Configuration
-    return Configuration.encryption.use_ssl
+from kervi.zmq_spine.zmqbus import ZMQBus
 
-def get_cert():
-    from kervi.config import Configuration
-    return (Configuration.encryption.cert_file, Configuration.encryption.key_file)
+class _ZMQSpine(ZMQBus):
+    def version(self):
+        return 2.0
+
+    def _init_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+        self.set_log(process_id)
+        self.reset_bus(process_id, spine_port, ip, root_address)
+        self.run()
+        if root_address:
+            self.wait_for_root()
+        return self

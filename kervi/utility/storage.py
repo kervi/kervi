@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" general DB handling in Kervi, store sensor values  """
+""" general DB handling in Kervi, store sensor values and settings """
 import os
 import time
 from datetime import datetime
@@ -28,7 +28,7 @@ import inspect
 import threading
 import sqlite3 as lite
 import kervi.spine as spine
-from kervi.utility.thread import KerviThread
+from kervi.core.utility.thread import KerviThread
 
 SPINE = spine.Spine()
 FILE_CON = None
@@ -36,11 +36,11 @@ MEMORY_CON = None
 MEMORY_LOCK = threading.Lock()
 FILE_LOCK = threading.Lock()
 
-def create_file_con():
-    return lite.connect('kervi.db', check_same_thread=False)
+def create_file_con(db_name):
+    return lite.connect(db_name + '.db', check_same_thread=False)
 
-def create_memory_con():
-    return lite.connect("kervi_mem.db", check_same_thread=False)
+def create_memory_con(db_name):
+    return lite.connect(db_name + "_mem.db", check_same_thread=False)
     #return lite.connect(":memory:", check_same_thread=False)
 
 
@@ -61,8 +61,8 @@ class MemoryCleanThread(KerviThread):
             rows = cursor.execute("select count(*) from dynamicData")
             values = rows.fetchone()
             row_count = values[0]
-            if row_count>20000:
-                limit = row_count - 20000 
+            if row_count > 20000:
+                limit = row_count - 20000
                 cursor.execute("DELETE FROM dynamicData WHERE id IN (SELECT id FROM dynamicData ORDER BY id ASC LIMIT "+ str(limit) +");")
         except lite.Error as msg:
             SPINE.log.error("clean memory db, Command skipped: {0}, command{1}", msg)
@@ -77,10 +77,6 @@ class MemoryCleanThread(KerviThread):
         if self.alive:
             self.alive = False
             self.stop()
-
-    
-
-
 
 DB_CREATE_SQL = """
         CREATE TABLE `log` (
@@ -163,11 +159,11 @@ def execute_sql(con, sql):
             SPINE.log.error("create db, Command skipped: {0}, command{1}", msg, command)
 
 
-def init_db():
+def init_db(db_name):
     global FILE_CON, MEMORY_CON
 
-    MEMORY_CON = create_memory_con()
-    FILE_CON = create_file_con()
+    MEMORY_CON = create_memory_con(db_name)
+    FILE_CON = create_file_con(db_name)
 
     for con in [FILE_CON, MEMORY_CON]:
         cursor = con.cursor()
@@ -183,7 +179,7 @@ def init_db():
 
     MemoryCleanThread()
 
-init_db()
+#init_db()
 TS_START = datetime.utcnow()
 
 def store_dynamic_value(value_id, value, persist=False):
@@ -194,12 +190,10 @@ def store_dynamic_value(value_id, value, persist=False):
         else:
             FILE_LOCK.acquire()
             cur = FILE_CON.cursor()
-
-        #print("vt", value["timestamp"])
-        #timestamp = (value["timestamp"] - datetime(1970, 1, 1)).total_seconds()
+        json_value = json.dumps(value["value"], cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
         cur.execute(
             "INSERT INTO dynamicData ('dynamicValue','value','timeStamp')  VALUES (?, ?, ?)",
-            (value["id"], value["value"], value["timestamp"])
+            (value["id"], json_value, value["timestamp"])
         )
         if not persist:
 
@@ -255,11 +249,17 @@ def retrieve_setting_db(group, name):
 
         all_rows = cur.fetchall()
         if len(all_rows) > 0:
+            value = None
+            try:
+                value = json.loads(all_rows[0][3])
+            except:
+                SPINE.log.debug("retrieve setting failed:{0}/{1}", group, name)
+
             return {
                 "id": all_rows[0][0],
                 "group": all_rows[0][1],
                 "name": all_rows[0][2],
-                "value": json.loads(all_rows[0][3])
+                "value": value
             }
     finally:
         FILE_LOCK.release()
@@ -308,7 +308,7 @@ def get_dynamic_data(dynamic_value, date_from=None, date_to=None, limit=60):
                 for row in all_rows:
                     result += [
                         {
-                            "value":row[2],
+                            "value":json.loads(row[2]),
                             "ts": row[3]
                         }
                     ]
@@ -407,7 +407,7 @@ if (SPINE):
     SPINE.register_command_handler("storeSetting", store_setting)
     SPINE.register_query_handler("retrieveSetting", retrieve_setting)
     SPINE.register_query_handler("getLogItems", get_log_items)
-    SPINE.register_event_handler("dynamicValueChanged", store_dynamic_value)
+    SPINE.register_event_handler("valueChanged", store_dynamic_value)
     SPINE.register_event_handler("userLogMessage", store_log_item)
     SPINE.register_command_handler("createCronJob", create_cron_job)
     SPINE.register_command_handler("deleteCronJob", delete_cron_job)
