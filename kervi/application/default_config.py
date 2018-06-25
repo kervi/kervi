@@ -70,11 +70,6 @@ def get_default_config():
             }
         },
         "display":{
-            "datetime":{
-                "time": "HH:mm",
-                "date": "DD-MM-YYYY",
-                "datetime": "HH:mm DD-MM-YYYY"
-            },
             "unit_systems":{
                 "default": "metric",
                 "systems":{
@@ -84,20 +79,68 @@ def get_default_config():
                         "speed": "m/s",
                         "volumne": "l",
                         "weight": "g",
+                        "datetime" :{
+                            "time": "HH:mm",
+                            "date": "DD-MM-YYYY",
+                            "datetime": "HH:mm DD-MM-YYYY",
+                            "chart":{
+                                "millisecond": "h:mm:ss.SSS",
+                                "second": "h:mm:ss",
+                                "minute": "h:mm",
+                                "hour":   "h",
+                                "day":    "MMM D",
+                                "week":   "ll",
+                                "month":  "MMM YYYY",
+                                "quarter":"[Q]Q - YYYY",
+                                "year":   "YYYY",
+                            }
+                        }
                     },
                     "uk-imperial":{
                         "length": "ft",
                         "temperature": "F",
                         "speed": "m/h",
                         "volumne": "gl",
-                        "weight": "g"
+                        "weight": "g",
+                        "datetime" :{
+                            "time": "HH:mm",
+                            "date": "DD-MM-YYYY",
+                            "datetime": "HH:mm DD-MM-YYYY",
+                            "chart":{
+                                "millisecond": "h:mm:ss.SSS",
+                                "second": "h:mm:ss",
+                                "minute": "h:mm",
+                                "hour":   "h",
+                                "day":    "MMM D",
+                                "week":   "ll",
+                                "month":  "MMM YYYY",
+                                "quarter":"[Q]Q - YYYY",
+                                "year":   "YYYY",
+                            }
+                        }
                     },
                     "us-imperial":{
                         "length": "ft",
                         "temperature": "F",
                         "speed": "m/h",
                         "volumne": "gl",
-                        "weight": "g"
+                        "weight": "g",
+                        "datetime" :{
+                            "time": "HH:mm",
+                            "date": "DD-MM-YYYY",
+                            "datetime": "HH:mm DD-MM-YYYY",
+                            "chart":{
+                                "millisecond": "h:mm:ss.SSS",
+                                "second": "h:mm:ss",
+                                "minute": "h:mm",
+                                "hour":   "h",
+                                "day":    "MMM D",
+                                "week":   "ll",
+                                "month":  "MMM YYYY",
+                                "quarter":"[Q]Q - YYYY",
+                                "year":   "YYYY",
+                            }
+                        }
                     },
                 }
             }
