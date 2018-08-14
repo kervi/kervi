@@ -286,14 +286,16 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
                     while not self.server.camera._terminate:
                         if self.server.camera.current_frame and self.server.camera.current_frame_number != self.frame_number:
                             self.frame_number = self.server.camera.current_frame_number
-                            buf = BytesIO()
                             self.server.mutex.acquire()
                             try:
-                                self.server.camera.current_frame.save(buf, format='png')
+                                if self.server.camera._frame_format == "jpeg":
+                                    data = self.server.camera.current_frame
+                                else:
+                                    buf = BytesIO()
+                                    self.server.camera.current_frame.save(buf, format='png')
+                                    data = buf.getvalue()
                             finally:
                                 self.server.mutex.release()
-
-                            data = buf.getvalue()
                             self.wfile.write(b"--jpgboundary\r\n")
                             self.send_header('Content-type', 'image/png')
                             self.send_header('Content-length', len(data))
@@ -360,7 +362,9 @@ class CameraStreamer(CameraBase):
     def __init__(self, camera_id, name, camera_source = None, **kwargs):
         CameraBase.__init__(self, camera_id, name, type="frame", **kwargs)
         self._device_driver = hal.get_camera_driver(camera_source)
+
         self._device_driver.camera = self
+        self._frame_format = self._device_driver.buffer_type
 
         protocol = "http://"
         if encryption.enabled():
@@ -487,6 +491,16 @@ class FrameCameraDeviceDriver(object):
     """
     def __init__(self):
         self._terminate = False
+        self._buffer_type = None
+
+    @property
+    def buffer_type(self):
+        return self._buffer_type
+
+    @buffer_type.setter
+    def buffer_type(self, value):
+        self._buffer_type = value
+
 
     @property
     def camera(self):
