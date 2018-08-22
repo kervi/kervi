@@ -22,6 +22,7 @@
 import os
 import threading
 import time
+from PIL import Image
 import kervi.utility.encryption as encryption
 from kervi.config import Configuration
 try:
@@ -451,7 +452,13 @@ class CameraStreamer(CameraBase):
         if self.current_frame:
             image_name = "/img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
             image_path = self.media_config.folders.images + image_name
-            self.current_frame.save(image_path, "PNG")
+            if not os.path.exists(os.path.dirname(image_path)):
+                os.makedirs(os.path.dirname(image_path))
+            if self._frame_format == "jpeg":
+                image = Image.open(BytesIO(self.current_frame))
+                image.save(image_path, "PNG")
+            else:
+                self.current_frame.save(image_path, "PNG")
 
     def _record(self):
         pass
