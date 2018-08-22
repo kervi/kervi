@@ -361,6 +361,7 @@ class Application(object):
         webserver.stop()
         print("stopping processes")
         process._stop_processes("app-" + self.config.application.id)
+        self.spine.trigger_event("processTerminating", None, scope="process")
         time.sleep(1)
         #process._stop_root_spine()
         #for thread in threading.enumerate():
