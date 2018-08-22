@@ -5,3 +5,6 @@ dist
 kervi-ui/node_modules
 _build
 .cache
+test_application.db
+test_application_mem.db
+.cache/v/cache/lastfailed
