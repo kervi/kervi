@@ -26,7 +26,7 @@ def test_application():
 
     app.spine.register_event_handler("appReady", app_ready)
     app.spine.register_command_handler("signalModuleLoad", module_loaded)
-    assert app.confi.application.id == "kervi"
+    assert app.config.application.id == "kervi"
     assert app.config.modules == ["app_module"]
     assert app.config.network.ip ==  "127.0.0.1"
 
