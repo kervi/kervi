@@ -8,11 +8,13 @@ class KerviIORouter(Router):
         self._config = config.routing.kervi_io
         self._address = self._config.address
         self._port = self._config.port
-        self._api_key = self._config.api_key
+        self._api_user = self._config.api_user
+        self._api_password = self._config.api_password
+        self._api_key = self._config.api_channel
         self._app_id = config.application.id
+        self._app_name = config.application.name
         self._enabled = self._config.enabled
-        print("xz1", self._address, self._api_key, self._app_id)
-        self._connection = _MQConnection(self, "user_1", "1234", self._address, self._port, self._api_key, self._app_id)
+        self._connection = _MQConnection(self, self._api_user, self._api_password, self._address, self._port, self._api_key, self._app_id, self._app_name)
         self.connected = False
     def connect(self):
         pass    

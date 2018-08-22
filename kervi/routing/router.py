@@ -1,9 +1,11 @@
-import kervi.spine as spine
 import threading
 import uuid
 import datetime
 import time
 import json
+
+import kervi.spine as spine
+import kervi.utility.authorization_handler as authorization
 
 class _PrepareThread(threading.Thread):
     def __init__(self, router):
@@ -13,6 +15,12 @@ class _PrepareThread(threading.Thread):
 
     def run(self):
         self._router._prepare()
+
+
+class _MQSession:
+    def __init__(self, mq_session):
+        self.mq_session = mq_session
+        self.authenticated = False
 
 class _Connection:
     def __init__(self, connection_id):
@@ -45,11 +53,12 @@ class Router(object):
         self._routes_in = []
         self._routes_out = []
         self._ids = []
-        self._prepare_thread = _PrepareThread(self)
+        self._prepare_thread = None
         self._route_table_ready = False
         self._router_id = uuid.uuid4().hex
         self._connection_id = None
         self._connections = {}
+        self._mq_sessions= {}
         print("rid", self._router_id)
 
     @property
@@ -62,6 +71,7 @@ class Router(object):
 
     def _app_ready(self, id):
         self._connection_id = id
+        self._prepare_thread = _PrepareThread(self)
         self._prepare_thread.start()
 
     def _module_ready(self, id):
@@ -194,14 +204,38 @@ class Router(object):
     def _on_response(self, event):
         
         self.send_message("query_response:", event["response"], event["headers"])
-        print("oqd", time.time()- float(event["headers"]["qts"]), event["headers"]["topic"])
+        #print("oqd", time.time()- float(event["headers"]["qts"]), event["headers"]["topic"])
 
+    def on_session(self, topic, headers, payload):
+        print("session", topic, self._router_id)
+        if headers["router_id"] == self._router_id:
+
+            if topic == "new":
+                if headers["session_id"] in self._mq_sessions:
+                    pass
+                else:
+                    session = _MQSession(headers["session_id"])
+                    self._mq_sessions[headers["session_id"]] = session
+                    
+                    if authorization.active():
+                        topic = "authenticate"
+                    else:
+                        session.authenticated = True
+                        topic = "session_authenticated"
+                        
+                    self.send_message(topic, "", {})
+        
+                print("new ui session", topic)
+            
     def on_message(self, headers, payload):
         #print("om", self._router_id, headers, payload)
-        if headers["router_id"] != self._router_id:
+        topic = headers["topic"].split(":")
+        if topic[0] == "session":
+            self.on_session(topic[1], headers, payload)
+            
+        elif headers["router_id"] != self._router_id:
             #print("om", self._router_id, headers)
         
-            topic = headers["topic"].split(":")
             if topic[0] == "event":
                 #print("te", topic[1])
                 event_id = None
@@ -227,18 +261,11 @@ class Router(object):
                 message_kwargs = dict(payload["kwargs"], injected="KIO_" + self._router_id, wait=False, headers=headers)
                 res = self._spine.send_query(topic[1], *payload["args"], **message_kwargs)
                 
-                # headers = {
-                #     "type": "query_response",
-                #     "topic": "query_response:",
-                #     "response_address": headers["response_address"],
-                #     "query_id": headers["query_id"],
-                #     "router_id": self._router_id,
-                #     "qts": headers["qts"]
-                # }
-                # self.send_message("query_response:", res, headers)
-                # print("oqd", time.time()- float(headers["qts"]), topic)
             elif topic[0] == "query_response":
                 #print("oqr", time.time()- float(headers["qts"]))
                 self._spine.send_query_response(headers["response_address"],headers["query_id"], payload)
+            elif topic[0] == "registerEventHandler":
+                print("re", payload)
+                self._spine.register_event_handler(payload["event"], self._event_handler, payload["eventId"])
         #else:
         #    print("kervi io error, receiving own messages")

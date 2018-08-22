@@ -8,6 +8,7 @@ import amqpstorm
 from amqpstorm import Connection
 from amqpstorm import UriConnection
 import json
+import requests
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -30,6 +31,8 @@ class _MQConsumer(threading.Thread):
         """
         while True:
             try:
+                
+                
                 channel = self._connection._connection.channel()
                 self._channel = channel
                 channel.queue.declare(
@@ -42,6 +45,7 @@ class _MQConsumer(threading.Thread):
                 )
 
                 channel.queue.bind(self._queue, self._exchange, "ping")
+                channel.queue.bind(self._queue, self._exchange, "session")
                 channel.queue.bind(self._queue, self._exchange, "message")# "*." + self._router._connection_id + ".*")
 
                 channel.basic.consume(self, self._queue, no_ack=True, no_local=False)
@@ -49,7 +53,7 @@ class _MQConsumer(threading.Thread):
                 if not channel.consumer_tags:
                     channel.close()
             except amqpstorm.AMQPError as why:
-                LOGGER.exception(why)
+                #LOGGER.exception(why)
                 break
                 #self.create_connection()
             except KeyboardInterrupt:
@@ -75,7 +79,9 @@ class _PingThread(threading.Thread):
 
         self._headers = {
             "connection_id": id,
-            "routes": None
+            "routes": None,
+            "topic" : "ping",
+            "router_id": self._router._router_id
         }
         self._terminated = False
 
@@ -99,6 +105,16 @@ class _PingThread(threading.Thread):
                 self._publisher._connection._app_id,
                 properties
             )
+
+            request_res = requests.post(
+                "https://api.kervi.io/sessions",
+                headers= {
+                    "api-user": self._publisher._connection._user,
+                    "api-password": self._publisher._connection._password,
+                    "app_id": self._publisher._connection._app_id,
+                    "app_name": self._publisher._connection._app_name
+                } 
+            )
             #self._publisher.send_message("ping","", self._headers)
             time.sleep(self._interval)
 
@@ -117,6 +133,8 @@ class _MQPublisher(object):
     
     def send_message(self, topic, payload, headers={}):
 
+        headers["topic"] = topic
+        headers["router_id"] = self._connection._router._router_id
         properties = {
             'content_type': 'application/json',
             'headers': headers
@@ -131,7 +149,7 @@ class _MQPublisher(object):
         )
 
 class _MQConnection(object):
-    def __init__(self, router, user, password, address, port, api_key, app_id):
+    def __init__(self, router, user, password, address, port, api_key, app_id, app_name):
         print("init mqc")
         self._max_retries = 10
         self._connection = None
@@ -146,6 +164,7 @@ class _MQConnection(object):
         self._port = port
         self._vhost = api_key
         self._app_id = app_id
+        self._app_name = app_name
         self._router = router
         self.connected = False
 
@@ -158,7 +177,18 @@ class _MQConnection(object):
         while True:
             attempts += 1
             try:
-                connection_string = 'amqp://'+self._user+':'+self._password+'@'+self._address+':' + str(self._port)+'/'+self._vhost
+                
+                request_res = requests.post(
+                    "https://api.kervi.io/sessions",
+                    headers= {
+                        "api-user": self._user,
+                        "api-password": self._password,
+                        "app_id": self._app_id,
+                        "app_name": self._app_name
+                    } 
+                )
+                print("cres", request_res.json())
+                connection_string = 'amqps://'+self._user+':'+self._password+'@'+self._address+':' + str(self._port)+'/'+self._vhost
                 print("cns", connection_string)
                 self._connection = UriConnection(
                     connection_string
@@ -188,12 +218,15 @@ class _MQConnection(object):
         
         if message.method["routing_key"] == "ping":
             self._router.on_ping(message.properties["headers"], message.json())
+        elif message.method["routing_key"] == "session":
+            self._router.on_session(message.properties["headers"], message.json())
         else:
             #print("Message:", message.json(), message.method, message.message_id, message.properties)
             self._router.on_message(message.properties["headers"], message.json())
 
     def send_message(self, topic, message, headers):
-        self._publisher.send_message(topic, message, headers)
+        if self._publisher:
+            self._publisher.send_message(topic, message, headers)
 
     def register_bus_connection(self, connection):
         self._bus_topic = ".Q." + "".join(self._router._connections.keys()) + ".Q"
