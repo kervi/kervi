@@ -41,6 +41,27 @@ from kervi.controllers.controller import Controller
 from kervi.actions import action
 from kervi.application.default_config import get_default_config
 
+
+def _pretty_print(d, indent=0):
+    if isinstance(d, dict):
+        for key in d.keys():
+            value = d[key]
+            
+            if isinstance(value, dict) or isinstance(value, list):
+                print( '  ' * indent + str(key))
+                _pretty_print(value, indent+1)
+            else:
+                print('  ' * (indent+1) + key + ":" +  str(value))
+    elif isinstance(d, list):
+        for item in d:
+            if isinstance(item, dict) or isinstance(item, list):
+                _pretty_print(item, indent+1)
+            else:
+                print('  ' * (indent+1) + str(item))
+    else:
+        pass    
+    
+
 class _AppActions(Controller):
     def __init__(self, app):
         super().__init__("app", "App controller")
@@ -77,7 +98,7 @@ class Application(object):
 
         config_files = []
 
-        opts, args = getopt.getopt(sys.argv[1:], "c", ["config_file=", "service_install", "service_uninstall", "service_start", "service_stop"])
+        opts, args = getopt.getopt(sys.argv[1:], "c", ["config_file=", "service_install", "service_uninstall", "service_start", "service_stop", "detect_devices"])
         for opt, arg in opts:
             if opt in ("-c", "--config_file"):
                 if os.path.isfile(arg):
@@ -107,7 +128,11 @@ class Application(object):
         )
 
         service_commands = []
+        detect_devices = None
         for opt, arg in opts:
+            if opt in ("--detect_devices"):
+                detect_devices = True
+
             if opt in ("--service_install"):
                 service_commands += ["install"]
 
@@ -135,7 +160,14 @@ class Application(object):
                 )
             exit()
 
-
+        if detect_devices:
+            import kervi.hal as hal
+            hal_driver = hal._load()
+            if hal_driver:
+                devices = hal.detect_devices()
+                print("devices:")
+                _pretty_print(devices)
+            exit()
 
         print("Starting kervi application:", self.config.application.name)
         #if settings:

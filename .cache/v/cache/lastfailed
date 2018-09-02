@@ -1,4 +1,5 @@
 {
+  "tests/test_application.py::test_application": true,
   "tests/test_application.py::test_application_run": true,
   "tests/test_controller.py::TestController": true
 }
