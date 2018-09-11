@@ -107,6 +107,17 @@ class Module(object):
 
         print("Starting kervi module, please wait")
         self.started = False
+        if self.config.module.app_connection_local and not self.config.network.ipc_root_address:
+            print("Locating kervi application, please wait")
+            from kervi.utility.discovery import find_kervi_app
+            address, port = find_kervi_app(self.config.application.id)
+            if address:
+                self.config.network.ipc_root_address = address
+                self.config.network.ipc_root_port = port
+            else:
+                print("Locate kervi application failed")
+                exit()
+        
         self._root_address = "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port)
         
         
@@ -192,7 +203,6 @@ class Module(object):
                     process_id=self.config.module.id + "-" + module
                 )
             ]
-
 
         if not self.config.module.app_connection_local and self.config.routing.kervi_io.enabled:
             print("x")

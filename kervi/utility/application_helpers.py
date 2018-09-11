@@ -22,6 +22,7 @@
 import collections
 import kervi.core.utility.process as process
 from kervi.zmq_spine import _ZMQSpine
+from kervi.utility.discovery import KerviAppDiscovery
 
 
 def _deep_update(d, u):
@@ -75,11 +76,21 @@ class _KerviSocketIPC(process._KerviProcess):
         self._socket_spine = SocketSpine(self.config)
         self.spine.send_command("startThreads", scope="process")
         self.spine.register_command_handler("startWebSocket", self._start_socket)
+        self._discovery_thread = None
+        self._app_id = self.config.application.id
+        if self._ip:
+            self._discovery_thread = KerviAppDiscovery(self._ip, self.config.network.ipc_root_port, self._app_id)
+            self._discovery_thread.start()
+        else:
+            self._discovery_thread = None
+        
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+        print("ls", ip, root_address)
         spine = _ZMQSpine()
         spine._init_spine(process_id, spine_port, root_address, ip)
-
+        self._ip = ip
+        self._port = spine_port
         return spine
     
     def _start_socket(self):
@@ -90,7 +101,9 @@ class _KerviSocketIPC(process._KerviProcess):
         self._socket_spine.step()
 
     def terminate_process(self):
-        pass
+        if self._discovery_thread:
+            self._discovery_thread.terminate()
+        
 
 
 class _KerviIORouterProcess(process._KerviProcess):
