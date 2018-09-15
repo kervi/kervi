@@ -78,8 +78,16 @@ class _KerviSocketIPC(process._KerviProcess):
         self.spine.register_command_handler("startWebSocket", self._start_socket)
         self._discovery_thread = None
         self._app_id = self.config.application.id
-        if self._ip:
-            self._discovery_thread = KerviAppDiscovery(self._ip, self.config.network.ipc_root_port, self._app_id)
+        if self._ip and self.config.discovery.enabled:
+            self._discovery_thread = KerviAppDiscovery(
+                self._ip, 
+                self.config.network.ipc_root_port,
+                self.config.discovery.port, 
+                self._app_id, 
+                self.config.discovery.challenge,
+                self.config.application.name,
+                "http://" + self.config.network.ip + ":" + str(self.config.network.http_port)
+            )
             self._discovery_thread.start()
         else:
             self._discovery_thread = None

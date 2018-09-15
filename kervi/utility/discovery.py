@@ -6,38 +6,56 @@ import time
 import json
 
 class KerviAppDiscovery(threading.Thread):
-	def __init__(self, ip, port, app_id):
+	def __init__(self, ip, port, discovery_port, app_id, challenge, app_name, web_address):
 		threading.Thread.__init__(self)
 		self.deamon = True
 		self._terminate = False
 		self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		server_address = (ip, 9434)
+		server_address = (ip, discovery_port)
 		self._sock.bind(server_address)
 		self._response = "I am a kervi app with id:" + app_id
 		self._hello = "Are you a kervi app with id: " + app_id
+		self._detect = "Are you a kervi app with challenge: " + challenge
+		self._detect_response = "I am a kervi app with challenge: " + challenge
+		
 		self._port = port
+		self._discovery_port = discovery_port
+		self._app_id = app_id
+		self._app_name = app_name
+		self._web_address = web_address
 
 	def terminate(self):
 		self._terminate = True
 		self._sock.close()
 
 	def run(self):
-		#print("Listining for discovery requests:", self._hello)
+		print("Listining for discovery requests on port:", self._discovery_port)
 		while not self._terminate:
 			try:
 				data, address = self._sock.recvfrom(4096)
 				data = str(data.decode('UTF-8'))
 				#print('Received ' + str(len(data)) + ' bytes from ' + str(address) )
 				#print('Data:' + data)
-				
 				if data == self._hello:
 					response = {
-						"challange": self._response,
+						"challenge": self._response,
 						"port": self._port
 					}
 					response_data = json.dumps(response)
 					self._sock.sendto(response_data.encode(), address)
-					#print('Sent confirmation back')
+				
+				if data == self._detect:
+					response = {
+						"challenge": self._detect_response,
+						"port": self._port,
+						"id": self._app_id,
+						"name": self._app_name,
+						"web": self._web_address
+					}
+					response_data = json.dumps(response)
+					self._sock.sendto(response_data.encode(), address)
+				
+					#print('Sent confirmation back', response)
 			except OSError:
 				self._terminate = True
 		#print("discovery terminated")

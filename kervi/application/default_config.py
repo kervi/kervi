@@ -6,6 +6,11 @@ def get_default_config():
             "name": "Kervi",
             "id": "kervi"
         },
+        "discovery":{
+            "enabled": True,
+            "challenge": "kervi",
+            "port": nethelper.get_free_port([9434])
+        },
         "log" : {
             "levels":["fatal", "error", "warning", "information", "debug"],
             "level":"debug",
