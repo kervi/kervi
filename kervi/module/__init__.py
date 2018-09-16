@@ -182,7 +182,7 @@ class Module(object):
             pass
 
         #self.spine.run()
-        self.spine.send_command("startThreads", scope="process")
+        self.spine.send_command("startThreads", local_only=True)
         time.sleep(.5)
 
         module_port = self.config.network.ipc_module_port

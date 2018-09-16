@@ -53,7 +53,7 @@ class _KerviModuleLoader(process._KerviProcess):
         except ImportError:
             self.spine.log.exception("load module:{0}", self.name)
         #import kervi.utility.storage
-        self.spine.send_command("startThreads", scope="process")
+        self.spine.send_command("startThreads", local_only=True)
         self.spine.trigger_event(
             "moduleLoaded",
             self.name,
@@ -74,7 +74,7 @@ class _KerviSocketIPC(process._KerviProcess):
         print("load interprocess communication")
         from kervi.utility.socket_spine import SocketSpine
         self._socket_spine = SocketSpine(self.config)
-        self.spine.send_command("startThreads", scope="process")
+        self.spine.send_command("startThreads", local_only=True)
         self.spine.register_command_handler("startWebSocket", self._start_socket)
         self._discovery_thread = None
         self._app_id = self.config.application.id
@@ -121,7 +121,7 @@ class _KerviIORouterProcess(process._KerviProcess):
         print("load kervi io ipc")
         from kervi.routing.kervi_io.mq_router import KerviIORouter
         self._router = KerviIORouter(self.config)
-        self.spine.send_command("startThreads", scope="process")
+        self.spine.send_command("startThreads", local_only=True)
         self.spine.register_command_handler("startRouter", self._start_router)
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):

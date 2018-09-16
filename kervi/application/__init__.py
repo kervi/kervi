@@ -289,7 +289,7 @@ class Application(object):
             pass
 
         #self.spine.run()
-        self.spine.send_command("startThreads", scope="process")
+        self.spine.send_command("startThreads", local_only=True)
         time.sleep(.5)
         module_port = self.config.network.ipc_root_port
 
@@ -393,7 +393,7 @@ class Application(object):
         webserver.stop()
         print("stopping processes")
         process._stop_processes("app-" + self.config.application.id)
-        self.spine.trigger_event("processTerminating", None, scope="process")
+        self.spine.trigger_event("processTerminating", None, local_only=True)
         time.sleep(1)
         self.spine.stop()
         #for thread in threading.enumerate():
