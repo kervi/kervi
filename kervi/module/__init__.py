@@ -108,7 +108,7 @@ class Module(object):
         print("Starting kervi module, please wait")
         self.started = False
         if self.config.module.app_connection_local and not self.config.network.ipc_root_address:
-            print("Locating kervi application, please wait")
+            print("Locating kervi application...")
             from kervi.utility.discovery import find_kervi_app
             address, port = find_kervi_app(self.config.application.id)
             if address:
@@ -276,3 +276,5 @@ class Module(object):
         #for thread in threading.enumerate():
         #    print("running thread",thread.name)
         print("module stopped")
+        import os
+        os._exit(0)
