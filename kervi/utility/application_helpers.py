@@ -94,7 +94,7 @@ class _KerviSocketIPC(process._KerviProcess):
         
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
-        print("ls", ip, root_address)
+        #print("ls", ip, root_address)
         spine = _ZMQSpine()
         spine._init_spine(process_id, spine_port, root_address, ip)
         self._ip = ip

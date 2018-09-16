@@ -115,7 +115,7 @@ class _ConnEventHandler(object):
 
 class _ClientConnectionThread(threading.Thread):
     def __init__(self, process_spine):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, None, None, "process spine clientconnection")
         self.daemon = True
         self.process_spine = process_spine
         self.terminate = False
@@ -143,7 +143,7 @@ class _ClientConnectionThread(threading.Thread):
 
 class _ConnectionMessageThread(threading.Thread):
     def __init__(self, process_spine, conn, src, is_root_connection=False):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, None, None, "ConnectionMessage")
         self.daemon = True
         self.process_spine = process_spine
         self.connection = conn

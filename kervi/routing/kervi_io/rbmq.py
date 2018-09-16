@@ -16,7 +16,7 @@ LOGGER = logging.getLogger()
 
 class _MQConsumer(threading.Thread):
     def __init__(self, connection):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, None, None, "MQCosnumer")
         self.deamon = True
         self._connection = connection
         self._consumer_tag = None
@@ -71,7 +71,7 @@ class _MQConsumer(threading.Thread):
 
 class _PingThread(threading.Thread):
     def __init__(self, publisher, id):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, None, None, "rbmqPing")
         self.deamon = True
         self._publisher = publisher
         self._router = publisher._connection._router
