@@ -395,7 +395,10 @@ class Application(object):
         process._stop_processes("app-" + self.config.application.id)
         self.spine.trigger_event("processTerminating", None, scope="process")
         time.sleep(1)
-        #process._stop_root_spine()
+        self.spine.stop()
         #for thread in threading.enumerate():
         #    print("running thread",thread.name)
         print("application stopped")
+        #exit()
+        import os
+        os._exit(0)
