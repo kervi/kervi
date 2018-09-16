@@ -7,11 +7,11 @@ import json
 
 class KerviAppDiscovery(threading.Thread):
 	def __init__(self, ip, port, discovery_port, app_id, challenge, app_name, web_address):
-		threading.Thread.__init__(self)
+		threading.Thread.__init__(self, None, None, "Kervi App discovery")
 		self.deamon = True
 		self._terminate = False
 		self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		server_address = (ip, discovery_port)
+		server_address = ("0.0.0.0", discovery_port)
 		self._sock.bind(server_address)
 		self._response = "I am a kervi app with id:" + app_id
 		self._hello = "Are you a kervi app with id: " + app_id
@@ -23,6 +23,7 @@ class KerviAppDiscovery(threading.Thread):
 		self._app_id = app_id
 		self._app_name = app_name
 		self._web_address = web_address
+		self._ip = ip
 
 	def terminate(self):
 		self._terminate = True
@@ -39,6 +40,7 @@ class KerviAppDiscovery(threading.Thread):
 				if data == self._hello:
 					response = {
 						"challenge": self._response,
+						"ip": self._ip,
 						"port": self._port
 					}
 					response_data = json.dumps(response)
@@ -61,7 +63,7 @@ class KerviAppDiscovery(threading.Thread):
 		#print("discovery terminated")
 
 
-def find_kervi_app(app_id):
+def find_kervi_app(app_id, discovery_port=9434):
 	result = (None, None)
 	# Create a UDP socket
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -77,9 +79,9 @@ def find_kervi_app(app_id):
 			# Send data
 			#print('sending: ' + message)
 			if use_local:
-				server_address = ('127.255.255.255', 9434)
+				server_address = ('127.255.255.255', discovery_port)
 			else:
-				server_address = ('255.255.255.255', 9434)
+				server_address = ('255.255.255.255', discovery_port)
 			use_local = not use_local
 			sock.sendto(message.encode(), server_address)
 
@@ -88,15 +90,16 @@ def find_kervi_app(app_id):
 			try:
 				data, server = sock.recvfrom(4096)
 				response = json.loads(data.decode("UTF-8"))
-				if response["challange"] == message_reply:
-					result = (server[0], response["port"])
+				#print("response", server[0], response)
+				if response["challenge"] == message_reply:
+					result = (response["ip"], response["port"])
 					#print('Received confirmation')
 					#print('Server ip: ', str(server[0]), response["port"])
 					break
 				else:
-					print('Verification failed')
+					print('Challenge verification failed.')
 			
-				print('Trying again...')
+				#print('Trying again...')
 			except KeyboardInterrupt:
 				break
 			except TimeoutError:
