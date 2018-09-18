@@ -25,6 +25,14 @@ def get_default_config():
             "ipc_root_port": nethelper.get_free_port([9500]),
             "ipc_root_address": nethelper.get_ip_address()
         },
+        "plugins":{
+            "authentication": {
+                "kervi.plugin.authentication.plain": False
+            },
+            "messageing":{
+                "mail_messenger": False
+            }
+        },
         "authentication": {
             "enabled": False,
             "users" : {
@@ -148,14 +156,6 @@ def get_default_config():
                         }
                     },
                 }
-            }
-        },
-        "routing": {
-            "kervi_io":{
-                "enabled": False,
-                "address": "127.0.0.1",
-                "port": None,
-                "api_key": None
             }
         }
     }
