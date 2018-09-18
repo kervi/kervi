@@ -23,11 +23,21 @@ import uuid
 import http.cookies as Cookie
 from  kervi.spine import Spine
 from kervi.config import Configuration
+from kervi.plugin.plugin_manager import PluginManager
 SESSIONS = {}
+
+_PLUGINS = []
+
+def _load_plugin(plugin):
+    global _PLUGINS
+    _PLUGINS.append(plugin)
 
 def active():
     result = Configuration.authentication.enabled and len(Configuration.authentication.users) > 0
     return result
+
+if active():
+    PluginManager(Configuration, "authentication", _load_plugin)
 
 def allow_anonymous():
     if "anonymous" in Configuration.authentication.users.keys:
@@ -55,7 +65,17 @@ def _add_session(user_name, user_info):
     SESSIONS[session] = {"user_name":user_name, "groups":groups}
     return (session, SESSIONS[session])
 
+
 def authorize(user_name, password):
+    if active():
+        for plugin in _PLUGINS:
+            user = plugin.authorize(user_name, password)
+            if user:
+                return _add_session(user_name, user)
+
+    return (None, None)
+
+def authorizex(user_name, password):
     if active():
         users = Configuration.authentication.users
         user = users.get(user_name, None)
