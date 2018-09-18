@@ -35,9 +35,9 @@ def test_application():
     process_info = app.spine.send_query("getProcessInfo")
     
 
-    time.sleep(10)
+    time.sleep(5)
 
-    app.stop()
+    app.stop(False)
  
     assert APP_READY
     assert MODULE_LOADED == "test_x"
@@ -45,4 +45,5 @@ def test_application():
     assert process_info[0]["id"] == "application"
     assert process_info[1]["id"] == "app_module"
     assert process_info[2]["id"] == "IPC"
+    
     

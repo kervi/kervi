@@ -324,20 +324,22 @@ class Application(object):
                 )
             ]
 
-        if self.config.routing.kervi_io.enabled:
-            module_port += 1
-            self._module_processes += [
-                process._start_process(
-                    "app-" + self.config.application.id,
-                    "kervi_io",
-                    self.config,
-                    nethelper.get_free_port([module_port]),
-                    app_helpers._KerviIORouterProcess
-                )
-            ]
+        # if self.config.routing.kervi_io.enabled:
+        #     module_port += 1
+        #     self._module_processes += [
+        #         process._start_process(
+        #             "app-" + self.config.application.id,
+        #             "kervi_io",
+        #             self.config,
+        #             nethelper.get_free_port([module_port]),
+        #             app_helpers._KerviIORouterProcess
+        #         )
+        #     ]
 
         while not self._is_ready():
             time.sleep(1)
+
+        #self._module_processes += app_helpers.load_plugins(self.config, module_port)
 
         from kervi.dashboards import Dashboard
         Dashboard._add_default()
@@ -388,7 +390,7 @@ class Application(object):
         if not self.started:
             self._start()
 
-    def stop(self):
+    def stop(self, force_exit=True):
         self.spine.send_command("kervi_action_app_exit")
         webserver.stop()
         print("stopping processes")
@@ -400,5 +402,6 @@ class Application(object):
         #    print("running thread",thread.name)
         print("application stopped")
         #exit()
-        import os
-        os._exit(0)
+        if force_exit:
+            import os
+            os._exit(0)
