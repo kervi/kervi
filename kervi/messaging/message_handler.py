@@ -16,7 +16,7 @@ class MessageHandler(Controller):
 
         self.add_channel("user_log", UserLogHandler())
         self.add_channel("email", EmailHandler())
-        self._users = Configuration.authentication.users
+        self._users = Configuration.authentication_plain.users
         self._config = Configuration.messaging
         self._levels = Configuration.log.levels
 

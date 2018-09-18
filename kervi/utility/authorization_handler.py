@@ -27,12 +27,12 @@ from kervi.plugin.plugin_manager import PluginManager
 SESSIONS = {}
 _PLUGIN_MANAGER = None
 
-def active():
-    result = Configuration.authentication.enabled and len(Configuration.authentication.users) > 0
-    return result
 
-if active():
-    _PLUGIN_MANAGER = PluginManager(Configuration, "authentication")
+_PLUGIN_MANAGER = PluginManager(Configuration, "authentication")
+
+def active():
+    return len(_PLUGIN_MANAGER.plugins)>0
+
 
 def allow_anonymous():
     if "anonymous" in Configuration.authentication.users.keys:

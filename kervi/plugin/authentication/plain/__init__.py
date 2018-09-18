@@ -6,13 +6,13 @@ class PlainAuthenticationHandler(AuthenticationHandler):
         AuthenticationHandler.__init__(self, "plain", configuration)
 
     def allow_anonymous(self):
-        if "anonymous" in self.configuration.authentication.users.keys:
-            return self.configuration.authentication.users.anonymous.enabled
+        if "anonymous" in self.configuration.authentication_plain.users.keys:
+            return self.configuration.authentication_plain.users.anonymous.enabled
         return False
     
     def authorize(self, user_name, password):
         print("au", user_name)
-        users = self.configuration.authentication.users
+        users = self.configuration.authentication_plain.users
         user = users.get(user_name, None)
         if user:
             if user_name == "anonymous":

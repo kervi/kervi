@@ -33,8 +33,7 @@ def get_default_config():
                 "mail_messenger": False
             }
         },
-        "authentication": {
-            "enabled": False,
+        "authentication_plain": {
             "users" : {
                 "anonymous":{
                     "enabled": True,
