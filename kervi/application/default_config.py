@@ -27,11 +27,11 @@ def get_default_config():
         },
         "plugins":{
             "authentication": {
-                "kervi.plugin.authentication.plain": True
+                "kervi.plugin.authentication.plain": False
             },
             "messaging":{
                 "kervi.plugin.messaging.email": {
-                    "enabled": True,
+                    "enabled": False,
                     "smtp": {
                         "sender_name": "Kervi",
                         "sender_address": "kervi@example.com",
