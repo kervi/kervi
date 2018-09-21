@@ -27,36 +27,11 @@ def get_default_config():
         },
         "plugins":{
             "authentication": {
-                "kervi.plugin.authentication.plain": False
+                "kervi.plugin.authentication.plain": True
             },
-            "messageing":{
-                "mail_messenger": False
-            }
-        },
-        "authentication_plain": {
-            "users" : {
-                "anonymous":{
+            "messaging":{
+                "kervi.plugin.messaging.email": {
                     "enabled": True,
-                    "groups":[]
-                },
-                "admin":{
-                    "enabled": True,
-                    "password":"",
-                    "groups":["admin"],
-                    "name": "",
-                    "email": "",
-                    "phone": ""
-                }
-            }
-        },
-        "messaging": {
-            "default_channels": ["user_log"],
-            "channels":{
-                "user_log":{
-
-                },
-                "email": {
-                    "enabled": False,
                     "smtp": {
                         "sender_name": "Kervi",
                         "sender_address": "kervi@example.com",
@@ -68,6 +43,25 @@ def get_default_config():
                     }
                 }
             }
+        },
+        "plain_users": {
+            "anonymous":{
+                "enabled": True,
+                "groups":[]
+            },
+            "admin":{
+                "enabled": True,
+                "password":"",
+                "groups":["admin"],
+                "name": "",
+                "addresses": {
+                    "email": "admin@example.com",
+                    "phone": ""
+                }
+            }
+        },
+        "messaging": {
+            "default_channels": ["user_log"]
         },
         "encryption" :{
             "ipc_secret":"",
