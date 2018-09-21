@@ -196,13 +196,17 @@ class Application(object):
 
         init_db(script_name)
 
-        from kervi.messaging.message_handler import MessageHandler
-        self._message_handler = MessageHandler()
-
+        
         import kervi.hal as hal
         hal_driver = hal._load()
         if hal_driver:
             print("Using HAL driver:", hal_driver)
+
+        from kervi.utility.authorization_manager import AuthorizationManager
+        self._authentication = AuthorizationManager()
+        
+        from kervi.messaging.message_manager import MessageManager
+        self._message_handler = MessageManager()
 
         self._app_actions = _AppActions(self)
 
