@@ -9,6 +9,6 @@ class _Messaging(object):
 
     def send_message(self, subject, **kwargs):
         kwargs = dict(kwargs, run_async=True)
-        Actions["message_handler.send_message"](subject, **kwargs)
+        Actions["message_manager.send_message"](subject, **kwargs)
 
 Messaging = _Messaging()

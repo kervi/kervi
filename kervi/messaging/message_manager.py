@@ -1,22 +1,29 @@
 from datetime import datetime
-from kervi.messaging.email import EmailHandler
+#from kervi.messaging.email import EmailHandler
 from kervi.messaging.user_log import UserLogHandler
 from kervi.config import Configuration
 from kervi.controllers.controller import Controller
 from kervi.actions import action
+from kervi.plugin.plugin_manager import PluginManager
+from kervi.plugin.messaging.message_handler import MessageHandler
+from kervi.core.authentication import Authorization 
 
-class MessageHandler(Controller):
-
+class MessageManager(Controller):
     def __init__(self):
-        Controller.__init__(self, "message_handler", "Message handler")
+        Controller.__init__(self, "message_manager", "Message handler")
         self._channels = {}
+        self._authorization = Authorization()
+        self._plugin_manager = None
+        self._plugin_manager = PluginManager(Configuration, "messaging", [MessageHandler])
+        self._users = self._authorization.get_users()
         self.load()
 
     def load(self):
 
-        self.add_channel("user_log", UserLogHandler())
-        self.add_channel("email", EmailHandler())
-        self._users = Configuration.authentication_plain.users
+        self._plugin_manager.add_plugin(UserLogHandler(Configuration))
+        for plugin in self._plugin_manager.plugins:
+            self._channels[plugin.message_type] = plugin
+
         self._config = Configuration.messaging
         self._levels = Configuration.log.levels
 
@@ -38,18 +45,19 @@ class MessageHandler(Controller):
                 ingroup = any(i in groups for i in user.groups)
                 if ingroup:
                     users += [user]
-
+        #print("u", users, message_channels, self._channels.keys())
         if users:
             for message_channel in message_channels:
+                
                 if message_channel in self._channels.keys():
                     channel = self._channels[message_channel]
-                    addresses = []
+                    channel_users = []
                     if channel.address_based:
                         for user in users:
-                            address = channel.create_address(user)
-                            if address:
-                                addresses += [address]
-                        if addresses:
-                            channel.send_message(addresses, subject, **kwargs)
+                            if user.addresses.get(message_channel, None):
+                                channel_users.append(user)
+                        
+                        if channel_users:
+                            channel.send_message(channel_users, subject, **kwargs)
                     else:
-                        channel.send_message(addresses, subject, **kwargs)
+                        channel.send_message([], subject, **kwargs)
