@@ -37,7 +37,7 @@ from kervi.core.utility.thread import KerviThread
 import kervi.utility.nethelper as nethelper
 import kervi.spine as spine
 import kervi.hal as hal
-import kervi.utility.authorization as authorization
+from kervi.core.authentication import Authorization
 from kervi.actions import action 
 
 try:
@@ -250,10 +250,12 @@ class _CameraFrameThread(KerviThread):
 
 class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
+        
         try:
             SimpleHTTPRequestHandler.__init__(self, req, client_addr, server)
             self.server = server
             self.req = req
+            
         except socket.error:
             pass
 
@@ -263,7 +265,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         try:
             #print("ch", self.headers["Cookie"])
-            if authorization.is_session_valid(self.headers):
+            if self.server.authorization.valid_session_header(self.headers["Cookie"]):
 
                 #print("img", self.path)
                 cam_id = self.server.camera.component_id
@@ -321,6 +323,7 @@ try:
             self.camera = camera
             self.terminate = False
             self.mutex = mutex
+            self.authorization = Authorization()
 except:
     print("ThreadingMixIn not found, use single thread camera server")
     class _HTTPFrameServer(HTTPServer):

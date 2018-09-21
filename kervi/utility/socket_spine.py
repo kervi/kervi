@@ -19,13 +19,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" Web socket ipc used by the web ui to comunicate with Kervi """
+""" Web socket ipc used by the web ui to communicate with Kervi """
 import time
 import inspect
 import json
 from kervi.spine import Spine
 import kervi.utility.nethelper as nethelper
-import kervi.utility.authorization_handler as authorization
+from kervi.core.authentication import Authorization
 import kervi.utility.encryption as encryption
 
 #from kervi.utility.kerviThread import KerviThread
@@ -121,6 +121,7 @@ class _SpineProtocol(WebSocketServerProtocol):
         self.authenticated = False
         self.session = None
         self.user = None
+        self._authorization = Authorization()
 
     def add_command_handler(self, command):
         found = False
@@ -163,7 +164,7 @@ class _SpineProtocol(WebSocketServerProtocol):
         pass
 
     def onOpen(self):
-        if authorization.active():
+        if self._authorization.active:
             res = {
                 "messageType":"authenticate"
             }
@@ -181,7 +182,8 @@ class _SpineProtocol(WebSocketServerProtocol):
             obj = json.loads(payload.decode('utf8'))
             
             if obj["messageType"] == "authenticate":
-                session, user = authorization.authorize(obj["userName"], obj["password"])
+                session, user = self._authorization.authorize(obj["userName"], obj["password"])
+                
                 if session is None:
                     print("authorization failed for:", obj["userName"])
                     res = {
@@ -201,7 +203,7 @@ class _SpineProtocol(WebSocketServerProtocol):
             elif obj["messageType"] == "logoff":
                 self.authenticated = False
                 self.session = None
-                authorization.remove_session(obj["session"])
+                self._authorization.remove_session(obj["session"])
                 res = {
                     "messageType":"session_logoff"
                 }
