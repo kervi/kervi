@@ -221,6 +221,7 @@ class Application(object):
         unit_system = self.config.display.unit_systems.default
         display = {}
         display["unit_system"] = self.config.display.unit_systems.systems[unit_system]
+        display["texts"] = self.config.texts.ui
 
         return {
             "name": self.config.application.name,
