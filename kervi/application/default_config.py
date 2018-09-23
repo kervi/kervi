@@ -53,7 +53,7 @@ def get_default_config():
                 "enabled": True,
                 "password":"",
                 "groups":["admin"],
-                "name": "",
+                "name": "Administrator",
                 "addresses": {
                     "email": "admin@example.com",
                     "phone": ""
@@ -149,6 +149,47 @@ def get_default_config():
                         }
                     },
                 }
+            }
+        },
+        "texts":{
+            "messages":{
+                "value_plain":'''
+{source_name} {value} {unit}
+{message_type}
+{message}
+             ''',
+                "value_html":'''
+                <p>
+                <b><span style="font-size:80%;color:{message_color}">⬤</span>&nbsp;{source_name}: {value} {unit}</b><br/>
+                <span>{message}</span>
+                <p>
+                '''
+            },
+            "ui":{
+                "kervi": "Kervi",
+                "yes": "yes",
+                "no": "no",
+                "warning": "warning",
+                "error": "error",
+                "user_name": "User name",
+                "password": "password",
+                "login_fail": "Login failed invalid user name or password",
+                "login": "Login",
+                "log_on": "Log on",
+                "dashboard": "Dashboard",
+                "dashboards": "Dashboards",
+                "empty_app": "No dashboards, sensors, controllers or other components are found in this application!",
+                "hello_world": "Hello world",
+                "toggle_screen": "Toggle full screen",
+                "source": "Source",
+                "time": "Time",
+                "message": "Message",
+                "connecting": "Connecting, please wait",
+                "pan": "pan",
+                "tilt": "tilt",
+                "take_picture": "Take picture",
+                "record": "Record video",
+                "media_folder": "Media folder"
             }
         }
     }

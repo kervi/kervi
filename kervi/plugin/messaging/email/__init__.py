@@ -8,7 +8,8 @@ from email.mime.text import MIMEText
 from kervi.plugin.messaging.message_handler import MessageHandler
 from kervi.config import Configuration
 from kervi.core.utility.superformatter import SuperFormatter
-
+import datetime
+from email.utils import formatdate
 
 class EmailHandler(MessageHandler):
     def __init__(self, config):
@@ -43,28 +44,33 @@ class EmailHandler(MessageHandler):
 
         subject += topic
 
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = subject
-        msg['From'] = self._configuration.smtp.sender_address
-        msg['Bcc'] = "".join(recipients_addresses)
 
-        if body:
-            part1 = MIMEText(body, 'plain')
-            #sf = SuperFormatter()
-            #part1 = sf.format(part1, user_name)
-            msg.attach(part1)
-        if body_html:
-            part2 = MIMEText(body_html, 'html')
-            msg.attach(part2)
+        for recipient in recipients:
+            email = recipient.addresses.get("email", None)
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = subject
+            msg['Date'] = formatdate(localtime=True)
+            msg['From'] = self._configuration.smtp.sender_name + "<" + self._configuration.smtp.sender_address + ">"
+            msg['To'] = recipient.name + "<" + email + ">"
 
-        with smtplib.SMTP(self._configuration.smtp.server, self._configuration.smtp.port) as smtp:
-            if self._configuration.smtp.tls:
-                smtp.starttls()
+            if body:
+                sf = SuperFormatter()
+                body_text = sf.format(body, user_name=recipient.name)
+                part1 = MIMEText(body_text, 'plain')
+                msg.attach(part1)
+            if body_html:
+                part2 = MIMEText(body_html, 'html')
+                msg.attach(part2)
 
-            if self._configuration.smtp.user and self._configuration.smtp.password:
-                smtp.login(self._configuration.smtp.user, self._configuration.smtp.password)
+            
+            with smtplib.SMTP(self._configuration.smtp.server, self._configuration.smtp.port) as smtp:
+                if self._configuration.smtp.tls:
+                    smtp.starttls()
 
-            smtp.send_message(msg)
+                if self._configuration.smtp.user and self._configuration.smtp.password:
+                    smtp.login(self._configuration.smtp.user, self._configuration.smtp.password)
+
+                smtp.send_message(msg)
        
 def init_plugin(config):
     return EmailHandler(config)
