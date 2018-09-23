@@ -74,7 +74,7 @@ class CameraBase(Controller):
         self.actions["take_picture"].set_ui_parameter("button_text", None)
 
 
-        self.actions["record"].set_ui_parameter("button_icon", "video-camera")
+        self.actions["record"].set_ui_parameter("button_icon", "video")
         self.actions["record"].set_ui_parameter("inline", True)
         self.actions["record"].set_ui_parameter("type", "button")
         self.actions["record"].set_ui_parameter("label", None)
