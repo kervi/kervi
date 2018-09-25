@@ -29,6 +29,16 @@ def get_default_config():
             "authentication": {
                 "kervi.plugin.authentication.plain": False
             },
+            "storage":{
+                "kervi.plugin.storage.sqlite_temp": {
+                    "enabled": True,
+                    "name": None
+                },
+                "kervi.plugin.storage.sqlite": {
+                    "enabled": True,
+                    "name": None
+                }
+            },
             "messaging":{
                 "kervi.plugin.messaging.email": {
                     "enabled": False,

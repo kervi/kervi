@@ -5,13 +5,13 @@ import smtplib
 from email.headerregistry import Address
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from kervi.plugin.messaging.message_handler import MessageHandler
+from kervi.plugin.messaging.message_plugin import MessagePlugin
 from kervi.config import Configuration
 from kervi.core.utility.superformatter import SuperFormatter
 import datetime
 from email.utils import formatdate
 
-class EmailHandler(MessageHandler):
+class EmailPlugin(MessagePlugin):
     def __init__(self, config):
         MessageHandler.__init__(self, "email", config)
 
@@ -72,5 +72,5 @@ class EmailHandler(MessageHandler):
 
                 smtp.send_message(msg)
        
-def init_plugin(config):
-    return EmailHandler(config)
+def init_plugin(config, manager):
+    return EmailPlugin(config, manager)

@@ -1,11 +1,11 @@
 from datetime import datetime
 #from kervi.messaging.email import EmailHandler
-from kervi.messaging.user_log import UserLogHandler
+from kervi.messaging.user_log import UserLogPlugin
 from kervi.config import Configuration
 from kervi.controllers.controller import Controller
 from kervi.actions import action
 from kervi.plugin.plugin_manager import PluginManager
-from kervi.plugin.messaging.message_handler import MessageHandler
+from kervi.plugin.messaging.message_plugin import MessagePlugin
 from kervi.core.authentication import Authorization 
 
 class MessageManager(Controller):
@@ -14,13 +14,13 @@ class MessageManager(Controller):
         self._channels = {}
         self._authorization = Authorization()
         self._plugin_manager = None
-        self._plugin_manager = PluginManager(Configuration, "messaging", [MessageHandler])
+        self._plugin_manager = PluginManager(Configuration, "messaging", [MessagePlugin])
         self._users = self._authorization.get_users()
         self.load()
 
     def load(self):
 
-        self._plugin_manager.add_plugin(UserLogHandler(Configuration))
+        self._plugin_manager.add_plugin(UserLogPlugin(Configuration, self))
         for plugin in self._plugin_manager.plugins:
             self._channels[plugin.message_type] = plugin
 

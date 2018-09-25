@@ -192,10 +192,10 @@ class Application(object):
         self._kervi_modules = []
         self._kervi_modules_lock = threading.Lock()
 
-        from kervi.utility.storage import init_db
-
-        init_db(script_name)
-
+        #from kervi.utility.storage import init_db
+        #init_db(script_name)
+        from kervi.storage.storage_manager import StorageManager
+        self._authentication = StorageManager()
         
         import kervi.hal as hal
         hal_driver = hal._load()

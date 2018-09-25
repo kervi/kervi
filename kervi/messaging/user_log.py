@@ -1,11 +1,11 @@
 
-from kervi.plugin.messaging.message_handler import MessageHandler
+from kervi.plugin.messaging.message_plugin import MessagePlugin
 from kervi.config import Configuration
 import kervi.spine as spine
 
-class UserLogHandler(MessageHandler):
-    def __init__(self, config):
-        MessageHandler.__init__(self, "user_log", config)
+class UserLogPlugin(MessagePlugin):
+    def __init__(self, config, manager):
+        MessagePlugin.__init__(self, "user_log", config, manager)
         #self._config = Configuration.messaging.channels.user_log
         self.spine = spine.Spine()
 

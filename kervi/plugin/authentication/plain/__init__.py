@@ -1,13 +1,12 @@
-from kervi.plugin.authentication.authentication_handler import AuthenticationHandler, KerviUser
+from kervi.plugin.authentication.authentication_plugin import AuthenticationPlugin, KerviUser
 
-
-class PlainAuthenticationHandler(AuthenticationHandler):
-    def __init__(self, configuration):
-        AuthenticationHandler.__init__(self, "plain", configuration)
-
+class PlainAuthenticationPlugin(AuthenticationPlugin):
+    def __init__(self, configuration, manager):
+        AuthenticationPlugin.__init__(self, "plain", configuration, manager)
+        self._users = manager.config.plain_users
     def allow_anonymous(self):
-        if "anonymous" in self.configuration.plain_users.keys:
-            return self.configuration.plain_users.anonymous.enabled
+        if "anonymous" in self._users.keys:
+            return self._users.anonymous.enabled
         return False
     
     def _get_user(self, user_name, config_user):
@@ -20,7 +19,7 @@ class PlainAuthenticationHandler(AuthenticationHandler):
         )
 
     def authorize(self, user_name, password):
-        users = self.configuration.plain_users
+        users = self._users
         user = users.get(user_name, None)
         if user:
             if user_name == "anonymous":
@@ -37,11 +36,11 @@ class PlainAuthenticationHandler(AuthenticationHandler):
 
     def get_users(self):
         result=[]
-        users = self.configuration.plain_users
+        users = self._users
         for user_name in users.keys:
             user = users[user_name]
             result.append(self._get_user(user_name, user))
         return result
 
-def init_plugin(config):
-    return PlainAuthenticationHandler(config)
+def init_plugin(config, manager):
+    return PlainAuthenticationPlugin(config, manager)

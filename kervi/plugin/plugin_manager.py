@@ -2,6 +2,7 @@ import inspect
 from kervi.config.configuration import _KerviConfig
 class PluginManager:
     def __init__(self, config, section, plugin_classes=None):
+        self._config = config
         self._plugins = []
         self._plugin_classes = plugin_classes
         for plugin in config.plugins[section].keys:
@@ -14,12 +15,16 @@ class PluginManager:
 
             if enabled:
                 module = __import__(plugin, fromlist=[''])
-                plugin = module.init_plugin(plugin_config)
+                plugin = module.init_plugin(plugin_config, self)
                 if self.add_plugin(plugin):
                     print("loaded plugin:", module.__name__)
                 else:
                     print("Invalid plugin class:", type(plugin))
 
+    @property
+    def config(self):
+        return self._config
+    
     def add_plugin(self, plugin):
         is_valid = True
         if self._plugin_classes:
