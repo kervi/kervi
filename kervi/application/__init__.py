@@ -91,7 +91,7 @@ class Application(object):
     def __init__(self, user_config = None):
         """ Settings is a dictionary with the following content
         """
-
+        print("Starting kervi application")
         import inspect
         import getopt
         import sys
@@ -117,8 +117,8 @@ class Application(object):
             if os.path.isfile(config_file):
                 selected_config_file = config_file
                 break
-        if not selected_config_file:
-            print("no config file found, revert to defaults")
+        #if not selected_config_file:
+        #    print("no config file found , revert to defaults")
 
         from kervi.config import load
         self.config = load(
@@ -150,7 +150,7 @@ class Application(object):
 
         if service_commands:
             import kervi.hal as hal
-            hal_driver = hal._load()
+            hal_driver = hal._load(self.config.platform.driver)
             if hal_driver:
                 hal.service_commands(
                     service_commands,
@@ -162,14 +162,14 @@ class Application(object):
 
         if detect_devices:
             import kervi.hal as hal
-            hal_driver = hal._load()
+            hal_driver = hal._load(self.config.platform.driver)
             if hal_driver:
                 devices = hal.detect_devices()
                 print("devices:")
                 _pretty_print(devices)
             exit()
 
-        print("Starting kervi application:", self.config.application.name)
+        
         #if settings:
         #    self.settings = app_helpers._deep_update(self.settings, settings)
         #self._validateSettings()
@@ -197,11 +197,6 @@ class Application(object):
         from kervi.storage.storage_manager import StorageManager
         self._authentication = StorageManager()
         
-        import kervi.hal as hal
-        hal_driver = hal._load()
-        if hal_driver:
-            print("Using HAL driver:", hal_driver)
-
         from kervi.utility.authorization_manager import AuthorizationManager
         self._authentication = AuthorizationManager()
         
@@ -209,6 +204,12 @@ class Application(object):
         self._message_handler = MessageManager()
 
         self._app_actions = _AppActions(self)
+
+        import kervi.hal as hal
+        hal_driver = hal._load(self.config.platform.driver)
+        if hal_driver:
+            print("platform driver:", hal_driver)
+
 
     @property
     def actions(self):
@@ -349,7 +350,11 @@ class Application(object):
         from kervi.dashboards import Dashboard
         Dashboard._add_default()
 
-        print("Your Kervi application is ready at http://" + self.config.network.ip + ":" + str(self.config.network.http_port))
+        import platform
+        if platform.system() != "Windows":
+            print("\033[92mYour Kervi application is ready at http://" + self.config.network.ip + ":" + str(self.config.network.http_port) + "\033[0m")
+        else:
+            print("Your Kervi application is ready at http://" + self.config.network.ip + ":" + str(self.config.network.http_port))
         print("Press ctrl + c to stop your application")
         webserver.start(
             self.config.network.ip,
