@@ -175,10 +175,10 @@ class SQLiteStoragePlugin(StoragePlugin):
 
     def retrieve_setting(self, group, name):
         setting = self._retrieve_setting_db(group, name)
+        
         if setting:
             return setting["value"]
 
-    
     def _retrieve_setting_db(self, group, name):
         self._db_lock.acquire()
         try:
@@ -192,8 +192,9 @@ class SQLiteStoragePlugin(StoragePlugin):
             if len(all_rows) > 0:
                 value = None
                 try:
-                    value = self.to_json(all_rows[0][3])
-                except:
+                    value = self.from_json(all_rows[0][3])
+                except Exception as ex:
+                    #print("d", ex)
                     pass
 
                 return {

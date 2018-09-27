@@ -59,4 +59,6 @@ class StoragePlugin(KerviPlugin):
 
     def to_json(self, data):
         return json.dumps(data, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
-            
+
+    def from_json(self, json_data):
+        return json.loads(json_data.decode('utf8'))    

@@ -58,7 +58,7 @@ class StorageManager(Controller):
         for plugin in self._plugin_manager.plugins:
             try:
                 if plugin.storage_type == "persisted":
-                    plugin.retrieve_setting(group, name)
+                    return plugin.retrieve_setting(group, name)
             except NotImplementedError:
                 pass
 
