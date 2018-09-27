@@ -6,6 +6,9 @@ def get_default_config():
             "name": "Kervi",
             "id": "kervi"
         },
+        "platform":{
+            "driver": "auto"
+        },
         "discovery":{
             "enabled": True,
             "challenge": "kervi",
