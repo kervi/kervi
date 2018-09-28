@@ -11,6 +11,7 @@ from kervi.core.authentication import Authorization
 class MessageManager(Controller):
     def __init__(self):
         Controller.__init__(self, "message_manager", "Message handler")
+        self.spine.register_command_handler("messageManagerSend", self.send_message)
         self._channels = {}
         self._authorization = Authorization()
         self._plugin_manager = None
@@ -30,7 +31,7 @@ class MessageManager(Controller):
     def add_channel(self, channel_id, handler):
         self._channels[channel_id] = handler
 
-    @action
+    #@action
     def send_message(self, subject, **kwargs):
         message_channels = kwargs.pop("channels", self._config.default_channels)
         groups = kwargs.pop("user_groups", [])
