@@ -176,6 +176,15 @@ def get_default_config():
                 <b><span style="font-size:80%;color:{message_color}">⬤</span>&nbsp;{source_name}: {value} {unit}</b><br/>
                 <span>{message}</span>
                 <p>
+                ''',
+                "action_subject": "{action_name} {state}",
+                "action_plain":'''
+Action {action_name} {state}
+{message}
+                ''',
+                "action_html":'''
+                <span style='font-size:80%;color:{message_color}'>⬤</span>&nbsp;<b>Action {action_name} {state}</b><br/>
+                {message}
                 '''
             },
             "ui":{
