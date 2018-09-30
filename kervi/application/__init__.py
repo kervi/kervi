@@ -28,6 +28,11 @@ try:
 except ImportError:
     import _thread as thread
 
+import sys
+if sys.version_info[0] < 3:
+    print("Kervi requires Python 3")
+    exit()
+
 #from kervi.application.kervi_module import KerviModule
 #import kervi.core.utility.process as process
 #import kervi.spine as spine
@@ -102,10 +107,7 @@ class Application(object):
     def __init__(self, user_config = None):
         """ Settings is a dictionary with the following content
         """
-        import sys
-        if sys.version_info[0] < 3:
-            print("Kervi requires Python 3")
-            exit()
+        
         
         print("Starting kervi application")
         import inspect
