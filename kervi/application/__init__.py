@@ -200,6 +200,7 @@ class Application(object):
         import kervi.spine as spine
         from kervi.zmq_spine import _ZMQSpine
         self.spine = _ZMQSpine()
+        self.config.network.ipc_root_port = nethelper.get_free_port([self.config.network.ipc_root_port])
         self.spine._init_spine("kervi-main", self.config.network.ipc_root_port, None, self.config.network.ipc_root_address)
         spine.set_spine(self.spine)
         #process._start_root_spine(self.config, True, _ZMQSpine)
