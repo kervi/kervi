@@ -244,7 +244,7 @@ class Application(object):
         pass
 
     def _get_application_info(self):
-        unit_system = self.config.display.unit_systems.default
+        unit_system = self.config.unit_system
         display = {}
         display["unit_system"] = self.config.display.unit_systems.systems[unit_system]
         display["texts"] = self.config.texts.ui
@@ -252,7 +252,8 @@ class Application(object):
         return {
             "name": self.config.application.name,
             "id": self.config.application.id,
-            "display": display
+            "display": display,
+            "unit_system": unit_system
         }
 
     def get_process_info(self):

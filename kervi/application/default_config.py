@@ -88,9 +88,9 @@ def get_default_config():
                 "videos":"videos"
             }
         },
+        "unit_system": "metric",
         "display":{
             "unit_systems":{
-                "default": "metric",
                 "systems":{
                     "metric":{
                         "length": "m",
