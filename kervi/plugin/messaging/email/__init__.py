@@ -12,8 +12,8 @@ import datetime
 from email.utils import formatdate
 
 class EmailPlugin(MessagePlugin):
-    def __init__(self, config):
-        MessageHandler.__init__(self, "email", config)
+    def __init__(self, config, manager):
+        MessagePlugin.__init__(self, "email", config, manager)
 
     @property
     def message_type(self):
@@ -50,7 +50,7 @@ class EmailPlugin(MessagePlugin):
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
             msg['Date'] = formatdate(localtime=True)
-            msg['From'] = self._configuration.smtp.sender_name + "<" + self._configuration.smtp.sender_address + ">"
+            msg['From'] = self._config.smtp.sender_name + "<" + self._config.smtp.sender_address + ">"
             msg['To'] = recipient.name + "<" + email + ">"
 
             if body:
@@ -63,12 +63,12 @@ class EmailPlugin(MessagePlugin):
                 msg.attach(part2)
 
             
-            with smtplib.SMTP(self._configuration.smtp.server, self._configuration.smtp.port) as smtp:
-                if self._configuration.smtp.tls:
+            with smtplib.SMTP(self._config.smtp.server, self._config.smtp.port) as smtp:
+                if self._config.smtp.tls:
                     smtp.starttls()
 
-                if self._configuration.smtp.user and self._configuration.smtp.password:
-                    smtp.login(self._configuration.smtp.user, self._configuration.smtp.password)
+                if self._config.smtp.user and self._config.smtp.password:
+                    smtp.login(self._config.smtp.user, self._config.smtp.password)
 
                 smtp.send_message(msg)
        
