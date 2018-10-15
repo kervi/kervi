@@ -1,5 +1,5 @@
 from kervi.config import Configuration
-from kervi.controllers.controller import Controller
+from kervi.controllers import Controller
 from kervi.actions import action
 from kervi.plugin.plugin_manager import PluginManager
 from kervi.plugin.storage.storage_plugin import StoragePlugin

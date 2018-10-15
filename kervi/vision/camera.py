@@ -31,7 +31,7 @@ except ImportError:
     from StringIO import StringIO as BytesIO
 
 import socket
-from kervi.controllers.controller import Controller
+from kervi.controllers import Controller
 from kervi.values import *
 from kervi.core.utility.thread import KerviThread
 import kervi.utility.nethelper as nethelper

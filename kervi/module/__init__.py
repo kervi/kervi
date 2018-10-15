@@ -39,7 +39,7 @@ import kervi.utility.nethelper as nethelper
 import kervi.utility.encryption as encryption
 import kervi.utility.application_helpers as app_helpers
 from kervi.actions import action, Actions
-from kervi.controllers.controller import Controller
+from kervi.controllers import Controller
 from kervi.module.default_config import get_default_config
 
 _app_running = True

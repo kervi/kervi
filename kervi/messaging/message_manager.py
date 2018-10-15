@@ -2,7 +2,7 @@ from datetime import datetime
 #from kervi.messaging.email import EmailHandler
 from kervi.messaging.user_log import UserLogPlugin
 from kervi.config import Configuration
-from kervi.controllers.controller import Controller
+from kervi.controllers import Controller
 from kervi.actions import action
 from kervi.plugin.plugin_manager import PluginManager
 from kervi.plugin.messaging.message_plugin import MessagePlugin

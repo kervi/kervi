@@ -25,7 +25,7 @@ from  kervi.spine import Spine
 from kervi.config import Configuration
 from kervi.plugin.plugin_manager import PluginManager
 from kervi.plugin.authentication.authentication_plugin import AuthenticationPlugin
-from kervi.controllers.controller import Controller
+from kervi.controllers import Controller
 from kervi.actions import action
 
 class AuthorizationManager(Controller):

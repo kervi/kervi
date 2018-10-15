@@ -40,7 +40,7 @@ if sys.version_info[0] < 3:
 #import kervi.kervi_logging as logging
 import kervi.utility.nethelper as nethelper
 #import kervi.utility.encryption as encryption
-from kervi.controllers.controller import Controller
+from kervi.controllers import Controller
 from kervi.actions import action
 from kervi.application.default_config import get_default_config
 
