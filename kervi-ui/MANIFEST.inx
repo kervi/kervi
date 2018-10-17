@@ -1,0 +1,10 @@
+include kervi-ui/web/dist/*.html
+include kervi-ui/web/dist/*.js
+include kervi-ui/web/dist/*.css
+include kervi-ui/web/dist/*.map
+include kervi-ui/web/dist/*.ico
+include kervi-ui/web/dist/*.eot
+include kervi-ui/web/dist/*.svg
+include kervi-ui/web/dist/*.woff
+include kervi-ui/web/dist/*.woff2
+include kervi-ui/web/dist/*.ttf 

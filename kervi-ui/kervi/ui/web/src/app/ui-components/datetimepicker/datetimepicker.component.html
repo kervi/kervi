@@ -1,0 +1,9 @@
+<div class="form-group" >
+    <div class="input-group date" id="datetimepicker_{{id}}" data-target-input="nearest">
+        <input type="text" class="form-control datetimepicker-input"  [attr.data-target]="'#datetimepicker_' + id"/>
+        <div class="input-group-append" [attr.data-target]="'#datetimepicker_' + id" data-toggle="datetimepicker">
+            <span *ngIf="parameters.type=='datetime' || parameters.type=='date'" class="input-group-text"><i class="fa fa-calendar"></i></span>
+            <span *ngIf="parameters.type=='time'" class="input-group-text"><i class="fa fa-clock-o"></i></span>
+        </div>
+    </div>
+</div>
