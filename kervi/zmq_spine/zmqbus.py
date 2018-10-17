@@ -110,7 +110,7 @@ class ProcessConnection:
 
 class ZMQPingThread(threading.Thread):
     def __init__(self, bus):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, None, None, "ZMQPing")
         self._bus = bus
         self.daemon = True
         self._terminate = False
@@ -125,7 +125,7 @@ class ZMQPingThread(threading.Thread):
 
 class ZMQQueryThread(threading.Thread):
     def __init__(self, bus, tag, message):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, None, None, "ZMQQyery")
         self._bus = bus
         self._message = message
         self._tag = tag
@@ -140,7 +140,7 @@ class ZMQQueryThread(threading.Thread):
 
 class ZMQHandlerThread(threading.Thread):
     def __init__(self, bus):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, None, None, "ZMQHandler")
         self._bus = bus
         self.daemon = True
         self._terminate = False
@@ -163,7 +163,7 @@ class ZMQHandlerThread(threading.Thread):
 
 class ZMQMessageThread(threading.Thread):
     def __init__(self, bus, address, bind=False):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, None, None, "ZMQMessage")
         self._bus = bus
         self._address = address
         self._bind = bind
@@ -362,7 +362,7 @@ class ZMQBus():
             else:
                 session_groups = None
 
-        if "scopes" in message:
+        if "scope" in message:
             message_scopes = message["scope"]
 
         if "injected" in message:
@@ -471,7 +471,7 @@ class ZMQBus():
 
         self._ping_thread.start()
         if self._is_root:
-            print("root ready:", self._process_id, self._signal_address)
+            print("IPC address:", self._signal_address)
     def stop(self):
         #print("stop zmq")
         exit_tag = "signal:exit"
@@ -511,6 +511,9 @@ class ZMQBus():
         for connection in self._connections:
             connection.disconnect()
 
+        for message_thread in self._message_threads:
+            message_thread.stop()
+        
     def connect_to_root(self):
         #print("connect to root", self._process_id, self._root_address)
 
@@ -634,9 +637,10 @@ class ZMQBus():
 
     def send_command(self, command, *args, **kwargs):
         injected = kwargs.pop("injected", "")
-        scope = kwargs.pop("scope", "global")
+        scope = kwargs.pop("scope", None)
         groups = kwargs.pop("groups", None)
         session = kwargs.pop("session", None)
+        local_only = kwargs.pop("local_only", False)
         command_message = {
             "command":command,
             "args":args,
@@ -655,7 +659,7 @@ class ZMQBus():
         finally:
             self._command_lock.release()
 
-        if scope == "global":
+        if not local_only:
             for connection in self._connections:
                 connection.send_package(package)
 
@@ -667,9 +671,10 @@ class ZMQBus():
 
     def trigger_event(self, event, id, *args, **kwargs):
         injected = kwargs.pop("injected", "")
-        scope = kwargs.pop("scope", "global")
+        scope = kwargs.pop("scope", None)
         groups = kwargs.pop("groups", None)
         session = kwargs.pop("session", None)
+        local_only = kwargs.pop("local_only", False)
         event_message = {
             'event':event,
             'id':id,
@@ -692,7 +697,7 @@ class ZMQBus():
         finally:
             self._event_lock.release()
 
-        if scope == "global":
+        if not local_only:
             for connection in self._connections:
                 connection.send_package(package)
                 #if event=="userLogMessage":
@@ -731,17 +736,18 @@ class ZMQBus():
             self._query_id_count += 1
             result = []
             injected = kwargs.pop("injected", "")
-            scope = kwargs.pop("scope", "global")
+            scope = kwargs.pop("scope", None)
             groups = kwargs.pop("groups", None)
             session = kwargs.pop("session", None)
             processes = kwargs.pop("processes", None)
             timeout = kwargs.pop("timeout", 10)
             wait = kwargs.pop("wait", True)
             headers = kwargs.pop("headers", None)
+            local_only = kwargs.pop("local_only", False)
             query_id = self._uuid_handler + "-" + str(self._query_id_count)
 
             process_count = 1
-            if scope == "global":
+            if not local_only:
                 for connection in self._connections:
                     if connection.is_alive and (not processes or (connection.process_id in processes)):
                         process_count += 1
@@ -780,7 +786,7 @@ class ZMQBus():
             finally:
                 self._query_lock.release()
 
-            if scope == "global" and len(self._connections) > 0:
+            if not local_only and len(self._connections) > 0:
                 query_message["responseAddress"] = self._signal_address
                 p = json.dumps(query_message, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')
                 package = [query_tag.encode(), p]

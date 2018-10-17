@@ -22,6 +22,8 @@
 import collections
 import kervi.core.utility.process as process
 from kervi.zmq_spine import _ZMQSpine
+from kervi.utility.discovery import KerviAppDiscovery
+import kervi.utility.nethelper as nethelper
 
 
 def _deep_update(d, u):
@@ -41,7 +43,7 @@ def _deep_update(d, u):
 
 class _KerviModuleLoader(process._KerviProcess):
     """ Private class that starts a seperate process that loads a module in the Kervi application """
-    def init_process(self):
+    def init_process(self, **kwargs):
         print("load:", self.name)
         #import kervi.core_sensors.cpu_sensors
         try:
@@ -52,7 +54,7 @@ class _KerviModuleLoader(process._KerviProcess):
         except ImportError:
             self.spine.log.exception("load module:{0}", self.name)
         #import kervi.utility.storage
-        self.spine.send_command("startThreads", scope="process")
+        self.spine.send_command("startThreads", local_only=True)
         self.spine.trigger_event(
             "moduleLoaded",
             self.name,
@@ -69,17 +71,35 @@ class _KerviModuleLoader(process._KerviProcess):
 class _KerviSocketIPC(process._KerviProcess):
     """ Private class that starts a seperate process for IPC communication in the Kervi application """
 
-    def init_process(self):
+    def init_process(self, **kwargs):
         print("load interprocess communication")
         from kervi.utility.socket_spine import SocketSpine
         self._socket_spine = SocketSpine(self.config)
-        self.spine.send_command("startThreads", scope="process")
+        self.spine.send_command("startThreads", local_only=True)
         self.spine.register_command_handler("startWebSocket", self._start_socket)
+        self._discovery_thread = None
+        self._app_id = self.config.application.id
+        if self._ip and self.config.discovery.enabled:
+            self._discovery_thread = KerviAppDiscovery(
+                self._ip, 
+                self.config.network.ipc_root_port,
+                self.config.discovery.port, 
+                self._app_id, 
+                self.config.discovery.challenge,
+                self.config.application.name,
+                "http://" + self.config.network.ip + ":" + str(self.config.network.http_port)
+            )
+            self._discovery_thread.start()
+        else:
+            self._discovery_thread = None
+        
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+        #print("ls", ip, root_address)
         spine = _ZMQSpine()
         spine._init_spine(process_id, spine_port, root_address, ip)
-
+        self._ip = ip
+        self._port = spine_port
         return spine
     
     def _start_socket(self):
@@ -90,17 +110,19 @@ class _KerviSocketIPC(process._KerviProcess):
         self._socket_spine.step()
 
     def terminate_process(self):
-        pass
+        if self._discovery_thread:
+            self._discovery_thread.terminate()
+        
 
 
 class _KerviIORouterProcess(process._KerviProcess):
     """ Private class that starts a seperate process for IPC communication in the Kervi application """
 
-    def init_process(self):
+    def init_process(self, **kwargs):
         print("load kervi io ipc")
         from kervi.routing.kervi_io.mq_router import KerviIORouter
         self._router = KerviIORouter(self.config)
-        self.spine.send_command("startThreads", scope="process")
+        self.spine.send_command("startThreads", local_only=True)
         self.spine.register_command_handler("startRouter", self._start_router)
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
@@ -122,3 +144,37 @@ class _KerviIORouterProcess(process._KerviProcess):
     def terminate_process(self):
         self._router.stop()
         pass
+
+class _KerviPluginProcess(process._KerviProcess):
+    """ Private class that starts a separate process for plugins """
+
+    def init_process(self, **kwargs):
+        plugin_section = kwargs.pop("plugin_section", None)
+        print("load plugins in: ", plugin_section)
+
+    def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+        spine = _ZMQSpine()
+        spine._init_spine(process_id, spine_port, root_address, ip)
+        return spine
+    
+    def process_step(self):
+        pass
+ 
+    def terminate_process(self):
+        pass
+
+def load_plugins(config, module_port):
+    for plugin_section in config.plugins.keys:
+        print(plugin_section)
+        if len(config.plugins[plugin_section].keys) > 0:
+            module_port += 1
+            process._start_process(
+                "plugin-" + config.application.id + plugin_section,
+                plugin_section,
+                config,
+                nethelper.get_free_port([module_port]),
+                _KerviPluginProcess,
+                plugin_section="plugin_section"
+            )
+
+

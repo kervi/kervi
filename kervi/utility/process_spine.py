@@ -42,7 +42,7 @@ class _ConnCommandHandler(object):
             injected = kwargs.get("injected", "")
             scope = kwargs.get("scope", "global")
             session = kwargs.get("session", None)
-            if not injected == "processSpine" and scope == "global":
+            if not injected == "processSpine":
                 self.conn.send({"messageType":"command", "command":self.command, "args":args, "session":session})
         except IOError:
             self.spine.log.debug("IOError ConnCommandHandler:{0}", self.src)
@@ -65,7 +65,7 @@ class _ConnQueryHandler(object):
             injected = kwargs.get("injected", "")
             scope = kwargs.get("scope", "global")
             session = kwargs.get("session", "session")
-            if not injected == "processSpine" and scope == "global":
+            if not injected == "processSpine":
                 self.id_count += 1
                 query_id = self.uuid_handler + "-" + str(self.id_count)
                 event = threading.Event()
@@ -102,7 +102,7 @@ class _ConnEventHandler(object):
         try:
             injected = kwargs.get("injected", "")
             scope = kwargs.get("scope", "global")
-            if not injected == "processSpine" and scope == "global":
+            if not injected == "processSpine":
                 self.spine.log.debug("trigger event: {0} on:{1} ", self.event, self.src)
                 self.conn.send(
                     {"messageType":"event", "event":self.event, "id":id_event, "args":args}
@@ -115,7 +115,7 @@ class _ConnEventHandler(object):
 
 class _ClientConnectionThread(threading.Thread):
     def __init__(self, process_spine):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, None, None, "process spine clientconnection")
         self.daemon = True
         self.process_spine = process_spine
         self.terminate = False
@@ -143,7 +143,7 @@ class _ClientConnectionThread(threading.Thread):
 
 class _ConnectionMessageThread(threading.Thread):
     def __init__(self, process_spine, conn, src, is_root_connection=False):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, None, None, "ConnectionMessage")
         self.daemon = True
         self.process_spine = process_spine
         self.connection = conn

@@ -9,7 +9,7 @@ import kervi.utility.authorization_handler as authorization
 
 class _PrepareThread(threading.Thread):
     def __init__(self, router):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, "RouterPrepareThread")
         self.daemon = True
         self._router = router
 

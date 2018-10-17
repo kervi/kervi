@@ -31,13 +31,13 @@ except ImportError:
     from StringIO import StringIO as BytesIO
 
 import socket
-from kervi.controllers.controller import Controller
+from kervi.controllers import Controller
 from kervi.values import *
 from kervi.core.utility.thread import KerviThread
 import kervi.utility.nethelper as nethelper
 import kervi.spine as spine
 import kervi.hal as hal
-import kervi.utility.authorization as authorization
+from kervi.core.authentication import Authorization
 from kervi.actions import action 
 
 try:
@@ -74,7 +74,7 @@ class CameraBase(Controller):
         self.actions["take_picture"].set_ui_parameter("button_text", None)
 
 
-        self.actions["record"].set_ui_parameter("button_icon", "video-camera")
+        self.actions["record"].set_ui_parameter("button_icon", "video")
         self.actions["record"].set_ui_parameter("inline", True)
         self.actions["record"].set_ui_parameter("type", "button")
         self.actions["record"].set_ui_parameter("label", None)
@@ -250,10 +250,12 @@ class _CameraFrameThread(KerviThread):
 
 class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
+        
         try:
             SimpleHTTPRequestHandler.__init__(self, req, client_addr, server)
             self.server = server
             self.req = req
+            
         except socket.error:
             pass
 
@@ -263,7 +265,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         try:
             #print("ch", self.headers["Cookie"])
-            if authorization.is_session_valid(self.headers):
+            if self.server.authorization.valid_session_header(self.headers["Cookie"]):
 
                 #print("img", self.path)
                 cam_id = self.server.camera.component_id
@@ -321,6 +323,7 @@ try:
             self.camera = camera
             self.terminate = False
             self.mutex = mutex
+            self.authorization = Authorization()
 except:
     print("ThreadingMixIn not found, use single thread camera server")
     class _HTTPFrameServer(HTTPServer):
@@ -397,7 +400,7 @@ class CameraStreamer(CameraBase):
                 import ssl
                 self.server.socket = ssl.wrap_socket (self.server.socket, keyfile=key_file, certfile=cert_file, server_side=True)
 
-        self.server_thread = threading.Thread(target=self.server.serve_forever)
+        self.server_thread = threading.Thread(target=self.server.serve_forever, name="CameraStreamer server")
         self.server_thread.daemon = True
         self.server_thread.start()
 

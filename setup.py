@@ -16,8 +16,18 @@ setup(
     packages=[
         'kervi',
         'kervi/application',
-        'kervi/module',
         'kervi/messaging',
+        'kervi/module',
+        'kervi/plugin',
+        'kervi/plugin/authentication',
+        'kervi/plugin/authentication/plain',
+        'kervi/plugin/messaging',
+        'kervi/plugin/messaging/email',
+        'kervi/plugin/storage',
+        'kervi/plugin/storage/sqlite',
+        'kervi/plugin/storage/sqlite_temp',
+        'kervi/routing',
+        'kervi/storage',
         'kervi/zmq_spine',
         'kervi/utility',
         'kervi/version',
@@ -59,6 +69,8 @@ setup(
         'kervi-device-library',
         'autobahn',
         'pyzmq',
+        'kervi-hal-win',
+        'kervi-hal-rpi'
     ],
     extras_require={
         'rpi':  ['kervi-hal-rpi'],

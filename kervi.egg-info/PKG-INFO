@@ -1,6 +1,6 @@
-Metadata-Version: 1.1
+Metadata-Version: 2.1
 Name: kervi
-Version: 0.13.34
+Version: 0.15.64
 Summary: 
     A python framework for creating robotic and automation applications on Raspbery pi (and other platforms).
     UI is web based and generated on the fly based on configuration in python code.
@@ -10,7 +10,6 @@ Author: Tim Wentzlau
 Author-email: tim.wentzlau@gmail.com
 License: UNKNOWN
 Download-URL: https://github.com/kervi/kervi/archive/v1.0-alpha.tar.gz
-Description-Content-Type: UNKNOWN
 Description: UNKNOWN
 Keywords: raspberry pi,robotic,automation
 Platform: UNKNOWN
@@ -30,3 +29,9 @@ Classifier: Operating System :: Microsoft :: Windows
 Classifier: Operating System :: MacOS
 Classifier: Operating System :: POSIX :: Linux
 Classifier: Programming Language :: Python :: 3.4
+Provides-Extra: win
+Provides-Extra: rpi
+Provides-Extra: mac
+Provides-Extra: windows
+Provides-Extra: linux
+Provides-Extra: raspberry

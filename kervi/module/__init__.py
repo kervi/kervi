@@ -39,8 +39,36 @@ import kervi.utility.nethelper as nethelper
 import kervi.utility.encryption as encryption
 import kervi.utility.application_helpers as app_helpers
 from kervi.actions import action, Actions
-from kervi.controllers.controller import Controller
+from kervi.controllers import Controller
 from kervi.module.default_config import get_default_config
+
+_app_running = True
+
+def handler_stop_signals(signum, frame):
+    global _app_running
+    _app_running = False
+    print("signal:", signum)
+
+
+def _pretty_print(d, indent=0):
+    if isinstance(d, dict):
+        for key in d.keys():
+            value = d[key]
+            
+            if isinstance(value, dict) or isinstance(value, list):
+                print( '  ' * indent + str(key))
+                _pretty_print(value, indent+1)
+            else:
+                print('  ' * (indent+1) + key + ":" +  str(value))
+    elif isinstance(d, list):
+        for item in d:
+            if isinstance(item, dict) or isinstance(item, list):
+                _pretty_print(item, indent+1)
+            else:
+                print('  ' * (indent+1) + str(item))
+    else:
+        pass
+
 
 class _ModuleActions(Controller):
     def __init__(self, module):
@@ -50,23 +78,23 @@ class _ModuleActions(Controller):
 
     @action
     def shutdown(self):
-        print("shutwown module device")
-        self._module.stop()
+        print("shutdown module device")
+        self._module._shutdown_action()
 
     @action
     def reboot(self):
         print("reboot module device")
-        self._module.stop()
+        self._module._reboot_action()
 
     @action
     def stop(self):
         print("stop module")
-        self._module.stop()
+        self._module._stop_action()
 
     @action
     def restart(self):
         print("restart module")
-        self._module.stop()
+        self._module._restart_action()
 
 
 
@@ -79,13 +107,25 @@ class Module(object):
 
         from kervi.config import load
         import inspect
-        #import sys
+        import sys
         import os
 
-        script_name = os.path.basename(os.path.abspath(inspect.stack()[1][1]))
-        script_name, script_ext = os.path.splitext(script_name)
+        script_path = os.path.basename(os.path.abspath(inspect.stack()[1][1]))
+        script_name, script_ext = os.path.splitext(script_path)
 
         config_files = []
+        
+        import getopt
+        opts, args = getopt.getopt(sys.argv[1:], "c", ["config_file=", "as-service", "install-service", "uninstall-service", "start-service", "stop-service", "restart-service", "status-service", "detect-devices"])
+        for opt, arg in opts:
+            if opt in ("-c", "--config_file"):
+                if os.path.isfile(arg):
+                    config_files += [arg]
+                else:
+                    print("Specified config file not found:", arg)
+        
+        
+        
         config_files += [script_name +".config.json"]
         config_files += ["kervi.config.json"]
 
@@ -96,8 +136,8 @@ class Module(object):
                 break
         if selected_config_file:
             print("using config file:", selected_config_file)
-        else:
-            print("no config file found, revert to defaults")
+        #else:
+        #    print("no config file found, revert to defaults")
 
         self.config = load(
             config_file=selected_config_file,
@@ -105,8 +145,67 @@ class Module(object):
             config_base= get_default_config()
         )
 
+        service_commands = []
+        detect_devices = None
+        self._as_service = False
+        for opt, arg in opts:
+            if opt in ("--as-service"):
+                self._as_service = True
+
+            if opt in ("--detect-devices"):
+                detect_devices = True
+
+            if opt in ("--install-service"):
+                service_commands += ["install"]
+
+            if opt in ("--uninstall-service"):
+                service_commands += ["uninstall"]
+
+            if opt in ("--start-service"):
+                service_commands += ["start"]
+
+            if opt in ("--stop-service"):
+                service_commands = ["stop"]
+            
+            if opt in ("--restart-service"):
+                service_commands = ["restart"]
+            if opt in ("--service-status"):
+                service_commands = ["status"]
+
+        if service_commands:
+            import kervi.hal as hal
+            hal_driver = hal._load(self.config.platform.driver)
+            if hal_driver:
+                hal.service_commands(
+                    service_commands,
+                    self.config.application.name,
+                    self.config.application.id,
+                    script_path
+                )
+            exit()
+
+        if detect_devices:
+            import kervi.hal as hal
+            hal_driver = hal._load(self.config.platform.driver)
+            if hal_driver:
+                devices = hal.detect_devices()
+                print("devices:")
+                _pretty_print(devices)
+            exit()
+
         print("Starting kervi module, please wait")
         self.started = False
+        if self.config.module.app_connection_local and not self.config.network.ipc_root_address:
+            print("Locating kervi application...")
+            from kervi.utility.discovery import find_kervi_app
+            address, port = find_kervi_app(self.config.application.id)
+            if address:
+                self.config.network.ipc_root_address = address
+                self.config.network.ipc_root_port = port
+            else:
+                print("Locate kervi application failed")
+                exit()
+        
         self._root_address = "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port)
         
         
@@ -165,13 +264,18 @@ class Module(object):
     def _start(self):
         self.started = True
 
+        if self._as_service:
+            import signal
+            signal.signal(signal.SIGINT, handler_stop_signals)
+            signal.signal(signal.SIGTERM, handler_stop_signals)
+
         try:
             import dashboards
         except ImportError:
             pass
 
         #self.spine.run()
-        self.spine.send_command("startThreads", scope="process")
+        self.spine.send_command("startThreads", local_only=True)
         time.sleep(.5)
 
         module_port = self.config.network.ipc_module_port
@@ -192,7 +296,6 @@ class Module(object):
                     process_id=self.config.module.id + "-" + module
                 )
             ]
-
 
         if not self.config.module.app_connection_local and self.config.routing.kervi_io.enabled:
             print("x")
@@ -239,7 +342,7 @@ class Module(object):
         try:
             char_list = []
             thread.start_new_thread(self._input_thread, (char_list,))
-            while not char_list:
+            while not char_list and _app_running:
                 self.spine.trigger_event("modulePing", self.config.module.id)
                 time.sleep(1)
 
@@ -254,15 +357,34 @@ class Module(object):
         if not self.started:
             self._start()
 
-    def stop(self):
+    def stop(self, force_exit=True, restart=False):
+        self.spine.send_command("kervi_action_module_exit")
         self.spine.trigger_event(
             "moduleStopped",
             self.config.module.id
         )
         print("stopping processes")
         process._stop_processes("module-" + self.config.module.id)
+        self.spine.trigger_event("processTerminating", None, local_only=True)
         time.sleep(1)
         spine.Spine().stop()
         #for thread in threading.enumerate():
         #    print("running thread",thread.name)
         print("module stopped")
+        if force_exit:
+            import os
+            os._exit(0)
+
+    def _stop_action(self):
+        self.stop()
+
+    def _restart_action(self):
+        self.stop(restart=True)
+
+    def _reboot_action(self):
+        import kervi.hal as hal
+        hal.device_reboot()
+
+    def _shutdown_action(self):
+        import kervi.hal as hal
+        hal.device_shutdown()

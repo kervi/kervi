@@ -1,19 +1,25 @@
 # kervi
-Kervi is a Python framework that makes it very easy to create robotic and automation projects.
-It runs on all platforms that supports Python and optimized for Raspberry pi. 
+Easy Python framework for robotic and automation projects.
+The framework runs on all platforms that supports Python and have hardware support for Raspberry pi.
+Wire up sensors, controllers and other devices to your Raspberry PI and link them to web based dashboards
+and internal application logic.
+
+Knowledge about web servers, html or web programming is not needed.
+UI configuration is done in python code and the framework creates the web ui.
 
 Features of the framework are:
-* Web based dashboards that are configured in python.
-* Python classes for handling sensor readings and display on dashboards.
+* Python classes for handling sensors, displays, motors, gpio and other hardware.
 * Python classes for handling user interactions from controllers on dashboards.
 * Integrated camera handling (Raspberry PI camera at the moment)
-* Easy dashboard setup.
+* Device driver library for common devices 
+* Very easy dashboard setup.
 * Dashboard UI is responsive and scales from mobile phones to desktop.
 * Multi process oriented by spreading over more than one core.
-* Knowledge about web development is not required as all UI settings are handled in python.
+* Multi device oriented by connecting multiple Raspberry Pi's in one large application. 
+* No web development knowledge is required as dashboard layout is handled in python. 
 
 
-[Read the full documentation](https://kervi.github.io/)
+[Read the full documentation](https://kervi.org/)
 
 <img src="https://kervi.github.io/_images/dashboard_browser.png" width="500"> <img src="https://kervi.github.io/_images/dashboard_mobile.png" width="300">
 

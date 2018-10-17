@@ -4,7 +4,6 @@ kervi-cli
 kervi-hal-generic
 kervi-device-library
 autobahn
-pillow
 pyzmq
 
 [linux]
