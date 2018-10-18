@@ -1,20 +1,34 @@
 """ Setup module for kervi generating setup package used with pip """
-from distutils.core import setup
+
 import distutils
+from setuptools import setup
+import sys
+
 try:
     from kervi.version import VERSION
 except:
-    VERSION = "0.0"
+    VERSION="0.0.0"
 
 try:
     distutils.dir_util.remove_tree("dist")
 except:
     pass
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name='kervi',
+    author='Tim Wentzlau',
+    author_email='tim.wentzlau@gmail.com',
+    url='https://kervi.org',
+    description="""
+    A python framework for creating robotic and automation applications on Raspbery pi (and other platforms).
+    UI is web based and generated on the fly based on configuration in python code.
+    """,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=[
-        'kervi',
         'kervi/application',
         'kervi/messaging',
         'kervi/module',
@@ -34,14 +48,7 @@ setup(
         'kervi/vision',
     ],
     version=VERSION,
-    description="""
-    A python framework for creating robotic and automation applications on Raspbery pi (and other platforms).
-    UI is web based and generated on the fly based on configuration in python code.
-    """,
-    author='Tim Wentzlau',
-    author_email='tim.wentzlau@gmail.com',
-    url='https://github.com/kervi/kervi',
-    download_url='https://github.com/kervi/kervi/archive/v1.0-alpha.tar.gz',
+    
     keywords=['raspberry pi', 'robotic', 'automation'],
     classifiers=[
         "License :: OSI Approved :: MIT License",
@@ -59,27 +66,27 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: MacOS",
         "Operating System :: POSIX :: Linux",
-        "Programming Language :: Python :: 3.4"
+        "Programming Language :: Python :: 3.5"
     ],
     install_requires=[
-        'kervi-core',
-        'kervi-ui',
-        'kervi-cli',
-        'kervi-hal-generic',
-        'kervi-device-library',
+        'kervi-core==' + VERSION,
+        'kervi-ui==' + VERSION,
+        'kervi-cli==' + VERSION,
+        'kervi-hal-generic==' + VERSION,
+        'kervi-device-library==' + VERSION,
         'autobahn',
         'pyzmq',
-        'kervi-hal-win',
-        'kervi-hal-rpi'
+        'kervi-hal-win==' + VERSION,
+        'kervi-hal-rpi==' + VERSION
     ],
-    extras_require={
-        'rpi':  ['kervi-hal-rpi'],
-        'raspberry':  ['kervi-hal-rpi'],
-        'win':  ['kervi-hal-win'],
-        'windows':  ['kervi-hal-win'],
-        'linux':  ['kervi-hal-linux'],
-        'mac':  ['kervi-hal-linux']
-    },
+    # extras_require={
+    #     'rpi':  ['kervi-hal-rpi'],
+    #     'raspberry':  ['kervi-hal-rpi'],
+    #     'win':  ['kervi-hal-win'],
+    #     'windows':  ['kervi-hal-win'],
+    #     'linux':  ['kervi-hal-linux'],
+    #     'mac':  ['kervi-hal-linux']
+    # },
     include_package_data=True,
     package_data={
         "kervi":[

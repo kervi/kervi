@@ -36,6 +36,7 @@ class NumberValue(KerviValue):
         self._type = None
         #self._display_unit = None
         self._value = 0
+        self._default_value = 0
         self._delta = None
         self._ui_parameters["type"] = ""
         self._ui_parameters["value_icon"] = None
@@ -321,6 +322,7 @@ class StringValue(KerviValue):
         KerviValue.__init__(self, name, "string-value", **kwargs)
         #self.spine = Spine()
         self._value = ""
+        self._default_value = ""
         self._ui_parameters["type"] = "text"
         self._ui_parameters["input_size"] = "5rem"
 
@@ -373,6 +375,7 @@ class DateTimeValue(KerviValue):
         KerviValue.__init__(self, name, "datetime-value", **kwargs)
         #self.spine = Spine()
         self._value = ""
+        self._default_value = ""
         self._ui_parameters["type"] = input_type
 
     @property
@@ -416,6 +419,7 @@ class BooleanValue(KerviValue):
     def __init__(self, name, **kwargs):
         KerviValue.__init__(self, name, "boolean-value", **kwargs)
         self._value = False
+        self._default_value = False
         self._ui_parameters["type"] = "switch"
         self._ui_parameters["on_text"] = "On"
         self._ui_parameters["off_text"] = "Off"
@@ -598,6 +602,7 @@ class ColorValue(KerviValue):
     def __init__(self, name, **kwargs):
         KerviValue.__init__(self, name, "color-value", **kwargs)
         self._value = (255, 255, 255)
+        self._default_value = (255, 255, 255)
         self._type = None
         self._ui_parameters["type"] = "button"
         self._ui_parameters["button_icon"] = None

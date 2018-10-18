@@ -1,10 +1,12 @@
 from distutils.core import setup
 import distutils
 
+import sys
+
 try:
     from kervi.ui.version import VERSION
 except:
-    VERSION = "0.0"
+    VERSION="0.0.0"
 
 try:
     distutils.dir_util.remove_tree("dist")

@@ -4,7 +4,7 @@ import distutils
 try:
     from ukervi.platforms.upython.version import VERSION
 except:
-    VERSION = "0.0"
+    VERSION = "0.0.0"
 
 try:
     distutils.dir_util.remove_tree("dist")
