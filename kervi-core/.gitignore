@@ -1,7 +1,0 @@
-*.pyc
-/roboSys.log
-/robosys.db
-dist
-kervi-ui/node_modules
-_build
-.cache
