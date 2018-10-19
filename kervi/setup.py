@@ -87,10 +87,5 @@ setup(
     #     'linux':  ['kervi-hal-linux'],
     #     'mac':  ['kervi-hal-linux']
     # },
-    include_package_data=True,
-    package_data={
-        "kervi":[
-            "vision/fonts/*.*"
-        ]
-    }
+    
 )

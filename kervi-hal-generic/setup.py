@@ -16,6 +16,9 @@ except:
 setup(
     name='kervi-hal-generic',
     version=VERSION,
+    author='Tim Wentzlau',
+    author_email='tim.wentzlau@gmail.com',
+    url='https://kervi.org',
     description="""
     Generic platform driver for the Kervi automation framework.
     """,

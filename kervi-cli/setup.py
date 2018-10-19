@@ -15,6 +15,9 @@ except:
 setup(
     name='kervi-cli',
     version=VERSION,
+    author='Tim Wentzlau',
+    author_email='tim.wentzlau@gmail.com',
+    url='https://kervi.org',
     packages=[
         "kervi_cli",
         "kervi_cli/scripts",

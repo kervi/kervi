@@ -1,5 +1,5 @@
 """ Setup module for kervi generating setup package used with pip """
-from distutils.core import setup
+from setuptools import setup
 import distutils
 try:
     from ukervi.platforms.upython.version import VERSION
@@ -13,6 +13,9 @@ except:
 
 setup(
     name='ukervi',
+    author='Tim Wentzlau',
+    author_email='tim.wentzlau@gmail.com',
+    url='https://kervi.org',
     packages=[
         'ukervi',
         'ukervi/application',
@@ -35,14 +38,8 @@ setup(
     ],
     version=VERSION,
     description="""
-    A python framework for creating robotic and automation applications on Raspbery pi (and other platforms).
-    UI is web based and generated on the fly based on configuration in python code.
-    This package 
+    This is a upython version of the Kervi framework.
     """,
-    author='Tim Wentzlau',
-    author_email='tim.wentzlau@gmail.com',
-    url='https://github.com/kervi/kervi',
-    download_url='https://github.com/kervi/kervi/archive/v1.0-alpha.tar.gz',
     keywords=['upython', 'micropython', 'robotic', 'automation'],
     classifiers=[
         "License :: OSI Approved :: MIT License",

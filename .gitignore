@@ -1,4 +1,4 @@
-*/PKG-INFO
+PKG-INFO
 MANIFEST
 SOURCES.txt
 dependency_links.txt
@@ -17,3 +17,4 @@ test_application_mem.db
 /kervi/kervi.egg-info
 kervi_ui.egg-info
 setup.cfg
+kervi-core/kervi_core.egg-info/PKG-INFO

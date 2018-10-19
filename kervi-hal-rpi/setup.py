@@ -17,6 +17,9 @@ except:
 setup(
     name='kervi-hal-rpi',
     version=VERSION,
+    author='Tim Wentzlau',
+    author_email='tim.wentzlau@gmail.com',
+    url='https://kervi.org',
     description="""Raspberry pi hardware abstraction layer for the Kervi automation framework""",
     packages=[
         "kervi.platforms.raspberry",

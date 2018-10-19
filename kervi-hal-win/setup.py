@@ -17,6 +17,12 @@ except:
 setup(
     name='kervi-hal-win',
     version=VERSION,
+    author='Tim Wentzlau',
+    author_email='tim.wentzlau@gmail.com',
+    url='https://kervi.org',
+    description="""
+    This is a sub package used by the Kervi framework. See Kervi for more information.
+    """,
     packages=[
         "kervi/platforms/windows",
     ],

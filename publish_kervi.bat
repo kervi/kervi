@@ -12,7 +12,7 @@ echo VERSION = %version% > kervi-hal-rpi/kervi/platforms/raspberry/version.py
 echo VERSION = %version% > kervi-hal-win/kervi/platforms/windows/version.py
 echo VERSION = %version% > ukervi/ukervi/platforms/upython/version.py
 
-
+@ECHO ON
 cd kervi-core
 call %pythonbin% setup.py  sdist 
 cd ..
@@ -20,6 +20,11 @@ cd kervi
 call %pythonbin% setup.py  sdist
 cd ..
 cd kervi-ui
+cd kervi/ui/web
+call ng build
+cd ..
+cd ..
+cd ..
 call %pythonbin% setup.py  sdist
 cd ..
 cd kervi-cli

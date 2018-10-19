@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 import distutils
 
 import sys
@@ -24,20 +24,20 @@ setup(
     download_url='https://github.com/wentzlau/kervi-ui/archive/v1.0-alpha.tar.gz',
     keywords=['ui', 'robotic', 'automation'],
     classifiers=[],
-    include_package_data=True,
-    package_data={
-        'kervi.ui': [
-            'web/dist/*.html',
-            'web/dist/*.js',
-            'web/dist/*.css',
-            'web/dist/*.map',
-            'web/dist/*.ico',
-            'web/dist/*.png',
-            'web/dist/*.eot',
-            'web/dist/*.svg',
-            'web/dist/*.woff',
-            'web/dist/*.woff2',
-            'web/dist/*.ttf'
-        ],
-    },
+    #include_package_data=True,
+    # package_data={
+    #     'kervi.ui': [
+    #         'web/dist/*.html',
+    #         'web/dist/*.js',
+    #         'web/dist/*.css',
+    #         'web/dist/*.map',
+    #         'web/dist/*.ico',
+    #         'web/dist/*.png',
+    #         'web/dist/*.eot',
+    #         'web/dist/*.svg',
+    #         'web/dist/*.woff',
+    #         'web/dist/*.woff2',
+    #         'web/dist/*.ttf'
+    #     ],
+    # },
 )
