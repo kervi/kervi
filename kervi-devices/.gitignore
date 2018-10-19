@@ -1,0 +1,4 @@
+*.pyc
+dist
+kervi_device_library.egg-info
+__pycache_/

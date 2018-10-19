@@ -1,3 +1,9 @@
+PKG-INFO
+MANIFEST
+SOURCES.txt
+dependency_links.txt
+requires.txt
+top_level.txt
 *.pyc
 /roboSys.log
 /robosys.db
@@ -8,4 +14,7 @@ _build
 test_application.db
 test_application_mem.db
 .cache/v/cache/lastfailed
-
+/kervi/kervi.egg-info
+kervi_ui.egg-info
+setup.cfg
+kervi-core/kervi_core.egg-info/PKG-INFO

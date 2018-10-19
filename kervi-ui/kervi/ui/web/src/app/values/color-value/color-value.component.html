@@ -1,0 +1,22 @@
+<div *ngIf="!inline" class="block-component"> 
+    <div class="label-section">
+        <div style="display:inline-block;float:left;">
+            <div class="value-label">
+                <span  *ngIf="parameters.labelIcon" class="fa fa-{{parameters.labelIcon}}"></span>
+                <span  *ngIf="parameters.label"  >{{parameters.label}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="value-section">
+        <div class="value-value" [style.min-width.rem]="parameters.valueSize">
+            <kervi-color [parent]="this" [defaultSizes]="defaultSizes" [value]="value.value$" [inline]="inline" [parameters]="parameters" ></kervi-color>
+        </div>
+    </div>
+    
+</div>
+<div style="display:inline-block" *ngIf="inline" >
+    <span  *ngIf="parameters.labelIcon" class="fa fa-{{parameters.labelIcon}}"></span>
+    <span *ngIf="parameters.label" >{{parameters.label}}</span>
+    <span *ngIf="parameters.labelIcon || parameters.label" >&nbsp;</span>
+    <kervi-color [parent]="this" [defaultSizes]="defaultSizes" [value]="value.value$" [inline]="inline" [parameters]="parameters" ></kervi-color>
+</div>

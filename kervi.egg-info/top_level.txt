@@ -1,8 +1,0 @@
-kervi
-kervi/application
-kervi/messaging
-kervi/module
-kervi/utility
-kervi/version
-kervi/vision
-kervi/zmq_spine
