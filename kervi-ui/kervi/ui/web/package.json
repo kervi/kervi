@@ -30,7 +30,6 @@
     "convert-units": "^2.3.4",
     "core-js": "^2.5.7",
     "css-toggle-switch": "^4.0.2",
-    "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "hammerjs": "^2.0.8",
     "js-quantities": "^1.7.2",
     "moments": "0.0.2",
