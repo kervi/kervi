@@ -161,7 +161,7 @@ export class  KerviSpineBase{
 			this.options.onClose.call(this.options.targetScope,evt);
 		this.firstOnOpen=true;
 		if (this.options.autoConnect){
-			setTimeout(1000,this.connect());
+			setTimeout(this.connect,1000);
 		}
 	}
 

@@ -93,25 +93,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
    toggleFullScreen() {
     var doc:any;
     doc = document;
-    if ((doc.fullScreenElement && doc.fullScreenElement !== null) ||    
-     (!doc.mozFullScreen && !document.webkitIsFullScreen)) {
+    if ((doc.fullScreenElement && doc.fullScreenElement !== null))     
+     /*(!doc.mozFullScreen && !document.webkitIsFullScreen))*/ {
        this.inFullScreen = true;
       if (doc.documentElement.requestFullScreen) {  
         doc.documentElement.requestFullScreen();  
       } else if (doc.documentElement.mozRequestFullScreen) {  
         doc.documentElement.mozRequestFullScreen();  
-      } else if (document.documentElement.webkitRequestFullScreen) {  
-        doc.documentElement.webkitRequestFullScreen();  
-      }  
+      }// } else if (document.documentElement.webkitRequestFullScreen) {  
+      //   doc.documentElement.webkitRequestFullScreen();  
+      // }  
     } else {  
       this.inFullScreen=false;
       if (doc.cancelFullScreen) {  
         doc.cancelFullScreen();  
       } else if (doc.mozCancelFullScreen) {  
         doc.mozCancelFullScreen();  
-      } else if (document.webkitCancelFullScreen) {  
-        doc.webkitCancelFullScreen();  
-      }  
+      }// } else if (document.webkitCancelFullScreen) {  
+      //   doc.webkitCancelFullScreen();  
+      // }  
     }  
   }
 
