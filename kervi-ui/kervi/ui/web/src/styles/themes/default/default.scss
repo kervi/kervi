@@ -347,9 +347,9 @@ kervi-sensor:last-child .block-component{
     @import "./components/slider/slider.scss";
     $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
     @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
-    @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/fa-brands.scss";
-    @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/fa-regular.scss";
-    @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/fa-solid.scss";
+    @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/brands.scss";
+    @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/regular.scss";
+    @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
 
  //   @import "./components/switch/candy";
   

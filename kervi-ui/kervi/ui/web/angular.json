@@ -42,7 +42,6 @@
               "node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js",
               "node_modules/sockjs-client/dist/sockjs.js",
               "node_modules/stompjs/lib/stomp.js",
-              "node_modules/js-quantities/build/quantities.js",
               "lib/convert-units-bundle.js",
               "lib/colors.js",
               "lib/jqColorPicker.js"
