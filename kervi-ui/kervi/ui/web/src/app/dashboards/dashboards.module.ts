@@ -13,6 +13,7 @@ import { DashboardSectionComponent } from './dashboard-section/dashboard-section
 import { RouterModule } from '@angular/router';
 import { UIComponentsModule} from '../ui-components/ui-components.module'
 import { KerviPipesModule } from '../pipes/pipes.module'
+
 @NgModule({
   imports: [
     CommonModule,

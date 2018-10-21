@@ -15,6 +15,44 @@
     "lib": [
       "es2016",
       "dom"
-    ]
+    ],
+    "paths": {
+      "kervi-js": [
+        "dist/kervi-js"
+      ],
+      "kervi-js/*": [
+        "dist/kervi-js/*"
+      ],
+      "kervi-ts": [
+        "dist/kervi-js"
+      ],
+      "kervi-ts/*": [
+        "dist/kervi-js/*"
+      ],
+      "ngx-kervi": [
+        "dist/ngx-kervi"
+      ],
+      "ngx-kervi/*": [
+        "dist/ngx-kervi/*"
+      ],
+      "kervi-ngx": [
+        "dist/kervi-ngx"
+      ],
+      "kervi-ngx/*": [
+        "dist/kervi-ngx/*"
+      ],
+      "kervi-ngx1": [
+        "dist/kervi-ngx1"
+      ],
+      "kervi-ngx1/*": [
+        "dist/kervi-ngx1/*"
+      ],
+      "kervingx2": [
+        "dist/kervingx2"
+      ],
+      "kervingx2/*": [
+        "dist/kervingx2/*"
+      ]
+    }
   }
 }

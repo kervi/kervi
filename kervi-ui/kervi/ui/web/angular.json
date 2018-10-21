@@ -19,7 +19,6 @@
             "assets": [
               "src/assets",
               "src/favicon.ico"
-              
             ],
             "styles": [
               "src/styles/themes/default/default.scss"
@@ -45,7 +44,6 @@
               "lib/convert-units-bundle.js",
               "lib/colors.js",
               "lib/jqColorPicker.js"
-              
             ]
           },
           "configurations": {
@@ -132,7 +130,7 @@
       }
     },
     "kervi-ui-e2e": {
-      "root": "",
+      "root": "e2e",
       "sourceRoot": "e2e",
       "projectType": "application",
       "architect": {
@@ -150,6 +148,181 @@
               "e2e/tsconfig.e2e.json"
             ],
             "exclude": []
+          }
+        }
+      }
+    },
+    "kervi-js": {
+      "root": "projects/kervi-js",
+      "sourceRoot": "projects/kervi-js/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/kervi-js/tsconfig.lib.json",
+            "project": "projects/kervi-js/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/kervi-js/src/test.ts",
+            "tsConfig": "projects/kervi-js/tsconfig.spec.json",
+            "karmaConfig": "projects/kervi-js/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/kervi-js/tsconfig.lib.json",
+              "projects/kervi-js/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "ngx-kervi": {
+      "root": "projects/ngx-kervi",
+      "sourceRoot": "projects/ngx-kervi/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ngx-kervi/tsconfig.lib.json",
+            "project": "projects/ngx-kervi/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-kervi/src/test.ts",
+            "tsConfig": "projects/ngx-kervi/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-kervi/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-kervi/tsconfig.lib.json",
+              "projects/ngx-kervi/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "kervi-ngx": {
+      "root": "projects/kervi-ngx",
+      "sourceRoot": "projects/kervi-ngx/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/kervi-ngx/tsconfig.lib.json",
+            "project": "projects/kervi-ngx/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/kervi-ngx/src/test.ts",
+            "tsConfig": "projects/kervi-ngx/tsconfig.spec.json",
+            "karmaConfig": "projects/kervi-ngx/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/kervi-ngx/tsconfig.lib.json",
+              "projects/kervi-ngx/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "kervi-ngx1": {
+      "root": "projects/kervi-ngx1",
+      "sourceRoot": "projects/kervi-ngx1/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/kervi-ngx1/tsconfig.lib.json",
+            "project": "projects/kervi-ngx1/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/kervi-ngx1/src/test.ts",
+            "tsConfig": "projects/kervi-ngx1/tsconfig.spec.json",
+            "karmaConfig": "projects/kervi-ngx1/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/kervi-ngx1/tsconfig.lib.json",
+              "projects/kervi-ngx1/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "kervingx2": {
+      "root": "projects/kervingx2",
+      "sourceRoot": "projects/kervingx2/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/kervingx2/tsconfig.lib.json",
+            "project": "projects/kervingx2/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/kervingx2/src/test.ts",
+            "tsConfig": "projects/kervingx2/tsconfig.spec.json",
+            "karmaConfig": "projects/kervingx2/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/kervingx2/tsconfig.lib.json",
+              "projects/kervingx2/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
