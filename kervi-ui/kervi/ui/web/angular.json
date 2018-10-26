@@ -326,6 +326,41 @@
           }
         }
       }
+    },
+    "ngx-kervi-components": {
+      "root": "projects/ngx-kervi-components",
+      "sourceRoot": "projects/ngx-kervi-components/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ngx-kervi-components/tsconfig.lib.json",
+            "project": "projects/ngx-kervi-components/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-kervi-components/src/test.ts",
+            "tsConfig": "projects/ngx-kervi-components/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-kervi-components/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-kervi-components/tsconfig.lib.json",
+              "projects/ngx-kervi-components/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "kervi-ui",

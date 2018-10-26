@@ -1,0 +1,14 @@
+<li class="nav-item dropdown">
+	<a class="nav-link" title="Dashboards" style="padding-top:0;cursor: pointer" data-toggle="dropdown"><i class="fa fa-bars fa-lg" aria-hidden="true"></i></a>
+	<div class="dropdown-menu  multi-leve ul.nav.navbar-nav.no-collapse">
+			<!--<span class="dropdown-divider">&nbsp; Dashboards</span>-->
+			<div class="dropdown-submenu">
+					<a *ngFor="let dashboard of (dashboards$ | async)" class="dropdown-item" [routerLink]="['/dashboard', dashboard.id]">{{dashboard.name}}</a>
+			</div>
+		<!--<div class="dropdown-divider"></div>-->
+		<!--<a class="dropdown-item" href="#/charts">Charts</a>-->
+		<!--<a class="dropdown-item" href="#/about">About</a>-->
+		<!--<a class="dropdown-item" href="#/settings">Settings</a>-->
+	</div>
+</li>
+		

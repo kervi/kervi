@@ -1,8 +1,8 @@
 
 import  * as KerviValues from './KerviValues.model'
 import { ControllerModel } from './controller.model'
-import { DashboardModel } from './dashboard.model'
-import { ActionModel } from './action.model'
+import { Dashboard } from './dashboard.model'
+import { Action } from './action.model'
 import { IComponent } from './IComponent.model';
 import { KerviBaseService } from '../kervi-js.service'
 
@@ -27,24 +27,24 @@ export class ComponentFactory{
             var component:any=null;
             var subComponents:any[] = [];
             if (message.componentType=="KerviAction")
-                component = new ActionModel(message);
+                component = new Action(message);
             else if (message.componentType=="dashboard"){
-                component = new DashboardModel(message);
+                component = new Dashboard(message);
                 dashboards.push(component);
             } else if (message.componentType=="controller")
                 component = new ControllerModel(message);
             else if (message.componentType == "boolean-value")
-                component = new KerviValues.KerviBooleanModel(message);
+                component = new KerviValues.BooleanValue(message, kerviService);
             else if (message.componentType == "number-value")
-                component = new KerviValues.KerviNumberModel(message, kerviService);
+                component = new KerviValues.NumberValue(message, kerviService);
             else if (message.componentType == "string-value")
-                component = new KerviValues.KerviStringModel(message);
+                component = new KerviValues.StringValue(message, kerviService);
             else if (message.componentType == "enum-value")
-                component = new KerviValues.KerviEnumModel(message);
+                component = new KerviValues.SelectValue(message, kerviService);
             else if (message.componentType == "datetime-value")
-                component = new KerviValues.KerviDateTimeModel(message);
+                component = new KerviValues.DateTimeValue(message, kerviService);
             else if (message.componentType == "color-value")
-                component = new KerviValues.KerviColorModel(message);
+                component = new KerviValues.ColorValue(message, kerviService);
             
             if (component)
                 result.push(component);
@@ -58,11 +58,10 @@ export class ComponentFactory{
         return [result, dashboards];    
     }
 
-    private static linkToDashboards(components:IComponent[], dashboards:DashboardModel[]){
+    private static linkToDashboards(components:IComponent[], dashboards:Dashboard[]){
         console.log("ltd", components, dashboards);
-        
         for(let component of components){
-            if (!(component instanceof DashboardModel)){
+            if (!(component instanceof Dashboard)){
                 for(let link of component.dashboards){
                     for(let dashboard of dashboards){
                         dashboard.addDashboardLink(link);

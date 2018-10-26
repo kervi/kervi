@@ -36,7 +36,7 @@ export class DashboardMessageModel{
     }
 }
 
-export class DashboardSectionComponentModel{
+export class DashboardSectionComponent{
     public component:IComponent;
     public componentId:string;
     public linkId:any;
@@ -50,7 +50,7 @@ export class DashboardSectionComponentModel{
     }
 }
 
-export class DashboardSectionParametersModel{
+export class DashboardSectionParameters{
     public title:string = null;
     public width:string = null;
     public height:string = null;
@@ -70,21 +70,21 @@ export class DashboardSectionParametersModel{
     }
 }
 
-export class DashboardSectionModel{
+export class DashboardSection {
     public id:string;
     public name:string;
-    public parameters: DashboardSectionParametersModel;
-    public components: DashboardSectionComponentModel[]=[];
-    public dashboard: DashboardModel;
+    public parameters: DashboardSectionParameters;
+    public components: DashboardSectionComponent[]=[];
+    public dashboard: Dashboard;
     public type:string;
-    public subSections: DashboardSectionModel[] = [];
+    public subSections: DashboardSection[] = [];
     
     constructor (dashboard, messageSection){
         this.dashboard=dashboard;
         this.id=messageSection.id;
         this.name=messageSection.name;
         this.type=messageSection.type;
-        this.parameters=new DashboardSectionParametersModel(messageSection.uiParameters);
+        this.parameters=new DashboardSectionParameters(messageSection.uiParameters);
         /*if (messageSection.components)
             for(var componentRef of messageSection.components){
                 this.components.push(new DashboardSectionComponentModel(componentRef))
@@ -93,13 +93,13 @@ export class DashboardSectionModel{
         if (messageSection.panels){
             //console.log("spa",messageSection.panels);
             for(var subMessageSection of messageSection.panels){
-                var section=new DashboardSectionModel(this, subMessageSection);
+                var section=new DashboardSection(this, subMessageSection);
                 this.subSections.push(section);
             }
         }
     }
 
-    public reload(source:DashboardSectionModel){
+    public reload(source:DashboardSection){
         //console.log("rl", this);
         for(var subSection of source.subSections){
             this.reload(subSection)
@@ -115,7 +115,7 @@ export class DashboardSectionModel{
                 this.components.push(sourceComponent);
             }
         }
-        var deleteComponents:DashboardSectionComponentModel[] = [];
+        var deleteComponents:DashboardSectionComponent[] = [];
         for (var component of this.components){
             var found=false;
             for(var sourceComponent of source.components){
@@ -145,26 +145,26 @@ export class DashboardBackgroundModel{
     }
 }
 
-export class DashboardModel implements IComponent{
+export class Dashboard implements IComponent{
     public id:string;
     public name:string;
     public componentType:string;
     public type:string;
     public isDefault:Boolean;
     public template:string;
-    public sections:DashboardSectionModel[];
-    public sysSections:DashboardSectionModel[];
-    public headerSection: DashboardSectionModel=null;
-    public footerCenterSection: DashboardSectionModel=null;
-    public footerLeftSection: DashboardSectionModel=null;
-    public footerRightSection: DashboardSectionModel=null;
-    public sysSection: DashboardSectionModel=null;
-    public backgroundSection: DashboardSectionModel=null;
-    public controllerSection: DashboardSectionModel=null;
-    public LeftPadXSection: DashboardSectionModel=null;
-    public LeftPadYSection: DashboardSectionModel=null;
-    public RightPadXSection: DashboardSectionModel=null;
-    public RightPadYSection: DashboardSectionModel=null;
+    public sections:DashboardSection[];
+    public sysSections:DashboardSection[];
+    public headerSection: DashboardSection=null;
+    public footerCenterSection: DashboardSection=null;
+    public footerLeftSection: DashboardSection=null;
+    public footerRightSection: DashboardSection=null;
+    public sysSection: DashboardSection=null;
+    public backgroundSection: DashboardSection=null;
+    public controllerSection: DashboardSection=null;
+    public LeftPadXSection: DashboardSection=null;
+    public LeftPadYSection: DashboardSection=null;
+    public RightPadXSection: DashboardSection=null;
+    public RightPadYSection: DashboardSection=null;
     //public background: DashboardBackgroundModel=null;
     public unitSize: number;
     
@@ -187,13 +187,13 @@ export class DashboardModel implements IComponent{
         this.sections=[];
         this.sysSections=[];
         if (!this.template){
-            var currentSection:DashboardSectionModel = null;
+            var currentSection:DashboardSection = null;
             for (let messageSection of message.sections){
                 if (!messageSection){
                     console.log("dashboard with null section", this.id);
                     continue;
                 }
-                var section = new DashboardSectionModel(this, messageSection);
+                var section = new DashboardSection(this, messageSection);
                 var sysSection = true;
                 if (section.id=="header_center")
                     this.headerSection=section;
@@ -221,7 +221,7 @@ export class DashboardModel implements IComponent{
                     sysSection=false;
                     if (section.type!="group"){
                         if(currentSection==null){
-                            currentSection = new DashboardSectionModel(
+                            currentSection = new DashboardSection(
                             this,
                             {
                                 "id":null,
@@ -297,7 +297,7 @@ export class DashboardModel implements IComponent{
     };
     updateReferences(){};
     reload(component:IComponent){
-        var source = component as DashboardModel;
+        var source = component as Dashboard;
         if (!this.backgroundSection && source.backgroundSection)
             this.backgroundSection=source.backgroundSection;
         else if (this.backgroundSection && !source.backgroundSection)
@@ -376,7 +376,7 @@ export class DashboardModel implements IComponent{
             this.controllerSection.reload(source.controllerSection)
     };
 
-    private getDashboardSectionById(id:string, sections:DashboardSectionModel[]){
+    private getDashboardSectionById(id:string, sections:DashboardSection[]){
         for(let section of sections){
             if (section.id == id)
                 return section; 
@@ -396,7 +396,7 @@ export class DashboardModel implements IComponent{
             if (!section)
                 section = this.getDashboardSectionById(link.sectionId, this.sysSections);
             if (section){
-                section.components.push(new DashboardSectionComponentModel(link));
+                section.components.push(new DashboardSectionComponent(link));
             } else {
                 console.log("adh",link);
                 var messageSection ={
@@ -411,9 +411,9 @@ export class DashboardModel implements IComponent{
                         "logLength":0
                     }
                 }
-                var newSection = new DashboardSectionModel(this, messageSection);
+                var newSection = new DashboardSection(this, messageSection);
                 this.sections.push(newSection);
-                newSection.components.push(new DashboardSectionComponentModel(link));
+                newSection.components.push(new DashboardSectionComponent(link));
             }
         }
     }

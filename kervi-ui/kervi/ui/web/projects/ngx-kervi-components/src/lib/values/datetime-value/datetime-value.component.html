@@ -1,0 +1,20 @@
+<div *ngIf="!inline" class="block-component"> 
+    <div class="label-section">
+        <div style="display:inline-block;float:left;">
+            <div class="value-label">
+                <span  *ngIf="parameters.labelIcon" class="fa fa-{{parameters.labelIcon}}"></span>
+                <span  *ngIf="parameters.label"  >{{parameters.label}}</span>
+            </div>
+        </div>
+    </div> 
+    <div class="value-section pull-right" style="display:inline-block">  
+        <kervi-datetime [parent]="this" [defaultSizes]="defaultSizes" [inline]="inline" [value]="value.value$" [parameters]="parameters" *ngIf="displayType!='button'"></kervi-datetime>
+    </div>
+</div>
+<div style="display:inline-block" *ngIf="inline" >
+    <span  *ngIf="parameters.labelIcon" class="fa fa-{{parameters.labelIcon}}"></span>
+    <span *ngIf="parameters.label" >{{parameters.label}}</span>
+    <kervi-datetime [parent]="this" [defaultSizes]="defaultSizes" [inline]="inline" [value]="value.value$" [parameters]="parameters" *ngIf="displayType!='button'"></kervi-datetime>
+    
+</div>
+    

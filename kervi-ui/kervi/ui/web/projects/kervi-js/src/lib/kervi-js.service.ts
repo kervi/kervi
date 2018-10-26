@@ -12,20 +12,24 @@ import { DashboardMessageModel } from './models/dashboard.model';
 declare var kerviSocketAddress : any;
 declare var socketProtocol : any;
 
+export enum ConnectionState {disconnected, loading, authenticate, connected};
+
 @Injectable()
 export class KerviBaseService {
-  spine: KerviSpineBase = null;
+  public spine: KerviSpineBase = null;
+  
   private appInfo=null;
-  public  application$: BehaviorSubject<any>;
   private  texts:{} = null;
   private components : IComponent[] = [];
-  private components$: BehaviorSubject<IComponent[]> = new  BehaviorSubject<IComponent[]>([]);
+  private components$: BehaviorSubject<IComponent[]> = new  BehaviorSubject<IComponent[]>([])
+  
+  public connectionState$: BehaviorSubject<ConnectionState> = new  BehaviorSubject<ConnectionState>(ConnectionState.disconnected);
+  public  application$: BehaviorSubject<any>;
   public doAuthenticate: boolean = false;
-  public inAuthentication$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
+  //public inAuthentication$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   private logMessages:DashboardMessageModel[] = [];
   private logMessages$: BehaviorSubject<DashboardMessageModel[]> = new  BehaviorSubject<DashboardMessageModel[]>([]);
   
-  connected$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   IPCReady$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   authenticationFailed$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
 
@@ -34,15 +38,9 @@ export class KerviBaseService {
   { 
     console.log("kervi service constructor");
     var self=this;
-    this.connected$ = new BehaviorSubject<Boolean>(false);
     this.application$= new BehaviorSubject<any>(null);
     
-    setInterval(function(){
-      if (self.connected$.value){
-        //self.refreshComponents()  
-        
-      }
-    },10000);
+    
 
      var s1=this.IPCReady$.subscribe(function(connected){
         if (connected){
@@ -196,34 +194,35 @@ export class KerviBaseService {
   }
 
   logoff(){
-    this.inAuthentication$.next(false);
+    //this.inAuthentication$.next(false);
     this.spine.logoff()
   }
 
   private onAuthenticateStart(){
-    this.inAuthentication$.next(true);
+    //this.inAuthentication$.next(true);
+    
   }
 
   private onAuthenticate(){
     this.doAuthenticate = true;
-    
+    this.connectionState$.next(ConnectionState.authenticate);
     this.reset();
   }
 
   private onAuthenticateFailed(){
     this.authenticationFailed$.next(true);
-    this.inAuthentication$.next(false);
+    //this.inAuthentication$.next(false);
   }
 
   private onLogoff(){
     console.log("ol");
     this.doAuthenticate = true;
-    this.inAuthentication$.next(false);
+    //this.inAuthentication$.next(false);
     //this.spine.logoff()
     if (this.spine.firstOnOpen)
       this.IPCReady$.next(true);
     
-    this.authenticationFailed$.next(false);
+    //this.authenticationFailed$.next(false);
     this.reset();
   }
 
@@ -231,7 +230,7 @@ export class KerviBaseService {
     //this.inAuthentication$.next(false);
     this.components = [];
     this.components$.next(this.components);
-    this.connected$.next(false);
+    this.connectionState$.next(ConnectionState.disconnected);
   }
 
   private getComponentInfo(retryCount){
@@ -244,8 +243,7 @@ export class KerviBaseService {
         self.texts = appInfo.display.texts;
         self.components = ComponentFactory.createComponents(message, self);
         self.components$.next(self.components);
-        self.connected$.next(true);
-        //self.inAuthentication$.next(false);
+        self.connectionState$.next(ConnectionState.connected);
         console.log("components",self.components); 
       },
       function(){
@@ -259,7 +257,7 @@ export class KerviBaseService {
   private onOpen(first){
     console.log("kervice service on open", this.spine.firstOnOpen, first,this);
     var self=this;
-    
+    this.connectionState$.next(ConnectionState.loading);
     this.doAuthenticate = this.spine.doAuthenticate;
     this.getComponentInfo(2)
     if (self.spine.firstOnOpen){

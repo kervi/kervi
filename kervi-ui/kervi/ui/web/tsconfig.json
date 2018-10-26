@@ -52,6 +52,12 @@
       ],
       "kervingx2/*": [
         "dist/kervingx2/*"
+      ],
+      "ngx-kervi-components": [
+        "dist/ngx-kervi-components"
+      ],
+      "ngx-kervi-components/*": [
+        "dist/ngx-kervi-components/*"
       ]
     }
   }

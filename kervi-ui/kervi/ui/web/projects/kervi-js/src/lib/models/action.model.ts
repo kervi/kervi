@@ -4,7 +4,7 @@
 import { BehaviorSubject } from 'rxjs/Rx';
 import { IComponent, DashboardLink } from './IComponent.model'
 
-export class ActionModel implements IComponent {
+export class Action implements IComponent {
     public id: string = null;
     public name: string = null;
     public componentType = "action";
@@ -32,6 +32,4 @@ export class ActionModel implements IComponent {
             this.dashboards.push(new DashboardLink(this, dashboardLink)); 
         }
     }
-
-    
 }

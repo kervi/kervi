@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs/Rx';
 import { KerviBaseService } from '../kervi-js.service'
 declare var Qty:any;
 
-export abstract class KerviValue<valueType> implements IComponent{
+export class KerviValue implements IComponent{
     public name: string;
     public componentType = "KerviValue"
         
@@ -14,14 +14,22 @@ export abstract class KerviValue<valueType> implements IComponent{
     public isInput:boolean;
     public command: string;
     public valueTS:Date;
-    public value$: BehaviorSubject<valueType>;
+
     public ui = {
         type: "",
         orientation: "",
         visible: true
     }
+}
 
-    constructor(message:any){
+abstract class KerviValueType<valueType> extends KerviValue{
+    
+    public value$: BehaviorSubject<valueType>;
+    private kerviService:KerviBaseService = null;
+
+    constructor(message:any, kerviService:KerviBaseService){
+        super();
+        this.kerviService = kerviService;
         this.value$= new BehaviorSubject<valueType>(message.value);
         this.name = message.name;
         this.isInput = message.isInput;
@@ -43,8 +51,10 @@ export abstract class KerviValue<valueType> implements IComponent{
         }
     }
     protected abstract getDefaultValue():valueType;
-    protected setValue(v){
-        this.value$.next(v)
+    protected setValue(v:valueType){
+        this.value$.next(v);
+        this.kerviService.spine.sendCommand(this.command, v);
+				
     }
 }
 
@@ -86,12 +96,12 @@ export class KerviEnumOptionModel{
     removeReferences(components:IComponent[]){};
 }
 
-export class KerviEnumModel extends KerviValue<string[]>{
+export class SelectValue extends KerviValueType<string[]>{
     public options:KerviEnumOptionModel[] = [];
     public lastSelected$:BehaviorSubject<KerviEnumOptionModel> = new BehaviorSubject<KerviEnumOptionModel>(null); 
     
-    constructor (message:any){
-        super(message);
+    constructor (message:any, kerviService:KerviBaseService){
+        super(message, kerviService);
         var self = this;
         this.options = []
         
@@ -136,7 +146,7 @@ export class KerviEnumModel extends KerviValue<string[]>{
     }
 }
 
-export class KerviNumberModel extends KerviValue<number> {
+export class NumberValue extends KerviValueType<number> {
     public unit: string;
     public qtyUnitFrom:string;
     public qtyUnitTo:string = null;
@@ -150,7 +160,7 @@ export class KerviNumberModel extends KerviValue<number> {
     }
 
     constructor(message: any, kerviService:KerviBaseService) {
-        super(message);
+        super(message, kerviService);
         this.unit = message.unit;
         	
         this.qtyUnitFrom = message.unit;
@@ -215,21 +225,21 @@ export class KerviNumberModel extends KerviValue<number> {
     }
 }
 
-export class KerviStringModel extends KerviValue<string> {
+export class StringValue extends KerviValueType<string> {
     
     protected getDefaultValue():string{
         return "";
     }
 
-    constructor(message: any) {
-        super(message)
+    constructor(message: any, kerviService:KerviBaseService) {
+        super(message, kerviService)
     }
     
 }
 
-export class KerviBooleanModel extends KerviValue<boolean> {
-    constructor(message) {
-        super(message)
+export class BooleanValue extends KerviValueType<boolean> {
+    constructor(message, kerviService:KerviBaseService) {
+        super(message, kerviService)
     }
 
     protected getDefaultValue():boolean{
@@ -237,11 +247,11 @@ export class KerviBooleanModel extends KerviValue<boolean> {
     }
 }
 
-export class KerviDateTimeModel extends KerviValue<Date> {
+export class DateTimeValue extends KerviValueType<Date> {
     public subType: string;
     
-    constructor(message) {
-        super(message)
+    constructor(message, kerviService:KerviBaseService) {
+        super(message, kerviService)
         this.subType = message.inputType;
     }
 
@@ -251,10 +261,10 @@ export class KerviDateTimeModel extends KerviValue<Date> {
     
 }
 
-export class KerviColorModel extends KerviValue<string> {
+export class ColorValue extends KerviValueType<string> {
     
-    constructor(message) {
-        super(message)
+    constructor(message, kerviService:KerviBaseService) {
+        super(message, kerviService)
     }
 
     protected getDefaultValue():string{

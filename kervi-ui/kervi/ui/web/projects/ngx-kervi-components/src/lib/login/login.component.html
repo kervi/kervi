@@ -1,0 +1,38 @@
+
+
+ <form [formGroup]="loginForm"  
+        (ngSubmit)="onSubmit(loginForm.value)"  
+        class="form"  
+        [class.error]="!loginForm.valid && loginForm.touched">
+ 
+    <div class="field"  
+        [class.error]="!userName.valid && username.touched">  
+      <label for="userNameInput">SKU</label>  
+      <input type="text"  
+             id="userNameInput"  
+             placeholder="User namex"  
+             [formControl]="username">  
+       <div *ngIf="!userName.valid"  
+         class="ui error message">User name is invalid</div>  
+       <div *ngIf="sku.hasError('required')"  
+         class="ui error message">user name is required</div>  
+    </div>
+
+    <div class="field"  
+        [class.error]="!password.valid && password.touched">  
+      <label for="passwordInput">SKU</label>  
+      <input type="text"  
+             id="passwordInput"  
+             placeholder="Passowrd"  
+             [formControl]="password">  
+       <div *ngIf="!password.valid"  
+         class="ui error message">Password is invalid</div>  
+       <div *ngIf="password.hasError('required')"  
+         class="ui error message">Password is required</div>  
+    </div>
+ 
+    <div *ngIf="!loginForm.valid"  
+      class="ui error message">Form is invalid</div>
+ 
+    <button type="submit" class="ui button">Submit</button>  
+  </form>  
