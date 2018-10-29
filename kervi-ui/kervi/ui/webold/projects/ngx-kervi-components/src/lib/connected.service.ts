@@ -2,7 +2,7 @@
 // Licensed under MIT
 
 import { Injectable } from '@angular/core';
-import { KerviService } from "./kervi.service"
+import { KerviService } from "ngx-kervi"
 import { DashboardsService } from './dashboards/dashboards.service'
 import { Router, ActivatedRoute } from '@angular/router';
 
