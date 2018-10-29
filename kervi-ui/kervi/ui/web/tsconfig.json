@@ -35,30 +35,6 @@
       "ngx-kervi/*": [
         "dist/ngx-kervi/*"
       ],
-      "kervi-ngx": [
-        "dist/kervi-ngx"
-      ],
-      "kervi-ngx/*": [
-        "dist/kervi-ngx/*"
-      ],
-      "kervi-ngx1": [
-        "dist/kervi-ngx1"
-      ],
-      "kervi-ngx1/*": [
-        "dist/kervi-ngx1/*"
-      ],
-      "kervingx2": [
-        "dist/kervingx2"
-      ],
-      "kervingx2/*": [
-        "dist/kervingx2/*"
-      ],
-      "ngx-kervi-components": [
-        "dist/ngx-kervi-components"
-      ],
-      "ngx-kervi-components/*": [
-        "dist/ngx-kervi-components/*"
-      ]
     }
   }
 }

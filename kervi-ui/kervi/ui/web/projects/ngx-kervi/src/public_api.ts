@@ -3,6 +3,8 @@
  */
 
 export * from './lib/ngx-kervi.service';
-export * from './components/value/value.component'
-//export * from './lib/ngx-kervi.component';
-//export * from './lib/ngx-kervi.module';
+export { KerviValueComponent } from './lib/components/value/value.component'
+export { KerviComponent} from './lib/components/kervi-component/kervi-component.component';
+export { KerviComponentsModule } from './lib/components/components.module'
+export { ConnectionState } from "kervi-js"
+export { KerviPipesModule  } from './lib/pipes/pipes.module'

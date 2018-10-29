@@ -3,7 +3,7 @@
 
 import { Component, Input, OnInit, ElementRef } from '@angular/core';
 import { KerviValue, DashboardSection, DashboardSizes } from 'kervi-js';
-import { NGXKerviService } from '../../lib/ngx-kervi.service'
+import { NGXKerviService } from '../../ngx-kervi.service'
 
 @Component({
 	selector: 'kervi-value',

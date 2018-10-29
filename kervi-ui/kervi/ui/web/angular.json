@@ -44,6 +44,7 @@
               "lib/convert-units-bundle.js",
               "lib/colors.js",
               "lib/jqColorPicker.js"
+              
             ]
           },
           "configurations": {

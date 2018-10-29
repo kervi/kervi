@@ -6,18 +6,13 @@ import { HttpModule } from '@angular/http';
 import { Routes, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
-import { DashboardsModule } from './dashboards/dashboards.module'
-import { ValuesModule } from './values/values.module'
 
 import { AppComponent } from './app.component';
 import { ConnectComponent } from './connect/connect.component';
-import { DashboardComponent } from './dashboards/dashboard/dashboard.component';
+import { LoginComponent } from './login/login.component';
 
-import { KerviService} from "./kervi.service";
-import { ConnectedService} from "./connected.service";
-import { DashboardsService} from "./dashboards/dashboards.service"
-import { TemplateService } from "./template.service"
-import { KerviPipesModule } from './pipes/pipes.module'
+import { NGXKerviService, KerviPipesModule} from "ngx-kervi";
+//import { KerviPipesModule } from './pipes/pipes.module'
 const ROUTES: Routes = [
   {
     path: '',
@@ -25,7 +20,8 @@ const ROUTES: Routes = [
     pathMatch: 'full'
   },
   { path: 'connect', component: ConnectComponent },
-  { path: 'dashboard/:name', component: DashboardComponent },
+  { path: 'authenticate', component: LoginComponent },
+  // { path: 'dashboard/:name', component: DashboardComponent },
 ];
 
 @NgModule({
@@ -39,17 +35,15 @@ const ROUTES: Routes = [
   imports: [
     KerviPipesModule,
     CommonModule,
-    DashboardsModule,
-    ValuesModule,
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
     HttpModule,
     RouterModule.forRoot(ROUTES)
   ],
-  providers: [KerviService, DashboardsService, ConnectedService, TemplateService],
+  providers: [NGXKerviService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor (private connectedService:ConnectedService){}
+  constructor (){}
 }

@@ -8,7 +8,7 @@ import {BehaviorSubject, Subject} from 'rxjs/Rx';
 import {IComponent} from './models/IComponent.model';
 import { ComponentFactory } from './models/factory';
 import { DashboardMessageModel } from './models/dashboard.model';
-
+import { Dashboard } from './models/dashboard.model'
 declare var kerviSocketAddress : any;
 declare var socketProtocol : any;
 
@@ -134,6 +134,15 @@ export class KerviBaseService {
     }
     return result;
   }
+
+  public getDefaultDashboard(){
+    var dashboards = this.getComponentsByType("dashboard") as Dashboard[] ;
+    for (let dashboard of dashboards) {
+        if (dashboard.isDefault)
+            return dashboard
+    }
+    return null;
+}
 
   public connect(){
     var address = null;

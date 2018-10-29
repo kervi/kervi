@@ -32,8 +32,6 @@
     "css-toggle-switch": "^4.0.2",
     "hammerjs": "^2.0.8",
     "js-quantities": "^1.7.2",
-    "kervi-js": "file:dist/kervi-js",
-    "kervingx2": "file:dist/kervingx2",
     "moments": "0.0.2",
     "ngx-gauge": "^1.0.0-beta.4",
     "photoswipe": "^4.1.2",

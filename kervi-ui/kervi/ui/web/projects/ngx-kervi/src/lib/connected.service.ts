@@ -2,9 +2,10 @@
 // Licensed under MIT
 
 import { Injectable } from '@angular/core';
-import { KerviService } from "./kervi.service"
-import { DashboardsService } from './dashboards/dashboards.service'
+import { NGXKerviService } from "./ngx-kervi.service"
+//import { DashboardsService } from './dashboards/dashboards.service'
 import { Router, ActivatedRoute } from '@angular/router';
+import { ConnectionState } from 'kervi-js/lib/kervi-js.service';
 
 @Injectable()
 export class ConnectedService {
@@ -12,31 +13,31 @@ export class ConnectedService {
   public isAuthenticated: boolean = false;
   
   private currentPage=null;
-  constructor(private kerviService:KerviService, private dashboardsService:DashboardsService, private router:Router, private route:ActivatedRoute) { 
+  constructor(private kerviService:NGXKerviService, private router:Router, private route:ActivatedRoute) { 
     console.log("connected service c");
     var self=this;
     this.kerviService.connect();
     
     
-    var s=this.kerviService.connected$.subscribe(function(connectedValue){
+    var s=this.kerviService.connectionState$.subscribe(function(connectedValue){
       console.log("connected service state",connectedValue, self.isConnected, self);
-      if (connectedValue){
+      if (connectedValue == ConnectionState.connected){
         self.isConnected=true;
         self.isAuthenticated=true;
         if (self.currentPage)
           self.router.navigate([self.currentPage]);
         else {
-          self.dashboardsService.getDashboards$().subscribe(function(v){
-            if (v && v.length){
-              var defaultDashboard=v.filter(function(v){ return v.isDefault; });
-              if (defaultDashboard.length>0){
-                console.log("df",defaultDashboard[0].componentType+'/'+defaultDashboard[0].id);
-                setTimeout(function(){
-                  self.router.navigate(['/'+defaultDashboard[0].componentType+'/'+defaultDashboard[0].id]);  
-                },100);
-              } 
-            }
-          });
+          // self.dashboardsService.getDashboards$().subscribe(function(v){
+          //   if (v && v.length){
+          //     var defaultDashboard=v.filter(function(v){ return v.isDefault; });
+          //     if (defaultDashboard.length>0){
+          //       console.log("df",defaultDashboard[0].componentType+'/'+defaultDashboard[0].id);
+          //       setTimeout(function(){
+          //         self.router.navigate(['/'+defaultDashboard[0].componentType+'/'+defaultDashboard[0].id]);  
+          //       },100);
+          //     } 
+          //   }
+          // });
         }
       } else if (!connectedValue) {
         self.isAuthenticated=false;

@@ -1,10 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { KerviService } from "../kervi.service"
+import { NGXKerviService } from "../ngx-kervi.service"
 @Pipe({
   name: 'translate'
 })
 export class TranslatePipe implements PipeTransform {
-  constructor(private kerviService: KerviService) {
+  constructor(private kerviService: NGXKerviService) {
 
   }
   transform(value: string, args?: any): any {

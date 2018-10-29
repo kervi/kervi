@@ -3,7 +3,7 @@
 
 import { Component, Input, OnInit, ElementRef, ContentChild } from '@angular/core';
 import { IComponent, DashboardSection, DashboardSizes } from 'kervi-js';
-import { KerviComponentIcon, KerviComponentLabel, KerviComponentValue, KerviComponentValueIcon, KerviComponentValueUnit } from '../../directives/kervi-component.directives'
+import { KerviComponentIcon, KerviComponentLabel, KerviComponentValue, KerviComponentValueIcon, KerviComponentValueUnit } from './kervi-component.directives'
 @Component({
 	selector: 'kervi-component',
 	templateUrl: './kervi-component.component.html',
