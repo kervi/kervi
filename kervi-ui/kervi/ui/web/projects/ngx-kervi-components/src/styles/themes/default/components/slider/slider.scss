@@ -1,0 +1,44 @@
+$slider-line-height: 20px !default;
+$slider-border-radius: 4px !default;
+$slider-horizontal-width: 65% !default;
+$slider-vertical-height: 210px !default;
+$slider-handle-color-start: theme-color("primary");
+$slider-handle-color-end: $card-cap-bg;
+$slider-handle-color-background: $input-group-addon-bg;
+$slider-height: 20px !default;
+$slider-width: 10px !default;
+
+.slider-button{
+	font-size:130%;
+	cursor: pointer;
+}
+
+.slider.slider-horizontal{
+	flex-grow:1
+}
+
+.slider-value{
+	//border-color:rgba(0,0,0,.25);
+	//border-width: 1px;
+	//border-style: solid;
+	padding-left:10px;
+	text-align: right;
+	overflow:hidden;
+}
+
+.slider-inline {
+	width:210px;
+}
+
+@import "../../../../../../node_modules/bootstrap-slider/src/sass/bootstrap-slider.scss";
+
+.slider-handle{
+	background : theme-color("primary");
+}
+
+.slider-track{
+	margin-top:-8px;
+}
+.slider.slider-horizontal{
+	margin-top:6px;
+}

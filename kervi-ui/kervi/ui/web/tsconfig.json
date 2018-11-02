@@ -1,0 +1,40 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "paths": {
+      "kervi-js": [
+        "dist/kervi-js"
+      ],
+      "kervi-js/*": [
+        "dist/kervi-js/*"
+      ],
+      "ngx-kervi": [
+        "dist/ngx-kervi"
+      ],
+      "ngx-kervi/*": [
+        "dist/ngx-kervi/*"
+      ],
+      "ngx-kervi-components": [
+        "dist/ngx-kervi-components"
+      ],
+      "ngx-kervi-components/*": [
+        "dist/ngx-kervi-components/*"
+      ]
+    }
+  }
+}
