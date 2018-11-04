@@ -8,7 +8,7 @@ declare var Qty:any;
 export class KerviValue implements IComponent{
     public name: string;
     public componentType = "KerviValue"
-        
+    public typeName:string = null;    
     public id: string;
     public dashboards: DashboardLink[] = [];
     public isInput:boolean;
@@ -36,7 +36,6 @@ export abstract class KerviValueType<valueType> extends KerviValue{
         this.ui = message.ui;
         this.command = message.command;
         this.id = message.id;
-        
         this.ui["type"] = message.componentType;
         this.ui["orientation"] = message.orientation;
         this.ui["visible"] = message.visible;
@@ -162,6 +161,8 @@ export class NumberValue extends KerviValueType<number> {
     constructor(message: any, kerviService:KerviBaseService) {
         super(message, kerviService);
         this.unit = message.unit;
+        this.typeName = "Number";
+    
         	
         this.qtyUnitFrom = message.unit;
         if (this.unit == "c" && kerviService.application$.value["display"]["unit_system"]["temperature"]=="F"){
@@ -233,6 +234,7 @@ export class StringValue extends KerviValueType<string> {
 
     constructor(message: any, kerviService:KerviBaseService) {
         super(message, kerviService)
+        this.typeName = "String";
     }
     
 }
@@ -240,6 +242,7 @@ export class StringValue extends KerviValueType<string> {
 export class BooleanValue extends KerviValueType<boolean> {
     constructor(message, kerviService:KerviBaseService) {
         super(message, kerviService)
+        this.typeName = "Boolean";
     }
 
     protected getDefaultValue():boolean{
@@ -253,6 +256,7 @@ export class DateTimeValue extends KerviValueType<Date> {
     constructor(message, kerviService:KerviBaseService) {
         super(message, kerviService)
         this.subType = message.inputType;
+        this.typeName = "DateTime";
     }
 
     protected getDefaultValue():Date{
@@ -265,6 +269,7 @@ export class ColorValue extends KerviValueType<string> {
     
     constructor(message, kerviService:KerviBaseService) {
         super(message, kerviService)
+        this.typeName = "Color";
     }
 
     protected getDefaultValue():string{

@@ -1,0 +1,32 @@
+<ng-container *ngIf="widgetType=='value'">
+    <div *ngIf="!inline" class="block-component"> 
+        <div class="label-section">
+            <div style="display:inline-block;float:left;">
+                <div class="value-label">
+                    <span   *ngIf="linkParameters.labelIcon" class="fa fa-{{linkParameters.labelIcon}}"></span>
+                    <span   *ngIf="linkParameters.label">{{linkParameters.label}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="value-section">
+            <kervi-value [value]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-value>
+        </div>
+    </div>
+
+    <div *ngIf="inline" class="inline-component"> 
+        <div style="display:inline-block">
+            <span style="display:inline"  *ngIf="linkParameters.labelIcon" class="fa fa-{{linkParameters.labelIcon}}"></span>
+            <span style="display:inline"  *ngIf="linkParameters.label"  >{{linkParameters.label}}</span>
+            <kervi-value [value]="component" [inline]="true" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-value>
+        </div>
+    </div>
+</ng-container>    
+    
+    
+<ng-container *ngIf="widgetType=='gauge'" class="block-component" >
+    <!-- <kervi-gauge [defaultSizes]="defaultSizes" [value]="input" [linkParameters]="linkParameters" [type]="gaugeType" [size]="size"></kervi-gauge> -->
+</ng-container>
+
+<ng-container *ngIf="widgetType=='chart'" class="" >
+    <!-- <kervi-chart [defaultSizes]="defaultSizes" [value]="input" [linkParameters]="linkParameters" [size]="size" ></kervi-chart> -->
+</ng-container>

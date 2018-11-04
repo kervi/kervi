@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NgxKerviComponentsComponent } from './ngx-kervi-components.component';
+import { WidgetComponent } from './widget.component';
 
 describe('NgxKerviComponentsComponent', () => {
-  let component: NgxKerviComponentsComponent;
-  let fixture: ComponentFixture<NgxKerviComponentsComponent>;
+  let component: WidgetComponent;
+  let fixture: ComponentFixture<WidgetComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ NgxKerviComponentsComponent ]
+      declarations: [ WidgetComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NgxKerviComponentsComponent);
+    fixture = TestBed.createComponent(WidgetComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

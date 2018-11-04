@@ -2,8 +2,8 @@
 // Licensed under MIT
 
 import { Component, Input, OnInit, ElementRef,ChangeDetectionStrategy } from '@angular/core';
-import { DynamicNumberModel} from '../../models/dynamicValues.model'
-import { TemplateService } from '../../template.service'
+import { NumberValue} from 'kervi-js'
+import {  KerviTemplateService } from 'ngx-kervi'
 
 declare var jQuery:any;
 
@@ -14,8 +14,8 @@ declare var jQuery:any;
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SparklineComponent implements OnInit {
-  @Input() public value:DynamicNumberModel;
-  constructor(private elementRef:ElementRef, private templateService:TemplateService) { 
+  @Input() public value:NumberValue;
+  constructor(private elementRef:ElementRef, private templateService:KerviTemplateService) { 
 
   }
 

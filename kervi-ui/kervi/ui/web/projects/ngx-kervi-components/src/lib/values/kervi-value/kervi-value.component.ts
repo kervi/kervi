@@ -15,7 +15,7 @@ export class KerviValueComponent {
 	@Input() dashboardPanel: DashboardPanel;
 	@Input() linkParameters:any;
 	@Input() inline:boolean = false;
-	@Input() defaultSizes:DashboardSizes = new DashboardSizes();
+	@Input() dashboardSizes:DashboardSizes = new DashboardSizes();
 
 	constructor() { 
 	}

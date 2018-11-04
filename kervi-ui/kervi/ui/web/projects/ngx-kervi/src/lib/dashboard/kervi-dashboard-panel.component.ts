@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { DashboardSizes, DashboardPanel, DashboardMessageModel } from 'kervi-js';
 import { NGXKerviService } from '../ngx-kervi.service';
 import { KerviTemplateService } from '../ngx-kervi-template.service';
@@ -8,7 +8,7 @@ import {  Observable } from 'rxjs';
   selector: 'kervi-dashboard-panel-base',
   template: ''
 })
-export class KerviDashboardPanelComponent implements OnInit {
+export class KerviDashboardPanelComponent {
   @Input() dashboardSizes: DashboardSizes;
   @Input() panel:DashboardPanel;
   @Input() inline:boolean = false;
@@ -55,7 +55,7 @@ export class KerviDashboardPanelComponent implements OnInit {
         
     }
 
-    ngOnInit() {
+    ngOnInitPanel() {
         var self=this;
         
         this.title = this.panel.parameters.title;

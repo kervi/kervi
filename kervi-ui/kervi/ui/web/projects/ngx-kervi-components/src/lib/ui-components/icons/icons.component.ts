@@ -2,7 +2,6 @@
 // Licensed under MIT
 
 import { Component, OnInit, Input, ElementRef, ChangeDetectionStrategy } from '@angular/core';
-import { TemplateService } from '../../template.service';
 @Component({
   selector: 'kervi-icon',
   templateUrl: './icons.component.html',

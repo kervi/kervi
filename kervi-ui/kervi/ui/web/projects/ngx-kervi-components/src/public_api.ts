@@ -3,5 +3,4 @@
  */
 
 export * from './lib/ngx-kervi-components.service';
-export * from './lib/ngx-kervi-components.component';
 export * from './lib/ngx-kervi-components.module';

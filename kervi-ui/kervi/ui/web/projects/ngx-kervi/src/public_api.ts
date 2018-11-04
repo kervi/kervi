@@ -12,6 +12,8 @@ export { KerviDashboardComponent } from './lib/dashboard/kervi-dashboard.compone
 export { KerviCamViewerComponent } from './lib/dashboard/kervi-cam-viewer.component'
 export { KerviDashboardPanelComponent } from './lib/dashboard/kervi-dashboard-panel.component'
 export { KerviControllerPadComponent } from './lib//dashboard/kervi-controller-pad.component'
+export { KerviWidgetComponent } from './lib/dashboard/kervi-widget.component'
+export { KerviNumberComponent } from './lib/values/kervi-number-value.component'
 export  { AppInjector } from './lib/app-injector.service'
 
 export * from './lib/ngx-kervi.component';

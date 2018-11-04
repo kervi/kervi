@@ -9,6 +9,7 @@ import { NGXKerviService } from './ngx-kervi.service';
 import { KerviTemplateService } from './ngx-kervi-template.service';
 import { KerviValueComponent } from './values/value.component'
 import { KerviNumberComponent } from './values/kervi-number-value.component'
+import { KerviWidgetComponent } from './dashboard/kervi-widget.component'
 @NgModule({
   imports: [
   ],
@@ -19,7 +20,8 @@ import { KerviNumberComponent } from './values/kervi-number-value.component'
     KerviCamViewerComponent,
     KerviControllerPadComponent,
     KerviNumberComponent,
-    KerviValueComponent
+    KerviValueComponent,
+    KerviWidgetComponent
   ],
   providers: [NGXKerviService, KerviTemplateService],
   exports: [
@@ -28,7 +30,8 @@ import { KerviNumberComponent } from './values/kervi-number-value.component'
     KerviDashboardPanelComponent,
     KerviCamViewerComponent,
     KerviControllerPadComponent,
-    KerviNumberComponent
+    KerviNumberComponent,
+    KerviWidgetComponent
   ]
 })
 export class NgxKerviModule {
