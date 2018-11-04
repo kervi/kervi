@@ -1,0 +1,68 @@
+<div *ngIf="displayType=='slider' && !inline" class="block-component"> 
+    <div class="label-section">
+        <div style="display:inline-block;float:left;">
+            <div class="value-label">
+                <span   *ngIf="parameters.labelIcon" class="fa fa-{{parameters.labelIcon}}"></span>
+                <span   *ngIf="parameters.label">{{parameters.label}}</span>
+            </div>
+        </div>
+        
+	</div>
+    <div class="value-section">
+        <div class="value-input" >
+            <ui-slider [defaultSizes]="defaultSizes" [value]="input" [parameters]="parameters"></ui-slider>
+        </div>
+        <div class="value-value" [style.min-width.rem]="parameters.valueSize">
+            {{(input.value$ | async | number:numberFormat)}}
+            <span *ngIf="parameters.displayUnit">{{input.unit}}</span>
+        </div>
+    </div>
+    
+</div>
+
+<div *ngIf="displayType=='slider' && inline" class="inline-component"> 
+    <div style="display:inline-block">
+        <span style="display:inline"  *ngIf="parameters.labelIcon" class="fa fa-{{parameters.labelIcon}}"></span>
+        <span style="display:inline"  *ngIf="parameters.label"  >{{parameters.label}}</span>
+	</div>
+    <div style="display:inline-block" class="slider-inline"  [style.max-width.%]="parameters.inputSize">
+        <ui-slider [defaultSizes]="defaultSizes" [value]="input" [parameters]="parameters"></ui-slider>
+	</div>
+    <span style="display:inline"  [style.max-width.%]="parameters.valueSize"    class="slider-value">{{(input.value$ | async | number:numberFormat)}}</span>
+    <span *ngIf="parameters.displayUnit">{{input.unit}}</span>
+</div>
+
+<span *ngIf="displayType=='value' && inline" class="input-inline input-type-value">
+		<i *ngIf="parameters.labelIcon" class="fa fa-{{currentIcon}}"></i>
+		<ng-container *ngIf="parameters.label">{{parameters.label}}:</ng-container>
+		<i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i>
+		<value-sparkline *ngIf="parameters.showSparkline" [value]="input"></value-sparkline>
+		<span style="display:inline-block" [style.min-width.rem]="parameters.valueSize" class="input-value">
+            {{(input.value$ | async | number:numberFormat)}}
+            <span *ngIf="parameters.displayUnit">{{input.unit}}</span>
+        </span>
+</span>
+
+<div *ngIf="displayType=='value' && !inline" class="block-component">
+    <div class="value-label" style="float: left">
+        <i *ngIf="parameters.labelIcon" class="fa fa-{{currentIcon}}"></i>
+		<ng-container *ngIf="parameters.label">{{parameters.label}}</ng-container>
+		
+    </div>
+    <div style="display:inline-block; float: right">
+        <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i>
+        <value-sparkline *ngIf="parameters.showSparkline" [value]="input"></value-sparkline>
+        <span style="display: inline-block;text-align:right" [style.min-width.rem]="parameters.valueSize" class="input-value">
+            {{(input.value$ | async | number:numberFormat)}}
+            <span *ngIf="parameters.displayUnit">{{input.unit}}</span>
+        </span>
+    </div>
+</div>
+
+<div *ngIf="displayType=='gauge'" class="block-component" >
+    <kervi-gauge [defaultSizes]="defaultSizes" [value]="input" [parameters]="parameters" [type]="gaugeType" [size]="size"></kervi-gauge>
+</div>
+
+<ng-container *ngIf="displayType=='chart'" class="" >
+    <kervi-chart [defaultSizes]="defaultSizes" [value]="input" [parameters]="parameters" [size]="size" ></kervi-chart>
+</ng-container>

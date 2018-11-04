@@ -346,10 +346,10 @@ kervi-sensor:last-child .block-component{
     @import "./components/switch/toggle.scss";
     @import "./components/slider/slider.scss";
     $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
-    @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
-    @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/brands.scss";
-    @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/regular.scss";
-    @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
+    @import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+    @import "~@fortawesome/fontawesome-free/scss/brands.scss";
+    @import "~@fortawesome/fontawesome-free/scss/regular.scss";
+    @import "~@fortawesome/fontawesome-free/scss/solid.scss";
 
  //   @import "./components/switch/candy";
   
@@ -383,20 +383,20 @@ th{
     margin-bottom:0;
   }
 
-  .card-deck-section{
+  .card-deck-panel{
     margin-bottom:10px;
     .card-deck{
       //display:inline-block;
     }
   }
 
-  .card-deck-section:last-child{
+  .card-deck-panel:last-child{
     margin-bottom:0;
   }
 
   
 
-  .card-section{
+  .card-panel{
     display: inline-block;
   }
 
@@ -409,7 +409,7 @@ th{
 
   
 
-  .card-deck-equal>.card-section {
+  .card-deck-equal>.card-panel {
     display:inline-block;
     float:none;
     padding-left:1%;
@@ -417,7 +417,7 @@ th{
     min-width:250px;
   }
 
-  .card-deck-equal>.card-deck-section {
+  .card-deck-equal>.card-deck-panel {
     display:inline-block;
     float:none;
     padding-left:1%;
@@ -428,12 +428,12 @@ th{
   
 }
 
-.card-section{
+.card-panel{
   //min-width: 250px;
   margin-bottom:10px;
 }
 
-.card-section:last-child{
+.card-panel:last-child{
   //margin-bottom: 0;
 }
 
@@ -477,11 +477,11 @@ th{
   }
 
 
-  .card-section{
+  .card-panel{
     width:100% !important;
     margin-bottom:10px;
   }
-  .card-deck-section{
+  .card-deck-panel{
     width:100% !important;
     //margin-bottom:10px;
     .card-deck{
@@ -501,7 +501,7 @@ th{
   }
 
 
-  .card-deck-equal>.card-section {
+  .card-deck-equal > .card-panel {
     display:inline-block;
     width:100% !important;
     //float:left;

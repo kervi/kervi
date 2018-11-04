@@ -27,11 +27,28 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "node_modules",
+                "./node_modules",
                 "src/styles"
               ]
             },
-            "scripts": []
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/popper.js/dist/umd/popper.js",
+              "node_modules/bootstrap/dist/js/bootstrap.js",
+              "node_modules/bootstrap-slider/dist/bootstrap-slider.js",
+              "node_modules/bootstrap-toggle/js/bootstrap-toggle.js",
+              "src/js-lib/jquery.sparkline.js",
+              "src/js-lib/jquery.kontrol.js",
+              "node_modules/moment/min/moment-with-locales.js",
+              "node_modules/chart.js/dist/Chart.js",
+              "node_modules/hammerjs/hammer.js",
+              "node_modules/chartjs-plugin-zoom/chartjs-plugin-zoom.js",
+              "node_modules/photoswipe/dist/photoswipe.js",
+              "node_modules/photoswipe/dist/photoswipe-ui-default.js",
+              "node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js",
+              "src/js-lib/colors.js",
+              "src/js-lib/jqColorPicker.js"
+            ]
           },
           "configurations": {
             "production": {

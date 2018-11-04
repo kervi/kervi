@@ -36,7 +36,7 @@ export class DashboardMessageModel{
     }
 }
 
-export class DashboardSectionComponent{
+export class DashboardPanelComponent{
     public component:IComponent;
     public componentId:string;
     public linkId:any;
@@ -50,7 +50,7 @@ export class DashboardSectionComponent{
     }
 }
 
-export class DashboardSectionParameters{
+export class DashboardPanelParameters{
     public title:string = null;
     public width:string = null;
     public height:string = null;
@@ -70,39 +70,39 @@ export class DashboardSectionParameters{
     }
 }
 
-export class DashboardSection {
+export class DashboardPanel {
     public id:string;
     public name:string;
-    public parameters: DashboardSectionParameters;
-    public components: DashboardSectionComponent[]=[];
+    public parameters: DashboardPanelParameters;
+    public components: DashboardPanelComponent[]=[];
     public dashboard: Dashboard;
     public type:string;
-    public subSections: DashboardSection[] = [];
+    public subPanels: DashboardPanel[] = [];
     
-    constructor (dashboard, messageSection){
+    constructor (dashboard, messagePanel){
         this.dashboard=dashboard;
-        this.id=messageSection.id;
-        this.name=messageSection.name;
-        this.type=messageSection.type;
-        this.parameters=new DashboardSectionParameters(messageSection.uiParameters);
-        /*if (messageSection.components)
-            for(var componentRef of messageSection.components){
-                this.components.push(new DashboardSectionComponentModel(componentRef))
+        this.id=messagePanel.id;
+        this.name=messagePanel.name;
+        this.type=messagePanel.type;
+        this.parameters=new DashboardPanelParameters(messagePanel.uiParameters);
+        /*if (messagePanel.components)
+            for(var componentRef of messagePanel.components){
+                this.components.push(new DashboardPanelComponentModel(componentRef))
             }*/
         
-        if (messageSection.panels){
-            //console.log("spa",messageSection.panels);
-            for(var subMessageSection of messageSection.panels){
-                var section=new DashboardSection(this, subMessageSection);
-                this.subSections.push(section);
+        if (messagePanel.panels){
+            //console.log("spa",messagePanel.panels);
+            for(var subMessagePanel of messagePanel.panels){
+                var panel=new DashboardPanel(this, subMessagePanel);
+                this.subPanels.push(panel);
             }
         }
     }
 
-    public reload(source:DashboardSection){
+    public reload(source:DashboardPanel){
         //console.log("rl", this);
-        for(var subSection of source.subSections){
-            this.reload(subSection)
+        for(var subPanel of source.subPanels){
+            this.reload(subPanel)
         }
         for(var sourceComponent of source.components){
             var found=false;
@@ -115,7 +115,7 @@ export class DashboardSection {
                 this.components.push(sourceComponent);
             }
         }
-        var deleteComponents:DashboardSectionComponent[] = [];
+        var deleteComponents:DashboardPanelComponent[] = [];
         for (var component of this.components){
             var found=false;
             for(var sourceComponent of source.components){
@@ -152,19 +152,19 @@ export class Dashboard implements IComponent{
     public type:string;
     public isDefault:Boolean;
     public template:string;
-    public sections:DashboardSection[];
-    public sysSections:DashboardSection[];
-    public headerSection: DashboardSection=null;
-    public footerCenterSection: DashboardSection=null;
-    public footerLeftSection: DashboardSection=null;
-    public footerRightSection: DashboardSection=null;
-    public sysSection: DashboardSection=null;
-    public backgroundSection: DashboardSection=null;
-    public controllerSection: DashboardSection=null;
-    public LeftPadXSection: DashboardSection=null;
-    public LeftPadYSection: DashboardSection=null;
-    public RightPadXSection: DashboardSection=null;
-    public RightPadYSection: DashboardSection=null;
+    public panels:DashboardPanel[];
+    public sysPanels:DashboardPanel[];
+    public headerPanel: DashboardPanel=null;
+    public footerCenterPanel: DashboardPanel=null;
+    public footerLeftPanel: DashboardPanel=null;
+    public footerRightPanel: DashboardPanel=null;
+    public sysPanel: DashboardPanel=null;
+    public backgroundPanel: DashboardPanel=null;
+    public controllerPanel: DashboardPanel=null;
+    public LeftPadXPanel: DashboardPanel=null;
+    public LeftPadYPanel: DashboardPanel=null;
+    public RightPadXPanel: DashboardPanel=null;
+    public RightPadYPanel: DashboardPanel=null;
     //public background: DashboardBackgroundModel=null;
     public unitSize: number;
     
@@ -184,44 +184,44 @@ export class Dashboard implements IComponent{
         this.template=message.template;
         this.unitSize=message.unitSize;
         //this.background=new DashboardBackgroundModel(message.background);
-        this.sections=[];
-        this.sysSections=[];
+        this.panels=[];
+        this.sysPanels=[];
         if (!this.template){
-            var currentSection:DashboardSection = null;
-            for (let messageSection of message.sections){
-                if (!messageSection){
-                    console.log("dashboard with null section", this.id);
+            var currentPanel:DashboardPanel = null;
+            for (let messagePanel of message.sections){
+                if (!messagePanel){
+                    console.log("dashboard with null panel", this.id);
                     continue;
                 }
-                var section = new DashboardSection(this, messageSection);
-                var sysSection = true;
-                if (section.id=="header_center")
-                    this.headerSection=section;
-                else if (section.id=="footer_left")
-                    this.footerLeftSection=section;
-                else if (section.id=="footer_center")
-                    this.footerCenterSection=section;
-                else if (section.id=="footer_right")
-                    this.footerRightSection=section;
-                else if (section.id=="header_right")
-                    this.sysSection=section;
-                else if (section.id=="controllers")
-                    this.controllerSection=section;
-                else if (section.id=="background")
-                    this.backgroundSection=section;
-                else if (section.id=="left_pad_x")
-                    this.LeftPadXSection=section;
-                else if (section.id=="left_pad_y")
-                    this.LeftPadYSection=section;
-                else if (section.id=="right_pad_x")
-                    this.RightPadXSection=section;
-                else if (section.id=="right_pad_y")
-                    this.RightPadYSection=section;
+                var panel = new DashboardPanel(this, messagePanel);
+                var sysPanel = true;
+                if (panel.id=="header_center")
+                    this.headerPanel=panel;
+                else if (panel.id=="footer_left")
+                    this.footerLeftPanel=panel;
+                else if (panel.id=="footer_center")
+                    this.footerCenterPanel=panel;
+                else if (panel.id=="footer_right")
+                    this.footerRightPanel=panel;
+                else if (panel.id=="header_right")
+                    this.sysPanel=panel;
+                else if (panel.id=="controllers")
+                    this.controllerPanel=panel;
+                else if (panel.id=="background")
+                    this.backgroundPanel=panel;
+                else if (panel.id=="left_pad_x")
+                    this.LeftPadXPanel=panel;
+                else if (panel.id=="left_pad_y")
+                    this.LeftPadYPanel=panel;
+                else if (panel.id=="right_pad_x")
+                    this.RightPadXPanel=panel;
+                else if (panel.id=="right_pad_y")
+                    this.RightPadYPanel=panel;
                 else{
-                    sysSection=false;
-                    if (section.type!="group"){
-                        if(currentSection==null){
-                            currentSection = new DashboardSection(
+                    sysPanel=false;
+                    if (panel.type!="group"){
+                        if(currentPanel==null){
+                            currentPanel = new DashboardPanel(
                             this,
                             {
                                 "id":null,
@@ -237,151 +237,151 @@ export class Dashboard implements IComponent{
                                     "logLength":0
                                 }    
                             });
-                            currentSection.subSections.push(section);
-                            this.sections.push(currentSection);
+                            currentPanel.subPanels.push(panel);
+                            this.panels.push(currentPanel);
                         } else {
-                            currentSection.subSections.push(section)
+                            currentPanel.subPanels.push(panel)
                         }
                     }   
                     else{
-                        this.sections.push(section);
-                        currentSection=null;
+                        this.panels.push(panel);
+                        currentPanel=null;
                     }
                 }
-                if (sysSection)
-                    this.sysSections.push(section);      
+                if (sysPanel)
+                    this.sysPanels.push(panel);      
             }
         }
     }
 
-    /*removeSectionRef(deleteComponents:IComponent[], section:DashboardSectionModel, removeEmpty:boolean){
-        var removeComponentSections:DashboardSectionComponentModel[] = [];
-        for(var sectionComponent of section.components){
+    /*removePanelRef(deleteComponents:IComponent[], panel:DashboardPanelModel, removeEmpty:boolean){
+        var removeComponentPanels:DashboardPanelComponentModel[] = [];
+        for(var panelComponent of panel.components){
             for(var deleteComponent of deleteComponents){
-                if (deleteComponent.id == sectionComponent.component.id){
-                    console.log("dlc", sectionComponent)
-                    removeComponentSections.push(sectionComponent)
+                if (deleteComponent.id == panelComponent.component.id){
+                    console.log("dlc", panelComponent)
+                    removeComponentPanels.push(panelComponent)
                     
                 }
             }
         }
-        for(var component of removeComponentSections){
-            section.components.splice(section.components.indexOf(component))
+        for(var component of removeComponentPanels){
+            panel.components.splice(panel.components.indexOf(component))
         }
-        var removeSections:DashboardSectionModel[] = [];
-        for(var subSection of section.subSections){
-            this.removeSectionRef(deleteComponents, subSection, removeEmpty)
-            if (subSection.components.length == 0){
-                removeSections.push(subSection)
+        var removePanels:DashboardPanelModel[] = [];
+        for(var subPanel of panel.subPanels){
+            this.removePanelRef(deleteComponents, subPanel, removeEmpty)
+            if (subPanel.components.length == 0){
+                removePanels.push(subPanel)
             }
         }
-        for(var subSection of removeSections){
-            section.subSections.splice(section.subSections.indexOf(subSection))
+        for(var subPanel of removePanels){
+            panel.subPanels.splice(panel.subPanels.indexOf(subPanel))
         }
     }*/
 
     removeReferences(deleteComponents:IComponent[]){
         // console.log("remove ref", deleteComponents)
-        // for(var section of this.sysSections){
-        //     this.removeSectionRef(deleteComponents, section, false)
+        // for(var panel of this.sysPanels){
+        //     this.removePanelRef(deleteComponents, panel, false)
         // }
-        // var removeSections:DashboardSectionModel[] = [];
-        // for(var section of this.sections){
-        //     this.removeSectionRef(deleteComponents, section, true)
-        //     if (section.components.length == 0)
-        //         removeSections.push(section)
+        // var removePanels:DashboardPanelModel[] = [];
+        // for(var panel of this.panels){
+        //     this.removePanelRef(deleteComponents, panel, true)
+        //     if (panel.components.length == 0)
+        //         removePanels.push(panel)
         // }
-        // for(var section of removeSections){
-        //     this.sections.splice(this.sections.indexOf(section))
+        // for(var panel of removePanels){
+        //     this.panels.splice(this.panels.indexOf(panel))
         // }
     };
     updateReferences(){};
     reload(component:IComponent){
         var source = component as Dashboard;
-        if (!this.backgroundSection && source.backgroundSection)
-            this.backgroundSection=source.backgroundSection;
-        else if (this.backgroundSection && !source.backgroundSection)
-            this.backgroundSection = null
-        else if (this.backgroundSection)
-            this.backgroundSection.reload(source.backgroundSection)
+        if (!this.backgroundPanel && source.backgroundPanel)
+            this.backgroundPanel=source.backgroundPanel;
+        else if (this.backgroundPanel && !source.backgroundPanel)
+            this.backgroundPanel = null
+        else if (this.backgroundPanel)
+            this.backgroundPanel.reload(source.backgroundPanel)
 
-        if (!this.footerLeftSection && source.footerLeftSection)
-            this.footerLeftSection=source.footerLeftSection;
-        else if (this.footerLeftSection && !source.footerLeftSection)
-            this.footerLeftSection = null
-        else if (this.footerLeftSection)
-            this.footerLeftSection.reload(source.footerLeftSection)
+        if (!this.footerLeftPanel && source.footerLeftPanel)
+            this.footerLeftPanel=source.footerLeftPanel;
+        else if (this.footerLeftPanel && !source.footerLeftPanel)
+            this.footerLeftPanel = null
+        else if (this.footerLeftPanel)
+            this.footerLeftPanel.reload(source.footerLeftPanel)
 
-        if (!this.footerRightSection && source.footerRightSection)
-            this.footerRightSection=source.footerRightSection;
-        else if (this.footerRightSection && !source.footerRightSection)
-            this.footerRightSection = null
-        else if (this.footerRightSection)
-            this.footerRightSection.reload(source.footerRightSection)
+        if (!this.footerRightPanel && source.footerRightPanel)
+            this.footerRightPanel=source.footerRightPanel;
+        else if (this.footerRightPanel && !source.footerRightPanel)
+            this.footerRightPanel = null
+        else if (this.footerRightPanel)
+            this.footerRightPanel.reload(source.footerRightPanel)
 
-        if (!this.footerCenterSection && source.footerCenterSection)
-            this.footerCenterSection=source.footerCenterSection;
-        else if (this.footerCenterSection && !source.footerCenterSection)
-            this.footerCenterSection = null
-        else if (this.footerCenterSection)
-            this.footerCenterSection.reload(source.footerCenterSection)
+        if (!this.footerCenterPanel && source.footerCenterPanel)
+            this.footerCenterPanel=source.footerCenterPanel;
+        else if (this.footerCenterPanel && !source.footerCenterPanel)
+            this.footerCenterPanel = null
+        else if (this.footerCenterPanel)
+            this.footerCenterPanel.reload(source.footerCenterPanel)
 
-        /*if (!this.headerSection && source.headerSection)
-            this.headerSection=source.headerSection;
-        else if (this.headerSection && !source.headerSection)
-            this.headerSection = null
-        else if (this.headerSection)
-            this.headerSection.reload(source.headerSection)*/
+        /*if (!this.headerPanel && source.headerPanel)
+            this.headerPanel=source.headerPanel;
+        else if (this.headerPanel && !source.headerPanel)
+            this.headerPanel = null
+        else if (this.headerPanel)
+            this.headerPanel.reload(source.headerPanel)*/
 
-        if (!this.sysSection && source.sysSection)
-            this.sysSection=source.sysSection;
-        else if (this.sysSection && !source.sysSection)
-            this.sysSection = null
-        else if (this.sysSection)
-            this.sysSection.reload(source.sysSection)
+        if (!this.sysPanel && source.sysPanel)
+            this.sysPanel=source.sysPanel;
+        else if (this.sysPanel && !source.sysPanel)
+            this.sysPanel = null
+        else if (this.sysPanel)
+            this.sysPanel.reload(source.sysPanel)
 
-        if (!this.LeftPadXSection && source.LeftPadXSection)
-            this.LeftPadXSection=source.LeftPadXSection;
-        else if (this.LeftPadXSection && !source.LeftPadXSection)
-            this.LeftPadXSection = null
-        else if (this.LeftPadXSection)
-            this.LeftPadXSection.reload(source.LeftPadXSection)
+        if (!this.LeftPadXPanel && source.LeftPadXPanel)
+            this.LeftPadXPanel=source.LeftPadXPanel;
+        else if (this.LeftPadXPanel && !source.LeftPadXPanel)
+            this.LeftPadXPanel = null
+        else if (this.LeftPadXPanel)
+            this.LeftPadXPanel.reload(source.LeftPadXPanel)
 
-        if (!this.LeftPadYSection && source.LeftPadYSection)
-            this.LeftPadYSection=source.LeftPadYSection;
-        else if (this.LeftPadYSection && !source.LeftPadYSection)
-            this.LeftPadYSection = null
-        else if (this.LeftPadYSection)
-            this.LeftPadYSection.reload(source.LeftPadYSection)
+        if (!this.LeftPadYPanel && source.LeftPadYPanel)
+            this.LeftPadYPanel=source.LeftPadYPanel;
+        else if (this.LeftPadYPanel && !source.LeftPadYPanel)
+            this.LeftPadYPanel = null
+        else if (this.LeftPadYPanel)
+            this.LeftPadYPanel.reload(source.LeftPadYPanel)
 
-        if (!this.RightPadXSection && source.RightPadXSection)
-            this.RightPadXSection=source.RightPadXSection;
-        else if (this.RightPadXSection && !source.RightPadXSection)
-            this.RightPadXSection = null
-        else if (this.RightPadXSection)
-            this.RightPadXSection.reload(source.RightPadXSection)
+        if (!this.RightPadXPanel && source.RightPadXPanel)
+            this.RightPadXPanel=source.RightPadXPanel;
+        else if (this.RightPadXPanel && !source.RightPadXPanel)
+            this.RightPadXPanel = null
+        else if (this.RightPadXPanel)
+            this.RightPadXPanel.reload(source.RightPadXPanel)
 
-        if (!this.RightPadYSection && source.RightPadYSection)
-            this.RightPadYSection=source.RightPadYSection;
-        else if (this.RightPadYSection && !source.RightPadYSection)
-            this.RightPadYSection = null
-        else if (this.RightPadYSection)
-            this.RightPadYSection.reload(source.RightPadYSection)
+        if (!this.RightPadYPanel && source.RightPadYPanel)
+            this.RightPadYPanel=source.RightPadYPanel;
+        else if (this.RightPadYPanel && !source.RightPadYPanel)
+            this.RightPadYPanel = null
+        else if (this.RightPadYPanel)
+            this.RightPadYPanel.reload(source.RightPadYPanel)
 
-        if (!this.controllerSection && source.controllerSection)
-            this.controllerSection=source.controllerSection;
-        else if (this.controllerSection && !source.controllerSection)
-            this.controllerSection = null
-        else if (this.controllerSection)
-            this.controllerSection.reload(source.controllerSection)
+        if (!this.controllerPanel && source.controllerPanel)
+            this.controllerPanel=source.controllerPanel;
+        else if (this.controllerPanel && !source.controllerPanel)
+            this.controllerPanel = null
+        else if (this.controllerPanel)
+            this.controllerPanel.reload(source.controllerPanel)
     };
 
-    private getDashboardSectionById(id:string, sections:DashboardSection[]){
-        for(let section of sections){
-            if (section.id == id)
-                return section; 
+    private getDashboardPanelById(id:string, panels:DashboardPanel[]){
+        for(let panel of panels){
+            if (panel.id == id)
+                return panel; 
             else{
-                var res = this.getDashboardSectionById(id, section.subSections);
+                var res = this.getDashboardPanelById(id, panel.subPanels);
                 if (res)
                     return res;
             }
@@ -391,17 +391,17 @@ export class Dashboard implements IComponent{
 
     public addDashboardLink(link:DashboardLink){
         if (link.dashboardId == "*" || link.dashboardId == this.id || (link.dashboardId=="**default**" && this.isDefault)){
-            var sectionFound = false;
-            var section = this.getDashboardSectionById(link.sectionId, this.sections);
-            if (!section)
-                section = this.getDashboardSectionById(link.sectionId, this.sysSections);
-            if (section){
-                section.components.push(new DashboardSectionComponent(link));
+            var panelFound = false;
+            var panel = this.getDashboardPanelById(link.panelId, this.panels);
+            if (!panel)
+                panel = this.getDashboardPanelById(link.panelId, this.sysPanels);
+            if (panel){
+                panel.components.push(new DashboardPanelComponent(link));
             } else {
                 console.log("adh",link);
-                var messageSection ={
-                    id:link.sectionId,
-                    name:link.sectionName,
+                var messagePanel ={
+                    id:link.panelId,
+                    name:link.panelName,
                     type:"panel",
                     uiParameters:{
                         "title":"",
@@ -411,9 +411,9 @@ export class Dashboard implements IComponent{
                         "logLength":0
                     }
                 }
-                var newSection = new DashboardSection(this, messageSection);
-                this.sections.push(newSection);
-                newSection.components.push(new DashboardSectionComponent(link));
+                var newPanel = new DashboardPanel(this, messagePanel);
+                this.panels.push(newPanel);
+                newPanel.components.push(new DashboardPanelComponent(link));
             }
         }
     }

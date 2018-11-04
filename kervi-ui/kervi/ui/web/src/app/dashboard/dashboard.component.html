@@ -16,14 +16,14 @@
 						</div>
 					</div>
 				</li>
-				<li class="nav-item" *ngIf="showSectionController">
-					<a  class="nav-link btn" (click)="dashboardSectionsHidden = !dashboardSectionsHidden;"><i class="fa fa-sliders-h fa-lg" aria-hidden="true" style="transform:rotate(90deg);"></i>{{dashboardSectionsVisible}}</a>
+				<li class="nav-item" *ngIf="showPanelController">
+					<a  class="nav-link btn" (click)="dashboardPanelsHidden = !dashboardPanelsHidden;"><i class="fa fa-sliders-h fa-lg" aria-hidden="true" style="transform:rotate(90deg);"></i>{{dashboardPanelsVisible}}</a>
 				</li>
 				<li *ngIf="dashboard" style="display:inline-block;white-space:nowrap">&nbsp;&nbsp;&nbsp;{{dashboard.name}}</li>
 			</ul>
 		</div>	
-		<div *ngIf="dashboard && dashboard.sysSection" class="col-xs-8 col-sm-8 core-sensors text-xs-center text-sm-right" style="display:inline-block">
-				&nbsp;<kervi-dashboard-section [dashboardSizes]="dashboardSizes" [inline]="true" [section]="dashboard.sysSection" ></kervi-dashboard-section>
+		<div *ngIf="dashboard && dashboard.sysPanel" class="col-xs-8 col-sm-8 core-sensors text-xs-center text-sm-right" style="display:inline-block">
+				&nbsp;<kervi-dashboard-panel [dashboardSizes]="dashboardSizes" [inline]="true" [panel]="dashboard.sysPanel" ></kervi-dashboard-panel>
 		</div>
 	</div>
 </nav>
@@ -36,7 +36,7 @@
     <kervi-controller-pad></kervi-controller-pad>
 	</div>
 	<div class="container-fluid" style="top:0;padding-top:10px;z-index:1999;position:absolute;padding-bottom:30px;" >
-		<ng-container *ngIf="componentsCount==0">
+		<ng-container *ngIf="isAppEmpty">
 			<div class="card-deck">
 				<div class="card-body"   style="position:relative;margin-top:35px;">
 					<h1>{{( 'hello_world' | translate)}}</h1>
@@ -45,21 +45,21 @@
 			</div>
 		</ng-container>
 		
-		<div  [ngClass]="{'dashboard-sections-hidden' : dashboardSectionsHidden }">
-			<kervi-dashboard-section  *ngFor="let section of dashboard.sections" [dashboardSizes]="defaultSizes" [section]="section" class="w-{{section.width}}"></kervi-dashboard-section>
+		<div  [ngClass]="{'dashboard-panels-hidden' : dashboardPanelsHidden }">
+			<kervi-dashboard-panel  *ngFor="let panel of dashboard.panels" [dashboardSizes]="defaultSizes" [panel]="panel" class="w-{{panel.width}}"></kervi-dashboard-panel>
 		</div>  
 	</div>
 
 <footer class="footer" *ngIf="dashboard">
 	<div class="row">
 		<div class="col-sm-4 text-left" style="text-align: left">
-			<kervi-dashboard-section [inline]="true" *ngIf="dashboard.footerLefSection" [dashboardSizes]="defaultSizes" [section]="dashboard.footerLeftSection"></kervi-dashboard-section>
+			<kervi-dashboard-panel [inline]="true" *ngIf="dashboard.footerLeftPanel" [dashboardSizes]="defaultSizes" [panel]="dashboard.footerLeftPanel"></kervi-dashboard-panel>
 		</div>
 		<div class="col-sm-4 text-center" style="text-align:center">
-			<kervi-dashboard-section [inline]="true" *ngIf="dashboard.footerCenterSection" [dashboardSizes]="defaultSizes" [section]="dashboard.footerCenterSection"></kervi-dashboard-section>
+			<kervi-dashboard-panel [inline]="true" *ngIf="dashboard.footerCenterPanel" [dashboardSizes]="defaultSizes" [panel]="dashboard.footerCenterPanel"></kervi-dashboard-panel>
 		</div>
 		<div class="col-sm-4 text-right" style="text-align: right">
-			<kervi-dashboard-section [inline]="true" *ngIf="dashboard.footerRightSection" [dashboardSizes]="defaultSizes" [section]="dashboard.footerRightSection"></kervi-dashboard-section>
+			<kervi-dashboard-panel [inline]="true" *ngIf="dashboard.footerRightPanel" [dashboardSizes]="defaultSizes" [panel]="dashboard.footerRightPanel"></kervi-dashboard-panel>
 			<i class="fa fa-expand" title="{{( 'toggle_screen' | translate)}}" (mousedown)="toggleFullScreen()"></i>&nbsp;
 		</div>
 	</div>

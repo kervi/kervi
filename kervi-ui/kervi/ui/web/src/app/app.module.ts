@@ -7,7 +7,7 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { ConnectComponent } from './connect/connect.component';
-import { NGXKerviService} from "ngx-kervi";
+//import { NGXKerviService, KerviTemplateService} from "ngx-kervi";
 import { Routes, RouterModule } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NgxKerviModule } from 'ngx-kervi';
@@ -35,9 +35,10 @@ const ROUTES: Routes = [
     BrowserModule,
     NgxKerviModule,
     NGXKerviPipesModule,
+    NgxKerviComponentsModule,
     RouterModule.forRoot(ROUTES)
   ],
-  providers: [NGXKerviService],
+  
   bootstrap: [AppComponent]
 })
 export class AppModule { }

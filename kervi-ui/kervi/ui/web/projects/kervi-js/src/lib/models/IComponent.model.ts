@@ -1,8 +1,8 @@
 
 export class DashboardLink{
     dashboardId:string;
-    sectionId:string;
-    sectionName:string;
+    panelId:string;
+    panelName:string;
     component:IComponent;
     parameters:any;
 
@@ -14,8 +14,8 @@ export class DashboardLink{
 
     constructor(component:IComponent, message:any){
         this.dashboardId = message.dashboardId;
-        this.sectionId = message.sectionId;
-        this.sectionName = message.sectionName;
+        this.panelId = message.sectionId;
+        this.panelName = message.sectionName;
         this.component = component;
         this.parameters = message.parameters;
     }

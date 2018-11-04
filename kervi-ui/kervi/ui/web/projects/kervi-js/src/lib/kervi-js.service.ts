@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import { KerviSpineBase } from "./spine/kervi-spinebase";
 import { KerviWSSpine } from "./spine/kervi-ws";
 import { KerviRMQSpine } from "./spine/kervi-rmq";
-import {  BehaviorSubject } from 'rxjs';
+import {  BehaviorSubject, Observable } from 'rxjs';
 import { IComponent } from './models/IComponent.model';
 import { ComponentFactory } from './models/factory';
 import { DashboardMessageModel } from './models/dashboard.model';
@@ -114,9 +114,13 @@ export class KerviBaseService {
   //   return this.components$.asObservable();
   // }
 
-  // public getLogMessages$(){
-  //   return this.logMessages$.asObservable();
-  // }
+   public getLogMessages$():Observable<DashboardMessageModel[]>{
+     return this.logMessages$.asObservable();
+   }
+
+  public isAppEmpty(){
+    return this.components.length == 0;
+  }
 
   public getComponent(id:string, componentType:string = null){
     for (var component of this.components){

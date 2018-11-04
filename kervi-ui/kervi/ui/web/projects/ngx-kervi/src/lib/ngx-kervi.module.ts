@@ -1,27 +1,34 @@
 import { NgModule, Injector } from '@angular/core';
 import { NgxKerviComponent } from './ngx-kervi.component';
-import { KerviDashboardComponent } from './dashboard/dashboard.component';
+import { KerviDashboardComponent } from './dashboard/kervi-dashboard.component';
 import { setAppInjector } from "./app-injector.service";
-import { KerviDashboardSectionComponent } from './kervi-dashboard-section/kervi-dashboard-section.component';
-import { KerviCamViewerComponent } from './kervi-cam-viewer/kervi-cam-viewer.component';
-import { KerviControllerPadComponent } from './kervi-controller-pad/kervi-controller-pad.component'
+import { KerviDashboardPanelComponent } from './dashboard/kervi-dashboard-panel.component';
+import { KerviCamViewerComponent } from './dashboard/kervi-cam-viewer.component';
+import { KerviControllerPadComponent } from './dashboard/kervi-controller-pad.component';
+import { NGXKerviService } from './ngx-kervi.service';
+import { KerviTemplateService } from './ngx-kervi-template.service';
+import { KerviValueComponent } from './values/value.component'
+import { KerviNumberComponent } from './values/kervi-number-value.component'
 @NgModule({
   imports: [
   ],
   declarations: [
     NgxKerviComponent,
     KerviDashboardComponent,
-    KerviDashboardSectionComponent,
+    KerviDashboardPanelComponent,
     KerviCamViewerComponent,
     KerviControllerPadComponent,
-    
+    KerviNumberComponent,
+    KerviValueComponent
   ],
+  providers: [NGXKerviService, KerviTemplateService],
   exports: [
     NgxKerviComponent,
     KerviDashboardComponent,
-    KerviDashboardSectionComponent,
+    KerviDashboardPanelComponent,
     KerviCamViewerComponent,
     KerviControllerPadComponent,
+    KerviNumberComponent
   ]
 })
 export class NgxKerviModule {
