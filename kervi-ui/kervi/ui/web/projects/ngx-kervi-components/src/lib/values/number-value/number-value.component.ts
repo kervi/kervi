@@ -3,7 +3,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { KerviNumberComponent } from 'ngx-kervi'
-declare var Qty: any;
 
 @Component({
 	selector: 'kervi-value-number',
@@ -15,7 +14,7 @@ export class NumberComponent extends KerviNumberComponent implements OnInit {
 	constructor() { 
 		super();
 	}
-
+	
 	ngOnInit() {
 		this.ngOnInitNumber();
 	}

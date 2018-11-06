@@ -50,7 +50,7 @@ export abstract class KerviValueType<valueType> extends KerviValue{
         }
     }
     protected abstract getDefaultValue():valueType;
-    protected setValue(v:valueType){
+    public set(v:valueType){
         this.value$.next(v);
         this.kerviService.spine.sendCommand(this.command, v);
 				

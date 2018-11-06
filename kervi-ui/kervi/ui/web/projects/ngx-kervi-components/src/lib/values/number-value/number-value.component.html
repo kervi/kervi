@@ -1,6 +1,6 @@
 <ng-container *ngIf="!inline">
     <div class="value-input" *ngIf="linkParameters.isInput">
-        <ui-slider  [value]="(value.value$ | async | number:numberFormat)" ></ui-slider>
+        <ui-slider [value]="value" [linkParameters]="linkParameters"></ui-slider>
     </div>
     <div class="value-value" [style.min-width.rem]="linkParameters.valueSize">
         <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i>
@@ -10,7 +10,7 @@
     </div>
 </ng-container>
 <ng-container *ngIf="inline"> 
-    <ui-slider *ngIf="linkParameters.isInput"  [value]="(value.value$ | async | number:numberFormat)"></ui-slider>
+    <ui-slider *ngIf="linkParameters.isInput" [value]="value" [linkParameters]="linkParameters"></ui-slider>
     <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i>
     <span style="display:inline"  [style.max-width.%]="linkParameters.valueSize"    class="slider-value">{{(value.value$ | async | number:numberFormat)}}</span>
     <span *ngIf="linkParameters.displayUnit">{{value.unit}}</span>

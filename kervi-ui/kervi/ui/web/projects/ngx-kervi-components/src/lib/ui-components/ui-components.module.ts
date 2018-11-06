@@ -7,8 +7,8 @@ import { SliderComponent } from './slider/slider.component';
 //import { GaugeComponent } from './gauge/gauge.component';
 //import { ChartComponent } from './chart/chart.component'
 //import { CommonModule } from '@angular/common';
-//import { SwitchButtonComponent} from './switch-button/switch-button.component';
-//import { ButtonComponent} from './button/button.component';
+import { SwitchButtonComponent} from './switch-button/switch-button.component';
+import { ButtonComponent} from './button/button.component';
 //import { CamViewerComponent } from './cam-viewer/cam-viewer.component';
 //import { MPEGViewerComponent } from './mpeg-viewer/mpeg-viewer.component';
 //import { ImageViewerComponent } from './image-viewer/image-viewer.component'; 
@@ -25,8 +25,8 @@ import { IconsComponent } from './icons/icons.component';
     IconsComponent,
     //GaugeComponent,
     //ChartComponent,
-    //SwitchButtonComponent,
-    //ButtonComponent,
+    SwitchButtonComponent,
+    ButtonComponent,
     //CamViewerComponent,
     //MPEGViewerComponent,
     //ImageViewerComponent,
@@ -37,11 +37,11 @@ import { IconsComponent } from './icons/icons.component';
   exports:[
       SparklineComponent,
       SliderComponent,
-      IconsComponent
+      IconsComponent,
       //GaugeComponent,
       //ChartComponent,
-      //SwitchButtonComponent,
-      //ButtonComponent,
+      SwitchButtonComponent,
+      ButtonComponent,
       //CamViewerComponent,
       //ActionComponent,
       //DateTimeComponent,

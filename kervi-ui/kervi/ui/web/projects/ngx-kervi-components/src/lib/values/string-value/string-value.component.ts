@@ -2,39 +2,30 @@
 // Licensed under MIT
 
 import { Component, Input, OnInit, ElementRef } from '@angular/core';
-import { DynamicStringModel } from '../../models/dynamicValues.model';
-import { KerviService } from '../../kervi.service'
-import { DashboardSectionModel, DashboardSizes } from '../../models/dashboard.model'
+import { KerviStringComponent } from 'ngx-kervi'
 
 declare var jQuery:any;
 @Component({
-	selector: 'dynamic-value-string',
+	selector: 'kervi-value-string',
 	templateUrl: './string-value.component.html',
 	styleUrls: ['./string-value.component.scss']
 })
-export class DynamicStringComponent implements OnInit {
-	@Input() input: DynamicStringModel;
-	@Input() dashboardSection: DashboardSectionModel;
-	@Input() parameters:any;
-	@Input() inline:boolean = false;
-	@Input() defaultSizes:DashboardSizes = new DashboardSizes();
-	
-	constructor(private kerviService: KerviService, private elementRef: ElementRef) { }
+export class StringComponent extends KerviStringComponent implements OnInit {
+	constructor(private elementRef: ElementRef) 
+	{
+		super();
+	 }
 
 	ngOnInit(){
-		var self=this;
-		if (!this.parameters)
-			  this.parameters = this.input.ui;
-			  
-		if (self.input.isInput){
-		}
-		this.input.value$.subscribe(function(v){
-			jQuery("input", self.elementRef.nativeElement).val(v).change();
+		var self = this;
+		this.ngOnInitString();
+		this.value.value$.subscribe(function(v){
+		 	jQuery("input", self.elementRef.nativeElement).val(v).change();
 		})
 	}
 
 	onChange(event){
 		console.log("evv",event);
-		this.kerviService.spine.sendCommand(this.input.command, event.target.value);
+		this.value.set(event);
 	}
 }

@@ -27,7 +27,7 @@ export class ComponentFactory{
             var component:any=null;
             var subComponents:any[] = [];
             if (message.componentType=="KerviAction")
-                component = new Action(message);
+                component = new Action(message, kerviService);
             else if (message.componentType=="dashboard"){
                 component = new Dashboard(message);
                 dashboards.push(component);

@@ -1,7 +1,7 @@
 // Copyright (c) 2016, Tim Wentzlau
 // Licensed under MIT
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, HostListener } from '@angular/core';
 import { KerviValue, DashboardPanel, DashboardSizes } from 'kervi-js';
 import { NGXKerviService } from '../ngx-kervi.service';
 import { AppInjector } from '../app-injector.service';
@@ -20,7 +20,6 @@ export class KerviValueComponent<T extends KerviValue>   {
 	constructor() { 
 		//console.log("cnio",this);
 		this.kerviService = AppInjector.get(NGXKerviService);  
-    	
 	}
 
 	ngOnInitValue() {

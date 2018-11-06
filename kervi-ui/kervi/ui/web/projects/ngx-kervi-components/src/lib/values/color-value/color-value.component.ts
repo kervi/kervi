@@ -29,43 +29,6 @@ export class DynamicColorComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		var self = this;
-		if (!this.parameters)
-      		this.parameters = this.value.ui;
-
-		if (this.parameters){
-			if (this.parameters.type){
-				this.displayType = this.parameters.type
-            }
-			if (this.parameters.size)
-				this.size=this.parameters.size;
-			
-			if (!this.inline && this.parameters.inline){
-				this.inline = true;
-			}else if (!this.inline && this.parameters.size > 0)
-			{
-				this.inline = true;
-			}
-        }
-
-		if (this.dashboardSection){
-			this.unitSize=this.dashboardSection.dashboard.unitSize;
-
-		}
-
-		if (self.value.isInput){
-			var sliderSize=self.unitSize*self.size;
-			if (self.size==0)
-				sliderSize=self.unitSize;
-		}
-
 		
 	}
-
-	public color_change(v) {
-		 this.kerviService.spine.sendCommand(this.value.command, v);
-	  }
-	
-	  
-
 }

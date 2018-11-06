@@ -1,13 +1,2 @@
-<div *ngIf="!parameters.inline"   class="block-component">
-	<span  *ngIf="parameters.labelIcon" class="fa fa-{{parameters.labelIcon}}"></span>
-    <span *ngIf="parameters.label">{{parameters.label}}</span>
-    
-    <span *ngIf="!parameters.isInput" class="pull-right" [style.width]="parameters.inputSize" >{{(input.value$ | async)}}</span>
-    <input *ngIf="parameters.isInput" class="form-control pull-right" [style.width]="parameters.inputSize" (keyup)="onChange($event)" name="{{input.id}}" value="{{(input.value$ | async)}}"/>
-</div>
-<div *ngIf="parameters.inline" style="white-space:nowrap"  >
-	<span  *ngIf="parameters.labelIcon" class="fa fa-{{parameters.labelIcon}}"></span>
-    <span *ngIf="parameters.label">{{parameters.label}}</span>
-    <span *ngIf="!parameters.isInput" [style.width]="parameters.inputSize" >&nbsp;{{(input.value$ | async)}}</span>
-    <input *ngIf="parameters.isInput" class="form-control" (keyup)="onChange($event)" [style.width]="parameters.inputSize" style="display: inline-block" name="{{input.id}}" [style.width.%]="parameters.inputSize" value="{{(input.value$ | async)}}"/>
-</div>
+<input *ngIf="linkParameters.isInput" class="form-control pull-right" (keyup)="onChange($event)" value="{{(value.value$ | async)}}"/>
+<span *ngIf="!linkParameters.isInput" class="form-control pull-right"   >{{(value.value$ | async)}}</span>

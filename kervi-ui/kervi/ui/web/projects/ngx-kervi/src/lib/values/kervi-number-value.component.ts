@@ -4,15 +4,12 @@
 import { Component } from '@angular/core';
 import { NumberValue } from 'kervi-js';
 import { KerviValueComponent } from './value.component'
-declare var Qty: any;
 
 @Component({
 	selector: 'kervi-value-number-base',
 	template: ''
 })
 export class KerviNumberComponent extends KerviValueComponent<NumberValue> {
-	private moveDelayTimer = null;
-	private inSlide:boolean=false;
 	public numberFormat = "1.2-2";
 	public displayValue:number = 0;
 	public displayUnit:string = "";
@@ -21,6 +18,10 @@ export class KerviNumberComponent extends KerviValueComponent<NumberValue> {
 	
 	constructor(){ 
 		super();
+	}
+
+	public setKerviValue(value){
+		this.value.set(value);
 	}
 
 	ngOnInitNumber() {

@@ -1,8 +1,8 @@
 // Copyright (c) 2016, Tim Wentzlau
 // Licensed under MIT
 
-import { Component, Input, OnInit, ElementRef } from '@angular/core';
-import { DashboardSizes } from 'kervi-js'
+import { Component, Input, Output, EventEmitter, OnInit, ElementRef } from '@angular/core';
+import { DashboardSizes, NumberValue } from 'kervi-js'
 import { KerviTemplateService } from 'ngx-kervi'
 declare var jQuery: any;
 
@@ -12,13 +12,12 @@ declare var jQuery: any;
 	styleUrls: ['./slider.component.scss']
 })
 export class SliderComponent implements OnInit {
-	@Input() value: Number;
-	@Input() minValue: Number;
-	@Input() maxValue: Number;
-    @Input() type: string = "horizontal_slider";
+	@Input() value: NumberValue;
+	@Input() type: string = "horizontal_slider";
     @Input() tick:number;
 	@Input() linkParameters:any;
 	@Input() defaultSizes:DashboardSizes = new DashboardSizes();
+	@Output() kerviValueChange = new EventEmitter();
 	private moveDelayTimer = null;
 	private inSlide:boolean=false;
 
@@ -39,15 +38,17 @@ export class SliderComponent implements OnInit {
 			
 			jQuery('input', self.elementRef.nativeElement).bootstrapSlider({
 				tooltip: "hide",
-				min:self.minValue,
-				max:self.maxValue,
+				min:self.value.minValue,
+				max:self.value.maxValue,
 				step:self.tick,
 				orientation: self.type == "horizontal_slider" ? "horizontal" : "vertical"
 			});
 
-			jQuery('.slider', self.elementRef.nativeElement).on("change",function(e){
-				//self.kerviService.spine.sendCommand(self.value.command,e.value.newValue);
-				jQuery(".slider-value", self.elementRef.nativeElement).html(e.value.newValue);
+			jQuery('.slider', self.elementRef.nativeElement).on("change",function(e,x){
+				
+				console.log("slsv", e, x);
+				if (e.value.newValue)
+					self.value.set(e.value.newValue);
 			});
 
 			jQuery('.slider', self.elementRef.nativeElement).on("slideStart",function(e){
@@ -56,22 +57,19 @@ export class SliderComponent implements OnInit {
 
 			jQuery('.slider', self.elementRef.nativeElement).on("slideStop",function(e){
 				self.inSlide=false;
-
 			});
-
-			// self.value.value$.subscribe(function (v) {
-				
-			// 	if (!self.inSlide) {
-			// 		jQuery("input", self.elementRef.nativeElement).bootstrapSlider('setValue',v);
-			// 		//jQuery(".slider-value", self.elementRef.nativeElement).html(e.value.newValue);
-			// 	}
-				
-			// });
+			
+			self.value.value$.subscribe(function (v) {
+				console.log("sv", v, self.inSlide);
+				if (v && !self.inSlide) {
+					jQuery("input", self.elementRef.nativeElement).bootstrapSlider('setValue',v);
+					//jQuery(".slider-value", self.elementRef.nativeElement).html(e.value.newValue);
+				}
+			});
 		},0);
 	}
 
 	step(v){
-		//this.kerviService.spine.sendCommand(this.value.command,this.value.value$.value + v);
+		this.value.set(this.value.value$.value + v);
 	}
-
 }

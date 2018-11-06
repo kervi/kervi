@@ -2,9 +2,8 @@
 // Licensed under MIT
 
 import { Component, OnInit, Input, ElementRef, ViewEncapsulation } from '@angular/core';
-import { KerviService } from '../../kervi.service'
-import { DashboardSectionModel, DashboardSizes } from '../../models/dashboard.model'
-import { BehaviorSubject } from 'rxjs/Rx';
+import { DashboardSizes } from 'kervi-js'
+import { BehaviorSubject } from 'rxjs';
 declare var jQuery: any;
 
 @Component({
@@ -15,53 +14,51 @@ declare var jQuery: any;
 })
 export class SwitchButtonComponent implements OnInit {
   @Input() value: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  @Input() dashboardSection: DashboardSectionModel;
-  @Input() parameters:any;
+  @Input() linkParameters:any;
   @Input() inline:boolean = false;
-  @Input() defaultSizes:DashboardSizes = new DashboardSizes();
-  @Input() parent:any;
+  @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
   state:boolean = false
-  private valueSubscription: any;
-  private width:string;
-  private height:string;
-  constructor(private kerviService: KerviService, private elementRef: ElementRef) { }
+  public valueSubscription: any;
+  public width:string;
+  public height:string;
+  constructor(private elementRef: ElementRef) { }
 
   public press() {
-    this.parent.press()
+    //this.parent.press()
      //this.kerviService.spine.sendCommand(this.value.command, true);
   }
 
   public release() {
-    this.parent.release() 
+    //this.parent.release() 
     //this.kerviService.spine.sendCommand(this.value.command, false);
   }
 
   ngOnInit() {
     var self = this;
 
-    if (!this.parameters){
+    if (!this.linkParameters){
     //  this.parameters = this.value.ui;
 
-    if (!self.parameters.buttonWidth)
-      this.width = this.defaultSizes.switchWidth;
+    if (!self.linkParameters.buttonWidth)
+      this.width = this.dashboardSizes.switchWidth;
     else
-      this.width = self.parameters.buttonWidth;
+      this.width = self.linkParameters.buttonWidth;
 
-    if (!self.parameters.buttonHeight)
-      this.height = this.defaultSizes.switchHeight;
+    if (!self.linkParameters.buttonHeight)
+      this.height = this.dashboardSizes.switchHeight;
     else
-      this.height = self.parameters.buttonHeight;
+      this.height = self.linkParameters.buttonHeight;
 
   } else{
-    this.width = this.defaultSizes.switchWidth;
-    this.height = this.defaultSizes.switchHeight;
+    this.width = this.dashboardSizes.switchWidth;
+    this.height = this.dashboardSizes.switchHeight;
   }
 
-    var onText= this.parameters && this.parameters.onIcon ? "<i class='fa fa-" + this.parameters.onIcon + "'></i> " : ""; 
-    var offText= this.parameters && this.parameters.offIcon ? "<i class='fa fa-" + this.parameters.offIcon + "'></i> " : ""; 
+    var onText= this.linkParameters && this.linkParameters.onIcon ? "<i class='fa fa-" + this.linkParameters.onIcon + "'></i> " : ""; 
+    var offText= this.linkParameters && this.linkParameters.offIcon ? "<i class='fa fa-" + this.linkParameters.offIcon + "'></i> " : ""; 
     
-    onText+= this.parameters && this.parameters.onText ? this.parameters.onText : ""; 
-    offText+= this.parameters && this.parameters.offText ? this.parameters.offText : ""; 
+    onText+= this.linkParameters && this.linkParameters.onText ? this.linkParameters.onText : ""; 
+    offText+= this.linkParameters && this.linkParameters.offText ? this.linkParameters.offText : ""; 
 
     self.valueSubscription = self.value.subscribe(function (v) {
       self.state = v;

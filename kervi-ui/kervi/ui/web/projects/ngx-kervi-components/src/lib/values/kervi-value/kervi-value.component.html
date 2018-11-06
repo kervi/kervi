@@ -1,5 +1,5 @@
-    <kervi-value-number *ngIf="value.typeName=='Number'" [value]="value" [dashboardSizes]="dashboardSizes" [linkParameters]="linkParameters" [dashboardPanel]="dashboardPanel" [inline]="inline" ></kervi-value-number>
-    
+    <kervi-value-number *ngIf="value.typeName=='Number'" [value]="value" [dashboardSizes]="dashboardSizes" [linkParameters]="linkParameters" [inline]="inline" ></kervi-value-number>
+    <kervi-value-boolean *ngIf="value.typeName=='Boolean'" [dashboardSizes]="dashboardSizes" [linkParameters]="linkParameters" [inline]="inline" [value]="value"></kervi-value-boolean>
     <!-- <ng-template ngSwitchCase="boolean-value">
         <kervi-value-boolean [defaultSizes]="defaultSizes" [linkParameters]="parameters" [dashboardSection]="dashboardSection" [inline]="inline" [value]="value"></kervi-value-boolean>
     </ng-template>
