@@ -37,17 +37,17 @@ export class Action implements IComponent {
     }
 
     public run(parameters){
-        if (!this.running$.value){
-            if (parameters)
-                this.kerviService.spine.sendCommand(this.runCommand, ...parameters.actionParameters);
+        //if (!this.running$.value){
+            if (parameters && parameters.length>0)
+                this.kerviService.spine.sendCommand(this.runCommand, ...parameters);
             else
                 this.kerviService.spine.sendCommand(this.runCommand);
-        }
+        //}
     }
 
     public interrupt(parameters){
-        if (parameters)
-            this.kerviService.spine.sendCommand(this.interruptCommand, ...parameters.actionParameters);
+        if (parameters && parameters.length>0)
+            this.kerviService.spine.sendCommand(this.interruptCommand, ...parameters);
         else
             this.kerviService.spine.sendCommand(this.interruptCommand);
     }

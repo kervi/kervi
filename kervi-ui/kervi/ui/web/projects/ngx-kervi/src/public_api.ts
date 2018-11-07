@@ -15,6 +15,7 @@ export { KerviControllerPadComponent } from './lib//dashboard/kervi-controller-p
 export { KerviWidgetComponent } from './lib/dashboard/kervi-widget.component'
 export { KerviNumberComponent } from './lib/values/kervi-number-value.component'
 export { KerviBooleanComponent } from './lib/values/kervi-boolean-value.component'
+export { KerviActionComponent } from './lib/actions/kervi-action.component'
 export  { AppInjector } from './lib/app-injector.service'
 
 export * from './lib/ngx-kervi.component';

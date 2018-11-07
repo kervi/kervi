@@ -1,9 +1,8 @@
 // Copyright (c) 2016, Tim Wentzlau
 // Licensed under MIT
 
-import { Component, OnInit, Input, ElementRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input, Output, ElementRef, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { DashboardSizes } from 'kervi-js'
-import { BehaviorSubject } from 'rxjs';
 declare var jQuery: any;
 
 @Component({
@@ -13,10 +12,20 @@ declare var jQuery: any;
   encapsulation: ViewEncapsulation.None
 })
 export class SwitchButtonComponent implements OnInit {
-  @Input() value: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private isReady = false;
+  @Input() set value(value: boolean){
+    this.state = value;
+    if (this.isReady){
+      if (value)
+        jQuery('input',this.elementRef.nativeElement).bootstrapToggle('on')
+      else
+        jQuery('input', this.elementRef.nativeElement).bootstrapToggle('off')
+    }
+  };
   @Input() linkParameters:any;
   @Input() inline:boolean = false;
   @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
+  @Output() buttonState = new EventEmitter()
   state:boolean = false
   public valueSubscription: any;
   public width:string;
@@ -24,11 +33,12 @@ export class SwitchButtonComponent implements OnInit {
   constructor(private elementRef: ElementRef) { }
 
   public press() {
-    //this.parent.press()
+    this.buttonState.emit(true);
      //this.kerviService.spine.sendCommand(this.value.command, true);
   }
 
   public release() {
+    this.buttonState.emit(false);
     //this.parent.release() 
     //this.kerviService.spine.sendCommand(this.value.command, false);
   }
@@ -60,16 +70,6 @@ export class SwitchButtonComponent implements OnInit {
     onText+= this.linkParameters && this.linkParameters.onText ? this.linkParameters.onText : ""; 
     offText+= this.linkParameters && this.linkParameters.offText ? this.linkParameters.offText : ""; 
 
-    self.valueSubscription = self.value.subscribe(function (v) {
-      self.state = v;
-      if (v)
-        jQuery('input', self.elementRef.nativeElement).bootstrapToggle('on')
-      else
-        jQuery('input', self.elementRef.nativeElement).bootstrapToggle('off')
-    });
-
-    
-
     setTimeout(function () {
         jQuery('input', self.elementRef.nativeElement).bootstrapToggle({
           'on': onText,
@@ -80,19 +80,20 @@ export class SwitchButtonComponent implements OnInit {
           "height":self.height
         })
 
-        if (self.value.value)
+        if (self.state)
           jQuery('input', self.elementRef.nativeElement).bootstrapToggle('on')
         else
           jQuery('input', self.elementRef.nativeElement).bootstrapToggle('off')
 
         jQuery('input', self.elementRef.nativeElement).change(function () {
           var state = jQuery('input', self.elementRef.nativeElement).prop('checked');
-          console.log("z", state, self.value.value);
-          if (state && !self.value.value)
-            self.press()
-          else if (!state && self.value.value)
-            self.release();
+          if (state && !self.state)
+            self.buttonState.emit(true);
+          else if (!state && self.state)
+            self.buttonState.emit(false);
         });
+
+      self.isReady = true;
       
     }, 0);
   }

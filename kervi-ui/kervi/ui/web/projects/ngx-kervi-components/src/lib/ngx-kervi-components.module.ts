@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { NgxKerviModule, NGXKerviPipesModule  } from 'ngx-kervi'
-
 import { WidgetComponent } from './widget/widget.component';
 import { ControllerPadComponent } from './controller-pad/controller-pad.component';
 import { CamViewerComponent } from './cam-viewer/cam-viewer.component';
@@ -12,7 +11,7 @@ import {  ValuesModule } from './values/values.module'
     NgxKerviModule,
     NGXKerviPipesModule,
     BrowserModule,
-    ValuesModule
+    ValuesModule,
   ],
   declarations: [
     WidgetComponent,

@@ -9,7 +9,8 @@
             </div>
         </div>
         <div class="value-section">
-            <kervi-value [value]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-value>
+            <kervi-value *ngIf="component.componentType=='KerviValue'" [value]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-value>
+            <kervi-action  *ngIf="component.componentType=='action'" [action]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-action>
         </div>
     </div>
 
@@ -17,7 +18,8 @@
         <div style="display:inline-block">
             <span style="display:inline"  *ngIf="linkParameters.labelIcon" class="fa fa-{{linkParameters.labelIcon}}"></span>
             <span style="display:inline"  *ngIf="linkParameters.label"  >{{linkParameters.label}}</span>
-            <kervi-value [value]="component" [inline]="true" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-value>
+            <kervi-value *ngIf="component.componentType=='KerviValue'" [value]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-value>
+            <kervi-action  *ngIf="component.componentType=='action'" [action]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-action>
         </div>
     </div>
 </ng-container>    

@@ -25,7 +25,7 @@ export class KerviValue implements IComponent{
 export abstract class KerviValueType<valueType> extends KerviValue{
     
     public value$: BehaviorSubject<valueType>;
-    private kerviService:KerviBaseService = null;
+    protected kerviService:KerviBaseService = null;
 
     constructor(message:any, kerviService:KerviBaseService){
         super();
@@ -50,10 +50,10 @@ export abstract class KerviValueType<valueType> extends KerviValue{
         }
     }
     protected abstract getDefaultValue():valueType;
-    public set(v:valueType){
+    public set(v:valueType, notify:boolean=true){
         this.value$.next(v);
-        this.kerviService.spine.sendCommand(this.command, v);
-				
+        if (notify)
+            this.kerviService.spine.sendCommand(this.command, v);
     }
 }
 
@@ -139,10 +139,6 @@ export class SelectValue extends KerviValueType<string[]>{
             }
         }
     }
-
-    setValue(v){
-        this.value$.next(v)
-    }
 }
 
 export class NumberValue extends KerviValueType<number> {
@@ -205,18 +201,19 @@ export class NumberValue extends KerviValueType<number> {
             spl.push(spv)
         }
         this.sparkline$.next(spl);
-        this.setValue(message.value);
+        this.set(message.value, false);
     }
 
-    setValue(v){
+    set(v, notify=true){
         var newValue = v;
         if (this.qtyUnitTo){
             var q = new Qty(v, this.qtyUnitFrom);
             newValue = q.to(this.qtyUnitTo).scalar;
         } 
-        
-        this.value$.next(newValue)
 
+        this.value$.next(newValue);
+        if (notify)
+            this.kerviService.spine.sendCommand(this.command, v);
         var spl=this.sparkline$.value;
         spl.push(newValue);
         if (spl.length>10)

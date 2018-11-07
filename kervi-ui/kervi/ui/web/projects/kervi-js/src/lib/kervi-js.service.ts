@@ -51,12 +51,13 @@ export class KerviBaseService {
                 var dynamicValue = component as any;
               
                 dynamicValue.valueTS=new Date(this.timestamp + " utc");
-                dynamicValue.setValue(value.value)  
+                dynamicValue.set(value.value, false);  
               }
             }
           });
         
         self.spine.addEventHandler("actionStarted","",function(id){
+          console.log("as", id);
           for (let component of self.components){
             if (component.id==id){
               var action = component as any;
@@ -67,6 +68,7 @@ export class KerviBaseService {
         });
 
         self.spine.addEventHandler("actionDone","",function(id){
+          console.log("ad", id);
           for (let component of self.components){
             if (component.id==id){
               var action = component as any;

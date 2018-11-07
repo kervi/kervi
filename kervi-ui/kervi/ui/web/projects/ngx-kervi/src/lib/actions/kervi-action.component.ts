@@ -1,7 +1,7 @@
 // Copyright (c) 2016, Tim Wentzlau
 // Licensed under MIT
 
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Action } from 'kervi-js';
 import { DashboardSizes  } from 'kervi-js';
 import { NGXKerviService } from '../ngx-kervi.service';
@@ -12,23 +12,22 @@ import { AppInjector } from '../app-injector.service';
   selector: 'kervi-action-base',
   template: '',
   styleUrls: [],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
-
-export class KerviActionComponent implements OnInit {
+export class KerviActionComponent {
     @Input() action: Action = null;
     @Input() linkParameters: any = null;
     @Input() inline:boolean = false;
     @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
-    private state: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public state: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     protected kerviService:NGXKerviService;
+    
 	public displayType:string="switch";
     
     constructor() { 
         this.kerviService = AppInjector.get(NGXKerviService);
     }
 
-    ngOnInit() {
+    ngOnInitAction() {
         var self = this;
         if (!this.linkParameters)
             this.linkParameters = this.action.ui;
@@ -47,11 +46,10 @@ export class KerviActionComponent implements OnInit {
         })
     }
 
-    public run() {
-        this.action.run(this.linkParameters.actionParameters);
-    }
-
-    public interrupt() {
-        this.action.interrupt(this.linkParameters.interruptParameters)
+    public setActionState(value){
+        if (value)
+            this.action.run(this.linkParameters.actionParameters);
+        else
+            this.action.interrupt(this.linkParameters.interruptParameters)
     }
 }

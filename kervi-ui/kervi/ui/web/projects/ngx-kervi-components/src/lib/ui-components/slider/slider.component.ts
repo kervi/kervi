@@ -12,12 +12,25 @@ declare var jQuery: any;
 	styleUrls: ['./slider.component.scss']
 })
 export class SliderComponent implements OnInit {
-	@Input() value: NumberValue;
+	private sliderValue:number = 0;
+	private isReady = false;
+	private ignoreChange = false;
+	@Input() set value(value: number){
+		if (value != this.sliderValue){
+			this.sliderValue = value;
+			if (this.isReady){
+				this.ignoreChange = true;
+				jQuery("input", this.elementRef.nativeElement).bootstrapSlider('setValue',value);
+			}
+		}
+	  };
 	@Input() type: string = "horizontal_slider";
     @Input() tick:number;
 	@Input() linkParameters:any;
 	@Input() defaultSizes:DashboardSizes = new DashboardSizes();
-	@Output() kerviValueChange = new EventEmitter();
+	@Input() maxValue:number;
+	@Input() minValue:number;
+	@Output() sliderChanged = new EventEmitter();
 	private moveDelayTimer = null;
 	private inSlide:boolean=false;
 
@@ -38,8 +51,8 @@ export class SliderComponent implements OnInit {
 			
 			jQuery('input', self.elementRef.nativeElement).bootstrapSlider({
 				tooltip: "hide",
-				min:self.value.minValue,
-				max:self.value.maxValue,
+				min:self.minValue,
+				max:self.maxValue,
 				step:self.tick,
 				orientation: self.type == "horizontal_slider" ? "horizontal" : "vertical"
 			});
@@ -47,8 +60,9 @@ export class SliderComponent implements OnInit {
 			jQuery('.slider', self.elementRef.nativeElement).on("change",function(e,x){
 				
 				console.log("slsv", e, x);
-				if (e.value.newValue)
-					self.value.set(e.value.newValue);
+				if (e.value.newValue && !self.ignoreChange)
+					self.sliderChanged.emit(e.value.newValue);
+				self.ignoreChange = false;
 			});
 
 			jQuery('.slider', self.elementRef.nativeElement).on("slideStart",function(e){
@@ -58,18 +72,12 @@ export class SliderComponent implements OnInit {
 			jQuery('.slider', self.elementRef.nativeElement).on("slideStop",function(e){
 				self.inSlide=false;
 			});
+			self.isReady = true;
 			
-			self.value.value$.subscribe(function (v) {
-				console.log("sv", v, self.inSlide);
-				if (v && !self.inSlide) {
-					jQuery("input", self.elementRef.nativeElement).bootstrapSlider('setValue',v);
-					//jQuery(".slider-value", self.elementRef.nativeElement).html(e.value.newValue);
-				}
-			});
 		},0);
 	}
 
 	step(v){
-		this.value.set(this.value.value$.value + v);
+		this.sliderChanged.emit(this.sliderValue +v);
 	}
 }

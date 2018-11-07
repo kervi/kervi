@@ -1,7 +1,7 @@
 // Copyright (c) 2016, Tim Wentzlau
 // Licensed under MIT
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { DashboardSizes } from 'kervi-js';
 import { BehaviorSubject } from 'rxjs';
 
@@ -13,14 +13,13 @@ declare var jQuery:any;
 })
 
 export class ButtonComponent implements OnInit {
-  @Input() value: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  @Input() value: Boolean = null;
   @Input() linkParameters: any = null;
   @Input() type: string;
-  //@Input() size:number;
   @Input() inline:boolean = false;
   @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
-  //@Input() parent:any;
   @Input() title:string;
+  @Output() buttonState = new EventEmitter();
   public width:string;
   public height:string;
   
@@ -28,9 +27,6 @@ export class ButtonComponent implements OnInit {
   }
  
   ngOnInit() {
-
-
-
     var self = this; 
     if (self.linkParameters){
       
@@ -51,13 +47,10 @@ export class ButtonComponent implements OnInit {
   }
 
   public press() {
-    console.log("x")
-    //this.parent.press();
-    //this.kerviService.spine.sendCommand(this.value.command, true);
+    this.buttonState.emit(true);
   }
 
   public release() {
-    //this.parent.release();
-    //this.kerviService.spine.sendCommand(this.value.command, false);
+    this.buttonState.emit(false);
   }
 }
