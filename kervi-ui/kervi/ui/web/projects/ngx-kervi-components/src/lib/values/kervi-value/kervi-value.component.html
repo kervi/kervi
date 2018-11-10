@@ -1,17 +1,5 @@
     <kervi-value-number *ngIf="value.typeName=='Number'" [value]="value" [dashboardSizes]="dashboardSizes" [linkParameters]="linkParameters" [inline]="inline" ></kervi-value-number>
     <kervi-value-boolean *ngIf="value.typeName=='Boolean'" [dashboardSizes]="dashboardSizes" [linkParameters]="linkParameters" [inline]="inline" [value]="value"></kervi-value-boolean>
-    <!-- <ng-template ngSwitchCase="boolean-value">
-        <kervi-value-boolean [defaultSizes]="defaultSizes" [linkParameters]="parameters" [dashboardSection]="dashboardSection" [inline]="inline" [value]="value"></kervi-value-boolean>
-    </ng-template>
-    <ng-template ngSwitchCase="string-value">
-        <kervi-value-string [defaultSizes]="defaultSizes" [linkParameters]="parameters" [dashboardSection]="dashboardSection" [inline]="inline" [value]="value"></kervi-value-string>
-    </ng-template>
-    <ng-template ngSwitchCase="enum-value">
-        <kervi-value-enum [defaultSizes]="defaultSizes" [linkParameters]="parameters" [dashboardSection]="dashboardSection" [inline]="inline" [value]="value"></kervi-value-enum>
-    </ng-template>
-    <ng-template ngSwitchCase="datetime-value">
-        <kervi-value-datetime [defaultSizes]="defaultSizes" [linkParameters]="parameters" [dashboardSection]="dashboardSection" [inline]="inline" [value]="value"></kervi-value-datetime>
-    </ng-template>
-    <ng-template ngSwitchCase="color-value">
-        <kervi-value-color [defaultSizes]="defaultSizes" [linkParameters]="parameters" [dashboardSection]="dashboardSection" [inline]="inline" [value]="value"></kervi-value-color>
-    </ng-template> -->
+    <kervi-value-string *ngIf="value.typeName=='String'" [dashboardSizes]="dashboardSizes" [linkParameters]="linkParameters" [inline]="inline" [value]="value"></kervi-value-string>
+    <kervi-value-color *ngIf="value.typeName=='Color'" [dashboardSizes]="dashboardSizes" [linkParameters]="linkParameters" [inline]="inline" [value]="value"></kervi-value-color>
+    <kervi-value-datetime *ngIf="value.typeName=='DateTime'" [dashboardSizes]="dashboardSizes" [linkParameters]="linkParameters" [inline]="inline" [value]="value"></kervi-value-datetime>

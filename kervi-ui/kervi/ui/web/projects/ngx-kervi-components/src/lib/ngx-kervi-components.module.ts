@@ -6,22 +6,28 @@ import { ControllerPadComponent } from './controller-pad/controller-pad.componen
 import { CamViewerComponent } from './cam-viewer/cam-viewer.component';
 import { DashboardPanelComponent } from './dashboard-panel/dashboard-panel.component';
 import {  ValuesModule } from './values/values.module'
+import { ActionComponent } from './action/action.component';
+import { UIComponentsModule} from './ui-components/ui-components.module'
+
 @NgModule({
   imports: [
     NgxKerviModule,
     NGXKerviPipesModule,
     BrowserModule,
     ValuesModule,
+    UIComponentsModule
   ],
   declarations: [
     WidgetComponent,
     ControllerPadComponent,
     CamViewerComponent,
     DashboardPanelComponent,
-    
+    ActionComponent
   ],
   exports: [
-    DashboardPanelComponent
+    DashboardPanelComponent,
+    ControllerPadComponent,
+    CamViewerComponent
   ]
 })
 export class NgxKerviComponentsModule { }

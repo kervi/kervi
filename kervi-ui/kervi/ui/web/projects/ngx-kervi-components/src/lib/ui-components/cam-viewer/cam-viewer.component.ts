@@ -18,8 +18,8 @@ declare var jQuery: any;
 export class CamViewerComponent implements OnInit {
   @Input() cameraId: string = null;
   @Input() isBackground: boolean = false;
-  @Input() parameters:any = null;
-  @Input() defaultSizes:DashboardSizes = new DashboardSizes();
+  @Input() linkParameters:any = null;
+  @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
   camera$: BehaviorSubject<ControllerModel> = new BehaviorSubject<ControllerModel>(null);
   cameraSource$: BehaviorSubject<string> = new BehaviorSubject<string>("");
   cameraName$: BehaviorSubject<string> = new BehaviorSubject<string>("");

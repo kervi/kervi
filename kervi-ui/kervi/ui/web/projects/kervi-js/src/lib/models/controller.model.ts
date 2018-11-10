@@ -2,10 +2,8 @@
 // Licensed under MIT
 import { IComponent, DashboardLink } from "./IComponent.model"
 import { ComponentRef } from "./ComponentRef"
-//import { BehaviorSubject } from 'rxjs';
-//import { ControllersFactory } from './factory' 
 
-export class ControllerModel implements IComponent {
+export class Controller implements IComponent {
     public type: string;
     public visible: boolean;
     public componentType="controller"

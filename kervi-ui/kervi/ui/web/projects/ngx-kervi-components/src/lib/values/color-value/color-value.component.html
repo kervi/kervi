@@ -1,1 +1,1 @@
-<kervi-color [value]="value" [linkParameters]="linkParameters" ></kervi-color>
+<kervi-color [color]="(value.value$ | async)" (colorChange)="setKerviValue($event)" [linkParameters]="linkParameters" ></kervi-color>

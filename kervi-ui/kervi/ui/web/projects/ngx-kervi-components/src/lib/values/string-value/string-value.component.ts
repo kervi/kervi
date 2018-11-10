@@ -25,7 +25,8 @@ export class StringComponent extends KerviStringComponent implements OnInit {
 	}
 
 	onChange(event){
-		console.log("evv",event);
-		this.value.set(event);
+		var v = jQuery("input", this.elementRef.nativeElement).val();
+		console.log("evv", v, event);
+		this.value.set(v);
 	}
 }

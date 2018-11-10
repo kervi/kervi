@@ -20,7 +20,7 @@ export class KerviStringComponent extends KerviValueComponent<StringValue> {
 		this.value.set(value);
 	}
 
-	ngOnInitString() {
+	public ngOnInitString() {
 		this.ngOnInitValue();
 		var self = this;
 		
@@ -29,9 +29,6 @@ export class KerviStringComponent extends KerviValueComponent<StringValue> {
 		}
 		
 		if (!this.inline && this.linkParameters.inline){
-			this.inline = true;
-		}else if (!this.inline && this.linkParameters.size > 0)
-		{
 			this.inline = true;
 		}
 	}

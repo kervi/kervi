@@ -10,7 +10,9 @@ import { AppInjector } from '../app-injector.service';
 	template: ''
 })
 export class KerviWidgetComponent   {
-	@Input() componentId:string=null;
+	@Input() set componentId(v:string){
+		this.component = this.kerviService.getComponent(this.componentId);
+	}
 	@Input() component:IComponent = null;
 	@Input() dashboardPanel: DashboardPanel;
 	@Input() linkParameters:any;
@@ -27,15 +29,14 @@ export class KerviWidgetComponent   {
 	}
 
 	ngOnInitWidget() {
-		if (this.component== null && this.componentId)
-			this.component = this.kerviService.getComponent(this.componentId);
+			
 		if (!this.linkParameters)
               this.linkParameters = this.component.ui;
     
         if (!this.inline && this.linkParameters.inline){
             this.inline = true;
 		}
-		console.log("widget", this.component, this.linkParameters);
+		//console.log("widget", this.component, this.linkParameters);
 		if (this.linkParameters.type){
 			if (this.linkParameters.type.indexOf("gauge") > -1 ){
 				this.widgetType = "gauge";

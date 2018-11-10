@@ -10,21 +10,22 @@ import { AppInjector } from '../app-injector.service';
 	template: ''
 })
 export class KerviValueComponent<T extends KerviValue>   {
-	@Input() valueId:string=null;
+	@Input() set valueId(v:string){
+		this.value = this.kerviService.getComponent(this.valueId) as T;
+	}
 	@Input() value:T = null;
-	@Input() dashboardPanel: DashboardPanel;
+	
+	//@Input() dashboardPanel: DashboardPanel;
 	@Input() linkParameters:any;
 	@Input() dashboardSizes:DashboardSizes = new DashboardSizes();
 	@Input() inline:boolean;
-	private kerviService: NGXKerviService;
+	protected kerviService: NGXKerviService;
 	constructor() { 
 		//console.log("cnio",this);
 		this.kerviService = AppInjector.get(NGXKerviService);  
 	}
 
 	ngOnInitValue() {
-		if (this.value== null && this.valueId)
-			this.value = this.kerviService.getComponent(this.valueId) as T;
 		if (!this.linkParameters)
       		this.linkParameters = this.value.ui;
 	}

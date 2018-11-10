@@ -10,13 +10,13 @@ import { SliderComponent } from './slider/slider.component';
 import { SwitchButtonComponent} from './switch-button/switch-button.component';
 import { ButtonComponent} from './button/button.component';
 //import { CamViewerComponent } from './cam-viewer/cam-viewer.component';
-//import { MPEGViewerComponent } from './mpeg-viewer/mpeg-viewer.component';
+import { MPEGViewerComponent } from './mpeg-viewer/mpeg-viewer.component';
 //import { ImageViewerComponent } from './image-viewer/image-viewer.component'; 
 //import { ActionComponent } from './action/action.component';
-//import { DateTimeComponent } from './datetimepicker/datetimepicker.component';
+import { DateTimeComponent } from './datetimepicker/datetimepicker.component';
 import { IconsComponent } from './icons/icons.component';
 //import { NgxGaugeModule } from 'ngx-gauge';
-//import { ColorComponent } from './color/color.component';
+import { ColorComponent } from './color/color.component';
 
 @NgModule({
   declarations: [
@@ -28,24 +28,25 @@ import { IconsComponent } from './icons/icons.component';
     SwitchButtonComponent,
     ButtonComponent,
     //CamViewerComponent,
-    //MPEGViewerComponent,
+    MPEGViewerComponent,
     //ImageViewerComponent,
     //ActionComponent,
-    //DateTimeComponent,
-    //ColorComponent
+    DateTimeComponent,
+    ColorComponent
   ],
   exports:[
       SparklineComponent,
       SliderComponent,
       IconsComponent,
+      MPEGViewerComponent,
       //GaugeComponent,
       //ChartComponent,
       SwitchButtonComponent,
       ButtonComponent,
       //CamViewerComponent,
       //ActionComponent,
-      //DateTimeComponent,
-      //ColorComponent
+      DateTimeComponent,
+      ColorComponent
   ],
   imports: [
     BrowserModule,

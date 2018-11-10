@@ -2,33 +2,25 @@
 // Licensed under MIT
 
 import { Component, Input, OnInit, ElementRef } from '@angular/core';
-import { DynamicColorModel } from '../../models/dynamicValues.model';
-import { KerviService } from '../../kervi.service'
-import { TemplateService } from '../../template.service'
-import { DashboardSectionModel, DashboardSizes } from '../../models/dashboard.model'
+import { KerviColorComponent } from 'ngx-kervi'
 
 @Component({
-	selector: 'dynamic-value-color',
+	selector: 'kervi-value-color',
 	templateUrl: './color-value.component.html',
 	styleUrls: ['./color-value.component.scss']
-	//directives: [ CommonModule  ],
 })
-export class DynamicColorComponent implements OnInit {
-	@Input() value: DynamicColorModel;
-	@Input() dashboardSection: DashboardSectionModel;
-	@Input() parameters:any;
-	@Input() inline:boolean = false;
-	@Input() defaultSizes:DashboardSizes = new DashboardSizes();
-	private size:number = 0;
-	private unitSize:number=150;
+export class ColorComponent extends KerviColorComponent implements OnInit {
 	
-	displayType:string="button";
-	
-	constructor(private kerviService: KerviService, private elementRef: ElementRef, private templateService:TemplateService) { 
+	constructor() { 
+		super();
 		//console.log("cnio",this);
 	}
 
+
+	setValue(v){
+		console.log(v);
+	}
 	ngOnInit() {
-		
+		this.ngOnInitColor();
 	}
 }

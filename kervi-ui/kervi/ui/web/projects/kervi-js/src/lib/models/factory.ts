@@ -1,6 +1,6 @@
 
 import  * as KerviValues from './KerviValues.model'
-import { ControllerModel } from './controller.model'
+import { Controller } from './controller.model'
 import { Dashboard } from './dashboard.model'
 import { Action } from './action.model'
 import { IComponent } from './IComponent.model';
@@ -32,7 +32,7 @@ export class ComponentFactory{
                 component = new Dashboard(message);
                 dashboards.push(component);
             } else if (message.componentType=="controller")
-                component = new ControllerModel(message);
+                component = new Controller(message);
             else if (message.componentType == "boolean-value")
                 component = new KerviValues.BooleanValue(message, kerviService);
             else if (message.componentType == "number-value")
