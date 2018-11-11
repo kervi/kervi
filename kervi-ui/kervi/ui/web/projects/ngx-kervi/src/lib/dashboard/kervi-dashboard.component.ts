@@ -1,12 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Dashboard, DashboardSizes } from 'kervi-js';
+import { Dashboard, DashboardSizes, NumberValue } from 'kervi-js';
 import { NGXKerviService } from '../ngx-kervi.service';
 import { AppInjector } from '../app-injector.service'
 @Component({
   selector: 'kervi-dashboard',
   template: ''
 })
-export class KerviDashboardComponent implements OnInit {
+export class KerviDashboardComponent {
   protected dashboard:Dashboard = null;
   protected kerviService:NGXKerviService;
   protected dashboards:Dashboard[] = null;
@@ -18,7 +18,15 @@ export class KerviDashboardComponent implements OnInit {
   protected cameraId: string = null;
   protected cameraParameters:any = null;
   
+  protected showLeftPad:boolean = false;
+  protected leftPadXValue:NumberValue = null;
+  protected leftPadYValue:NumberValue = null;
+  protected autoCenterLeftPad:boolean = false;
   
+  protected showRightPad:boolean = false;
+  protected rightPadXValue:NumberValue = null;
+  protected rightPadYValue:NumberValue = null;
+  protected autoCenterRightPad:boolean = false;
 
   private inFullScreen:boolean = false; 
   constructor() {
@@ -41,12 +49,41 @@ export class KerviDashboardComponent implements OnInit {
         console.log("cam", this.cameraId, this.cameraParameters);
       }
     }
+
+    if (this.dashboard.LeftPadXPanel && this.dashboard.LeftPadXPanel.components.length || this.dashboard.LeftPadYPanel && this.dashboard.LeftPadYPanel.components.length){
+      this.showLeftPad = true;
+      if (this.dashboard.LeftPadXPanel.components.length){
+        this.leftPadXValue=this.dashboard.LeftPadXPanel.components[0].component as NumberValue;
+        if (this.dashboard.LeftPadXPanel.components[0].parameters.padAutoCenter)
+          this.autoCenterLeftPad = true;
+      }
+      if (this.dashboard.LeftPadYPanel.components.length){
+        this.leftPadYValue=this.dashboard.LeftPadYPanel.components[0].component as NumberValue;
+        if (this.dashboard.LeftPadXPanel.components[0].parameters.padAutoCenter)
+          this.autoCenterLeftPad = true;
+      }
+    }
+
+    if (this.dashboard.RightPadXPanel && this.dashboard.RightPadXPanel.components.length || this.dashboard.RightPadYPanel && this.dashboard.RightPadYPanel.components.length){
+      this.showRightPad = true;
+      if (this.dashboard.RightPadXPanel.components.length){
+        this.rightPadXValue=this.dashboard.RightPadXPanel.components[0].component as NumberValue;
+        if (this.dashboard.LeftPadXPanel.components[0].parameters.padAutoCenter)
+          this.autoCenterRightPad = true;
+      }
+      if (this.dashboard.RightPadYPanel.components.length){
+        this.rightPadYValue=this.dashboard.RightPadYPanel.components[0].component as NumberValue;
+        if (this.dashboard.RightPadXPanel.components[0].parameters.padAutoCenter)
+          this.autoCenterRightPad = true;
+      }
+    }
+
+
+
     console.log("db", dashboardId, this.dashboard);
   }
 
-  ngOnInit() {
-    
-  }
+  
 
   toggleFullScreen() {
     var doc:any;

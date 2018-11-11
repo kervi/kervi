@@ -10,7 +10,7 @@ export * from './lib/models/action.model';
 export * from './lib/models/IComponent.model';
 export * from './lib/models/controller.model';
 
-export { KerviValue } from './lib/models/KerviValues.model';
+export { KerviValue, ValueRange, ValueRangeType } from './lib/models/KerviValues.model';
 
 
 export * from './lib/kervi-js.service';

@@ -32,7 +32,7 @@ export class ComponentFactory{
                 component = new Dashboard(message);
                 dashboards.push(component);
             } else if (message.componentType=="controller")
-                component = new Controller(message);
+                component = new Controller(message, kerviService);
             else if (message.componentType == "boolean-value")
                 component = new KerviValues.BooleanValue(message, kerviService);
             else if (message.componentType == "number-value")
@@ -56,6 +56,14 @@ export class ComponentFactory{
             }
         }
         return [result, dashboards];    
+    }
+
+    public static FixControllerReferences(components:IComponent[]){
+        for(let component of components){
+            var controller = component as Controller;
+            if (controller && controller.componentType=="controller")
+                controller.updateReferences();
+        }
     }
 
     private static linkToDashboards(components:IComponent[], dashboards:Dashboard[]){

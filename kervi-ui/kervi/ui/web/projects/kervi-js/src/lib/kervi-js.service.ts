@@ -257,6 +257,7 @@ export class KerviBaseService {
         self.application$.next(appInfo);
         self.texts = appInfo.display.texts;
         self.components = ComponentFactory.createComponents(message, self);
+        ComponentFactory.FixControllerReferences(self.getComponentsByType("controller"));
         self.components$.next(self.components);
         self.connectionState$.next(ConnectionState.connected);
         console.log("components",self.components); 

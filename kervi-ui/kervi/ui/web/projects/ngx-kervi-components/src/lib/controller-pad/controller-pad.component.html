@@ -1,4 +1,6 @@
-  <fieldset id="leftPad" style="position:absolute" class="pad" [attr.data-width]="padSize" [attr.data-height]="padSize">
+<div (mousedown)="padPress()" (mouseup)="padRelease()">
+  <fieldset id="leftPad" style="position:absolute" class="pad" [attr.data-width]="padSize" [attr.data-height]="padSize" >
     <legend></legend>
-    <input type="hidden" id="left-pad-x" name="left-x" value="0"><input type="hidden" id="left-pad-y" name="left-y" value="0">
+    <input type="hidden" name="pad-x" value="0"><input type="hidden"  name="pad-y" value="0">
   </fieldset>
+</div>

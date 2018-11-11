@@ -1,11 +1,11 @@
 <ng-container *ngIf="isBackground">
-	<div id="video-viewer" class="video video-background" style="text-align:center;position:fixed;top:60px;left:0px;height:100%;" [style.height.px]="camHeight" [style.width.px]="camWidth">
+	<div #videoViewer id="video-viewer" class="video video-background" style="text-align:center;position:fixed;top:60px;left:0px;height:100%;" [style.height.px]="camHeight" [style.width.px]="camWidth">
 		<span class="camImage" style="top:0px;left:0px;">
 			<kervi-mpeg-viewer (imageLoaded)="imageLoaded()" [height]=100   [cameraSource]="cameraSource" > </kervi-mpeg-viewer>
 		</span>
 		<canvas id="camCanvas" style="position:absolute;top:0px;left:0px;" [style.height.px]="camHeight" [style.width.px]="camWidth"></canvas>
 		<canvas id="poiCanvas" style="position:absolute;top:0px;left:0px;width:100%;height:100%"></canvas>
-		<div class="cam-pad-area" style="position:fixed;z-index: 2000; display:none">
+		<div class="cam-pad-area" *ngIf="showCamPad" [style.left.px]="camPadLeft" [style.top.px]="camPadTop" style="position:absolute;z-index: 2000">
       <kervi-controller-pad [XValue]="pan" [YValue]="tilt"> </kervi-controller-pad>
 		</div>
 		<div style="position:absolute;top:30px;left:0px;width:100%;height:50px">
@@ -20,13 +20,13 @@
 </ng-container>
 
 <ng-container *ngIf="!isBackground">
-	<div id="video-viewer" class="video" style="overflow:hidden;position:relative;width:100%">
+	<div #videoViewer id="video-viewer" class="video" style="overflow:hidden;position:relative;width:100%">
 		<span class="camImage" style="top:0px;left:0px;height:100%;width:100%">
 			<kervi-mpeg-viewer (imageLoaded)="imageLoaded()" [width]=100  [cameraSource]="cameraSource" > </kervi-mpeg-viewer>
 		</span>
 		<canvas id="camCanvas" style="position:absolute;top:0px;left:0px;width:100%;height:100%"></canvas>
 		<canvas id="poiCanvas" style="position:absolute;top:0px;left:0px;width:100%;height:100%"></canvas>
-		<div class="cam-pad-area" style="position:absolute">
+		<div class="cam-pad-area" *ngIf="showCamPad" [style.left.px]="camPadLeft" [style.top.px]="camPadTop" style="position:absolute">
       <kervi-controller-pad [XValue]="pan" [YValue]="tilt"> </kervi-controller-pad>
 		</div>
 	</div>

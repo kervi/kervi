@@ -58,23 +58,23 @@ export abstract class KerviValueType<valueType> extends KerviValue{
 }
 
 
-export enum DynamicRangeType {normal, warning, error};
+export enum ValueRangeType {normal, warning, error};
 
-export class DynamicRange{
+export class ValueRange{
     
     public start:number = null;
     public end:number = null;
-    public type:DynamicRangeType = null;
+    public type:ValueRangeType = null;
 
     constructor(range:any){
         this.start = range["start"];
         this.end = range["end"]
         if (range["type"] == "warning")
-            this.type = DynamicRangeType.warning;
+            this.type = ValueRangeType.warning;
         else if (range["type"] == "error")
-            this.type = DynamicRangeType.error;
+            this.type = ValueRangeType.error;
         else
-            this.type = DynamicRangeType.normal;
+            this.type = ValueRangeType.normal;
     }
 }
 
@@ -148,7 +148,7 @@ export class NumberValue extends KerviValueType<number> {
     public maxValue: number;
     public minValue: number;
     public sparkline$: BehaviorSubject<number[]> = new BehaviorSubject<number[]>([]);
-    public ranges: DynamicRange[] = [];
+    public ranges: ValueRange[] = [];
 
     protected getDefaultValue():number{
         return 0;
@@ -173,9 +173,9 @@ export class NumberValue extends KerviValueType<number> {
                 range["start"] = q.to(this.qtyUnitTo).scalar
                 var q = new Qty(range["end"], this.qtyUnitFrom);
                 range["end"] = q.to(this.qtyUnitTo).scalar
-                this.ranges.push(new DynamicRange(range));
+                this.ranges.push(new ValueRange(range));
             } else
-                this.ranges.push(new DynamicRange(range));
+                this.ranges.push(new ValueRange(range));
         }
         
         if (this.qtyUnitTo && message.maxValue){

@@ -2,6 +2,7 @@
 // Licensed under MIT
 import { IComponent, DashboardLink } from "./IComponent.model"
 import { ComponentRef } from "./ComponentRef"
+import { KerviBaseService } from '../kervi-js.service'
 
 export class Controller implements IComponent {
     public type: string;
@@ -19,8 +20,10 @@ export class Controller implements IComponent {
     public actionsReferences: ComponentRef[] = [];
     public dashboards: DashboardLink[]=[];
     public template:string;
+    private kerviService:KerviBaseService
 
-    constructor(message: any) {
+    constructor(message: any, kerviService:KerviBaseService) {
+        this.kerviService = kerviService;
         this.id = message.id;
         this.name = message.name;
         this.type = message.type;
@@ -45,7 +48,29 @@ export class Controller implements IComponent {
         }
     }
 
-    updateReferences(){};
+    updateReferences(){
+        if (this.inputs.length==0){
+            for(var ref of this.inputReferences){
+                var component = this.kerviService.getComponent(ref.id)
+                if (component)
+                    this.inputs.push(component)
+            }
+        }
+        if (this.outputs.length==0){
+            for(var ref of this.outputReferences){
+                var component = this.kerviService.getComponent(ref.id)
+                if (component)
+                    this.outputs.push(component)
+            }
+        }
+        if (this.actions.length==0){
+            for(var ref of this.actionsReferences){
+                var component = this.kerviService.getComponent(ref.id)
+                if (component)
+                    this.actions.push(component)
+            }
+        }
+    };
     removeReferences(components:IComponent[]){};
     reload(component:IComponent){};
 }

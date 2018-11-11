@@ -4,8 +4,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NGXKerviPipesModule  } from 'ngx-kervi'
 import { SparklineComponent } from './sparkline/sparkline.component';
 import { SliderComponent } from './slider/slider.component';
-//import { GaugeComponent } from './gauge/gauge.component';
-//import { ChartComponent } from './chart/chart.component'
+import { GaugeComponent } from './gauge/gauge.component';
+import { ChartComponent } from './chart/chart.component'
 //import { CommonModule } from '@angular/common';
 import { SwitchButtonComponent} from './switch-button/switch-button.component';
 import { ButtonComponent} from './button/button.component';
@@ -15,7 +15,7 @@ import { MPEGViewerComponent } from './mpeg-viewer/mpeg-viewer.component';
 //import { ActionComponent } from './action/action.component';
 import { DateTimeComponent } from './datetimepicker/datetimepicker.component';
 import { IconsComponent } from './icons/icons.component';
-//import { NgxGaugeModule } from 'ngx-gauge';
+import { NgxGaugeModule } from 'ngx-gauge';
 import { ColorComponent } from './color/color.component';
 
 @NgModule({
@@ -23,8 +23,8 @@ import { ColorComponent } from './color/color.component';
     SparklineComponent,
     SliderComponent,
     IconsComponent,
-    //GaugeComponent,
-    //ChartComponent,
+    GaugeComponent,
+    ChartComponent,
     SwitchButtonComponent,
     ButtonComponent,
     //CamViewerComponent,
@@ -39,8 +39,8 @@ import { ColorComponent } from './color/color.component';
       SliderComponent,
       IconsComponent,
       MPEGViewerComponent,
-      //GaugeComponent,
-      //ChartComponent,
+      GaugeComponent,
+      ChartComponent,
       SwitchButtonComponent,
       ButtonComponent,
       //CamViewerComponent,
@@ -52,7 +52,7 @@ import { ColorComponent } from './color/color.component';
     BrowserModule,
     NGXKerviPipesModule,
     CommonModule,
-    //NgxGaugeModule,
+    NgxGaugeModule,
     //KerviPipesModule
   ],
   providers: [],

@@ -1,9 +1,9 @@
 <div style="width:100%;height:100%">
-    <div class="row" *ngIf="parameters.chartButtons || parameters.label">
-        <div class="col-sm-6" *ngIf="parameters.label">
-            {{parameters.label}}
+    <div class="row" *ngIf="linkParameters.chartButtons || linkParameters.label">
+        <div class="col-sm-6" *ngIf="linkParameters.label">
+            {{linkParameters.label}}
         </div>
-        <div class="col-sm-6 text-right" *ngIf="parameters.chartButtons=='top'">
+        <div class="col-sm-6 text-right" *ngIf="linkParameters.chartButtons=='top'">
             <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                 <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-chevron-left" aria-hidden="true" (click) = "movePeriod(-1)"></i></button>
                 <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-chevron-right" aria-hidden="true" (click) = "movePeriod(1)"></i></button>
@@ -31,7 +31,7 @@
         <canvas id="{{canvasId}}" class="sensor-canvas"></canvas>
     </div>
     <div class="row">
-        <div class="col-sm-6 text-right" *ngIf="parameters.chartButtons && parameters.chartButtons!='top'">
+        <div class="col-sm-6 text-right" *ngIf="linkParameters.chartButtons && linkParameters.chartButtons!='top'">
             <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                 <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-chevron-left" aria-hidden="true" (click) = "movePeriod(-1)"></i></button>
                 <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-chevron-right" aria-hidden="true" (click) = "movePeriod(1)"></i></button>

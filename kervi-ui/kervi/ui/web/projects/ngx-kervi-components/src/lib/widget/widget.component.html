@@ -23,12 +23,15 @@
         </div>
     </div>
 </ng-container>    
+<ng-container *ngIf="widgetType=='camera'" class="block-component" >
+    <kervi-cam-viewer [isBackground]="false" [camera]="component" [linkParameters]="linkParameters"></kervi-cam-viewer>
+</ng-container>
     
     
 <ng-container *ngIf="widgetType=='gauge'" class="block-component" >
-    <!-- <kervi-gauge [defaultSizes]="defaultSizes" [value]="input" [linkParameters]="linkParameters" [type]="gaugeType" [size]="size"></kervi-gauge> -->
+    <kervi-gauge [dashboardSizes]="dashboardSizes" [value]="component" [linkParameters]="linkParameters"></kervi-gauge>
 </ng-container>
 
 <ng-container *ngIf="widgetType=='chart'" class="" >
-    <!-- <kervi-chart [defaultSizes]="defaultSizes" [value]="input" [linkParameters]="linkParameters" [size]="size" ></kervi-chart> -->
+    <kervi-chart [dashboardSizes]="dashboardSizes" [value]="component" [linkParameters]="linkParameters" ></kervi-chart>
 </ng-container>

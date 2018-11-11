@@ -3,7 +3,7 @@
  */
 
 export * from './lib/ngx-kervi.service';
-export * from './lib/ngx-kervi-template.service'
+export { KerviTemplateService } from './lib/ngx-kervi-template.service'
 export { ConnectionState, DashboardSizes } from "kervi-js"
 export { KerviDashboardComponent } from './lib/dashboard/kervi-dashboard.component'
 export { KerviDashboardPanelComponent } from './lib/dashboard/kervi-dashboard-panel.component'

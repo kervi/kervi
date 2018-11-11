@@ -31,9 +31,11 @@
 
 	
 	<kervi-cam-viewer *ngIf="cameraId" [isBackground]="true" [cameraId]="cameraId" [linkParameters]="cameraParameters"></kervi-cam-viewer>
-	<div id="controller-pads">
-    <kervi-controller-pad></kervi-controller-pad>
-    <kervi-controller-pad></kervi-controller-pad>
+	<div #leftPad class="controller-pad" *ngIf="showLeftPad" [style.left.px]="leftPadLeft" [style.top.px]="leftPadTop" style="position:absolute;z-index: 2000">
+    	<kervi-controller-pad [autoCenter]="autoCenterLeftPad" [XValue]="leftPadXValue" [YValue]="leftPadYValue"></kervi-controller-pad>
+	</div>
+	<div #rightPad class="controller-pad" *ngIf="showRightPad" [style.left.px]="rightPadLeft" [style.top.px]="rightPadTop" style="position:absolute;z-index: 2000">
+    	<kervi-controller-pad [autoCenter]="autoCenterRightPad" [XValue]="rightPadXValue" [YValue]="rightPadYValue"></kervi-controller-pad>
 	</div>
 	<div class="container-fluid" style="top:0;padding-top:10px;z-index:1999;position:absolute;padding-bottom:30px;" >
 		<ng-container *ngIf="isAppEmpty">

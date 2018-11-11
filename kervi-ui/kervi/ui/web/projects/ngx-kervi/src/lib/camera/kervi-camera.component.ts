@@ -22,7 +22,7 @@ export class KerviCameraComponent {
     @Input() set camera(v:Controller){
         console.log("setcam", v);
         this.cam = v;
-        for(var i of v.inputs){
+        for(var i of v.outputs){
         if (i.id.endsWith(".pan"))
             this.pan=i as NumberValue;
         else if (i.id.endsWith(".tilt"))

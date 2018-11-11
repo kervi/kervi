@@ -2,10 +2,8 @@
 // Licensed under MIT
 
 import { Component, OnInit, Input, ElementRef, ChangeDetectionStrategy } from '@angular/core';
-import { DynamicNumberModel, DynamicRange, DynamicRangeType  } from '../../models/dynamicValues.model';
-import { DashboardSectionModel, DashboardSizes } from '../../models/dashboard.model';
-import { KerviService } from '../../kervi.service';
-import { TemplateService } from '../../template.service';
+import { DashboardSizes, NumberValue, ValueRange, ValueRangeType } from 'kervi-js';
+import { KerviTemplateService } from 'ngx-kervi';
 declare var LinearGauge:any;
 declare var RadialGauge:any;
 declare var jQuery:any;
@@ -17,18 +15,17 @@ declare var jQuery:any;
 })
 
 export class GaugeComponent implements OnInit {
-  @Input() value: DynamicNumberModel = null;
-  @Input() parameters: any = null;
+  @Input() value: NumberValue = null;
+  @Input() linkParameters: any = null;
   @Input() type: string = "radial_gauge";
-  @Input() size:number;
-  @Input() defaultSizes:DashboardSizes = new DashboardSizes();
-  private  unitSize:number = 110;
-  private numberFormat = "1.2-2";
+  @Input() dashboardSizes: DashboardSizes;
+  protected  unitSize:number = 110;
+  public numberFormat = "1.2-2";
   canvasId:string="";
   dataHighlights:any={};
   private gauge:any=null;
   private gaugeTypes:string[]=['radial_gauge','vertical_linear_gauge', 'horizontal_linear_gauge', 'compass']
-  constructor(private kerviService:KerviService, private elementRef:ElementRef, private templateService:TemplateService ) {  
+  constructor(private elementRef:ElementRef, private templateService:KerviTemplateService ) {  
   }
 
   private color(style,selector){
@@ -41,7 +38,7 @@ export class GaugeComponent implements OnInit {
     var self = this;  
    
 
-    this.numberFormat = this.parameters.minIntegerDigits + "." + this.parameters.minFractionDigits + "-" + this.parameters.maxFractionDigits
+    this.numberFormat = this.linkParameters.minIntegerDigits + "." + this.linkParameters.minFractionDigits + "-" + this.linkParameters.maxFractionDigits
 			
     this.canvasId=this.templateService.makeId();
     
@@ -53,9 +50,9 @@ export class GaugeComponent implements OnInit {
     
     this.dataHighlights[self.value.minValue]={color:normalColor}
     for(var range of self.value.ranges){
-      if (range.type == DynamicRangeType.error)
+      if (range.type == ValueRangeType.error)
         this.dataHighlights[range.start]={color: fatalColor};
-      else if (range.type == DynamicRangeType.warning)
+      else if (range.type == ValueRangeType.warning)
         this.dataHighlights[range.start]={color:warningColor};
       else
         this.dataHighlights[range.start]={color:normalColor};
@@ -72,7 +69,7 @@ export class GaugeComponent implements OnInit {
           renderTo: self.canvasId,
           value:self.value.value$.value,
           units: self.value.unit,
-          title: self.parameters.label,
+          title: self.linkParameters.label,
           minValue: self.value.minValue,
           maxValue: self.value.maxValue,
           highlights: this.dataHighlights,

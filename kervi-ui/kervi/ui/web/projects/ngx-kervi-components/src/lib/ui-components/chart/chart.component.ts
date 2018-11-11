@@ -1,36 +1,33 @@
 // Copyright (c) 2016, Tim Wentzlau
 // Licensed under MIT
 
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
-import { DynamicNumberModel, DynamicRange, DynamicRangeType  } from '../../models/dynamicValues.model';
-import { DashboardSectionModel, DashboardSizes } from '../../models/dashboard.model';
-import { KerviService } from '../../kervi.service';
-import { TemplateService } from '../../template.service';
+import { Component, OnInit, Input } from '@angular/core';
+import { NumberValue, DashboardSizes   } from 'kervi-js';
+import { NGXKerviService, KerviTemplateService } from 'ngx-kervi';
 declare var jQuery:any;
 declare var Chart:any;
 @Component({
   selector: 'kervi-chart',
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class ChartComponent implements OnInit {
-  @Input() value: DynamicNumberModel = null;
-  @Input() parameters: any = null;
+  @Input() value: NumberValue = null;
+  @Input() linkParameters: any = null;
   @Input() type: string;
   @Input() size:number;
-  @Input() defaultSizes:DashboardSizes = new DashboardSizes();
+  @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
   private  unitSize:number = 150;
   canvasId:string="";
   private chart:any=null;
   private chartData = [];
-  selectedPeriodText:string = "Hourx";
+  selectedPeriodText:string = "Hour";
   selectedPeriod:string = "hour";
   periodStart: Date = null;
   periodEnd: Date = null;
   updateChart:boolean = true;
-  constructor(private kerviService:KerviService, private templateService:TemplateService ) {  
+  constructor(private kerviService:NGXKerviService, private templateService:KerviTemplateService ) {  
   }
 
   private color(style,selector){
@@ -41,7 +38,7 @@ export class ChartComponent implements OnInit {
 
   ngOnInit() {
     var self = this;
-    this.setSelectedPeriodText(self.parameters.chartInterval);
+    this.setSelectedPeriodText(self.linkParameters.chartInterval);
     this.canvasId=this.templateService.makeId();
       
       this.value.value$.subscribe(function(v){
@@ -76,11 +73,11 @@ export class ChartComponent implements OnInit {
             datasets: [
               {
                 data: self.chartData,
-                fill: self.parameters.chartFill,
+                fill: self.linkParameters.chartFill,
                 //lineTension: 0.5,
                 //borderColor: self.color("border-color",".sensor-chart"),
                 pointBorderWidth: 1,
-                pointRadius: self.parameters.chartPoint,
+                pointRadius: self.linkParameters.chartPoint,
                 //backgroundColor: "rgba(75,192,192,0.1)",
                 borderColor: "rgba(0,0,0,0.1)",
                 borderWidth:3
@@ -152,7 +149,7 @@ export class ChartComponent implements OnInit {
                   display:true,
                   stepSize: 120,
                 },
-                display: self.parameters.chartGrid,
+                display: self.linkParameters.chartGrid,
                 scaleLabel: {
                   display: true,
                   //labelString: 'Date'
@@ -171,7 +168,7 @@ export class ChartComponent implements OnInit {
                   //color:"rgba(255,255,255,0.5)",
                   zeroLineColor:"rgba(255,255,255,0.5)"
                 },
-                display: self.parameters.chartGrid,
+                display: self.linkParameters.chartGrid,
                 scaleLabel: {
                   display: true,
                   //labelString: 'value'
@@ -182,7 +179,7 @@ export class ChartComponent implements OnInit {
           
         });
         setTimeout(function(){
-          self.selectPeriod(self.parameters.chartInterval);
+          self.selectPeriod(self.linkParameters.chartInterval);
         },0)
 
       }, 0);

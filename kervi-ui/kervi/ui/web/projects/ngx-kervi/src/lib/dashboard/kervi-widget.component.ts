@@ -2,7 +2,7 @@
 // Licensed under MIT
 
 import { Component, Input, ElementRef } from '@angular/core';
-import { IComponent, DashboardPanel, DashboardSizes } from 'kervi-js';
+import { IComponent, DashboardPanel, DashboardSizes, Controller } from 'kervi-js';
 import { NGXKerviService } from '../ngx-kervi.service';
 import { AppInjector } from '../app-injector.service';
 @Component({
@@ -37,7 +37,13 @@ export class KerviWidgetComponent   {
             this.inline = true;
 		}
 		//console.log("widget", this.component, this.linkParameters);
-		if (this.linkParameters.type){
+		if (this.component.componentType == "controller"){
+			var controller = this.component as Controller;
+			console.log("widget ctrl", controller);
+			if (controller.type == "camera")
+				this.widgetType == "camera"
+				
+		} else if (this.linkParameters.type){
 			if (this.linkParameters.type.indexOf("gauge") > -1 ){
 				this.widgetType = "gauge";
 
