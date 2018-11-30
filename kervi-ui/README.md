@@ -8,6 +8,6 @@ This kervi module is included via dependency when you install kervi via pip:
 pip install kervi
 ```
 
-If you want to host the ui part in another web server you can grab the kervi-ui/dist folder an install it on your web server.
+If you want to host the ui part in another web server you can grab the kervi-ui/dist/webapp folder an install it on your web server.
 
 for more information take a look on http://github.com/kervi/kervi
