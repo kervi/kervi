@@ -1,7 +1,7 @@
 
 cd kervi_ui
 cd web
-rem ng build
+rem ng build webApp
 cd ..
 cd ..
 

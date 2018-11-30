@@ -31,7 +31,7 @@ Install Kervi via pip:
 On Raspberry Pi
 
 ```
-sudo pip3 install kervi[rpi]
+sudo pip3 install kervi
 ```
 
 On other systems like windows and linux:
