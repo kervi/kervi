@@ -14,7 +14,7 @@ export class KerviDashboardComponent {
   protected isAppEmpty:boolean = true;
   protected showMenu:boolean = false;
   protected dashboardPanelsHidden:boolean=false;
-  protected showPanelController:boolean;
+  protected showPanelController:boolean = false;
   protected cameraId: string = null;
   protected cameraParameters:any = null;
   
@@ -78,12 +78,8 @@ export class KerviDashboardComponent {
       }
     }
 
-
-
-    console.log("db", dashboardId, this.dashboard);
+    console.log("load db", dashboardId, this.dashboard, this);
   }
-
-  
 
   toggleFullScreen() {
     var doc:any;

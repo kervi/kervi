@@ -1,5 +1,5 @@
-include kervi/ui/web/dist/*.html
-include kervi/ui/web/dist/*.js
+include kervi/ui/web/dist/webApp/*.html
+include kervi/ui/web/dist/webApp/*.js
 include kervi/ui/web/dist/webApp/*.css
 include kervi/ui/web/dist/webApp/*.map
 include kervi/ui/web/dist/webApp/*.ico

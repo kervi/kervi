@@ -14,14 +14,15 @@ import { NgxKerviModule } from 'ngx-kervi';
 import { NGXKerviPipesModule } from 'ngx-kervi'
 import { NgxKerviComponentsModule  } from 'ngx-kervi-components'
 const ROUTES: Routes = [
+  
+  { path: 'connect', component: ConnectComponent },
+  { path: 'authenticate', component: LoginComponent },
+  { path: 'dashboard/:name', component: DashboardComponent },
   {
     path: '',
     redirectTo: '/connect',
     pathMatch: 'full'
-  },
-  { path: 'connect', component: ConnectComponent },
-  { path: 'authenticate', component: LoginComponent },
-  { path: 'dashboard/:name', component: DashboardComponent },
+  }
 ];
 
 @NgModule({
