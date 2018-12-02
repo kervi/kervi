@@ -178,7 +178,7 @@ class _HTTPServer(ThreadingMixIn, HTTPServer):
         self.terminate = False
         self.ws_port = ws_port
         kervipath = os.path.dirname(kervi.ui.__file__)
-        self.docpath = os.path.join(kervipath, "web/dist")
+        self.docpath = os.path.join(kervipath, "web/dist/webApp")
 
     def do_authorize(self):
         return False

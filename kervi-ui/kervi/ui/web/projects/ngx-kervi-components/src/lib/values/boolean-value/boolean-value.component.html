@@ -1,0 +1,5 @@
+<kervi-switchbutton class="pull-right" (buttonState)="changeState($event)" [dashboardSizes]="dashboardSizes" [inline]="inline" [value]="(value.value$ | async)" [linkParameters]="linkParameters" *ngIf="displayType!='button'"></kervi-switchbutton>
+<kervi-button (buttonState)="changeState($event)" [dashboardSizes]="dashboardSizes" [value]="(value.value$ | async)" [inline]="inline" [linkParameters]="linkParameters" *ngIf="displayType=='button'"></kervi-button>
+
+
+

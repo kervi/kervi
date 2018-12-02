@@ -1,0 +1,517 @@
+$white:  #fafff8 !default;
+$gray-100: #f8f9fa !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-600: #868e96 !default;
+$gray-700: #495057 !default;
+$gray-800: #343a40 !default;
+$gray-900: #212529 !default;
+$black:  #000 !default;
+
+$grays: (
+  100: $gray-100,
+  200: $gray-200,
+  300: $gray-300,
+  400: $gray-400,
+  500: $gray-500,
+  600: #5d765d,
+  700: $gray-700,
+  800: $gray-800,
+  900: $gray-900
+) !default;
+
+$blue:    #116611 !default;
+$indigo:  #6610f2 !default;
+$purple:  #6f42c1 !default;
+$pink:    #e83e8c !default;
+$red:     #dc3545 !default;
+$orange:  #fd7e14 !default;
+$yellow:  #ffc107 !default;
+$green:   #28a745 !default;
+$teal:    #20c997 !default;
+$cyan:    #17a2b8 !default;
+
+$colors: (
+  blue: $blue,
+  indigo: $indigo,
+  purple: $purple,
+  pink: $pink,
+  red: $red,
+  orange: $orange,
+  yellow: $yellow,
+  green: $green,
+  teal: $teal,
+  cyan: $cyan,
+  white: $white,
+  gray: $gray-600,
+  gray-dark: $gray-800
+) !default;
+
+
+$theme-colors: (
+  primary: #116611,
+  secondary: $gray-600,
+  success: #5cb85c,
+  info: $cyan,
+  warning: $yellow,
+  danger: $red,
+  light: $gray-100,
+  dark: $gray-800
+) !default;
+
+$sizes: (
+  10: 10%,
+  20: 20%,
+  25: 25%,
+  33: 33%,
+  40: 40%,
+  50: 50%,
+  66: 66%,
+  75: 75%,
+  100: 100%
+) !default;
+
+
+
+$input-group-addon-color:  #fff;
+$input-group-addon-bg:           #116611;// $gray-lighter !default;
+$input-group-addon-border-color: #116611;// !default;
+
+$card-cap-bg:              rgba(6,19,3,.57) !default;
+$card-bg:                  #88cc88 !default;
+$card-border-width: 0px;
+
+$card-link-hover-color:    #fff !default;
+
+$gray-lightest:             #55aa55 !default;
+
+$navbar-light-color:                #55aa55 !default;
+$navbar-light-hover-color:          rgba(0,0,0,.7) !default;
+$navbar-light-active-color:         rgba(0,0,0,.9) !default;
+$navbar-light-disabled-color:       rgba(0,0,0,.3) !default;
+
+$body-bg:    #011001 !default;
+$body-color: #67b16b !default;
+$border-radius-base: .15rem;
+
+html:fullscreen{
+  background-color:#011001 !important;
+}
+.form-group{
+  margin-bottom:0 !important;
+}
+
+.btn{
+  overflow:hidden;
+  font-size:.7rem !important;
+  padding: 0.2rem 0.3rem !important;
+  border:0;
+}
+
+.dropdown-menu{
+  position:absolute !important;
+}
+
+.sparkline-template{
+	color:#004400;
+	background-color:#55aa55;
+	height:16px;
+	width:35px;
+	.spot{
+		color:#116611;
+	}
+}
+
+.sensor-chart{
+	border-color:rgba(85,170,85,1);
+	color:#004400;
+	.spot{
+		color:#ff7f3f;
+		border-color:#116611;
+	}
+}
+
+.text-normal{
+  color:rgba(85, 180, 85, .5);
+}
+
+.number-gauge-template{
+	color: theme-color("primary");
+	border: 1px solid $gray-lightest
+}
+
+.sensor-template{
+	background:rgba(128,128,128,0);
+	color:#ff0000;
+
+  
+
+	.sensor-warning{
+    //color:rgba(255, 166, 24, .5);
+    color:#ffc107; 
+	}
+
+	.sensor-fatal{
+    //color:rgba(255, 35, 46, .5);
+    color:#dc3545;
+	}
+
+	.sensor-major-ticks{
+		color:#f5f5f5;
+	}
+
+	.sensor-minor-ticks{
+		color:#ddd;
+	}
+
+	.sensor-title{
+		color:#fff;
+	}
+
+	.sensor-units{
+		color:#ddd;
+	}
+
+	.sensor-numbers{
+		color:#eee;
+	}
+
+	.sensor-needle-start{
+		color:rgba(240, 128, 128, 1);
+	}
+
+	.sensor-needle-end{
+		color:rgba(255, 160, 122, .9);
+	}
+
+	.sensor-bar{
+		color:#55aa55;
+	}
+
+	.sensor-bar-progress{
+		color:#116611;
+	}
+}
+
+.btn-primary-hover
+{
+	background-color: #0a3a0a !important;
+	border-color: #083208 !important;
+}
+
+.core-sensors{
+  padding-right: 0 !important;
+}
+
+.navbar{
+  padding-right:0 !important;
+}
+
+.navbar-light{
+	a.nav-link{
+		color:#ffffff !important;	
+	}	
+}
+
+.nav-link{
+  padding-left:.5rem !important;
+}
+
+.navbar-nav>li, .navbar-nav {
+  float: left !important;
+  color:#fafff8;
+}
+
+.block-component{
+	border-bottom:1px solid rgba(255,255,255,.4);
+  padding-top:5px;
+  padding-bottom:5px;
+}
+
+dynamic-value:first-child .block-component{
+  padding-top: 0;
+  
+}
+
+kervi-sensor:first-child .block-component{
+  padding-top: 0;
+  
+}
+
+dynamic-value:last-child .block-component{
+  border-bottom:0;
+  padding-bottom: 0;
+  
+}
+
+kervi-sensor:last-child .block-component{
+  border-bottom:0;
+  padding-bottom: 0;
+  
+}
+
+.card-header .block-component{
+	width:100%;
+  clear:both;
+  border:0;
+  padding:0;
+}
+
+.value-label{
+  display: block;
+  white-space: nowrap;
+  padding-right:4px;
+}
+
+.value-section{
+  display: inline-block;
+  width:93%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.label-section{
+  display: block;
+  
+}
+.value-input{
+  display: inline-block;
+  //float:right;
+  width:75%
+}
+
+.value-value{
+  display: inline-block;
+  //float:right;
+  width:25%;
+  text-align: right;
+}
+
+
+.card{
+  margin-left:5px !important;
+  margin-right:5px !important;
+}
+
+.card-non-group{
+  display:inline-block;
+}
+
+.card {
+  height:100%;
+  margin-bottom:10px;
+  .card-header{
+    padding: .5rem 1rem;
+    color:#fff !important;
+  }
+
+  h4{
+    font-size:1.1rem;
+    margin:0;
+  }
+  .card-body{
+    width:100%;
+    color:#fafff8;
+  }
+}
+
+.page-header{
+  position:fixed !important;
+  z-index:2000;
+  top:0;
+  left:0;
+  width:100%;
+  background: #013b05;
+
+  &.row{
+    margin:0;
+  }
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 25px;
+  background-color: #013b05;
+  z-index:2000;
+}
+@import "../../core/core.scss";
+
+
+@media only screen {
+    @import "./components/switch/toggle.scss";
+    @import "./components/slider/slider.scss";
+    $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+    @import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+    @import "~@fortawesome/fontawesome-free/scss/brands.scss";
+    @import "~@fortawesome/fontawesome-free/scss/regular.scss";
+    @import "~@fortawesome/fontawesome-free/scss/solid.scss";
+
+ //   @import "./components/switch/candy";
+  
+}
+
+td {
+  padding:0.25rem !important;
+}
+
+td:first-child{
+  padding:0 !important;
+  vertical-align: middle;
+  .alert{
+    padding:0;
+  }
+}
+
+th{
+  border-top:0 !important;
+  padding-top:0 !important;
+}
+
+
+@include media-breakpoint-up(sm) {
+  .card-deck{
+    margin:inherit;
+    margin-bottom: 10px;
+  }
+
+  .card-deck:last-child{
+    margin-bottom:0;
+  }
+
+  .card-deck-panel{
+    margin-bottom:10px;
+    .card-deck{
+      //display:inline-block;
+    }
+  }
+
+  .card-deck-panel:last-child{
+    margin-bottom:0;
+  }
+
+  
+
+  .card-panel{
+    display: inline-block;
+  }
+
+  .card-deck-equal {
+    display:table;
+    table-layout:fixed;
+    width:100%;
+    margin-bottom:1%;
+  }
+
+  
+
+  .card-deck-equal>.card-panel {
+    display:inline-block;
+    float:none;
+    padding-left:1%;
+    padding-right:1%;
+    min-width:250px;
+  }
+
+  .card-deck-equal>.card-deck-panel {
+    display:inline-block;
+    float:none;
+    padding-left:1%;
+    padding-right:1%;
+    min-width:250px;
+  }
+  
+  
+}
+
+.card-panel{
+  //min-width: 250px;
+  margin-bottom:10px;
+}
+
+.card-panel:last-child{
+  //margin-bottom: 0;
+}
+
+.gauge-width {
+  width: 100% !important;
+  height: unset !important;
+  canvas {
+    width: 80% !important;
+    //height: 100% !important;
+  }
+  .reading-block{
+    line-height: unset !important;
+    font-size:3.5vw !important;
+    margin-top:1vw;
+  }
+  .gauge-unit{
+    font-size:2vw !important;
+    margin-top:-12px;
+  }
+  .reading-label {
+    width: 80% !important;
+    line-height: unset !important;
+    position: absolute;
+    bottom:0;
+    //height: 100% !important;
+  }
+}
+
+@include media-breakpoint-down(sm) {
+
+  .gauge-width{
+    .reading-block{
+      line-height: unset !important;
+      font-size:15vw !important;
+      margin-top:8vw;
+    }
+    .gauge-unit{
+      font-size:12vw !important;
+      margin-top:-30px;
+    } 
+  }
+
+
+  .card-panel{
+    width:100% !important;
+    margin-bottom:10px;
+  }
+  .card-deck-panel{
+    width:100% !important;
+    //margin-bottom:10px;
+    .card-deck{
+      //display:inline-block;
+    }
+  }
+
+  .card {
+    width:100% !important;
+  }
+  
+  .card-deck-equal {
+    display:block;
+    table-layout:fixed;
+    width:100%;
+    
+  }
+
+
+  .card-deck-equal > .card-panel {
+    display:inline-block;
+    width:100% !important;
+    //float:left;
+    padding-left:1%;
+    padding-right:1%;
+    margin-bottom:10px;
+  }
+  
+  .container-fluid{
+		width:100%;
+	}
+	
+}

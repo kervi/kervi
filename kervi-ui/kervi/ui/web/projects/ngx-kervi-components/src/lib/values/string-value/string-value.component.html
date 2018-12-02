@@ -1,0 +1,2 @@
+<input *ngIf="linkParameters.isInput" class="form-control pull-right" (keyup)="onChange($event)" value="{{(value.value$ | async)}}"/>
+<span *ngIf="!linkParameters.isInput" class="form-control pull-right"   >{{(value.value$ | async)}}</span>

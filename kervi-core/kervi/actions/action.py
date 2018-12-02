@@ -455,7 +455,7 @@ class Action(KerviComponent):
             return self._last_result
 
     def interrupt(self, *args, **kwargs):
-        self._send_message("interrupt", **kwargs)
+        self._send_message("interrupted", **kwargs)
         if self._interrupt:
             self._interrupt(*args, **kwargs)
         else:

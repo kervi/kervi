@@ -3,36 +3,42 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "kervi-ui": {
+    "web": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
+      "prefix": "app",
+      "schematics": {},
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist",
+            "outputPath": "dist/web",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.app.json",
             "assets": [
-              "src/assets",
-              "src/favicon.ico"
-              
+              "src/favicon.ico",
+              "src/assets"
             ],
             "styles": [
-              "src/styles/themes/default/default.scss"
+              "./projects/ngx-kervi-components/src/styles/themes/default/default.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "./node_modules",
+                "src/styles"
+              ]
+            },
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
-              "node_modules/tether/dist/js/tether.js",
               "node_modules/popper.js/dist/umd/popper.js",
               "node_modules/bootstrap/dist/js/bootstrap.js",
               "node_modules/bootstrap-slider/dist/bootstrap-slider.js",
               "node_modules/bootstrap-toggle/js/bootstrap-toggle.js",
-              "lib/jquery.sparkline.js",
-              "lib/jquery.kontrol.js",
+              "src/js-lib/jquery.sparkline.js",
+              "src/js-lib/jquery.kontrol.js",
               "node_modules/moment/min/moment-with-locales.js",
               "node_modules/chart.js/dist/Chart.js",
               "node_modules/hammerjs/hammer.js",
@@ -40,16 +46,18 @@
               "node_modules/photoswipe/dist/photoswipe.js",
               "node_modules/photoswipe/dist/photoswipe-ui-default.js",
               "node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js",
-              "node_modules/sockjs-client/dist/sockjs.js",
-              "node_modules/stompjs/lib/stomp.js",
-              "lib/convert-units-bundle.js",
-              "lib/colors.js",
-              "lib/jqColorPicker.js"
-              
+              "src/js-lib/colors.js",
+              "src/js-lib/jqColorPicker.js"
             ]
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -58,64 +66,41 @@
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ]
+              "buildOptimizer": true
             }
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "kervi-ui:build"
+            "browserTarget": "web:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "kervi-ui:build:production"
+              "browserTarget": "web:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "kervi-ui:build"
+            "browserTarget": "web:build"
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
-            "karmaConfig": "./karma.conf.js",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/tether/dist/js/tether.js",
-              "node_modules/popper.js/dist/umd/popper.js",
-              "node_modules/bootstrap/dist/js/bootstrap.js",
-              "node_modules/bootstrap-slider/dist/bootstrap-slider.js",
-              "node_modules/bootstrap-toggle/js/bootstrap-toggle.js",
-              "lib/jquery.sparkline.js",
-              "lib/jquery.kontrol.js",
-              "node_modules/canvas-gauges/gauge.min",
-              "node_modules/moment/min/moment-with-locales.js",
-              "node_modules/chart.js/dist/Chart.js",
-              "node_modules/hammerjs/hammer.js",
-              "node_modules/chartjs-plugin-zoom/chartjs-plugin-zoom.js",
-              "node_modules/photoswipe/dist/photoswipe.js",
-              "node_modules/photoswipe/dist/photoswipe-ui-default.js",
-              "node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js"
-            ],
+            "karmaConfig": "src/karma.conf.js",
             "styles": [
-              "src/styles/themes/default/default.scss"
+              "src/styles.css"
             ],
+            "scripts": [],
             "assets": [
-              "src/assets",
-              "src/favicon.ico"
+              "src/favicon.ico",
+              "src/assets"
             ]
           }
         },
@@ -126,43 +111,535 @@
               "src/tsconfig.app.json",
               "src/tsconfig.spec.json"
             ],
-            "exclude": []
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
     },
-    "kervi-ui-e2e": {
-      "root": "",
-      "sourceRoot": "e2e",
+    "web-e2e": {
+      "root": "e2e/",
       "projectType": "application",
       "architect": {
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
-            "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "kervi-ui:serve"
+            "protractorConfig": "e2e/protractor.conf.js",
+            "devServerTarget": "web:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "web:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "e2e/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "kervi-js": {
+      "root": "projects/kervi-js",
+      "sourceRoot": "projects/kervi-js/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/kervi-js/tsconfig.lib.json",
+            "project": "projects/kervi-js/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "project": "projects/kervi-js/ng-package.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/kervi-js/src/test.ts",
+            "tsConfig": "projects/kervi-js/tsconfig.spec.json",
+            "karmaConfig": "projects/kervi-js/karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "e2e/tsconfig.e2e.json"
+              "projects/kervi-js/tsconfig.lib.json",
+              "projects/kervi-js/tsconfig.spec.json"
             ],
-            "exclude": []
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "ngx-kervi": {
+      "root": "projects/ngx-kervi",
+      "sourceRoot": "projects/ngx-kervi/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ngx-kervi/tsconfig.lib.json",
+            "project": "projects/ngx-kervi/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "project": "projects/ngx-kervi/ng-package.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-kervi/src/test.ts",
+            "tsConfig": "projects/ngx-kervi/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-kervi/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-kervi/tsconfig.lib.json",
+              "projects/ngx-kervi/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "ngx-kervi-components": {
+      "root": "projects/ngx-kervi-components",
+      "sourceRoot": "projects/ngx-kervi-components/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ngx-kervi-components/tsconfig.lib.json",
+            "project": "projects/ngx-kervi-components/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "project": "projects/ngx-kervi-components/ng-package.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-kervi-components/src/test.ts",
+            "tsConfig": "projects/ngx-kervi-components/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-kervi-components/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-kervi-components/tsconfig.lib.json",
+              "projects/ngx-kervi-components/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "mobileApp": {
+      "root": "projects/mobileApp/",
+      "sourceRoot": "projects/mobileApp/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/mobileApp",
+            "index": "projects/mobileApp/src/index.html",
+            "main": "projects/mobileApp/src/main.ts",
+            "polyfills": "projects/mobileApp/src/polyfills.ts",
+            "tsConfig": "projects/mobileApp/tsconfig.app.json",
+            "assets": [
+              "projects/mobileApp/src/favicon.ico",
+              "projects/mobileApp/src/assets"
+            ],
+            "styles": [
+              "projects/mobileApp/src/styles.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/mobileApp/src/environments/environment.ts",
+                  "with": "projects/mobileApp/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "mobileApp:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "mobileApp:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "mobileApp:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/mobileApp/src/test.ts",
+            "polyfills": "projects/mobileApp/src/polyfills.ts",
+            "tsConfig": "projects/mobileApp/tsconfig.spec.json",
+            "karmaConfig": "projects/mobileApp/karma.conf.js",
+            "styles": [
+              "projects/mobileApp/src/styles.css"
+            ],
+            "scripts": [],
+            "assets": [
+              "projects/mobileApp/src/favicon.ico",
+              "projects/mobileApp/src/assets"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/mobileApp/tsconfig.app.json",
+              "projects/mobileApp/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "mobileApp-e2e": {
+      "root": "projects/mobileApp-e2e/",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/mobileApp-e2e/protractor.conf.js",
+            "devServerTarget": "mobileApp:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "mobileApp:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "projects/mobileApp-e2e/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "webApp": {
+      "root": "projects/webApp/",
+      "sourceRoot": "projects/webApp/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/webApp",
+            "index": "projects/webApp/src/index.html",
+            "main": "projects/webApp/src/main.ts",
+            "polyfills": "projects/webApp/src/polyfills.ts",
+            "tsConfig": "projects/webApp/tsconfig.app.json",
+            "assets": [
+              "projects/webApp/src/favicon.ico",
+              "projects/webApp/src/assets"
+            ],
+            "styles": [
+              "./projects/ngx-kervi-components/src/styles/themes/default/default.scss"
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/popper.js/dist/umd/popper.js",
+              "node_modules/bootstrap/dist/js/bootstrap.js",
+              "node_modules/bootstrap-slider/dist/bootstrap-slider.js",
+              "node_modules/bootstrap-toggle/js/bootstrap-toggle.js",
+              "js-lib/jquery.sparkline.js",
+              "js-lib/jquery.kontrol.js",
+              "node_modules/moment/min/moment-with-locales.js",
+              "node_modules/chart.js/dist/Chart.js",
+              "node_modules/hammerjs/hammer.js",
+              "node_modules/chartjs-plugin-zoom/chartjs-plugin-zoom.js",
+              "node_modules/photoswipe/dist/photoswipe.js",
+              "node_modules/photoswipe/dist/photoswipe-ui-default.js",
+              "node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js",
+              "js-lib/colors.js",
+              "js-lib/jqColorPicker.js"
+
+            ]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/webApp/src/environments/environment.ts",
+                  "with": "projects/webApp/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "webApp:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "webApp:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "webApp:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/webApp/src/test.ts",
+            "polyfills": "projects/webApp/src/polyfills.ts",
+            "tsConfig": "projects/webApp/tsconfig.spec.json",
+            "karmaConfig": "projects/webApp/karma.conf.js",
+            "styles": [
+              "projects/webApp/src/styles.css"
+            ],
+            "scripts": [],
+            "assets": [
+              "projects/webApp/src/favicon.ico",
+              "projects/webApp/src/assets"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/webApp/tsconfig.app.json",
+              "projects/webApp/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "webApp-e2e": {
+      "root": "projects/webApp-e2e/",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/webApp-e2e/protractor.conf.js",
+            "devServerTarget": "webApp:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "webApp:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "projects/webApp-e2e/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "IOApp": {
+      "root": "projects/IOApp/",
+      "sourceRoot": "projects/IOApp/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/IOApp",
+            "index": "projects/IOApp/src/index.html",
+            "main": "projects/IOApp/src/main.ts",
+            "polyfills": "projects/IOApp/src/polyfills.ts",
+            "tsConfig": "projects/IOApp/tsconfig.app.json",
+            "assets": [
+              "projects/IOApp/src/favicon.ico",
+              "projects/IOApp/src/assets"
+            ],
+            "styles": [
+              "projects/IOApp/src/styles.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/IOApp/src/environments/environment.ts",
+                  "with": "projects/IOApp/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "IOApp:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "IOApp:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "IOApp:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/IOApp/src/test.ts",
+            "polyfills": "projects/IOApp/src/polyfills.ts",
+            "tsConfig": "projects/IOApp/tsconfig.spec.json",
+            "karmaConfig": "projects/IOApp/karma.conf.js",
+            "styles": [
+              "projects/IOApp/src/styles.css"
+            ],
+            "scripts": [],
+            "assets": [
+              "projects/IOApp/src/favicon.ico",
+              "projects/IOApp/src/assets"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/IOApp/tsconfig.app.json",
+              "projects/IOApp/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "IOApp-e2e": {
+      "root": "projects/IOApp-e2e/",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/IOApp-e2e/protractor.conf.js",
+            "devServerTarget": "IOApp:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "IOApp:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "projects/IOApp-e2e/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
     }
   },
-  "defaultProject": "kervi-ui",
-  "schematics": {
-    "@schematics/angular:component": {
-      "prefix": "app",
-      "styleext": "scss"
-    },
-    "@schematics/angular:directive": {
-      "prefix": "app"
-    }
-  }
+  "defaultProject": "web"
 }

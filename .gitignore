@@ -8,7 +8,9 @@ top_level.txt
 /roboSys.log
 /robosys.db
 dist
-kervi-ui/node_modules
+/kervi-ui/kervi/ui/web/node_modules
+/kervi-ui/kervi/ui/web/projects/ngx-kervi-components/node_modules
+kervi-ui/web/node_modules
 _build
 .cache
 test_application.db
@@ -18,3 +20,4 @@ test_application_mem.db
 kervi_ui.egg-info
 setup.cfg
 kervi-core/kervi_core.egg-info/PKG-INFO
+node_modules
