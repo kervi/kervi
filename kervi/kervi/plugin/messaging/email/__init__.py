@@ -74,3 +74,6 @@ class EmailPlugin(MessagePlugin):
        
 def init_plugin(config, manager):
     return EmailPlugin(config, manager)
+
+def plugin_type():
+    return "messaging"

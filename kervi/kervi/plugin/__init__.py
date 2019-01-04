@@ -5,7 +5,7 @@ class KerviPlugin(object):
         self._name = name
         self._config = config
         self._manager = manager
-
+    
     @property
     def manager(self):
         return self._manager
@@ -17,3 +17,9 @@ class KerviPlugin(object):
     @property
     def name(self):
         return self._name
+
+    def process_step(self):
+        pass
+
+    def terminate_process(self):
+        pass

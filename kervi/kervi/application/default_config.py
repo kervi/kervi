@@ -29,32 +29,34 @@ def get_default_config():
             "ipc_root_address": nethelper.get_ip_address()
         },
         "plugins":{
-            "authentication": {
-                "kervi.plugin.authentication.plain": False
+            "kervi.plugin.authentication.plain": False,
+            "kervi.plugin.storage.sqlite_temp": {
+                "enabled": True,
+                "name": None
             },
-            "storage":{
-                "kervi.plugin.storage.sqlite_temp": {
-                    "enabled": True,
-                    "name": None
-                },
-                "kervi.plugin.storage.sqlite": {
-                    "enabled": True,
-                    "name": None
+            "kervi.plugin.storage.sqlite": {
+                "enabled": True,
+                "name": None
+            },
+            "kervi.plugin.messaging.email": {
+                "enabled": False,
+                "smtp": {
+                    "sender_name": "Kervi",
+                    "sender_address": "kervi@example.com",
+                    "server": "localhost",
+                    "port": "25",
+                    "user": "",
+                    "password": "",
+                    "tls": False
                 }
             },
-            "messaging":{
-                "kervi.plugin.messaging.email": {
-                    "enabled": False,
-                    "smtp": {
-                        "sender_name": "Kervi",
-                        "sender_address": "kervi@example.com",
-                        "server": "localhost",
-                        "port": "25",
-                        "user": "",
-                        "password": "",
-                        "tls": False
-                    }
-                }
+            "kervi.plugin.routing.kervi_io":{
+                "enabled": False,
+                "address": "mq.kervi.io",
+                "port": 5671,
+                "api_user": "",
+                "api_password": "",
+                "api_channel": ""
             }
         },
         "plain_users": {

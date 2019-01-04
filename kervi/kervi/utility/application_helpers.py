@@ -150,7 +150,15 @@ class _KerviPluginProcess(process._KerviProcess):
 
     def init_process(self, **kwargs):
         plugin_section = kwargs.pop("plugin_section", None)
-        print("load plugins in: ", plugin_section)
+        from kervi.plugin.plugin_manager import PluginManager
+        #print("load plugins in: ", plugin_section)
+        
+        self.manager = PluginManager(self.config, plugin_section)
+        self.spine.trigger_event(
+            "moduleLoaded",
+            self.name,
+        )
+        
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
         spine = _ZMQSpine()
@@ -158,23 +166,18 @@ class _KerviPluginProcess(process._KerviProcess):
         return spine
     
     def process_step(self):
-        pass
+        self.manager.process_step()
  
     def terminate_process(self):
-        pass
+        self.manager.terminate_process()
 
-def load_plugins(config, module_port):
-    for plugin_section in config.plugins.keys:
-        print(plugin_section)
-        if len(config.plugins[plugin_section].keys) > 0:
-            module_port += 1
-            process._start_process(
-                "plugin-" + config.application.id + plugin_section,
-                plugin_section,
-                config,
-                nethelper.get_free_port([module_port]),
-                _KerviPluginProcess,
-                plugin_section="plugin_section"
-            )
-
-
+def load_plugin_section(config, module_port, plugin_section):
+    print(plugin_section)
+    process._start_process(
+        "plugin-" + config.application.id + plugin_section,
+        "plugins_" + plugin_section,
+        config,
+        nethelper.get_free_port([module_port]),
+        _KerviPluginProcess,
+        plugin_section=plugin_section
+    )

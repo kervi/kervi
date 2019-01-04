@@ -30,7 +30,7 @@ class StoragePlugin(KerviPlugin):
     def __init__(self, name, config, manager):
         KerviPlugin.__init__(self, name, config, manager)
         self._spine = Spine()
-
+    
     @property
     def storage_type(self):
         return "persisted"

@@ -39,6 +39,12 @@ export class KerviDashboardComponent {
     this.dashboards = this.kerviService.getComponentsByType("dashboard");
     this.isAppEmpty = this.kerviService.isAppEmpty();
     this.showMenu = (this.dashboards.length > 1 || this.kerviService.doAuthenticate);
+    this.showPanelController=false;
+    this.cameraId = null;
+    this.cameraParameters = null;
+    this.showLeftPad = false;
+    this.showRightPad = false;
+    this.dashboardPanelsHidden=false;
     if (this.dashboard.backgroundPanel){
       if (this.dashboard.backgroundPanel.components.length > 0)
       {
@@ -47,9 +53,8 @@ export class KerviDashboardComponent {
         this.cameraId=this.dashboard.backgroundPanel.components[0].component.id;
         this.cameraParameters=this.dashboard.backgroundPanel.components[0].parameters;
         console.log("cam", this.cameraId, this.cameraParameters);
-      }
+      } 
     }
-
     if (this.dashboard.LeftPadXPanel && this.dashboard.LeftPadXPanel.components.length || this.dashboard.LeftPadYPanel && this.dashboard.LeftPadYPanel.components.length){
       this.showLeftPad = true;
       if (this.dashboard.LeftPadXPanel.components.length){

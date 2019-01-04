@@ -44,3 +44,6 @@ class PlainAuthenticationPlugin(AuthenticationPlugin):
 
 def init_plugin(config, manager):
     return PlainAuthenticationPlugin(config, manager)
+
+def plugin_type():
+    return "authentication"

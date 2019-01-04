@@ -288,6 +288,39 @@ class ZMQBus():
         self._event_lock = threading.Lock()
         self._query_lock = threading.Lock()
 
+        self.register_query_handler("GetRoutingInfo", self._get_routing_info)
+
+    def _get_routing_info(self):
+        result = []
+        ignore_topics = [
+            "GetRoutingInfo", 
+            "ping", 
+            "terminateProcess", 
+            "getProcessInfo", 
+            "processReady", 
+            "appReady", 
+            "authorizationAllowAnonymousUser",
+            "authorizationValidSessionHeader",
+            "authorizationRemoveSession",
+            "startWebSocket",
+            "stopThreads"
+        ]
+        for tag  in self._handlers.get_list_names():
+            #print("t", tag)
+            tag_info = tag.split(":")
+            tag_id = None
+            if len(tag_info) == 3:
+                tag_id = tag_info[2]
+            
+            if not tag_info[1] in ignore_topics:
+                result.append({
+                    "id": tag_id,
+                    "direction": "in",
+                    "topic_type": tag_info[0],
+                    "topic": tag_info[1]
+                })
+        return result
+    
     def _add_linked_handler(self, func, **kwargs):
         groups = kwargs.get("groups", None)
         scopes = kwargs.get("scopes", [])

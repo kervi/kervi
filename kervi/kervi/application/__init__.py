@@ -33,17 +33,11 @@ if sys.version_info[0] < 3:
     print("Kervi requires Python 3")
     exit()
 
-#from kervi.application.kervi_module import KerviModule
-#import kervi.core.utility.process as process
-#import kervi.spine as spine
-#from kervi.utility.process_spine import _ProcessSpine
-#import kervi.kervi_logging as logging
 import kervi.utility.nethelper as nethelper
-#import kervi.utility.encryption as encryption
 from kervi.controllers import Controller
 from kervi.actions import action
 from kervi.application.default_config import get_default_config
-
+from kervi.application.kervi_module import KerviModule
 import signal
 
 _app_running = True
@@ -193,8 +187,6 @@ class Application(object):
             exit()
 
         
-        #if settings:
-        #    self.settings = app_helpers._deep_update(self.settings, settings)
         #self._validateSettings()
         self.started = False
         import kervi.spine as spine
@@ -203,8 +195,6 @@ class Application(object):
         self.config.network.ipc_root_port = nethelper.get_free_port([self.config.network.ipc_root_port])
         self.spine._init_spine("kervi-main", self.config.network.ipc_root_port, None, self.config.network.ipc_root_address)
         spine.set_spine(self.spine)
-        #process._start_root_spine(self.config, True, _ZMQSpine)
-        #spine._init_spine("application-" + self.settings["info"]["id"])
         self.spine = spine.Spine()
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
@@ -217,8 +207,6 @@ class Application(object):
         self._kervi_modules = []
         self._kervi_modules_lock = threading.Lock()
 
-        #from kervi.utility.storage import init_db
-        #init_db(script_name)
         from kervi.storage.storage_manager import StorageManager
         self._authentication = StorageManager()
         
@@ -362,6 +350,13 @@ class Application(object):
                     app_helpers._KerviModuleLoader
                 )
             ]
+
+        self._process_info_lock.acquire()
+        self._process_info += [{"id":"plugins_routing", "ready":False}]
+        self._process_info_lock.release()
+        module_port += 1
+        app_helpers.load_plugin_section(self.config, module_port, "routing")
+        #app_helpers.load_plugin_section(self.config, module_port, "general")
 
         # if self.config.routing.kervi_io.enabled:
         #     module_port += 1

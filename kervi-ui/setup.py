@@ -23,6 +23,7 @@ setup(
     url='https://github.com/kervi/kervi-ui',
     download_url='https://github.com/wentzlau/kervi-ui/archive/v1.0-alpha.tar.gz',
     keywords=['ui', 'robotic', 'automation'],
-    classifiers=[]
+    classifiers=[],
+    include_package_data=True
     
 )

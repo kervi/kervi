@@ -297,22 +297,12 @@ class Module(object):
                 )
             ]
 
-        if not self.config.module.app_connection_local and self.config.routing.kervi_io.enabled:
-            print("x")
-            module_port += 1
-            self._process_info_lock.acquire()
-            self._process_info = [{"id":"kervi_io", "ready":False}]
-            self._process_info_lock.release()
-
-            self._module_processes += [
-                process._start_process(
-                    "module-routing" + self.config.module.id,
-                    "kervi_io",
-                    self.config,
-                    nethelper.get_free_port([module_port]),
-                    app_helpers._KerviIORouterProcess
-                )
-            ]
+        self._process_info_lock.acquire()
+        self._process_info += [{"id":"plugins_routing", "ready":False}]
+        self._process_info_lock.release()
+        module_port += 1
+        app_helpers.load_plugin_section(self.config, module_port, "routing")
+        
             #time.sleep(1)
         while not self._is_ready():
             time.sleep(1)
