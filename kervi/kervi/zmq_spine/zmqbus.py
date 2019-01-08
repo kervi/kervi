@@ -175,6 +175,9 @@ class ZMQMessageThread(threading.Thread):
     def register(self, tag):
         self._socket.setsockopt_string(zmq.SUBSCRIBE, tag)
 
+    def unregister(self, tag):
+        self._socket.setsockopt_string(zmq.UNSUBSCRIBE, tag)
+
     def stop(self):
         self._terminate = True
 
@@ -339,6 +342,15 @@ class ZMQBus():
         argspec = inspect.getargspec(func)
         self._handlers.add(tag, (func, groups, scopes, argspec.keywords != None))
 
+    
+    def _unregister_handler(self, tag, func, **kwargs):
+        groups = kwargs.get("groups", None)
+        scopes = kwargs.get("scopes", [])
+
+        argspec = inspect.getargspec(func)
+        self._handlers.remove(tag, (func, groups, scopes, argspec.keywords != None))
+
+    
     def get_handler_info(self):
         return self._handlers.get_list_names()
 
@@ -702,6 +714,12 @@ class ZMQBus():
         self._command_handler.register(tag)
         self._message_handler.register(tag)
 
+    def unregister_command_handler(self, command, func, **kwargs):
+        tag = "command:"+command
+        self._unregister_handler(tag, func, **kwargs)
+        self._command_handler.unregister(tag)
+        self._message_handler.unregister(tag)
+
     def trigger_event(self, event, id, *args, **kwargs):
         injected = kwargs.pop("injected", "")
         scope = kwargs.pop("scope", None)
@@ -733,18 +751,25 @@ class ZMQBus():
         if not local_only:
             for connection in self._connections:
                 connection.send_package(package)
-                #if event=="userLogMessage":
-                #    print("tcwum", connection.address)
 
     def register_event_handler(self, event, func, component_id=None, **kwargs):
         tag = "event:"+event +":"
-        #tag_id = id
         if component_id:
             tag +=  component_id
         if func:
             self._register_handler(tag, func, **kwargs)
         self._event_handler.register(tag)
         self._message_handler.register(tag)
+
+    def unregister_event_handler(self, event, func, component_id=None, **kwargs):
+        tag = "event:"+event +":"
+        if component_id:
+            tag +=  component_id
+        
+        if func:
+            self._unregister_handler(tag, func, **kwargs)
+        self._event_handler.unregister(tag)
+        self._message_handler.unregister(tag)
 
     def resolve_response(self, message):
         #print("m", message)
@@ -849,3 +874,6 @@ class ZMQBus():
 
     def register_query_handler(self, query, func, **kwargs):
         self._register_handler("query:"+query, func, **kwargs)
+
+    def unregister_query_handler(self, query, func, **kwargs):
+        self._unregister_handler("query:"+query, func, **kwargs)

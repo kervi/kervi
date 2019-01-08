@@ -172,7 +172,7 @@ class _KerviPluginProcess(process._KerviProcess):
         self.manager.terminate_process()
 
 def load_plugin_section(config, module_port, plugin_section):
-    print(plugin_section)
+    #print(plugin_section)
     process._start_process(
         "plugin-" + config.application.id + plugin_section,
         "plugins_" + plugin_section,

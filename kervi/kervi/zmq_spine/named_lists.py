@@ -25,12 +25,16 @@ class NamedLists(object):
     def __init__(self):
         self.data = {}
 
-    def add(self, list_name, object):
+    def add(self, list_name, obj):
         if list_name in self.data:
-            self.data[list_name] += [object]
+            self.data[list_name] += [obj]
         else:
-            self.data[list_name] = [object]
+            self.data[list_name] = [obj]
 
+    def remove(self, list_name, obj):
+        if list_name in self.data:
+            self.data[list_name].remove(obj)
+    
     def get_list_names(self):
         result = []
         for key in self.data:

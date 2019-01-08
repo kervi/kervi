@@ -280,15 +280,17 @@ export class KerviBaseService {
       this.IPCReady$.next(true);
       this.spine.addEventHandler("moduleStarted","",function(){
           console.log("module loaded",self.components); 
-          setTimeout(self.refreshComponents, 2000); 
+          setTimeout(function(){
+            self.getComponentInfo(2)
+          }
+          , 2000); 
       });           
       
       this.spine.addEventHandler("moduleStopped","",function(){
           console.log("module unloaded"); 
           setTimeout(function() {
             console.log("module unloaded, refresh");
-          
-            self.refreshComponents()
+            self.getComponentInfo(2);
         }, 5000);           
       });
     }
