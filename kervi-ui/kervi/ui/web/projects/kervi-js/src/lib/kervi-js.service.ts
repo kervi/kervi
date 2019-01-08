@@ -26,12 +26,14 @@ export class KerviBaseService {
   public connectionState$: BehaviorSubject<ConnectionState> = new  BehaviorSubject<ConnectionState>(ConnectionState.disconnected);
   public  application$: BehaviorSubject<any>;
   public doAuthenticate: boolean = false;
+  public componentsChanged$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   //public inAuthentication$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   private logMessages:DashboardMessageModel[] = [];
   private logMessages$: BehaviorSubject<DashboardMessageModel[]> = new  BehaviorSubject<DashboardMessageModel[]>([]);
   
   IPCReady$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   authenticationFailed$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
+  
 
 
   constructor() 
@@ -91,17 +93,17 @@ export class KerviBaseService {
 
   }
 
-  private refreshComponents(){
-    var self=this;
-    self.spine.sendQuery("getComponentInfo",function(message){
-    console.log("refresh component info",message);
-    self.components = []
-    self.components$.next([]);
-    self.components = ComponentFactory.createComponents(message, this);
-    console.log("refresh components",self.components);
-    self.components$.next(self.components);
-    });
-  }
+  // private refreshComponents(){
+  //   var self=this;
+  //   self.spine.sendQuery("getComponentInfo",function(message){
+  //   console.log("refresh component info",message);
+  //   self.components = []
+  //   self.components$.next([]);
+  //   self.components = ComponentFactory.createComponents(message, this);
+  //   console.log("refresh components",self.components);
+  //   self.components$.next(self.components);
+  //   });
+  // }
 
   public text(key:string, defaultValue:string=""):string{
     //  console.log("t", key, this.texts);
@@ -248,7 +250,7 @@ export class KerviBaseService {
     this.connectionState$.next(ConnectionState.disconnected);
   }
 
-  private getComponentInfo(retryCount){
+  private getComponentInfo(retryCount, module_load){
     var self = this;
     this.spine.sendQuery("GetApplicationInfo",function(appInfo){
       console.log("appinfo",appInfo);
@@ -260,12 +262,14 @@ export class KerviBaseService {
         ComponentFactory.FixControllerReferences(self.getComponentsByType("controller"));
         self.components$.next(self.components);
         self.connectionState$.next(ConnectionState.connected);
+        if (module_load)
+          self.componentsChanged$.next(true)
         console.log("components",self.components); 
       },
       function(){
         console.log("get component info timeout");
         if (retryCount>0)
-          self.getComponentInfo(retryCount-1)
+          self.getComponentInfo(retryCount-1, module_load)
       });  
 	  });
   }
@@ -275,13 +279,13 @@ export class KerviBaseService {
     var self=this;
     this.connectionState$.next(ConnectionState.loading);
     this.doAuthenticate = this.spine.doAuthenticate;
-    this.getComponentInfo(2)
+    this.getComponentInfo(2, false)
     if (self.spine.firstOnOpen){
       this.IPCReady$.next(true);
       this.spine.addEventHandler("moduleStarted","",function(){
           console.log("module loaded",self.components); 
           setTimeout(function(){
-            self.getComponentInfo(2)
+            self.getComponentInfo(2, true)
           }
           , 2000); 
       });           
@@ -290,7 +294,7 @@ export class KerviBaseService {
           console.log("module unloaded"); 
           setTimeout(function() {
             console.log("module unloaded, refresh");
-            self.getComponentInfo(2);
+            self.getComponentInfo(2, true);
         }, 5000);           
       });
     }

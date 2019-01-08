@@ -7,6 +7,7 @@ import { AppInjector } from '../app-injector.service'
   template: ''
 })
 export class KerviDashboardComponent {
+  private dashboardId:string=null;
   protected dashboard:Dashboard = null;
   protected kerviService:NGXKerviService;
   protected dashboards:Dashboard[] = null;
@@ -31,10 +32,17 @@ export class KerviDashboardComponent {
   private inFullScreen:boolean = false; 
   constructor() {
     this.kerviService = AppInjector.get(NGXKerviService);
+    var self = this;
+    this.kerviService.componentsChanged$.subscribe(function(){
+      var dashboard = self.kerviService.getComponent(self.dashboardId, "dashboard") as Dashboard
+      if (dashboard)
+        self.loadDashboard(self.dashboardId);
+    })
     
    }
 
   protected loadDashboard(dashboardId:string){
+    this.dashboardId = dashboardId;
     this.dashboard = this.kerviService.getComponent(dashboardId, "dashboard") as Dashboard;
     this.dashboards = this.kerviService.getComponentsByType("dashboard");
     this.isAppEmpty = this.kerviService.isAppEmpty();
