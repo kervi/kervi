@@ -69,6 +69,10 @@ class SQLiteStoragePlugin(StoragePlugin):
         self._db_lock = threading.Lock()
         self._ts_start = datetime.utcnow()
         
+    def get_default_config(self):
+        return {
+            "name": None    
+        }
     
     def _init_db(self):
         cursor = self._connection.cursor()

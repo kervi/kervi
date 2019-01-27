@@ -7,6 +7,7 @@ import json
 
 class KerviAppDiscovery(threading.Thread):
 	def __init__(self, ip, port, discovery_port, app_id, challenge, app_name, web_address):
+		print("d", ip, port, discovery_port)
 		threading.Thread.__init__(self, None, None, "Kervi App discovery")
 		self.deamon = True
 		self._terminate = False

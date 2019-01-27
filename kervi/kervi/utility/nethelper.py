@@ -54,7 +54,7 @@ def is_port_free(port):
     _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
-        _socket.bind(("127.0.0.1", port))
+        _socket.bind((get_ip_address(), port))
     except socket.error:
         return False
 

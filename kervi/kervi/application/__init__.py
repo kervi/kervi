@@ -38,6 +38,7 @@ from kervi.controllers import Controller
 from kervi.actions import action
 from kervi.application.default_config import get_default_config
 from kervi.application.kervi_module import KerviModule
+from kervi.plugin.plugin_manager import PluginManager
 import signal
 
 _app_running = True
@@ -319,9 +320,14 @@ class Application(object):
         self.spine.send_command("startThreads", local_only=True)
         time.sleep(.5)
         module_port = self.config.network.ipc_root_port
-
+        pluginManager = PluginManager(self.config)
         self._process_info_lock.acquire()
         self._process_info = [{"id":"IPC", "ready":False}]
+        plugin_modules = pluginManager.prepare_load()
+        for plugin_module in plugin_modules:
+            self._process_info.append(
+                {"id":plugin_module, "ready": False}
+            )
         self._process_info_lock.release()
 
         module_port += 1
@@ -334,6 +340,8 @@ class Application(object):
                 app_helpers._KerviSocketIPC
             )
         ]
+
+        module_port = pluginManager.load_plugins(module_port+1)
 
         for module in self.config.modules:
             self._process_info_lock.acquire()
@@ -351,11 +359,11 @@ class Application(object):
                 )
             ]
 
-        self._process_info_lock.acquire()
-        self._process_info += [{"id":"plugins_routing", "ready":False}]
-        self._process_info_lock.release()
-        module_port += 1
-        app_helpers.load_plugin_section(self.config, module_port, "routing")
+        #self._process_info_lock.acquire()
+        #self._process_info += [{"id":"plugins_routing", "ready":False}]
+        #self._process_info_lock.release()
+        #module_port += 1
+        #app_helpers.load_plugin_section(self.config, module_port, "routing")
         #app_helpers.load_plugin_section(self.config, module_port, "general")
 
         # if self.config.routing.kervi_io.enabled:
@@ -382,14 +390,14 @@ class Application(object):
         if platform.system() != "Windows":
             print("\033[92mYour Kervi application is ready at http://" + self.config.network.ip + ":" + str(self.config.network.http_port) + "\033[0m")
         else:
-            print("Your Kervi application is ready at http://" + self.config.network.ip + ":" + str(self.config.network.http_port))
+            print("Your Kervi application is ready at http://" + self.config.network.ip + ":")# + str(self.config.network.http_port))
         print("Press ctrl + c to stop your application")
-        import kervi.ui.webserver as webserver
-        webserver.start(
-            self.config.network.ip,
-            self.config.network.http_port,
-            self.config.network.ws_port
-        )
+        # import kervi.ui.webserver as webserver
+        # webserver.start(
+        #     self.config.network.ip,
+        #     self.config.network.http_port,
+        #     self.config.network.ws_port
+        # )
         self.spine.trigger_event(
             "appReady",
             self.config.application.id
@@ -433,7 +441,7 @@ class Application(object):
         self.spine.send_command("kervi_action_app_exit")
         import kervi.ui.webserver as webserver
         
-        webserver.stop()
+        #webserver.stop()
         print("stopping processes")
         import kervi.core.utility.process as process
         process._stop_processes("app-" + self.config.application.id)

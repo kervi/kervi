@@ -34,6 +34,9 @@ class _MQConsumer(threading.Thread):
                 
                 channel = self._connection._connection.channel()
                 self._channel = channel
+                
+                channel.exchange.declare(self._exchange, exchange_type="fanout", durable=False, auto_delete=True)
+                
                 channel.queue.declare(
                     self._queue,
                     auto_delete=True,
@@ -192,6 +195,7 @@ class _MQConnection(object):
                 self._connection = UriConnection(
                     connection_string
                 )
+
                 #self._connection = Connection(self._address, self._user, self._password, port=self._port, vhost=self._vhost)
                 break
             except amqpstorm.AMQPError as why:
@@ -208,6 +212,7 @@ class _MQConnection(object):
                 break
             
         if self._connection:
+            
             self._consumer = _MQConsumer(self)
             self._consumer.start()
             self._publisher = _MQPublisher(self)

@@ -14,14 +14,12 @@ class MessageManager(Controller):
         self.spine.register_command_handler("messageManagerSend", self.send_message)
         self._channels = {}
         self._authorization = Authorization()
-        self._plugin_manager = None
         self._plugin_manager = PluginManager(Configuration, "messaging", [MessagePlugin])
         self._users = self._authorization.get_users()
         self.load()
 
     def load(self):
 
-        self._plugin_manager.add_plugin(UserLogPlugin(Configuration, self))
         for plugin in self._plugin_manager.plugins:
             self._channels[plugin.message_type] = plugin
 

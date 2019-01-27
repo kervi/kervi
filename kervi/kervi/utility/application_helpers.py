@@ -87,7 +87,7 @@ class _KerviSocketIPC(process._KerviProcess):
                 self._app_id, 
                 self.config.discovery.challenge,
                 self.config.application.name,
-                "http://" + self.config.network.ip + ":" + str(self.config.network.http_port)
+                "http://" + self.config.network.ip# + ":" + str(self.config.network.http_port)
             )
             self._discovery_thread.start()
         else:
