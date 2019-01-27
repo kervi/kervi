@@ -4,11 +4,11 @@ import {KerviSpineBase} from "./kervi-spinebase";
 declare var Stomp:any;
 export class  KerviRMQSpine extends KerviSpineBase {
 	private socketSession:null;
-	private exchange = "/exchange/app_1";
+	private exchange = "/exchange/";
 	
 	constructor(public constructorOptions){
 		super(constructorOptions);
-		console.log("Kervi io spine init x", this.options,constructorOptions);
+		console.log("Kervi io spine init y", this.options,constructorOptions);
 		
 	}
 
@@ -27,12 +27,15 @@ export class  KerviRMQSpine extends KerviSpineBase {
 		var mqUrl= "wss://mq.kervi.io:15673/ws"
 		this.websocket = Stomp.client(mqUrl);
 		this.websocket.heartbeat.incoming = 0;
+		self.exchange = "/exchange/" +  self.options.apiToken.app_id;
+		console.log("exchange", self.exchange)
 		this.websocket.connect(
 			self.options.apiToken.api_token, 
 			"ui", 
 			function (frame){
-				console.log("MQ connect", frame, this.websocket, this);
+				console.log("MQ connect", frame, self.websocket, this, self);
 				self.socketSession = frame.headers.session;
+				self.exchange = "/exchange/" +  self.options.apiToken.app_id;
 				self.websocket.subscribe(self.exchange, function(message) {
 					console.log("mq ", message);
 					if (message.headers["topic"])
@@ -51,14 +54,12 @@ export class  KerviRMQSpine extends KerviSpineBase {
 
 	
 	onPing(message){
-		console.log("onping", this.options.appId, message);
+		console.log("onping", this.options.appId, message, );
 		var self = this;
 		if (!this.isConnected && message.headers["connection_id"]== self.options.apiToken.app_id){
 			this.onOpen(message);
 			this.websocket.send(self.exchange, { topic:"session:new", router_id:message.headers["router_id"], session_id:this.socketSession}, "{}")	
-			
 		}
-		
 	}
 
 	authenticate(userName, password){

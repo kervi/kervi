@@ -27,15 +27,12 @@ export class KerviBaseService {
   public  application$: BehaviorSubject<any>;
   public doAuthenticate: boolean = false;
   public componentsChanged$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
-  //public inAuthentication$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   private logMessages:DashboardMessageModel[] = [];
   private logMessages$: BehaviorSubject<DashboardMessageModel[]> = new  BehaviorSubject<DashboardMessageModel[]>([]);
   
   IPCReady$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   authenticationFailed$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   
-
-
   constructor() 
   { 
     console.log("kervi service constructor");
@@ -92,18 +89,6 @@ export class KerviBaseService {
     });
 
   }
-
-  // private refreshComponents(){
-  //   var self=this;
-  //   self.spine.sendQuery("getComponentInfo",function(message){
-  //   console.log("refresh component info",message);
-  //   self.components = []
-  //   self.components$.next([]);
-  //   self.components = ComponentFactory.createComponents(message, this);
-  //   console.log("refresh components",self.components);
-  //   self.components$.next(self.components);
-  //   });
-  // }
 
   public text(key:string, defaultValue:string=""):string{
     //  console.log("t", key, this.texts);
@@ -172,7 +157,26 @@ export class KerviBaseService {
       var httpHost = window.location.hostname;
       address = httpHost + ":9000";
     }
-    console.log("ks", address, sessionStorage.getItem("mqc"));
+    console.log("ks", address);
+    
+    this.spine = new KerviWSSpine({
+      address: address,
+      protocol: protocol,
+      onOpen: this.onOpen,
+      onClose:this.onClose,
+      onAuthenticate:this.onAuthenticate,
+      onAuthenticateFailed:this.onAuthenticateFailed,
+      onLogOff: this.onLogoff,
+      onAuthenticateStart: this.onAuthenticateStart,
+      targetScope:this
+    });
+  }
+
+  public connectMQ(){
+    
+    //if (!sessionStorage.getItem("mqc"))
+    //  sessionStorage.setItem("mqc", '{"key_id":"c5bd0824bda44ffeaba8010383f1af96","api_token":"4776ec9d4bdf4b3192ffa6a1f37d15aa145e2e665ae64e46afd766ee851ac046","api_channel":"20bddf88a4434e99ba0e014de2b875c7","app_id":"app_1"}');
+    console.log("ks", sessionStorage.getItem("mqc"));
     
     if (sessionStorage.getItem("mqc")){
       
@@ -186,18 +190,9 @@ export class KerviBaseService {
         targetScope:this,
         apiToken: JSON.parse(sessionStorage.getItem("mqc"))
       });
-    } else
-      this.spine = new KerviWSSpine({
-        address: address,
-        protocol: protocol,
-        onOpen: this.onOpen,
-        onClose:this.onClose,
-        onAuthenticate:this.onAuthenticate,
-        onAuthenticateFailed:this.onAuthenticateFailed,
-        onLogOff: this.onLogoff,
-        onAuthenticateStart: this.onAuthenticateStart,
-        targetScope:this
-      });
+    } else {
+      console.log("qmc not found in storage")
+    }
   }
 
   isAnonymous(){
@@ -211,12 +206,10 @@ export class KerviBaseService {
   }
 
   logoff(){
-    //this.inAuthentication$.next(false);
     this.spine.logoff()
   }
 
   private onAuthenticateStart(){
-    //this.inAuthentication$.next(true);
     
   }
 
@@ -228,23 +221,19 @@ export class KerviBaseService {
 
   private onAuthenticateFailed(){
     this.authenticationFailed$.next(true);
-    //this.inAuthentication$.next(false);
+    
   }
 
   private onLogoff(){
     console.log("olxrc");
     this.doAuthenticate = true;
-    //this.inAuthentication$.next(false);
-    //this.spine.logoff()
     if (this.spine.firstOnOpen)
       this.IPCReady$.next(true);
     
-    //this.authenticationFailed$.next(false);
     this.reset();
   }
 
   private reset(){
-    //this.inAuthentication$.next(false);
     this.components = [];
     this.components$.next(this.components);
     this.connectionState$.next(ConnectionState.disconnected);
