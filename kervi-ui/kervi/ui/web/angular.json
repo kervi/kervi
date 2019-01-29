@@ -394,7 +394,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/webApp",
+            "outputPath": "../../plugin/ui/web/http_docs",
             "index": "projects/webApp/src/index.html",
             "main": "projects/webApp/src/main.ts",
             "polyfills": "projects/webApp/src/polyfills.ts",
