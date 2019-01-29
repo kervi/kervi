@@ -13,6 +13,9 @@ class KerviPlugin(object):
         self._global_config = Configuration
         self._name = name
         self._manager = manager
+
+        from kervi.spine import Spine
+        self.spine = Spine()
     
     @property
     def manager(self):

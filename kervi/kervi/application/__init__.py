@@ -190,6 +190,7 @@ class Application(object):
         
         #self._validateSettings()
         self.started = False
+        self._webserver_port = None
         import kervi.spine as spine
         from kervi.zmq_spine import _ZMQSpine
         self.spine = _ZMQSpine()
@@ -201,6 +202,7 @@ class Application(object):
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
         self.spine.register_event_handler("modulePing", self._module_ping)
         self.spine.register_event_handler("processReady", self._process_ready, scope="app-" + self.config.application.id)
+        self.spine.register_event_handler("WebAppReady", self._webapp_ready, scope="app-" + self.config.application.id)
         self._module_processes = []
         self._process_info = []
         self._process_info_lock = threading.Lock()
@@ -289,6 +291,9 @@ class Application(object):
         finally:
             self._process_info_lock.release()
 
+    def _webapp_ready(self, scope, webserver_info):
+        self._webserver_info = webserver_info
+
     def _is_ready(self):
         result = True
         self._process_info_lock.acquire()
@@ -359,45 +364,23 @@ class Application(object):
                 )
             ]
 
-        #self._process_info_lock.acquire()
-        #self._process_info += [{"id":"plugins_routing", "ready":False}]
-        #self._process_info_lock.release()
-        #module_port += 1
-        #app_helpers.load_plugin_section(self.config, module_port, "routing")
-        #app_helpers.load_plugin_section(self.config, module_port, "general")
-
-        # if self.config.routing.kervi_io.enabled:
-        #     module_port += 1
-        #     self._module_processes += [
-        #         process._start_process(
-        #             "app-" + self.config.application.id,
-        #             "kervi_io",
-        #             self.config,
-        #             nethelper.get_free_port([module_port]),
-        #             app_helpers._KerviIORouterProcess
-        #         )
-        #     ]
-
         while not self._is_ready():
             time.sleep(1)
-
-        #self._module_processes += app_helpers.load_plugins(self.config, module_port)
 
         from kervi.dashboards import Dashboard
         Dashboard._add_default()
 
+        ready_message = "Your Kervi application is ready"
+        if self._webserver_info:
+            ready_message = "Your Kervi application is ready at http://" + self._webserver_info["ip"] + ":" + str(self._webserver_info["port"])
+
         import platform
         if platform.system() != "Windows":
-            print("\033[92mYour Kervi application is ready at http://" + self.config.network.ip + ":" + str(self.config.network.http_port) + "\033[0m")
+            print("\033[92m" + ready_message + "\033[0m")
         else:
-            print("Your Kervi application is ready at http://" + self.config.network.ip + ":")# + str(self.config.network.http_port))
+            print(ready_message)
+
         print("Press ctrl + c to stop your application")
-        # import kervi.ui.webserver as webserver
-        # webserver.start(
-        #     self.config.network.ip,
-        #     self.config.network.http_port,
-        #     self.config.network.ws_port
-        # )
         self.spine.trigger_event(
             "appReady",
             self.config.application.id

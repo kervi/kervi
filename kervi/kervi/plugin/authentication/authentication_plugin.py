@@ -22,7 +22,7 @@ class KerviUser(object):
     def addresses(self):
         return self._addresses
 
-from kervi.plugin import KerviPlugin
+from kervi.plugin.kervi_plugin import KerviPlugin
 class AuthenticationPlugin(KerviPlugin):
     def __init__(self, name, configuration, manager):
         KerviPlugin.__init__(self, name, configuration, manager)

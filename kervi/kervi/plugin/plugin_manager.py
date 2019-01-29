@@ -66,20 +66,25 @@ class _PluginInfo:
         )
     
     def _create_instance(self):
-        print("load plugin:", self._plugin_module)
-        module = __import__(self._plugin_module, fromlist=[''])
-        self.instance = module.init_plugin(self._config, self._manager)
-        is_valid = True
-        if self._manager and self._manager._plugin_classes:
-            #plugin_bases = inspect.getmro(type(plugin))
-            valid = False
-            for plugin_class in self._manager._plugin_classes:
-                if isinstance(self.instance, plugin_class):
-                    valid = True
-                    break
-            if not valid:
-                print("Invalid plugin class:", self.instance, "expected: ", self._manager.plugin_classes)
-                self.instance = None
+        try:
+            print("load plugin:", self._plugin_module)
+            module = __import__(self._plugin_module, fromlist=[''])
+            self.instance = module.init_plugin(self._config, self._manager)
+            
+        
+            is_valid = True
+            if self._manager and self._manager._plugin_classes:
+                #plugin_bases = inspect.getmro(type(plugin))
+                valid = False
+                for plugin_class in self._manager._plugin_classes:
+                    if isinstance(self.instance, plugin_class):
+                        valid = True
+                        break
+                if not valid:
+                    print("Invalid plugin class:", self.instance, "expected: ", self._manager.plugin_classes)
+                    self.instance = None
+        except ModuleNotFoundError:
+            print("Could not load plugin, module not found: ", self._plugin_module)
 
     def load(self, module_port=None):
         if self.own_process:

@@ -37,7 +37,7 @@ def get_default_config():
                     "own_process": False,
                     "managed": True  
                 },
-                "webserver": {
+                "ui": {
                     "own_process": True,
                     "managed": False
                 },
@@ -53,8 +53,8 @@ def get_default_config():
             "kervi.plugin.storage.sqlite": True,
             "kervi.plugin.messaging.email": False,
             "kervi.plugin.messaging.user_log": True,
-            "kervi.plugin.webserver.build_in": True,
-            "kervi.plugin.routing.kervi_io": False
+            "kervi.plugin.routing.kervi_io": False,
+            "kervi.plugin.ui.web": True,
         },
         "plain_users": {
             "anonymous":{

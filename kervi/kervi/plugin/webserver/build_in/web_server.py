@@ -153,13 +153,15 @@ class _HTTPRequestHandler(SimpleHTTPRequestHandler):
             pass
 
 class _HTTPServer(ThreadingMixIn, HTTPServer):
-    def __init__(self, address, web_port, ws_port, handler):
+    def __init__(self, address, web_port, ws_port, handler, http_docs=None):
         HTTPServer.__init__(self, (address, web_port), handler)
         self.ip_address = address
         self.terminate = False
         self.ws_port = ws_port
-        kervipath = os.path.dirname(kervi.ui.__file__)
-        self.docpath = os.path.join(kervipath, "web/dist/webApp")
+        self.docpath = http_docs
+        if not self.docpath:
+            kervipath = os.path.dirname(kervi.ui.__file__)
+            self.docpath = os.path.join(kervipath, "web/dist/webApp")
 
     def do_authorize(self):
         return False
@@ -176,21 +178,23 @@ class _HTTPServer(ThreadingMixIn, HTTPServer):
 
 
 class KerviWebServerPlugin(WebServerPlugin):
-    def __init__(self, name, config, manager):
+    def __init__(self, name, config, manager, http_docs):
         WebServerPlugin.__init__(self, name, config, manager)
-    
+        self._use_encryption = False
         self._server = None
         self._asset_path = ""
         self._server_thread = None
+        self.start()
+        self.server_ready(self._use_encryption, self.plugin_config.ip_address, self.plugin_config.http_port)
         
     def start(self):
-        
         self._server = _HTTPServer(self.plugin_config.ip_address, self.plugin_config.http_port, self.plugin_config.ws_port, _HTTPRequestHandler)
         if encryption.enabled():
             cert_file, key_file = encryption.get_cert()
             if key_file and cert_file:
                 import ssl
                 self._server.socket = ssl.wrap_socket (self._server.socket, keyfile=key_file, certfile=cert_file, server_side=True)
+                self._use_encryption = True
 
         self._server_thread = threading.Thread(target=self._server.serve_forever, name="webserver")
         self._server_thread.daemon = True

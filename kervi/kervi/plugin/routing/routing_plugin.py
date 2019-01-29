@@ -8,7 +8,7 @@ import json
 
 import kervi.spine as spine
 import kervi.utility.authorization as authorization
-from kervi.plugin import KerviPlugin
+from kervi.plugin.kervi_plugin import KerviPlugin
 
 
 # class _CatchUnhandledQueriesThread(threading.Thread):
