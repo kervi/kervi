@@ -15,9 +15,9 @@ except:
 
 setup(
     name='kervi-ui',
-    packages=['kervi.ui'],
+    packages=['kervi/plugin/ui/web'],
     version=VERSION,
-    description='UI module for the kervi framework. It is included as dependency when kervi in installed.',
+    description='UI plugin for the kervi framework. It is included as dependency when kervi in installed.',
     author='Tim Wentzlau',
     author_email='tim.wentzlau@gmail.com',
     url='https://github.com/kervi/kervi-ui',
