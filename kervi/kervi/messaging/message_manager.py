@@ -15,12 +15,14 @@ class MessageManager(Controller):
         self._channels = {}
         self._authorization = Authorization()
         self._plugin_manager = PluginManager(Configuration, "messaging", [MessagePlugin])
+        self._plugin_manager.load_managed_plugins()
         self._users = self._authorization.get_users()
         self.load()
 
     def load(self):
 
         for plugin in self._plugin_manager.plugins:
+            print("mp", plugin.message_type)
             self._channels[plugin.message_type] = plugin
 
         self._config = Configuration.messaging

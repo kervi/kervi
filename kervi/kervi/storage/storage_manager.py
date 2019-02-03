@@ -27,7 +27,7 @@ class StorageManager(Controller):
         
         self._plugin_manager = None
         self._plugin_manager = PluginManager(Configuration, "storage", [StoragePlugin])
-        
+        self._plugin_manager.load_managed_plugins()        
 
     def _store_value(self, value_id, value, persist=False):
         for plugin in self._plugin_manager.plugins:

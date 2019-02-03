@@ -44,11 +44,20 @@ def get_default_config():
                 "storage": {
                     "own_process": False,
                     "managed": True
+                },
+                "authentication": {
+                    "own_process": False,
+                    "managed": True
+                },
+                "message_bus": {
+                    "own_process": False,
+                    "managed": True
                 }
             }
         },
         "plugins":{
-            "kervi.plugin.authentication.plain": False,
+            "kervi.plugin.message_bus.zmq": True,
+            "kervi.plugin.authentication.plain": True,
             "kervi.plugin.storage.sqlite_temp": True,
             "kervi.plugin.storage.sqlite": True,
             "kervi.plugin.messaging.email": False,

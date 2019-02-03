@@ -64,9 +64,10 @@ class _KerviModuleLoader(process._KerviProcess):
         pass
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
-        spine = _ZMQSpine()
-        spine._init_spine(process_id, spine_port, root_address, ip)
-        return spine
+        from kervi.plugin.message_bus.bus_manager import BusManager
+        self._bus_manager = BusManager()
+        self._bus_manager.load(process_id, spine_port, root_address, ip)
+        return self._bus_manager.bus
 
 class _KerviSocketIPC(process._KerviProcess):
     """ Private class that starts a seperate process for IPC communication in the Kervi application """
@@ -96,11 +97,12 @@ class _KerviSocketIPC(process._KerviProcess):
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
         #print("ls", ip, root_address)
-        spine = _ZMQSpine()
-        spine._init_spine(process_id, spine_port, root_address, ip)
+        from kervi.plugin.message_bus.bus_manager import BusManager
+        self._bus_manager = BusManager()
+        self._bus_manager.load(process_id, spine_port, root_address, ip)
         self._ip = ip
         self._port = spine_port
-        return spine
+        return self._bus_manager.bus
     
     def _start_socket(self):
         #print("start socket")
@@ -126,9 +128,10 @@ class _KerviIORouterProcess(process._KerviProcess):
         self.spine.register_command_handler("startRouter", self._start_router)
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
-        spine = _ZMQSpine()
-        spine._init_spine(process_id, spine_port, root_address, ip)
-        return spine
+        from kervi.plugin.message_bus.bus_manager import BusManager
+        self._bus_manager = BusManager()
+        self._bus_manager.load(process_id, spine_port, root_address, ip)
+        return self._bus_manager.bus
     
     def _start_router(self):
         #print("start socket")
@@ -161,10 +164,11 @@ class _KerviPluginProcess(process._KerviProcess):
         
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
-        spine = _ZMQSpine()
-        spine._init_spine(process_id, spine_port, root_address, ip)
-        return spine
-    
+        from kervi.plugin.message_bus.bus_manager import BusManager
+        self._bus_manager = BusManager()
+        self._bus_manager.load(process_id, spine_port, root_address, ip)
+        return self._bus_manager.bus
+
     def process_step(self):
         self.manager.process_step()
  

@@ -191,12 +191,13 @@ class Application(object):
         #self._validateSettings()
         self.started = False
         self._webserver_port = None
-        import kervi.spine as spine
-        from kervi.zmq_spine import _ZMQSpine
-        self.spine = _ZMQSpine()
+        
+        from kervi.plugin.message_bus.bus_manager import BusManager
+        self.bus_manager = BusManager()
         self.config.network.ipc_root_port = nethelper.get_free_port([self.config.network.ipc_root_port])
-        self.spine._init_spine("kervi-main", self.config.network.ipc_root_port, None, self.config.network.ipc_root_address)
-        spine.set_spine(self.spine)
+        self.bus_manager.load("kervi-main", self.config.network.ipc_root_port, None, self.config.network.ipc_root_address)
+        
+        from kervi import spine
         self.spine = spine.Spine()
         self.spine.register_query_handler("GetApplicationInfo", self._get_application_info)
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
@@ -211,13 +212,13 @@ class Application(object):
         self._kervi_modules_lock = threading.Lock()
 
         from kervi.storage.storage_manager import StorageManager
-        self._authentication = StorageManager()
+        self._storage_manager = StorageManager()
         
         from kervi.utility.authorization_manager import AuthorizationManager
-        self._authentication = AuthorizationManager()
+        self._authorization_manager = AuthorizationManager()
         
         from kervi.messaging.message_manager import MessageManager
-        self._message_handler = MessageManager()
+        self._message_manager = MessageManager()
 
         self._app_actions = _AppActions(self)
 
@@ -430,7 +431,7 @@ class Application(object):
         process._stop_processes("app-" + self.config.application.id)
         self.spine.trigger_event("processTerminating", None, local_only=True)
         time.sleep(1)
-        self.spine.stop()
+        self.bus_manager.stop()
         #for thread in threading.enumerate():
         #    print("running thread",thread.name)
         print("application stopped")

@@ -12,7 +12,9 @@ def _deep_update(d, u):
     """
 
     for k, v in u.items():
-        if isinstance(v, collections.Mapping):
+        if k in d and isinstance(d[k], (bool, int, str)):
+            d[k] = u[k]
+        elif isinstance(v, collections.Mapping):
             r = _deep_update(d.get(k, {}), v)
             d[k] = r
         else:

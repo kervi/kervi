@@ -34,6 +34,7 @@ class AuthorizationManager(Controller):
         #self._config = Configuration.authentication
         self._sessions = {}
         self._plugin_manager = PluginManager(Configuration, "authentication", [AuthenticationPlugin])
+        self._plugin_manager.load_managed_plugins()
         self.spine.register_query_handler("authorizationActive", self._is_active)
         self.spine.register_query_handler("authorizationValidSessionHeader", self._is_session_valid)
         self.spine.register_query_handler("authorizationAllowAnonymousUser", self.allow_anonymous)

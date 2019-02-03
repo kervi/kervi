@@ -19,8 +19,9 @@ class _KerviProcess(object):
         self._is_connected = False
         self.port = ipcPort
         self.config = config
+
+        
         self.spine = self.load_spine(name, ipcPort, "tcp://" + config.network.ipc_root_address + ":" + str(config.network.ipc_root_port), config.network.ip)
-        spine.set_spine(self.spine)
         self.spine.register_command_handler("terminateProcess", self.terminate, scopes=[scope])
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
         self.init_process(**kwargs)

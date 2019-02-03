@@ -34,9 +34,10 @@ class _KerviPluginProcess(process._KerviProcess):
         )
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
-        spine = _ZMQSpine()
-        spine._init_spine(process_id, spine_port, root_address, ip)
-        return spine
+        from kervi.plugin.message_bus.bus_manager import BusManager
+        self._bus_manager = BusManager()
+        self._bus_manager.load(process_id, spine_port, root_address, ip)
+        return self._bus_manager.bus
     
     def process_step(self):
         self.plugin.process_step()
@@ -67,11 +68,11 @@ class _PluginInfo:
     
     def _create_instance(self):
         try:
-            print("load plugin:", self._plugin_module)
+            if (self._manager and not self._manager._load_silent) and True:
+                print("load plugin:", self._plugin_module)
             module = __import__(self._plugin_module, fromlist=[''])
             self.instance = module.init_plugin(self._config, self._manager)
             
-        
             is_valid = True
             if self._manager and self._manager._plugin_classes:
                 #plugin_bases = inspect.getmro(type(plugin))
@@ -81,7 +82,7 @@ class _PluginInfo:
                         valid = True
                         break
                 if not valid:
-                    print("Invalid plugin class:", self.instance, "expected: ", self._manager.plugin_classes)
+                    print("Invalid plugin class:", self.instance, "expected: ", self._manager._plugin_classes)
                     self.instance = None
         except ModuleNotFoundError:
             print("Could not load plugin, module not found: ", self._plugin_module)
@@ -124,8 +125,10 @@ class _PluginInfo:
             return False
 
 class PluginManager:
-    def __init__(self, config, section="general", plugin_classes=None):
+    def __init__(self, config, section="general", plugin_classes=None, load_silent=False):
         self._config = config
+        self._section = section
+        self._load_silent = load_silent
         self._plugins = []
         self._plugin_classes = plugin_classes
 
@@ -166,7 +169,7 @@ class PluginManager:
         result = []
         for plugin in self._plugins:
             if plugin.instance:
-                result.append(plugin)
+                result.append(plugin.instance)
         return result
 
     def prepare_load(self):
@@ -183,11 +186,9 @@ class PluginManager:
                 module_port += 1
                 plugin.load(module_port)
         return module_port
-    
-    # def process_step(self):
-    #     for plugin in self.plugins:
-    #         plugin.process_step()
 
-    # def terminate_process(self):
-    #     for plugin in self.plugins:
-    #         plugin.terminate_process()
+    def load_managed_plugins(self):
+        for plugin in self._plugins:
+            if plugin.managed and plugin._plugin_type == self._section:
+                plugin.load()
+    
