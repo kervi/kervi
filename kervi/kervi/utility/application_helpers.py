@@ -21,7 +21,7 @@
 
 import collections
 import kervi.core.utility.process as process
-from kervi.zmq_spine import _ZMQSpine
+#from kervi.zmq_spine import _ZMQSpine
 from kervi.utility.discovery import KerviAppDiscovery
 import kervi.utility.nethelper as nethelper
 

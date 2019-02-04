@@ -328,7 +328,7 @@ class Application(object):
         module_port = self.config.network.ipc_root_port
         pluginManager = PluginManager(self.config)
         self._process_info_lock.acquire()
-        self._process_info = [{"id":"IPC", "ready":False}]
+        #self._process_info = [{"id":"IPC", "ready":False}]
         plugin_modules = pluginManager.prepare_load()
         for plugin_module in plugin_modules:
             self._process_info.append(
@@ -336,16 +336,16 @@ class Application(object):
             )
         self._process_info_lock.release()
 
-        module_port += 1
-        self._module_processes += [
-            process._start_process(
-                "app-" + self.config.application.id,
-                "IPC",
-                self.config,
-                nethelper.get_free_port([module_port]),
-                app_helpers._KerviSocketIPC
-            )
-        ]
+        #module_port += 1
+        # self._module_processes += [
+        #     process._start_process(
+        #         "app-" + self.config.application.id,
+        #         "IPC",
+        #         self.config,
+        #         nethelper.get_free_port([module_port]),
+        #         app_helpers._KerviSocketIPC
+        #     )
+        # ]
 
         module_port = pluginManager.load_plugins(module_port+1)
 

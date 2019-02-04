@@ -29,7 +29,7 @@ import json
 import uuid
 import queue
 import datetime
-from kervi.zmq_spine.named_lists import NamedLists
+from kervi.plugin.message_bus.zmq.named_lists import NamedLists
 import kervi.utility.nethelper as nethelper
 from  kervi.core.utility.kervi_logging import KerviLog
 from kervi.config.configuration import _KerviConfig

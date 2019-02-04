@@ -1,7 +1,7 @@
 import inspect
 from kervi.config.configuration import _KerviConfig
 import kervi.core.utility.process as process
-from kervi.zmq_spine import _ZMQSpine
+#from kervi.zmq_spine import _ZMQSpine
 from kervi.utility.discovery import KerviAppDiscovery
 import kervi.utility.nethelper as nethelper
 
@@ -38,7 +38,7 @@ class _KerviPluginProcess(process._KerviProcess):
         self._bus_manager = BusManager()
         self._bus_manager.load(process_id, spine_port, root_address, ip)
         return self._bus_manager.bus
-    
+
     def process_step(self):
         self.plugin.process_step()
  
@@ -53,6 +53,7 @@ class _PluginInfo:
         self._load_config = load_config
         self.instance = None
         self._manager = manager
+        self._first_process_step = True
 
     def _start_plugin_process(self, module_port):
         #print(plugin_section)
@@ -93,10 +94,12 @@ class _PluginInfo:
         else:
             self._create_instance()
 
-
     def process_step(self):
         if self.instance:
-            self.instance.process_step()
+            if self._first_process_step:
+                self.instance.first_process_step()
+            else:
+                self.instance.process_step()
     
     def terminate_process(self):
         if self.instance:

@@ -64,6 +64,7 @@ def get_default_config():
             "kervi.plugin.messaging.user_log": True,
             "kervi.plugin.routing.kervi_io": False,
             "kervi.plugin.ui.web": True,
+            "kervi.plugin.ipc.websocket": True
         },
         "plain_users": {
             "anonymous":{

@@ -33,6 +33,9 @@ class KerviPlugin(object):
     def name(self):
         return self._name
 
+    def first_process_step(self):
+        pass
+    
     def process_step(self):
         pass
 
