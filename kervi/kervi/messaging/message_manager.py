@@ -22,7 +22,6 @@ class MessageManager(Controller):
     def load(self):
 
         for plugin in self._plugin_manager.plugins:
-            print("mp", plugin.message_type)
             self._channels[plugin.message_type] = plugin
 
         self._config = Configuration.messaging
