@@ -39,6 +39,8 @@ from kervi.actions import action
 from kervi.application.default_config import get_default_config
 from kervi.application.kervi_module import KerviModule
 from kervi.plugin.plugin_manager import PluginManager
+from kervi.utility.discovery import KerviAppDiscovery
+
 import signal
 
 _app_running = True
@@ -108,6 +110,7 @@ class Application(object):
         import inspect
         import getopt
         
+        self._discovery_thread = None
         config_files = []
 
         opts, args = getopt.getopt(sys.argv[1:], "c", ["config_file=", "as-service", "install-service", "uninstall-service", "start-service", "stop-service", "restart-service", "status-service", "detect-devices"])
@@ -191,7 +194,12 @@ class Application(object):
         #self._validateSettings()
         self.started = False
         self._webserver_port = None
-        
+
+        import kervi.hal as hal
+        hal_driver = hal._load(self.config.platform.driver)
+        if hal_driver:
+            print("platform driver:", hal_driver)
+
         from kervi.plugin.message_bus.bus_manager import BusManager
         self.bus_manager = BusManager()
         self.config.network.ipc_root_port = nethelper.get_free_port([self.config.network.ipc_root_port])
@@ -211,6 +219,9 @@ class Application(object):
         self._kervi_modules = []
         self._kervi_modules_lock = threading.Lock()
 
+        
+
+        
         from kervi.storage.storage_manager import StorageManager
         self._storage_manager = StorageManager()
         
@@ -221,12 +232,6 @@ class Application(object):
         self._message_manager = MessageManager()
 
         self._app_actions = _AppActions(self)
-
-        import kervi.hal as hal
-        hal_driver = hal._load(self.config.platform.driver)
-        if hal_driver:
-            print("platform driver:", hal_driver)
-
 
     @property
     def actions(self):
@@ -365,6 +370,7 @@ class Application(object):
                 )
             ]
 
+        #print("wait for ready")
         while not self._is_ready():
             time.sleep(1)
 
@@ -381,14 +387,31 @@ class Application(object):
         else:
             print(ready_message)
 
+        self.spine.send_command("kervi_action_app_main")
+        self.spine.send_command("startWebSocket")
+        
+
         print("Press ctrl + c to stop your application")
         self.spine.trigger_event(
             "appReady",
             self.config.application.id
         )
-        self.spine.send_command("startWebSocket")
-        self.spine.send_command("kervi_action_app_main")
 
+        self._ip = "127.0.0.1"
+        if self._ip and self.config.discovery.enabled:
+            self._discovery_thread = KerviAppDiscovery(
+                self._ip, 
+                self.config.network.ipc_root_port,
+                self.config.discovery.port, 
+                self.config.application.id, 
+                self.config.discovery.challenge,
+                self.config.application.name,
+                "http://" + self.config.network.ip# + ":" + str(self.config.network.http_port)
+            )
+            self._discovery_thread.start()
+        else:
+            self._discovery_thread = None
+        
     def _input_thread(self, list):
         try:
             raw_input()
@@ -425,6 +448,9 @@ class Application(object):
         self.spine.send_command("kervi_action_app_exit")
         import kervi.ui.webserver as webserver
         
+        if self._discovery_thread:
+            self._discovery_thread.terminate()
+
         #webserver.stop()
         print("stopping processes")
         import kervi.core.utility.process as process
