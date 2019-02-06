@@ -31,15 +31,37 @@ def get_default_config():
                 "videos":"videos"
             }
         },
-        "plugins":{
-            "kervi.plugin.routing.kervi_io":{
-                "enabled": False,
-                "address": "mq.kervi.io",
-                "port": 5671,
-                "api_user": "",
-                "api_password": "",
-                "api_channel": ""
+        "plugin_manager":{
+            "plugin_types":{
+                "default": {
+                    "managed": False,
+                    "own_process": True
+                },
+                "messaging": {
+                    "own_process": False,
+                    "managed": True  
+                },
+                "ui": {
+                    "own_process": True,
+                    "managed": False
+                },
+                "storage": {
+                    "own_process": False,
+                    "managed": True
+                },
+                "authentication": {
+                    "own_process": False,
+                    "managed": True
+                },
+                "message_bus": {
+                    "own_process": False,
+                    "managed": True
+                }
             }
+        },
+        "plugins":{
+            "kervi.plugin.message_bus.zmq": True,
+            "kervi.plugin.routing.kervi_io": False
         },
         "unit_system": "metric",
         "display":{

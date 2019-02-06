@@ -2,7 +2,7 @@ import inspect
 from kervi.config.configuration import _KerviConfig
 import kervi.core.utility.process as process
 #from kervi.zmq_spine import _ZMQSpine
-from kervi.utility.discovery import KerviAppDiscovery
+#from kervi.utility.discovery import KerviAppDiscovery
 import kervi.utility.nethelper as nethelper
 
 # "plugin_types":{
@@ -98,6 +98,7 @@ class _PluginInfo:
         if self.instance:
             if self._first_process_step:
                 self.instance.first_process_step()
+                self._first_process_step = False
             else:
                 self.instance.process_step()
     

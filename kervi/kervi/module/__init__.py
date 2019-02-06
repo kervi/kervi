@@ -41,6 +41,7 @@ import kervi.utility.application_helpers as app_helpers
 from kervi.actions import action, Actions
 from kervi.controllers import Controller
 from kervi.module.default_config import get_default_config
+from kervi.plugin.plugin_manager import PluginManager
 
 _app_running = True
 
@@ -193,6 +194,8 @@ class Module(object):
                 _pretty_print(devices)
             exit()
 
+
+
         print("Starting kervi module, please wait")
         self.started = False
         if self.config.module.app_connection_local and not self.config.network.ipc_root_address:
@@ -207,15 +210,45 @@ class Module(object):
                 exit()
         
         self._root_address = "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port)
+
+        from kervi.plugin.message_bus.bus_manager import BusManager
+        self.bus_manager = BusManager()
+        self.config.network.ipc_root_port = nethelper.get_free_port([self.config.network.ipc_root_port])
         
-        
-        from kervi.zmq_spine import _ZMQSpine
-        self.spine = _ZMQSpine()
         if self.config.module.app_connection_local:
-            self.spine._init_spine("kervi-module", self.config.network.ipc_module_port, "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port), self.config.network.ip)
+            self.bus_manager.load(
+                "kervi-module", 
+                self.config.network.ipc_module_port,
+                "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port),
+                self.config.network.ip
+            )
         else:
-            self.spine._init_spine("kervi-main", self.config.network.ipc_root_port, None, self.config.network.ipc_root_address)
-        spine.set_spine(self.spine)
+            self.bus_manager.load(
+                "kervi-main", 
+                self.config.network.ipc_root_port,
+                None,
+                self.config.network.ipc_root_address
+            )
+        
+        #from kervi.zmq_spine import _ZMQSpine
+        #self.spine = _ZMQSpine()
+        #if self.config.module.app_connection_local:
+        #    self.spine._init_spine(
+        #       "kervi-module", 
+        #       self.config.network.ipc_module_port, 
+        #       "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port),
+        #  
+        #       self.config.network.ip)
+        #else:
+        #    self.spine._init_spine(
+        #   "kervi-main", 
+        #   self.config.network.ipc_root_port, 
+        #   None, 
+        #   self.config.network.ipc_root_address)
+        #spine.set_spine(self.spine)
+        from kervi import spine
+        self.spine = spine.Spine()
+        
         self.spine.register_event_handler("processReady", self._process_ready, scope="app-" + self.config.application.id)
         self.spine = spine.Spine()
 
@@ -279,6 +312,21 @@ class Module(object):
         time.sleep(.5)
 
         module_port = self.config.network.ipc_module_port
+        pluginManager = PluginManager(self.config)
+        self._process_info_lock.acquire()
+        #self._process_info = [{"id":"IPC", "ready":False}]
+        plugin_modules = pluginManager.prepare_load()
+        for plugin_module in plugin_modules:
+            self._process_info.append(
+                {"id":plugin_module, "ready": False}
+            )
+        self._process_info_lock.release()
+
+
+        module_port = self.config.network.ipc_module_port
+        module_port = pluginManager.load_plugins(module_port+1)
+
+
 
         for module in self.config.modules:
             module_port += 1
@@ -297,11 +345,15 @@ class Module(object):
                 )
             ]
 
-        self._process_info_lock.acquire()
-        self._process_info += [{"id":"plugins_routing", "ready":False}]
-        self._process_info_lock.release()
-        module_port += 1
-        app_helpers.load_plugin_section(self.config, module_port, "routing")
+        # self._process_info_lock.acquire()
+        # plugin_modules = pluginManager.prepare_load()
+        # for plugin_module in plugin_modules:
+        #     self._process_info.append(
+        #         {"id":plugin_module, "ready": False}
+        #     )
+        # self._process_info_lock.release()
+        # module_port += 1
+        # app_helpers.load_plugin_section(self.config, module_port, "routing")
         
             #time.sleep(1)
         while not self._is_ready():
