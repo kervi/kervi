@@ -275,7 +275,6 @@ class SocketSpine:
             self._config.network.ip,
             self._config.network.ws_port
         )
-        print("start websocket: ", self._config.network.ip, self._config.network.ws_port)
         self.factory = WebSocketServerFactory()
         self.factory.protocol = _SpineProtocol
 
@@ -288,6 +287,8 @@ class SocketSpine:
         )
 
     def start_socket(self):
+        print("start websocket: ", self._config.network.ip, self._config.network.ws_port)
+        
         self.loop.run_until_complete(self.coro)
         self._started = True
 
