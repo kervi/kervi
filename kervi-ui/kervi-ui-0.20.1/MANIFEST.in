@@ -1,0 +1,10 @@
+include kervi/plugin/ui/web/http_docs/*.html
+include kervi/plugin/ui/web/http_docs/*.js
+include kervi/plugin/ui/web/http_docs/*.css
+include kervi/plugin/ui/web/http_docs/*.map
+include kervi/plugin/ui/web/http_docs/*.ico
+include kervi/plugin/ui/web/http_docs/*.eot
+include kervi/plugin/ui/web/http_docs/*.svg
+include kervi/plugin/ui/web/http_docs/*.woff
+include kervi/plugin/ui/web/http_docs/*.woff2
+include kervi/plugin/ui/web/http_docs/*.ttf 
