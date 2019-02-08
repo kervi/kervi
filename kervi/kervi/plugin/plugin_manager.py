@@ -1,24 +1,8 @@
 import inspect
 from kervi.config.configuration import _KerviConfig
 import kervi.core.utility.process as process
-#from kervi.zmq_spine import _ZMQSpine
-#from kervi.utility.discovery import KerviAppDiscovery
 import kervi.utility.nethelper as nethelper
 
-# "plugin_types":{
-#                 "default": {
-#                     "managed": False,
-#                     "own_process": True
-#                 },
-#                 "messaging": {
-#                     "own_process": False,
-#                     "managed": True  
-#                 },
-#                 "webserver": {
-#                     "own_process": True,
-#                     "managed": False
-#                 }
-#             }
 class _KerviPluginProcess(process._KerviProcess):
     """ Private class that starts a separate process for plugins """
 
@@ -85,8 +69,8 @@ class _PluginInfo:
                 if not valid:
                     print("Invalid plugin class:", self.instance, "expected: ", self._manager._plugin_classes)
                     self.instance = None
-        except ModuleNotFoundError:
-            print("Could not load plugin, module not found: ", self._plugin_module)
+        except Exception as ex:
+            print("Could not load plugin: ", self._plugin_module, ex)
 
     def load(self, module_port=None):
         if self.own_process:
