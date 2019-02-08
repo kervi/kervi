@@ -112,7 +112,7 @@ class Application(object):
         
         self._discovery_thread = None
         config_files = []
-
+        self._webserver_info = None
         opts, args = getopt.getopt(sys.argv[1:], "c", ["config_file=", "as-service", "install-service", "uninstall-service", "start-service", "stop-service", "restart-service", "status-service", "detect-devices"])
         for opt, arg in opts:
             if opt in ("-c", "--config_file"):
@@ -446,7 +446,6 @@ class Application(object):
 
     def stop(self, force_exit=True, restart=False):
         self.spine.send_command("kervi_action_app_exit")
-        import kervi.ui.webserver as webserver
         
         if self._discovery_thread:
             self._discovery_thread.terminate()
