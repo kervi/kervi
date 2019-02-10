@@ -7,7 +7,7 @@ from kervi.core.authentication import Authorization
 from kervi.spine import Spine
 
 class StorageManager(Controller):
-    def __init__(self):
+    def __init__(self, log_queue):
 
         Controller.__init__(self, "storage_manager", "Storage manager")
         
@@ -26,7 +26,7 @@ class StorageManager(Controller):
         #SPINE.register_query_handler("queryCronJob", query_cron_job)
         
         self._plugin_manager = None
-        self._plugin_manager = PluginManager(Configuration, "storage", [StoragePlugin])
+        self._plugin_manager = PluginManager(Configuration, "storage", [StoragePlugin], log_queue=log_queue)
         self._plugin_manager.load_managed_plugins()        
 
     def _store_value(self, value_id, value, persist=False):

@@ -9,12 +9,12 @@ from kervi.plugin.messaging.message_plugin import MessagePlugin
 from kervi.core.authentication import Authorization 
 
 class MessageManager(Controller):
-    def __init__(self):
+    def __init__(self, log_queue):
         Controller.__init__(self, "message_manager", "Message handler")
         self.spine.register_command_handler("messageManagerSend", self.send_message)
         self._channels = {}
         self._authorization = Authorization()
-        self._plugin_manager = PluginManager(Configuration, "messaging", [MessagePlugin])
+        self._plugin_manager = PluginManager(Configuration, "messaging", [MessagePlugin], log_queue=log_queue)
         self._plugin_manager.load_managed_plugins()
         self._users = self._authorization.get_users()
         self.load()

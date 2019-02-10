@@ -29,11 +29,11 @@ from kervi.controllers import Controller
 from kervi.actions import action
 
 class AuthorizationManager(Controller):
-    def __init__(self):
+    def __init__(self, log_queue):
         Controller.__init__(self, "authentication", "Authentication")
         #self._config = Configuration.authentication
         self._sessions = {}
-        self._plugin_manager = PluginManager(Configuration, "authentication", [AuthenticationPlugin])
+        self._plugin_manager = PluginManager(Configuration, "authentication", [AuthenticationPlugin], log_queue=log_queue)
         self._plugin_manager.load_managed_plugins()
         self.spine.register_query_handler("authorizationActive", self._is_active)
         self.spine.register_query_handler("authorizationValidSessionHeader", self._is_session_valid)

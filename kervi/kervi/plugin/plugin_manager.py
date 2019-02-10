@@ -2,14 +2,14 @@ import inspect
 from kervi.config.configuration import _KerviConfig
 import kervi.core.utility.process as process
 import kervi.utility.nethelper as nethelper
-
+import logging
+import time
 class _KerviPluginProcess(process._KerviProcess):
     """ Private class that starts a separate process for plugins """
 
     def init_process(self, **kwargs):
         plugin_module = kwargs.pop("plugin_module", None)
         plugin_config = kwargs.pop("plugin_config", {})
-        #print("load plugins in: ", plugin_section)
         self.plugin = _PluginInfo(plugin_module, plugin_config, None, None, None)
         self.plugin.load()
         self.spine.trigger_event(
@@ -25,6 +25,7 @@ class _KerviPluginProcess(process._KerviProcess):
 
     def process_step(self):
         self.plugin.process_step()
+        time.sleep(0.01)
  
     def terminate_process(self):
         self.plugin.terminate_process()
@@ -40,7 +41,6 @@ class _PluginInfo:
         self._first_process_step = True
 
     def _start_plugin_process(self, module_port):
-        #print(plugin_section)
         process._start_process(
             "plugin-" + self._manager._config.application.id + "." + self._plugin_module,
             "plugin_" + self._plugin_module,
@@ -48,13 +48,14 @@ class _PluginInfo:
             nethelper.get_free_port([module_port]),
             _KerviPluginProcess,
             plugin_module=self._plugin_module,
-            plugin_config=self._config
+            plugin_config=self._config,
+            log_queue = self._manager._log_queue
         )
     
     def _create_instance(self):
         try:
             if (self._manager and not self._manager._load_silent) and True:
-                print("load plugin:", self._plugin_module)
+                logging.getLogger().info("load plugin: %s", self._plugin_module)
             module = __import__(self._plugin_module, fromlist=[''])
             self.instance = module.init_plugin(self._config, self._manager)
             
@@ -113,12 +114,13 @@ class _PluginInfo:
             return False
 
 class PluginManager:
-    def __init__(self, config, section="general", plugin_classes=None, load_silent=False):
+    def __init__(self, config, section="general", plugin_classes=None, load_silent=False, log_queue=None):
         self._config = config
         self._section = section
         self._load_silent = load_silent
         self._plugins = []
         self._plugin_classes = plugin_classes
+        self._log_queue = log_queue
 
         self._manager_config = self._config.plugin_manager
 

@@ -3,7 +3,7 @@
 
 """
 Module that holds log functionality.
-In general you dont need to include this in your kervi code as the spine class holds a refference
+In general you dont need to include this in your kervi code as the spine class holds a reference
 to a fully configured log.
 """
 
@@ -20,10 +20,11 @@ class BraceMessage(object):
 
 class KerviLog(object):
     def __init__(self, name):
+        
         self.logger = logging.getLogger(name)
 
     def info(self, message, *args):
-        self.logger.debug(BraceMessage(message, *args))
+        self.logger.info(BraceMessage(message, *args))
 
     def debug(self, message, *args):
         if args:
@@ -40,24 +41,32 @@ class KerviLog(object):
     def fatal(self, message, *args):
         self.logger.fatal(BraceMessage(message, *args))
 
-def init_process_logging(process_name, config):
+def init_process_logging(process_name, config, log_queue=None):
     logger = logging.getLogger(process_name)
+    if config.level == "info":
+        logger.setLevel(logging.INFO)
     if config.level == "warning":
         logger.setLevel(logging.WARNING)
     elif config.level == "debug":
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.DEBUG)    
+        
 
-    if config.resetLog:
-        try:
-            os.remove(config.file)
-        except:
-            pass
-    file_handler = logging.FileHandler(config.file)
-    file_handler.setLevel(logging.DEBUG)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.ERROR)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    logger.addHandler(stream_handler)
+    if log_queue:
+        queue_handler = logging.handlers.QueueHandler(log_queue)
+        logger.addHandler(queue_handler)
+    else:
+        if config.resetLog:
+            try:
+                os.remove(config.file)
+            except:
+                pass
+
+        file_handler = logging.FileHandler(config.file)
+        file_handler.setLevel(logging.DEBUG)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.ERROR)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+        logger.addHandler(stream_handler)

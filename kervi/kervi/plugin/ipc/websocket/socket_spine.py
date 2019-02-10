@@ -27,6 +27,7 @@ from kervi.spine import Spine
 import kervi.utility.nethelper as nethelper
 from kervi.core.authentication import Authorization
 import kervi.utility.encryption as encryption
+import logging
 
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
@@ -259,16 +260,16 @@ class SocketSpine:
         ssl_context = None
 
         if encryption.enabled():
-            print("socket using ssl")
+            self._spine.log.debug("socket using ssl")
             cert_file, key_file = encryption.get_cert()
             try:
                 import ssl
                 ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
                 ssl_context.load_cert_chain(cert_file, key_file)
-                print("socket ssl found")
+                self._spine.log.debug("socket ssl found")
             except:
                 ssl_context = None
-                print("socket failed to use ssl")
+                self._spine.log.error("socket failed to use ssl")
 
         self._spine.log.debug(
             "start websocket on:{0}, port:{1}",
@@ -287,8 +288,7 @@ class SocketSpine:
         )
 
     def start_socket(self):
-        print("start websocket: ", self._config.network.ip, self._config.network.ws_port)
-        
+        self._spine.log.debug("start websocket: {0} {1} ", self._config.network.ip, self._config.network.ws_port)
         self.loop.run_until_complete(self.coro)
         self._started = True
 

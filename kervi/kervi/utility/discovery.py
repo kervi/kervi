@@ -7,7 +7,7 @@ import json
 
 class KerviAppDiscovery(threading.Thread):
 	def __init__(self, ip, port, discovery_port, app_id, challenge, app_name, web_address):
-		print("d", ip, port, discovery_port)
+		#print("d", ip, port, discovery_port)
 		threading.Thread.__init__(self, None, None, "Kervi App discovery")
 		self.deamon = True
 		self._terminate = False
@@ -31,7 +31,8 @@ class KerviAppDiscovery(threading.Thread):
 		self._sock.close()
 
 	def run(self):
-		print("Listining for discovery requests on port:", self._discovery_port)
+		import logging
+		logging.getLogger("discovery").info("Listining for discovery requests on port: %s", self._discovery_port)
 		while not self._terminate:
 			try:
 				data, address = self._sock.recvfrom(4096)

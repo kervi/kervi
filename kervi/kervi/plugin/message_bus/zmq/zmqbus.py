@@ -29,6 +29,7 @@ import json
 import uuid
 import queue
 import datetime
+import logging
 from kervi.plugin.message_bus.zmq.named_lists import NamedLists
 import kervi.utility.nethelper as nethelper
 from  kervi.core.utility.kervi_logging import KerviLog
@@ -497,6 +498,7 @@ class ZMQBus():
             self.send_connection_message(response_address, "queryResponse", message)
 
     def run(self):
+
         for message_thread in self._message_threads:
             message_thread.start()
 
@@ -516,7 +518,8 @@ class ZMQBus():
 
         self._ping_thread.start()
         if self._is_root:
-            print("IPC address:", self._signal_address)
+            logger = logging.getLogger()
+            self.log.info("IPC address: %s", self._signal_address)
     def stop(self):
         #print("stop zmq")
         exit_tag = "signal:exit"

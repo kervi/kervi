@@ -3,10 +3,10 @@ from kervi.plugin.plugin_manager import PluginManager
 from kervi.config import Configuration
 
 class BusManager():
-    def __init__(self):
+    def __init__(self, log_queue=None):
         
         self._plugin_manager = None
-        self._plugin_manager = PluginManager(Configuration, "message_bus", [KerviBusPlugin], load_silent=True)
+        self._plugin_manager = PluginManager(Configuration, "message_bus", [KerviBusPlugin], load_silent=True, log_queue=log_queue)
         self._plugin_manager.load_managed_plugins()
         self._current_bus = None
 
