@@ -19,6 +19,11 @@ class NumberValue(KerviValue):
     If is an output it is possible to specify different kinds of gauges.
     """
     def __init__(self, name, **kwargs):
+        self._q_unit = None
+        self._q_display = None
+        self._min_value = -100
+        self._max_value = 100
+        
         KerviValue.__init__(self, name, "number-value", **kwargs)
         #self.spine = Spine()
         try:
@@ -29,10 +34,6 @@ class NumberValue(KerviValue):
         except ModuleNotFoundError:
             self._Q = None
 
-        self._q_unit = None
-        self._q_display = None
-        self._min_value = -100
-        self._max_value = 100
         self._type = None
         #self._display_unit = None
         self._value = 0
@@ -149,7 +150,6 @@ class NumberValue(KerviValue):
                 from_unit = self._unit
                 to_unit = self._display_unit
 
-            #print("dv", from_unit, to_unit)
             self._q_unit = self._Q("1 " + from_unit)
             self._q_display = self._Q("1 " + to_unit)
             

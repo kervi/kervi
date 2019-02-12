@@ -53,7 +53,6 @@ class StoragePlugin(KerviPlugin):
 
     def log_error(self, message, *args):
         self.spine.log.error(message, *args)
-        print("storage error", "".format(message, *args))
 
     def to_json(self, data):
         return json.dumps(data, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')

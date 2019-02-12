@@ -38,7 +38,6 @@ class _HTTPRequestHandler(SimpleHTTPRequestHandler):
         return
 
     def do_AUTHHEAD(self):
-        print("send header")
         self.send_response(401)
         self.send_header('WWW-Authenticate', 'Basic realm=\"Test\"')
         self.send_header('Content-type', 'text/html')
@@ -56,7 +55,6 @@ class _HTTPRequestHandler(SimpleHTTPRequestHandler):
                     path = self.path.split("/")
                     cam_id = path[-1]
                     spine = Spine()
-                    print("cam:", cam_id)
                     info = spine.send_query("getComponentInfo", cam_id)
                     if info:
                         conn = http.client.HTTPConnection(info["ui"]["source"]["server"], timeout=self.timeout)
@@ -170,11 +168,8 @@ class _HTTPServer(ThreadingMixIn, HTTPServer):
             return True
         else:
             authstr = base64.b64decode(authorize_header[6:]).decode('utf-8')
-            print(authstr)
             credentials = authstr.split(":")
-            print(credentials)
             return Authorization.authorize(credentials[0], credentials[1])
-
 
 class KerviWebServerPlugin(WebServerPlugin):
     def __init__(self, name, config, manager, http_docs=None):
@@ -201,13 +196,11 @@ class KerviWebServerPlugin(WebServerPlugin):
         self._server_thread.start()
 
     def stop(self):
-        #print("stop web server")
         self._server.terminate = True
         self._server.shutdown()
         if not self._server_thread.join(5):
             print("")
-        #print("ws terminated")
-
+        
     def get_default_config(self):
         return {
                 "ip_address": "0.0.0.0",

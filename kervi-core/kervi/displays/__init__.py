@@ -212,14 +212,12 @@ class Display(Controller):
                     line_height = int(self._device.height / line_count )
                     if line_height < 16:
                         line_height = 8
-                #print("l", line_height, line_count, self._device.height)
                 if line_height == 8:
                     font = self._get_font(line_height, "PixelOperatorMono8-Bold.ttf")
                 else:
                     font = self._get_font(line_height, "PixelOperatorMono-Bold.ttf")
                 image = Image.new('1', size=(self._device.width, self._device.height), color=self._background_color)
                 draw = ImageDraw.Draw(image)
-                #draw.text((0, 0), self.text.value, font=self.font, fill=self._text_color)
                 draw.multiline_text((0, 0), self.text.value, font=font, fill=self._text_color, spacing=2)
                 self._bitmap_lock.acquire()
                 try:

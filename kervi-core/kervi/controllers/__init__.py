@@ -54,7 +54,6 @@ class Controller(KerviComponent):
                         method_qual_name = self.__class__.__name__ + "." + method_name
                     
                     if Actions.is_unbound(method_qual_name):
-                        #print("mqn", method_qual_name, method.__qualname__)
                         action_id, name = Actions.get_unbound(method_qual_name)
                         setattr(self, "kervi_action_"+ method.__name__, method)
                         copy_method = getattr(self, "kervi_action_"+ method.__name__)

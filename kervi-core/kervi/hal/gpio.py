@@ -14,6 +14,7 @@ In your application you access GPIO via:
 """
 from kervi.values import NumberValue, BooleanValue
 from kervi.values.value_list import ValueList
+from kervi.core.utility.kervi_logging import KerviLog
 
 CHANNEL_TYPE_ANALOG_IN = 1
 CHANNEL_TYPE_ANALOG_OUT = 2
@@ -140,7 +141,7 @@ class IGPIODeviceDriver(object):
             elif channel_type == CHANNEL_TYPE_GPIO:
                 self.channels[channel] = LogicIOChannel(self, channel)
             else:
-                print("unknown channel_type:", channel, channel_type)
+                KerviLog("gpio").warning("unknown channel_type: %s %s", channel, channel_type)
 
         return self.channels[channel]
 

@@ -16,7 +16,7 @@ class KerviIORouterPlugin(RouterPlugin):
         self._app_id = self.global_config.application.id
         if os.path.isfile('api_credentials.kervi_io'):
             with open('api_credentials.kervi_io') as handle:
-                print("using credentials file")
+                self.spine.log.verbose("using credentials file")
                 json_data = json.loads(handle.read())
                 self._api_user = json_data["api_user"]
                 self._api_password = json_data["api_password"]

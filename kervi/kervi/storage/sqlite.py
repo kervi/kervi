@@ -171,9 +171,9 @@ class SQLiteStoragePlugin(StoragePlugin):
             self._connection.commit()
         except lite.Error as er:
             self.log_error('error store settings data:{0}', er)
-            print("error store setting", er)
+            
         except Exception as er:
-            print("error store setting", er)
+            self.log_error('error store settings data:{0}', er)
         finally:
             self._db_lock.release()
 
@@ -197,8 +197,7 @@ class SQLiteStoragePlugin(StoragePlugin):
                 value = None
                 try:
                     value = self.from_json(all_rows[0][3])
-                except Exception as ex:
-                    #print("d", ex)
+                except Exception:
                     pass
 
                 return {

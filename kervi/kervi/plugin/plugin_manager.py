@@ -39,7 +39,7 @@ class _PluginInfo:
         self.instance = None
         self._manager = manager
         self._first_process_step = True
-        self._log = KerviLog("PluginManager")
+        self._log = KerviLog("PluginInfo")
 
     def _start_plugin_process(self, module_port):
         process._start_process(
@@ -60,19 +60,17 @@ class _PluginInfo:
             module = __import__(self._plugin_module, fromlist=[''])
             self.instance = module.init_plugin(self._config, self._manager)
             
-            is_valid = True
             if self._manager and self._manager._plugin_classes:
-                #plugin_bases = inspect.getmro(type(plugin))
                 valid = False
                 for plugin_class in self._manager._plugin_classes:
                     if isinstance(self.instance, plugin_class):
                         valid = True
                         break
                 if not valid:
-                    print("Invalid plugin class:", self.instance, "expected: ", self._manager._plugin_classes)
+                    self._log.error("Invalid plugin class: %s expected: %s", self.instance, self._manager._plugin_classes)
                     self.instance = None
         except Exception as ex:
-            print("Could not load plugin: ", self._plugin_module, ex)
+            self._log.error("Could not load plugin: %s", self._plugin_module, ex)
 
     def load(self, module_port=None):
         if self.own_process:
@@ -143,7 +141,6 @@ class PluginManager:
                         plugin_type = section
                         break
 
-                #print("x", plugin_type, plugin, name_sections, self._manager_config.plugin_types[plugin_type].own_process)
                 self._plugins.append(_PluginInfo(
                     plugin,
                     plugin_config, 

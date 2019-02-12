@@ -13,8 +13,6 @@ import logging
 
 class _KerviProcess(object):
     def __init__(self, scope, name, config, ipcPort, root_close, log_queue=None, **kwargs):
-        #print("process", scope, name)
-        #process_id = groups = kwargs.get("process_id", name)
         self.name = name
         self._do_terminate = False
         self._is_connected = False
@@ -29,7 +27,6 @@ class _KerviProcess(object):
         self.spine.send_command("startThreads", local_only=True)
 
     def __del__(self):
-        #print("pd", self.name)
         pass
 
     def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
@@ -83,7 +80,6 @@ def _launch(scope, name, process_class, config_data, ipc_port, root_close, log_q
     except:
         log.exception("error in process loop")
         pass
-    #print("leave process", name, spine.Spine().root_gone)
     process._terminate_process()
 
 def _start_process(scope, name, config, port_idx, process_class, root_close=True, log_queue=None, **kwargs):

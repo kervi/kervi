@@ -8,7 +8,6 @@ class KerviPlugin(object):
         if config:
             plugin_config = config.as_dict()
         self._config._load(config_user=plugin_config, config_base=self.get_default_config())
-        #print("y", plugin_config)
         from kervi.config import Configuration
         self._global_config = Configuration
         self._name = name

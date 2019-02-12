@@ -11,7 +11,6 @@ def get_camera_driver(source):
     return camera_driver.CameraDriver()
 
 def service_commands(commands, app_name, app_id, script_path):
-    print("win service commands: ", commands, app_name, app_id, script_path)
     from . import service
     service.handle_command(commands, app_name, app_id, script_path)
 

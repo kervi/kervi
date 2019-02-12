@@ -5,7 +5,7 @@ import importlib
 import json
 import collections
 import os
-
+from kervi.core.utility.kervi_logging import KerviLog
 def _deep_update(d, u):
     """Update a nested dictionary or similar mapping.
     Modify ``source`` in place.
@@ -73,6 +73,7 @@ class _Configuration:
             self._config = None
             self._config_base = None
             self._is_loaded = False
+            self._log = KerviLog("config")
 
         def _load(self, **kwargs):
             self._config_path = kwargs.get("config_file", None)
@@ -85,7 +86,7 @@ class _Configuration:
             elif not self._user_config and self._config_path:
                 try:
                     if os.path.isfile(self._config_path):
-                        print("use config:", self._config_path)
+                        self._log.verbose("use config: %s", self._config_path)
                         config_data = ""
 
                         with open(self._config_path, "r") as config_file:
@@ -97,10 +98,9 @@ class _Configuration:
                                     config_data += "\n"
                         if config_data:
                             self._user_config = json.loads(config_data)
-                        #print(self._user_config)
+                        
                 except Exception as ex:
-                    print("error in config file", ex)
-                    pass
+                    self._log.error("error in config file: %s", ex)
 
             self._config = self._config_base
             if self._user_config:
@@ -108,7 +108,6 @@ class _Configuration:
             if self._user_data:
                 self._config = _deep_update(self._config, self._user_data)
 
-            #self.__dict__.update(config)
             self._load_dict(self._config, top=self)
             self._is_loaded = True
 
@@ -116,7 +115,6 @@ class _Configuration:
             return True
 
         def to_json(self):
-            #print("c", self._config)
             return json.dumps(self._config)
 
         def get(self, name, default_value=None):

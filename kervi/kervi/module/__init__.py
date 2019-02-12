@@ -336,7 +336,7 @@ class Module(object):
         while not self._is_ready():
             time.sleep(1)
         
-        self._logger.info("module connected to application at:", self._root_address)
+        self._logger.info("module connected to application at: %s", self._root_address)
         self._logger.info("Press ctrl + c to stop your module")
         self.spine.trigger_event(
             "moduleReady",

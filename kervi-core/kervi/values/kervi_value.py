@@ -151,7 +151,6 @@ class KerviValue(KerviComponent):
     def _load_persisted(self):
         if self._persist_value:
             value = self.settings.retrieve_value("value", self._default_value)
-            #print("v", value)
             self._set_value(value, False)
 
     def link_to(self, source, transformation=None):
@@ -263,7 +262,7 @@ class KerviValue(KerviComponent):
             try:
                 self.value_changed(nvalue, old_value)
             except Exception as Ex:
-                print("Error in value changed", Ex)
+                self.spine.log.exception("Error in value changed")
             
             for observer in self._observers:
                 try:
@@ -273,7 +272,7 @@ class KerviValue(KerviComponent):
                     else:
                         item.kervi_value_changed(self, nvalue)
                 except Exception:
-                    print("error in value observer:")
+                    self.spine.log.exception("error in value observer:")
 
             self._check_value_events(nvalue, old_value)
 

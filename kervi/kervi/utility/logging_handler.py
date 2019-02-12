@@ -17,7 +17,6 @@ class LogInfoLevelFilter(logging.Filter):
         self._level = param
 
     def filter(self, record):
-        #print("r", self._level, record)
         if self._level == 25 and record.levelno == 25:
             return True
 
@@ -31,16 +30,12 @@ class LogInfoLevelFilter(logging.Filter):
 
 
 def logger_thread(q):
-    #print("start log thread")
     while True:
         record = q.get()
         if record is None:
             break
-        #print("log", record)
         logger = logging.getLogger(record.name)
         logger.handle(record)
-    #print("exit log thread")
-
 
 class KerviLogHandler:
     def __init__(self, config):

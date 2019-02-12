@@ -45,7 +45,6 @@ class MessageManager(Controller):
                 ingroup = any(i in groups for i in user.groups)
                 if ingroup:
                     users += [user]
-        #print("u", users, message_channels, self._channels.keys())
         if users:
             for message_channel in message_channels:
                 

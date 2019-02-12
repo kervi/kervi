@@ -175,8 +175,7 @@ class StepperMotor(object):
             s_per_s /= self.MICROSTEPS
             steps *= self.MICROSTEPS
 
-        #print("{} sec per step".format(s_per_s))
-
+        
         for s in range(steps):
             lateststep = self._step(direction, step_style)
             time.sleep(s_per_s)
