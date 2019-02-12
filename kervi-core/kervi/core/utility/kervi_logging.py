@@ -8,7 +8,12 @@ to a fully configured log.
 """
 
 import logging
+import logging.handlers
 import os
+
+VERBOSE = 15
+
+logging.addLevelName(VERBOSE, "VERBOSE")
 
 class BraceMessage(object):
     def __init__(self, fmt, *args):
@@ -16,15 +21,31 @@ class BraceMessage(object):
         self.args = args
 
     def __str__(self):
-        return self.fmt.format(*self.args)
+        try:
+            if '{' in self.fmt:
+                return self.fmt.format(*self.args)
+            else:
+                return self.fmt % self.args
+        except:
+            return self.fmt
 
 class KerviLog(object):
     def __init__(self, name):
         
         self.logger = logging.getLogger(name)
+        
 
     def info(self, message, *args):
         self.logger.info(BraceMessage(message, *args))
+
+    def verbose(self, message, *args, **kwargs):
+        if args:
+            self.logger._log(VERBOSE, str(BraceMessage(message, *args)), None)
+        else:
+            self.logger._log(VERBOSE, message, *args)
+    
+    def warn(self, message, *args):
+        self.logger.warn(BraceMessage(message, *args))
 
     def debug(self, message, *args):
         if args:
@@ -43,9 +64,12 @@ class KerviLog(object):
 
 def init_process_logging(process_name, config, log_queue=None):
     logger = logging.getLogger(process_name)
-    if config.level == "info":
+    
+    if config.level == "verbose":
+        logger.setLevel(VERBOSE)
+    elif config.level == "info":
         logger.setLevel(logging.INFO)
-    if config.level == "warning":
+    elif config.level == "warning":
         logger.setLevel(logging.WARNING)
     elif config.level == "debug":
         logger.setLevel(logging.DEBUG)    

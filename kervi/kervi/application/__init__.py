@@ -21,10 +21,12 @@
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
 import os
+os.system('color')
 import time
 import threading
 import logging
-import logging.config
+from kervi.core.utility.kervi_logging import KerviLog
+
 try:
     import thread
 except ImportError:
@@ -35,21 +37,24 @@ if sys.version_info[0] < 3:
     print("Kervi requires Python 3")
     exit()
 
+from kervi.application.kervi_module import KerviModule
 import kervi.utility.nethelper as nethelper
 from kervi.controllers import Controller
 from kervi.actions import action
 from kervi.application.default_config import get_default_config
 from kervi.plugin.plugin_manager import PluginManager
 from kervi.utility.discovery import KerviAppDiscovery
+from kervi.utility.logging_handler import KerviLogHandler
 
 import signal
 
 _app_running = True
+_console_log = 15
 
 def handler_stop_signals(signum, frame):
     global _app_running
     _app_running = False
-    print("signal:", signum)
+    logging.getLogger().fatal("signal:", signum)
 
 def _pretty_print(d, indent=0):
     if isinstance(d, dict):
@@ -72,23 +77,6 @@ def _pretty_print(d, indent=0):
 
 
 
-class LogLevelFilter(logging.Filter):
-    def __init__(self, param=None):
-        self._level = param
-
-    def filter(self, record):
-        return record.levelno == self._level
-
-def logger_thread(q):
-    #print("start log thread")
-    while True:
-        record = q.get()
-        if record is None:
-            break
-        #print("log", record)
-        logger = logging.getLogger(record.name)
-        logger.handle(record)
-    #print("exit log thread")
 
 class _AppActions(Controller):
     def __init__(self, app):
@@ -120,12 +108,12 @@ class Application(object):
     def __init__(self, user_config = None):
         """ Settings is a dictionary with the following content
         """
+        global _console_log
         
-        
-        print("Starting kervi application")
+        print("\033[92mStarting kervi application \033[0m")
         import inspect
         import getopt
-        from multiprocessing import Queue
+       
         
         self._discovery_thread = None
         config_files = []
@@ -204,87 +192,18 @@ class Application(object):
                 print("devices:")
                 _pretty_print(devices)
             exit()
-
-        log_config = {
-            'version': 1,
-            'filters':{
-                'info':{
-                    '()': LogLevelFilter,
-                    'param': logging.INFO
-                },
-                'error':{
-                    '()': LogLevelFilter,
-                    'param': logging.ERROR
-                }
-            },
-            'formatters': {
-                'detailed': {
-                    'class': 'logging.Formatter',
-                    'format': '%(asctime)s %(name)-15s %(levelname)-8s %(processName)-10s %(message)s'
-                },
-                'console': {
-                    'class': 'logging.Formatter',
-                    'format': 'l %(message)s',
-                    
-                },
-                'console-error': {
-                    'class': 'logging.Formatter',
-                    'format': 'ERROR %(processName)-10s %(message)s',
-                    
-                },
-            },
-            'handlers': {
-                'console': {
-                    'class': 'logging.StreamHandler',
-                    'level': 'INFO',
-                    'formatter': 'console',
-                    'filters': ['info']
-                },
-                'console-error': {
-                    'class': 'logging.StreamHandler',
-                    'level': 'ERROR',
-                    'formatter': 'console-error',
-                    'filters': ['error']
-                },
-                'file': {
-                    'class': 'logging.FileHandler',
-                    'filename': 'mplog.log',
-                    'mode': 'w',
-                    'formatter': 'detailed',
-                },
-                'errors': {
-                    'class': 'logging.FileHandler',
-                    'filename': 'mplog-errors.log',
-                    'mode': 'w',
-                    'level': 'ERROR',
-                    'formatter': 'detailed',
-                },
-            },
-            'loggers':{
-                'kervi':{
-                    'handlers': ['console', 'file', 'errors']
-                }
-            },
-        
-            'root': {
-                'level': 'DEBUG',
-                'handlers': ['console', 'console-error', 'file', 'errors']
-            },
-        }
-
-        logging.config.dictConfig(log_config)
-        self._logger = logging.getLogger()
-        self._log_queue = Queue()
-        self._logging_thread = threading.Thread(target=logger_thread, args=(self._log_queue,))
-        self._logging_thread.start()
+        self._log_handler = KerviLogHandler(self.config)
+        self._log_queue = self._log_handler._log_queue 
+        self._logger = KerviLog("application")
         #self._validateSettings()
         self.started = False
         self._webserver_port = None
 
+
         import kervi.hal as hal
         hal_driver = hal._load(self.config.platform.driver)
         if hal_driver:
-            self._logger.info("platform driver: %s", hal_driver)
+            self._logger.verbose("platform driver: %s", hal_driver)
             
         from kervi.plugin.message_bus.bus_manager import BusManager
         self.bus_manager = BusManager(self._log_queue)
@@ -345,7 +264,7 @@ class Application(object):
                 if module.module_id == module_id:
                     
                     if not module.is_alive:
-                        self._logger.info("module started: %s", module_id)
+                        self._logger.verbose("module started: %s", module_id)
                         self.spine.trigger_event(
                             "moduleStarted",
                             module_id
@@ -353,7 +272,7 @@ class Application(object):
                     module.ping()
                     break
             else:
-                self._logger.info("module started: %s", module_id)
+                self._logger.verbose("module started: %s", module_id)
                 self._kervi_modules += [KerviModule(module_id)]
                 self.spine.trigger_event(
                     "moduleStarted",
@@ -364,7 +283,7 @@ class Application(object):
         with self._kervi_modules_lock:
             for module in self._kervi_modules:
                 if not module.is_alive and module.connected:
-                    self._logger.info("module stopped: %s", module.module_id)
+                    self._logger.verbose("module stopped: %s", module.module_id)
                     module.connected = False
                     self.spine.trigger_event(
                         "moduleStopped",
@@ -453,11 +372,7 @@ class Application(object):
         if self._webserver_info:
             ready_message = "Your Kervi application is ready at http://" + self._webserver_info["ip"] + ":" + str(self._webserver_info["port"])
 
-        import platform
-        if platform.system() != "Windows":
-            self._logger.info("\033[92m" + ready_message + "\033[0m")
-        else:
-            self._logger.info(ready_message)
+        self._logger.info(ready_message)
 
         self.spine.send_command("kervi_action_app_main")
         self.spine.send_command("startWebSocket")
@@ -522,7 +437,7 @@ class Application(object):
         if self._discovery_thread:
             self._discovery_thread.terminate()
 
-        self._logger.info("stopping processes")
+        self._logger.warn("stopping processes")
         import kervi.core.utility.process as process
         process._stop_processes("app-" + self.config.application.id)
         self.spine.trigger_event("processTerminating", None, local_only=True)
@@ -536,19 +451,19 @@ class Application(object):
             os._exit(0)
 
     def _stop_action(self):
-        self._logger.info("stop action")
+        self._logger.verbose("stop action")
         self.stop()
 
     def _restart_action(self):
-        self._logger.info("restart action")
+        self._logger.verbose("restart action")
         self.stop(restart=True)
 
     def _reboot_action(self):
-        self._logger.info("reboot action")
+        self._logger.verbose("reboot action")
         import kervi.hal as hal
         hal.device_reboot()
 
     def _shutdown_action(self):
-        self._logger.info("shutdown action")
+        self._logger.verbose("shutdown action")
         import kervi.hal as hal
         hal.device_shutdown()

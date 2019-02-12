@@ -25,7 +25,7 @@ import kervi.core.utility.process as process
 class _KerviModuleLoader(process._KerviProcess):
     """ Private class that starts a separate process that loads a module in the Kervi application """
     def init_process(self, **kwargs):
-        self.spine.log.info("load: {0}", self.name)
+        self.spine.log.verbose("load: %s", self.name)
 
         try:
             import kervi.hal as hal

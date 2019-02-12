@@ -519,7 +519,7 @@ class ZMQBus():
         self._ping_thread.start()
         if self._is_root:
             logger = logging.getLogger()
-            self.log.info("IPC address: %s", self._signal_address)
+            self.log.verbose("IPC address: %s", self._signal_address)
     def stop(self):
         #print("stop zmq")
         exit_tag = "signal:exit"

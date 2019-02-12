@@ -2,7 +2,7 @@ import inspect
 from kervi.config.configuration import _KerviConfig
 import kervi.core.utility.process as process
 import kervi.utility.nethelper as nethelper
-import logging
+from kervi.core.utility.kervi_logging import KerviLog
 import time
 class _KerviPluginProcess(process._KerviProcess):
     """ Private class that starts a separate process for plugins """
@@ -39,6 +39,7 @@ class _PluginInfo:
         self.instance = None
         self._manager = manager
         self._first_process_step = True
+        self._log = KerviLog("PluginManager")
 
     def _start_plugin_process(self, module_port):
         process._start_process(
@@ -55,7 +56,7 @@ class _PluginInfo:
     def _create_instance(self):
         try:
             if (self._manager and not self._manager._load_silent) and True:
-                logging.getLogger().info("load plugin: %s", self._plugin_module)
+                self._log.verbose("load plugin: %s", self._plugin_module)
             module = __import__(self._plugin_module, fromlist=[''])
             self.instance = module.init_plugin(self._config, self._manager)
             
@@ -121,6 +122,7 @@ class PluginManager:
         self._plugins = []
         self._plugin_classes = plugin_classes
         self._log_queue = log_queue
+        self.log = KerviLog("PluginManager")
 
         self._manager_config = self._config.plugin_manager
 

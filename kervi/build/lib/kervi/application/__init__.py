@@ -33,7 +33,7 @@ if sys.version_info[0] < 3:
     print("Kervi requires Python 3")
     exit()
 
-#from kervi.application.kervi_module import KerviModule
+from kervi.application.kervi_module import KerviModule
 #import kervi.core.utility.process as process
 #import kervi.spine as spine
 #from kervi.utility.process_spine import _ProcessSpine

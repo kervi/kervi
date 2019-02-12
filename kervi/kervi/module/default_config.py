@@ -15,6 +15,14 @@ def get_default_config():
             "challenge": "kervi",
             "port": 9434
         },
+        "log" : {
+            "levels":["fatal", "error", "warning", "information", "debug"],
+            "level":"info",
+            "console_level":"verbose",
+            "file": "kervi.log",
+            "max_file_size": 1000000,
+            "resetLog": False
+        },
         "modules":[],
         "network" : {
             "ip": nethelper.get_ip_address(),
