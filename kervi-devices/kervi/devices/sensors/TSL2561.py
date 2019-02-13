@@ -44,7 +44,8 @@ class TSL2561DeviceDriver(I2CSensorDeviceDriver):
             newval = self.i2c.reverse_byte_order(wordval)
             return newval
         except IOError:
-            print("Error accessing 0x%02X: Check your I2C address" % self.i2c.address)
+            import logging
+            logging.getLogger("TSL2561").exception("Error accessing 0x%02X: Check your I2C address" % self.i2c.address)
             return -1
 
 

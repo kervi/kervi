@@ -15,12 +15,9 @@ class _ServoController(ServoMotorControllerBase):
 
         self._pulse_length = 1000000    # 1,000,000 us per second
         self._pulse_length //= 60       # 60 Hz
-        #print('{0}us per period'.format(self._pulse_length))
         self._pulse_length //= 4096     # 12 bits of resolution
-        #print('{0}us per bit'.format(self._pulse_length))
-
+        
     def _set_position(self, channel, position, adjust_min=0, adjust_max=0, adjust_center=0):
-        print("sp", channel, position)
         pulse_min = 200 + 200 * adjust_min
         pulse_center = 400 + 400 * adjust_center
         pulse_max = 600 + 600 * adjust_max
@@ -35,7 +32,6 @@ class _ServoController(ServoMotorControllerBase):
         #servo_pulse = 1000 * pulse
         #servo_pulse //= self._pulse_length
 
-        #print("sp", channel, position, int(pulse), int(servo_pulse))
         self.pwm_device.set_pwm(channel, 0, int(pulse))
 
 class PCA9685ServoDeviceDriver(MotorControllerBoard):

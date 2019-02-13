@@ -3,7 +3,7 @@ from kervi.plugin.authentication.authentication_plugin import AuthenticationPlug
 class PlainAuthenticationPlugin(AuthenticationPlugin):
     def __init__(self, configuration, manager):
         AuthenticationPlugin.__init__(self, "plain", configuration, manager)
-        self._users = manager.config.plain_users
+        self._users = self.global_config.plain_users
     def allow_anonymous(self):
         if "anonymous" in self._users.keys:
             return self._users.anonymous.enabled
@@ -44,3 +44,6 @@ class PlainAuthenticationPlugin(AuthenticationPlugin):
 
 def init_plugin(config, manager):
     return PlainAuthenticationPlugin(config, manager)
+
+def plugin_type():
+    return "authentication"

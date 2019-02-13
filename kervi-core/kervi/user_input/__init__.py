@@ -45,17 +45,17 @@ class UserInput(Controller):
             if len(self._devices.keyboards):
                 self._keyboard_thread = _InputThread(self, self._devices.keyboards[0])
             else:
-                print("no keyboards found")
+                self.spine.log.warning("no keyboards found")
         if listen_to_mouse:
             if len(self._devices.mice):
                 self._mouse_thread = _InputThread(self, self._devices.mice[0])
             else:
-                print("no mouse found")
+                self.spine.log.warning("no mouse found")
         if listen_to_gamepad:
             if len(self._devices.gamepads):
                 self._gamepad_thread = _InputThread(self, self._devices.gamepads[0])
             else:
-                print("no gamepads found")
+                self.spine.log.warning("no gamepads found")
         self.key = self.outputs.add("key", "Key", StringValue)
         self.mouse_x = self.outputs.add("mouse_x", "Mouse x", NumberValue)
         self.mouse_y = self.outputs.add("mouse_y", "Mouse y", NumberValue)
@@ -98,14 +98,12 @@ class UserInput(Controller):
 
         if self._gamepad_thread:
             self._gamepad_thread.terminate()
-        #self._keyboard_thread.join()
 
     def on_input(self, event, thread):
         if event.ev_type == "Sync":
             return
         if event.ev_type == "Misc":
             return
-        #print("event", event.code, event.state, event.timestamp, event.ev_type)
         if event.ev_type == "Relative":
             if event.code == "REL_WHEEL":
                 self.mouse_wheel.value += event.state

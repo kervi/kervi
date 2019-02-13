@@ -264,10 +264,7 @@ class _HTTPFrameHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            #print("ch", self.headers["Cookie"])
             if self.server.authorization.valid_session_header(self.headers["Cookie"]):
-
-                #print("img", self.path)
                 cam_id = self.server.camera.component_id
                 if self.path.startswith("/"+ cam_id + "/media"):
                     self.send_response(200)
@@ -325,7 +322,6 @@ try:
             self.mutex = mutex
             self.authorization = Authorization()
 except:
-    print("ThreadingMixIn not found, use single thread camera server")
     class _HTTPFrameServer(HTTPServer):
         def __init__(self, addres, handler, camera, mutex):
             HTTPServer.__init__(self, addres, handler)
@@ -477,7 +473,6 @@ class CameraStreamer(CameraBase):
             result["files"].append({
                 "name": media[7:]
             })
-        #print("mf", result)
         return result
 
 class IPCamera(CameraBase):

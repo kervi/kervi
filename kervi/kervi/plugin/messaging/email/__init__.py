@@ -6,7 +6,6 @@ from email.headerregistry import Address
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from kervi.plugin.messaging.message_plugin import MessagePlugin
-from kervi.config import Configuration
 from kervi.core.utility.superformatter import SuperFormatter
 import datetime
 from email.utils import formatdate
@@ -50,7 +49,7 @@ class EmailPlugin(MessagePlugin):
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
             msg['Date'] = formatdate(localtime=True)
-            msg['From'] = self._config.smtp.sender_name + "<" + self._config.smtp.sender_address + ">"
+            msg['From'] = self.plugin_config.smtp.sender_name + "<" + self.plugin_config.smtp.sender_address + ">"
             msg['To'] = recipient.name + "<" + email + ">"
 
             if body:
@@ -63,14 +62,29 @@ class EmailPlugin(MessagePlugin):
                 msg.attach(part2)
 
             
-            with smtplib.SMTP(self._config.smtp.server, self._config.smtp.port) as smtp:
-                if self._config.smtp.tls:
+            with smtplib.SMTP(self.plugin_config.smtp.server, self.plugin_config.smtp.port) as smtp:
+                if self.plugin_config.smtp.tls:
                     smtp.starttls()
 
-                if self._config.smtp.user and self._config.smtp.password:
-                    smtp.login(self._config.smtp.user, self._config.smtp.password)
+                if self.plugin_config.smtp.user and self.plugin_config.smtp.password:
+                    smtp.login(self.plugin_config.smtp.user, self.plugin_config.smtp.password)
 
                 smtp.send_message(msg)
-       
+    def get_default_config(self):
+        return {
+            "smtp": {
+                "sender_name": "Kervi",
+                "sender_address": "kervi@example.com",
+                "server": "localhost",
+                "port": "25",
+                "user": "",
+                "password": "",
+                "tls": False
+            }
+        }      
+
 def init_plugin(config, manager):
     return EmailPlugin(config, manager)
+
+def plugin_type():
+    return "messaging"

@@ -44,20 +44,19 @@ class Sensor(Controller):
 
     """
     def __init__(self, sensor_id, name, device=None, **kwargs):
-        #KerviComponent.__init__(self, sensor_id, "sensor", name, **kwargs)
         Controller.__init__(self, sensor_id, name)
+        self._device = device
+        self._sub_sensors = []
+        self._dimensions = 1
+        self._index = kwargs.pop("index", -1)
+        self._enabled = None
+
         if device.value_type == "color":
             self._sensor_value = self.outputs.add("value", name, ColorValue)
         elif device.value_type == "number":
             self._sensor_value = self.outputs.add(sensor_id, name, NumberValue)
         else:
             raise ValueError("Can not handle device value type: " + str(device.value_type))
-
-        self._device = device
-        self._sub_sensors = []
-        self._dimensions = 1
-        self._index = kwargs.pop("index", -1)
-        self._enabled = None
         
         if self._device:
             self.value_type = self._device.type

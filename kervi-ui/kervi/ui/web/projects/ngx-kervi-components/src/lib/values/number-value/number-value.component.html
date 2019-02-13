@@ -1,8 +1,9 @@
 <ng-container *ngIf="!inline">
     <div class="value-input" *ngIf="linkParameters.isInput">
-        <ui-slider [value]="(value.value$ | async)" (sliderChanged)="setKerviValue($event)" [minValue]="value.minValue" [maxValue]="value.maxValue" [linkParameters]="linkParameters"></ui-slider>
+        <input *ngIf="linkParameters.isInput" class="form-control text-right pull-right" (keyup)="onChange($event)" value="{{(value.value$ | async)}}"/>
+        <!-- <ui-slider [value]="(value.value$ | async)" (sliderChanged)="setKerviValue($event)" [minValue]="value.minValue" [maxValue]="value.maxValue" [linkParameters]="linkParameters"></ui-slider> -->
     </div>
-    <div class="value-value" [style.min-width.rem]="linkParameters.valueSize">
+    <div class="value-value" *ngIf="!linkParameters.isInput" [style.min-width.rem]="linkParameters.valueSize">
         <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i>
 		<value-sparkline *ngIf="linkParameters.showSparkline && !linkParameters.isInput" [value]="value"></value-sparkline>
         {{(value.value$ | async | number:numberFormat)}}

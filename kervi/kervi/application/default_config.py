@@ -12,50 +12,61 @@ def get_default_config():
         "discovery":{
             "enabled": True,
             "challenge": "kervi",
-            "port": nethelper.get_free_port([9434])
+            "port": nethelper.get_free_port([9434, 9435, 9436])
         },
         "log" : {
             "levels":["fatal", "error", "warning", "information", "debug"],
-            "level":"debug",
-            "file":"kervi.log",
+            "level":"info",
+            "console_level":"verbose",
+            "file": "kervi.log",
+            "max_file_size": 1000000,
             "resetLog": False
         },
         "modules":[],
         "network" : {
             "ip": nethelper.get_ip_address(),
-            "http_port": nethelper.get_free_port([80, 8080, 8081]),
-            "ws_port": nethelper.get_free_port([9000]),
+            "ws_port": nethelper.get_free_port([9000, 9001, 9002]),
             "ipc_root_port": nethelper.get_free_port([9500]),
             "ipc_root_address": nethelper.get_ip_address()
         },
-        "plugins":{
-            "authentication": {
-                "kervi.plugin.authentication.plain": False
-            },
-            "storage":{
-                "kervi.plugin.storage.sqlite_temp": {
-                    "enabled": True,
-                    "name": None
+        "plugin_manager":{
+            "plugin_types":{
+                "default": {
+                    "managed": False,
+                    "own_process": True
                 },
-                "kervi.plugin.storage.sqlite": {
-                    "enabled": True,
-                    "name": None
-                }
-            },
-            "messaging":{
-                "kervi.plugin.messaging.email": {
-                    "enabled": False,
-                    "smtp": {
-                        "sender_name": "Kervi",
-                        "sender_address": "kervi@example.com",
-                        "server": "localhost",
-                        "port": "25",
-                        "user": "",
-                        "password": "",
-                        "tls": False
-                    }
+                "messaging": {
+                    "own_process": False,
+                    "managed": True  
+                },
+                "ui": {
+                    "own_process": True,
+                    "managed": False
+                },
+                "storage": {
+                    "own_process": False,
+                    "managed": True
+                },
+                "authentication": {
+                    "own_process": False,
+                    "managed": True
+                },
+                "message_bus": {
+                    "own_process": False,
+                    "managed": True
                 }
             }
+        },
+        "plugins":{
+            "kervi.plugin.message_bus.zmq": True,
+            "kervi.plugin.authentication.plain": True,
+            "kervi.plugin.storage.sqlite_temp": True,
+            "kervi.plugin.storage.sqlite": True,
+            "kervi.plugin.messaging.email": False,
+            "kervi.plugin.messaging.user_log": True,
+            "kervi.plugin.routing.kervi_io": False,
+            "kervi.plugin.ui.web": True,
+            "kervi.plugin.ipc.websocket": True
         },
         "plain_users": {
             "anonymous":{

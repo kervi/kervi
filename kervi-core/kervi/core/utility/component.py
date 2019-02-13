@@ -193,11 +193,7 @@ class KerviComponent(object):
                     authorized = False
                 
             if authorized:
-                #try:
                 info = self._get_info(**kwargs)
-                #except Exception as ex:
-                #    print("ex", self.component_id, ex)
-                #    info = {}
                 ui_parameters = self._get_ui_parameters(self._ui_parameters)
                 info["componentType"] = self.component_type
                 info["id"] = self.component_id
@@ -207,7 +203,6 @@ class KerviComponent(object):
                 dashboard_links = []
                 for link in self._dashboard_links:
                     param = self._camel_case_parameters(link.parameters)
-                    #print("pmr", link.dashboard_id, dashboard_id, section_id, self.component_id, param)
                     dashboard_links += [{
                         "linkId": link.link_id,
                         "dashboardId": link.dashboard_id,
@@ -237,12 +232,10 @@ class KerviComponent(object):
 
     def _get_dashboard_components(self, dashboard_id, section_id):
         result = []
-        #print("gdc", self._component_id, dashboard_id, section_id)
         for link in self._dashboard_links:
             if ((link.dashboard_id == "*" or link.dashboard_id == dashboard_id)
                     and link.section_id == section_id):
                 param = self._camel_case_parameters(link.parameters)
-                #print("pmr", link.dashboard_id, dashboard_id, section_id, self.component_id, param)
                 result += [{
                     "linkId": link.link_id,
                     "componentId":self.component_id,

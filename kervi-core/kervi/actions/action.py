@@ -170,10 +170,8 @@ class _ActionThread(threading.Thread):
         self.result = None
 
     def run(self):
-        #print("run", self._action.action_id)
         self.result = self._action._execute(*self._args, **self._kwargs)
-        #print("run exit", self._action.action_id)
-
+        
 class _ActionInterrupt():
     def __init__(self, interrupt):
         self._interrupt = interrupt
@@ -195,7 +193,6 @@ class Action(KerviComponent):
         self._handler.__globals__["exit_action"] = False
         argspec = inspect.getargspec(handler)
         self._keywords = argspec.keywords != None
-        #print("kw", self.action_id, self._keywords, argspec, handler)
         self.spine = Spine()
         self.spine.register_command_handler("kervi_action_" + action_id, self._handle_command)
         self.spine.register_command_handler("kervi_action_interrupt_" + action_id, self.interrupt)
@@ -385,10 +382,9 @@ class Action(KerviComponent):
             self._state = ACTION_SUCCESS
 
         except Exception as e:
-            print("action failed:", self.action_id, e)
+            self.spine.log.exception("action failed: %s %s", self.action_id, e)
             self._send_message("failed", e)
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_tb(exc_traceback, limit=10, file=sys.stdout)
+            
             self._state = ACTION_FAILED
         self.spine.trigger_event("actionDone", self.action_id, self._state, result)
         self._last_result = result
@@ -443,7 +439,7 @@ class Action(KerviComponent):
                         result = thread
                 return result
             except Exception as ex:
-                print(ex)
+                self.spine.log.exception(ex)
                 self._action_lock.release()
             finally:
                 pass
@@ -641,7 +637,8 @@ class Action(KerviComponent):
                 if qual_name:
                     Actions.add_unbound_interrupt(qual_name, self)
                 else:
-                    print("using upython? if yes you need to pass the name of the controller class via the controller_class parameter.")    
+                    import logging 
+                    logging.getLogger().error("using upython? if yes you need to pass the name of the controller class via the controller_class parameter.")    
                 return f
         
         if method:

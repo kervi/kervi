@@ -1,5 +1,4 @@
 
-from kervi.spine import Spine
 
 import json
 import inspect
@@ -25,12 +24,11 @@ class _ObjectEncoder(json.JSONEncoder):
             return self.default(data)
         return obj
 
-from kervi.plugin import KerviPlugin
+from kervi.plugin.kervi_plugin import KerviPlugin
 class StoragePlugin(KerviPlugin):
     def __init__(self, name, config, manager):
         KerviPlugin.__init__(self, name, config, manager)
-        self._spine = Spine()
-
+    
     @property
     def storage_type(self):
         return "persisted"
@@ -54,8 +52,7 @@ class StoragePlugin(KerviPlugin):
         raise NotImplementedError    
 
     def log_error(self, message, *args):
-        self._spine.log.error(message, *args)
-        print("storage error", "".format(message, *args))
+        self.spine.log.error(message, *args)
 
     def to_json(self, data):
         return json.dumps(data, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')

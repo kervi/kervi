@@ -8,7 +8,6 @@ GPIO.setmode(GPIO.BOARD)
 class GPIODriver(IGPIODeviceDriver):
     def __init__(self, gpio_id="RPI_GPIO"):
 
-        print("init rpi gpio driver")
         IGPIODeviceDriver.__init__(self, gpio_id)
         self._pwm_pins = {}
         self._pin_map ={

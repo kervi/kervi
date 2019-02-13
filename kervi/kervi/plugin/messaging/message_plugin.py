@@ -1,5 +1,5 @@
 
-from kervi.plugin import KerviPlugin
+from kervi.plugin.kervi_plugin import KerviPlugin
 class MessagePlugin(KerviPlugin):
     def __init__(self, name, configuration, manager):
         KerviPlugin.__init__(self, name, configuration, manager)

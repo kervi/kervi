@@ -21,6 +21,9 @@
 
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
+import os
+os.system('color')
+
 import time
 import threading
 try:
@@ -41,7 +44,9 @@ import kervi.utility.application_helpers as app_helpers
 from kervi.actions import action, Actions
 from kervi.controllers import Controller
 from kervi.module.default_config import get_default_config
-
+from kervi.plugin.plugin_manager import PluginManager
+from kervi.utility.logging_handler import KerviLogHandler
+from kervi.core.utility.kervi_logging import KerviLog
 _app_running = True
 
 def handler_stop_signals(signum, frame):
@@ -78,22 +83,18 @@ class _ModuleActions(Controller):
 
     @action
     def shutdown(self):
-        print("shutdown module device")
         self._module._shutdown_action()
 
     @action
     def reboot(self):
-        print("reboot module device")
         self._module._reboot_action()
 
     @action
     def stop(self):
-        print("stop module")
         self._module._stop_action()
 
     @action
     def restart(self):
-        print("restart module")
         self._module._restart_action()
 
 
@@ -193,29 +194,49 @@ class Module(object):
                 _pretty_print(devices)
             exit()
 
-        print("Starting kervi module, please wait")
+        self._log_handler = KerviLogHandler(self.config)
+        self._log_queue = self._log_handler._log_queue 
+        self._logger = KerviLog("module")
+        
+
+
+        self._logger.info("Starting kervi module, please wait")
         self.started = False
         if self.config.module.app_connection_local and not self.config.network.ipc_root_address:
-            print("Locating kervi application...")
+            self._logger.verbose("Locating kervi application...{0}", "")
             from kervi.utility.discovery import find_kervi_app
             address, port = find_kervi_app(self.config.application.id)
             if address:
                 self.config.network.ipc_root_address = address
                 self.config.network.ipc_root_port = port
             else:
-                print("Locate kervi application failed")
+                self._logger.error("Locate kervi application failed")
                 exit()
         
         self._root_address = "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port)
+
+        from kervi.plugin.message_bus.bus_manager import BusManager
+        self.bus_manager = BusManager()
+        self.config.network.ipc_root_port = nethelper.get_free_port([self.config.network.ipc_root_port])
         
-        
-        from kervi.zmq_spine import _ZMQSpine
-        self.spine = _ZMQSpine()
         if self.config.module.app_connection_local:
-            self.spine._init_spine("kervi-module", self.config.network.ipc_module_port, "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port), self.config.network.ip)
+            self.bus_manager.load(
+                "kervi-module", 
+                self.config.network.ipc_module_port,
+                "tcp://" + self.config.network.ipc_root_address + ":" + str(self.config.network.ipc_root_port),
+                self.config.network.ip
+            )
         else:
-            self.spine._init_spine("kervi-main", self.config.network.ipc_root_port, None, self.config.network.ipc_root_address)
-        spine.set_spine(self.spine)
+            self.bus_manager.load(
+                "kervi-main", 
+                self.config.network.ipc_root_port,
+                None,
+                self.config.network.ipc_root_address
+            )
+        
+        from kervi import spine
+        self.spine = spine.Spine()
+        
         self.spine.register_event_handler("processReady", self._process_ready, scope="app-" + self.config.application.id)
         self.spine = spine.Spine()
 
@@ -226,7 +247,7 @@ class Module(object):
         import kervi.hal as hal
         hal_driver = hal._load()
         if hal_driver:
-            print("Using HAL driver:", hal_driver)
+            self._logger.verbose("Using HAL driver:", hal_driver)
 
         self._actions = _ModuleActions(self)
 
@@ -279,6 +300,21 @@ class Module(object):
         time.sleep(.5)
 
         module_port = self.config.network.ipc_module_port
+        pluginManager = PluginManager(self.config)
+        self._process_info_lock.acquire()
+        #self._process_info = [{"id":"IPC", "ready":False}]
+        plugin_modules = pluginManager.prepare_load()
+        for plugin_module in plugin_modules:
+            self._process_info.append(
+                {"id":plugin_module, "ready": False}
+            )
+        self._process_info_lock.release()
+
+
+        module_port = self.config.network.ipc_module_port
+        module_port = pluginManager.load_plugins(module_port+1)
+
+
 
         for module in self.config.modules:
             module_port += 1
@@ -297,28 +333,11 @@ class Module(object):
                 )
             ]
 
-        if not self.config.module.app_connection_local and self.config.routing.kervi_io.enabled:
-            print("x")
-            module_port += 1
-            self._process_info_lock.acquire()
-            self._process_info = [{"id":"kervi_io", "ready":False}]
-            self._process_info_lock.release()
-
-            self._module_processes += [
-                process._start_process(
-                    "module-routing" + self.config.module.id,
-                    "kervi_io",
-                    self.config,
-                    nethelper.get_free_port([module_port]),
-                    app_helpers._KerviIORouterProcess
-                )
-            ]
-            #time.sleep(1)
         while not self._is_ready():
             time.sleep(1)
         
-        print("module connected to application at:", self._root_address)
-        print("Press ctrl + c to stop your module")
+        self._logger.info("module connected to application at: %s", self._root_address)
+        self._logger.info("Press ctrl + c to stop your module")
         self.spine.trigger_event(
             "moduleReady",
             self.config.module.id
@@ -363,28 +382,32 @@ class Module(object):
             "moduleStopped",
             self.config.module.id
         )
-        print("stopping processes")
+        self._logger.warn("stopping processes")
         process._stop_processes("module-" + self.config.module.id)
         self.spine.trigger_event("processTerminating", None, local_only=True)
         time.sleep(1)
         spine.Spine().stop()
         #for thread in threading.enumerate():
         #    print("running thread",thread.name)
-        print("module stopped")
+        self._logger.info("module stopped")
         if force_exit:
             import os
             os._exit(0)
 
     def _stop_action(self):
+        self._logger.verbose("module action: stop")
         self.stop()
 
     def _restart_action(self):
+        self._logger.verbose("module action: restart")
         self.stop(restart=True)
 
     def _reboot_action(self):
+        self._logger.verbose("module action: reboot")
         import kervi.hal as hal
         hal.device_reboot()
 
     def _shutdown_action(self):
+        self._logger.verbose("module action: shutdown")
         import kervi.hal as hal
         hal.device_shutdown()

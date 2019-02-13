@@ -41,7 +41,7 @@ export class KerviWidgetComponent   {
 			var controller = this.component as Controller;
 			console.log("widget ctrl", controller);
 			if (controller.type == "camera")
-				this.widgetType == "camera"
+				this.widgetType = "camera"
 				
 		} else if (this.linkParameters.type){
 			if (this.linkParameters.type.indexOf("gauge") > -1 ){

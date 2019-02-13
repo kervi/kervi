@@ -83,7 +83,8 @@ def action(method=None, **kwargs):
                 Actions.add_unbound(qual_name, action_id, name)
                 setattr(f, "set_interrupt", _SetInterrupt(action_id))
             else:
-                print("using upython? if yes you need to pass the name of the controller class via the controller_class parameter.")
+                import logging
+                logging.getLogger().error("using upython? if yes you need to pass the name of the controller class via the controller_class parameter.")
             return f
 
     if method:

@@ -57,7 +57,7 @@ class MotorSteering(Controller):
         wheel_rotations = kwargs.pop("wheel_rotations",None)
         duration = kwargs.pop("duration",None)
         
-        print("steering rotate:", speed)
+        self.spine.log.verbose("steering rotate: %s", speed)
         new_direction = self._adjust
         left_speed = speed * (-new_direction / 100)
         right_speed = speed * (new_direction / 100)
@@ -68,10 +68,10 @@ class MotorSteering(Controller):
             time.sleep(duration)
 
     def _update(self):
-        print("steering update:", self.speed.value, self.direction.value)
+        self.spine.log.verbose("steering update: %s %s", self.speed.value, self.direction.value)
         new_direction = self.direction.value + self.adaptive_direction.value + self._adjust
         speed = self.speed.value + self.adaptive_speed.value
-        print("steering adaptive update:", speed, new_direction)
+        self.spine.log.verbose("steering adaptive update: speed= %s direction=%s", speed, new_direction)
         if new_direction > 0:
             left_speed = speed * (1 - new_direction / 100)
             right_speed = speed
@@ -86,6 +86,5 @@ class MotorSteering(Controller):
         self.outputs["right_speed"].value = right_speed
 
     def input_changed(self, changed_input):
-        #print("steering input changed:", changed_input.input_id, changed_input.value)
         if changed_input in [self.speed, self.direction, self.adaptive_speed]:
             self._update()
