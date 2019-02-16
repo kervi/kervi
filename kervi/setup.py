@@ -52,7 +52,7 @@ setup(
         'kervi/storage',
         'kervi/utility',
         'kervi/version',
-        'kervi/vision',
+        'kervi/vision'
     ],
     version=VERSION,
     
@@ -83,9 +83,11 @@ setup(
         'kervi-device-library==' + VERSION,
         'autobahn',
         'pyzmq',
+        'pillow',
         'kervi-hal-win==' + VERSION,
         'kervi-hal-rpi==' + VERSION
     ],
+    include_package_data=True
     # extras_require={
     #     'rpi':  ['kervi-hal-rpi'],
     #     'raspberry':  ['kervi-hal-rpi'],

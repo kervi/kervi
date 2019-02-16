@@ -91,7 +91,7 @@ class _WebEventHandler(object):
         injected = kwargs.get("injected", "")
         groups = kwargs.get("groups", None)
         process_id = kwargs.get("process_id", None)
-        self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
+        #self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
 
         authorized = True
 
@@ -204,12 +204,12 @@ class _SpineProtocol(WebSocketServerProtocol):
                 jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
                 self.sendMessage(jsonres, False)
             else:
-                self.spine.log.debug("WS onMessage:{0}", obj)
+                #self.spine.log.debug("WS onMessage:{0}", obj)
                 if not self.authenticated:
                     pass
                 elif obj["messageType"] == "query":
                     res = self.spine.send_query(obj["query"], *obj["args"], injected="socketSpine", session=self.user)
-                    self.spine.log.debug("query response:{0}", res)
+                    #self.spine.log.debug("query response:{0}", res)
                     self.send_response(obj["id"], res)
                 elif obj["messageType"] == "registerQueryHandler":
                     self.add_query_handler(obj["query"])
@@ -259,7 +259,7 @@ class SocketSpine:
                 import ssl
                 ssl_context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
                 ssl_context.load_cert_chain(cert_file, key_file)
-                self._spine.log.debug("socket ssl found")
+                #self._spine.log.debug("socket ssl found")
             except:
                 ssl_context = None
                 self._spine.log.error("socket failed to use ssl")

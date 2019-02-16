@@ -16,8 +16,8 @@ def get_default_config():
         },
         "log" : {
             "levels":["fatal", "error", "warning", "information", "debug"],
-            "level":"info",
-            "console_level":"verbose",
+            "level":"verbose",
+            "console_level":"warning",
             "file": "kervi.log",
             "max_file_size": 1000000,
             "resetLog": False
@@ -25,6 +25,7 @@ def get_default_config():
         "modules":[],
         "network" : {
             "ip": nethelper.get_ip_address(),
+            "http_port": nethelper.get_free_port([80, 8080, 8000]),
             "ws_port": nethelper.get_free_port([9000, 9001, 9002]),
             "ipc_root_port": nethelper.get_free_port([9500]),
             "ipc_root_address": nethelper.get_ip_address()

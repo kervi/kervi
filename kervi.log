@@ -1,0 +1,156 @@
+2019-02-15 07:36:57,019 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 07:36:57,036 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 07:36:57,211 kervi-main      VERBOSE  MainProcess IPC address: tcp://192.168.203.20:9500
+2019-02-15 07:36:57,219 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 07:36:57,302 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 07:36:57,384 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 07:36:57,395 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 07:36:59,787 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 07:37:01,604 application     INFO     MainProcess Your Kervi application is ready at http://127.0.0.1:8080
+2019-02-15 07:37:01,604 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 07:37:01,605 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 07:37:06,623 application     WARNING  MainProcess stopping processes
+2019-02-15 07:37:08,738 application     INFO     MainProcess application stopped
+2019-02-15 07:46:53,674 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 07:46:53,688 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 07:46:53,815 kervi-main      VERBOSE  MainProcess IPC address: tcp://192.168.203.20:9500
+2019-02-15 07:46:53,825 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 07:46:53,840 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 07:46:53,851 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 07:46:53,858 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 07:46:56,326 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 07:46:57,972 application     INFO     MainProcess Your Kervi application is ready at http://127.0.0.1:8080
+2019-02-15 07:46:57,973 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 07:46:57,974 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 07:47:02,992 application     WARNING  MainProcess stopping processes
+2019-02-15 07:47:05,335 application     INFO     MainProcess application stopped
+2019-02-15 07:49:16,442 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 07:49:16,457 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 07:49:16,579 kervi-main      VERBOSE  MainProcess IPC address: tcp://192.168.203.20:9500
+2019-02-15 07:49:16,589 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 07:49:16,603 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 07:49:16,617 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 07:49:16,628 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 07:49:18,590 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 07:49:19,691 application     INFO     MainProcess Your Kervi application is ready at http://127.0.0.1:8080
+2019-02-15 07:49:19,693 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 07:49:19,694 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 07:49:24,722 application     WARNING  MainProcess stopping processes
+2019-02-15 07:49:27,104 application     INFO     MainProcess application stopped
+2019-02-15 07:51:31,199 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 07:51:31,214 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 07:51:31,348 kervi-main      VERBOSE  MainProcess IPC address: tcp://192.168.203.20:9500
+2019-02-15 07:51:31,357 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 07:51:31,368 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 07:51:31,386 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 07:51:31,401 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 07:51:33,361 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 07:51:34,410 application     INFO     MainProcess Your Kervi application is ready at http://127.0.0.1:8080
+2019-02-15 07:51:34,411 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 07:51:34,412 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 07:51:39,432 application     WARNING  MainProcess stopping processes
+2019-02-15 07:51:41,907 application     INFO     MainProcess application stopped
+2019-02-15 07:52:36,825 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 07:52:36,847 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 07:52:36,989 kervi-main      VERBOSE  MainProcess IPC address: tcp://192.168.203.20:9500
+2019-02-15 07:52:36,997 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 07:52:37,008 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 07:52:37,020 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 07:52:37,034 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 07:52:39,501 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 07:52:40,191 application     INFO     MainProcess Your Kervi application is ready at http://127.0.0.1:8080
+2019-02-15 07:52:40,191 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 07:52:40,193 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 07:52:45,210 application     WARNING  MainProcess stopping processes
+2019-02-15 07:52:47,508 application     INFO     MainProcess application stopped
+2019-02-15 07:56:55,334 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 07:56:55,349 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 07:56:55,489 kervi-main      VERBOSE  MainProcess IPC address: tcp://192.168.203.20:9500
+2019-02-15 07:56:55,499 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 07:56:55,509 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 07:56:55,522 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 07:56:55,532 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 07:56:58,000 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 07:56:59,577 application     INFO     MainProcess Your Kervi application is ready at http://127.0.0.1:8080
+2019-02-15 07:56:59,578 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 07:56:59,579 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 07:57:04,596 application     WARNING  MainProcess stopping processes
+2019-02-15 07:57:07,016 application     INFO     MainProcess application stopped
+2019-02-15 07:58:47,424 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 07:58:47,435 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 07:58:47,564 kervi-main      VERBOSE  MainProcess IPC address: tcp://192.168.203.20:9500
+2019-02-15 07:58:47,577 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 07:58:47,586 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 07:58:47,598 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 07:58:47,609 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 07:58:49,575 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 07:58:50,647 application     INFO     MainProcess Your Kervi application is ready at http://127.0.0.1:8080
+2019-02-15 07:58:50,647 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 07:58:50,649 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 07:58:55,665 application     WARNING  MainProcess stopping processes
+2019-02-15 07:58:58,082 application     INFO     MainProcess application stopped
+2019-02-15 08:02:31,772 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 08:02:31,788 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 08:02:31,927 kervi-main      VERBOSE  MainProcess IPC address: tcp://192.168.203.20:9500
+2019-02-15 08:02:31,935 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 08:02:31,947 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 08:02:31,962 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 08:02:31,970 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 08:02:33,945 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 08:02:35,021 application     INFO     MainProcess Your Kervi application is ready at http://127.0.0.1:8080
+2019-02-15 08:02:35,022 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 08:02:35,023 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 08:02:40,045 application     WARNING  MainProcess stopping processes
+2019-02-15 08:02:42,444 application     INFO     MainProcess application stopped
+2019-02-15 08:03:21,481 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 08:03:21,494 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 08:03:21,621 kervi-main      VERBOSE  MainProcess IPC address: tcp://192.168.203.20:9500
+2019-02-15 08:03:21,629 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 08:03:21,640 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 08:03:21,654 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 08:03:21,662 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 08:03:23,636 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 08:03:24,689 application     INFO     MainProcess Your Kervi application is ready at http://127.0.0.1:8080
+2019-02-15 08:03:24,690 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 08:03:24,691 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 08:03:29,712 application     WARNING  MainProcess stopping processes
+2019-02-15 08:03:32,143 application     INFO     MainProcess application stopped
+2019-02-15 19:54:50,243 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 19:54:50,255 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 19:54:50,378 kervi-main      VERBOSE  MainProcess IPC address: tcp://10.151.8.10:9500
+2019-02-15 19:54:50,385 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 19:54:50,395 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 19:54:50,407 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 19:54:50,414 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 19:54:51,378 application     INFO     MainProcess Your Kervi application is ready
+2019-02-15 19:54:51,379 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 19:54:51,380 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 19:54:52,388 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 19:54:56,384 application     WARNING  MainProcess stopping processes
+2019-02-15 19:54:58,400 application     INFO     MainProcess application stopped
+2019-02-15 19:58:29,044 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 19:58:29,056 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 19:58:29,172 kervi-main      VERBOSE  MainProcess IPC address: tcp://10.151.8.10:9500
+2019-02-15 19:58:29,180 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 19:58:29,190 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 19:58:29,201 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 19:58:29,210 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 19:58:30,122 application     INFO     MainProcess Your Kervi application is ready
+2019-02-15 19:58:30,123 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 19:58:30,124 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 19:58:31,182 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 19:58:35,126 application     WARNING  MainProcess stopping processes
+2019-02-15 19:58:37,186 application     INFO     MainProcess application stopped
+2019-02-15 20:39:10,452 application     VERBOSE  MainProcess kervi version: 0.20.14
+2019-02-15 20:39:10,522 application     VERBOSE  MainProcess platform driver: kervi.platforms.windows
+2019-02-15 20:39:11,020 kervi-main      VERBOSE  MainProcess IPC address: tcp://192.168.203.252:9500
+2019-02-15 20:39:11,056 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite_temp
+2019-02-15 20:39:11,098 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.storage.sqlite
+2019-02-15 20:39:11,150 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.authentication.plain
+2019-02-15 20:39:11,183 PluginInfo      VERBOSE  MainProcess load plugin: kervi.plugin.messaging.user_log
+2019-02-15 20:39:14,241 application     INFO     MainProcess Your Kervi application is ready
+2019-02-15 20:39:14,243 application     INFO     MainProcess Press ctrl + c to stop your application
+2019-02-15 20:39:14,274 discovery       VERBOSE  MainProcess Listining for discovery requests on port: 9434
+2019-02-15 20:39:16,617 app_module      VERBOSE  Process-3  load: app_module
+2019-02-15 20:39:19,296 application     WARNING  MainProcess stopping processes
+2019-02-15 20:39:22,680 application     INFO     MainProcess application stopped

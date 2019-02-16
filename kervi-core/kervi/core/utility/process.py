@@ -60,26 +60,33 @@ class _KerviProcess(object):
         pass
 
 def _launch(scope, name, process_class, config_data, ipc_port, root_close, log_queue, **kwargs):
-    from kervi.config import Configuration
-    Configuration._load(json_data=config_data)
-    process_config = Configuration
-    #if "log" in process_config:
-    k_logging.init_process_logging(name, process_config.log, log_queue=log_queue)
-    log = k_logging.KerviLog(name)
-    log.debug('create process:{0} ipc port:{1}:', process_class.__name__, ipc_port)
-    process = process_class(scope, name, process_config, ipc_port, root_close, log_queue, **kwargs)
     try:
-        while not process.do_terminate:
-            if not process._is_connected and process.spine.is_connected:
-                process._is_connected = True
-                process.spine.trigger_event("processReady", scope, name)
-            process.process_step()
+        from kervi.config import Configuration
+        Configuration._load(json_data=config_data)
+        process_config = Configuration
+        #if "log" in process_config:
+        k_logging.init_process_logging(name, process_config.log, log_queue=log_queue)
+        log = k_logging.KerviLog(name)
+        log.debug('create process:{0} ipc port:{1}:', process_class.__name__, ipc_port)
+        process = process_class(scope, name, process_config, ipc_port, root_close, log_queue, **kwargs)
+        try:
+            while not process.do_terminate:
+                if not process._is_connected and process.spine.is_connected:
+                    process._is_connected = True
+                    process.spine.trigger_event("processReady", scope, name)
+                process.process_step()
 
+        except KeyboardInterrupt:
+            pass
+        except:
+            log.exception("error in process loop")
+            pass
     except KeyboardInterrupt:
         pass
     except:
-        log.exception("error in process loop")
+        log.exception("error in process initialization")
         pass
+    print("trm", name)
     process._terminate_process()
 
 def _start_process(scope, name, config, port_idx, process_class, root_close=True, log_queue=None, **kwargs):

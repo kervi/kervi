@@ -38,12 +38,13 @@ def test_application():
     time.sleep(5)
 
     app.stop(False)
- 
     assert APP_READY
     assert MODULE_LOADED == "test_x"
-    assert len(process_info) == 3
-    assert process_info[0]["id"] == "application"
-    assert process_info[1]["id"] == "app_module"
-    assert process_info[2]["id"] == "IPC"
+    assert len(process_info) == 4
+    
+    processes = ["application", "plugin_kervi.plugin.ipc.websocket", "plugin_kervi.plugin.ui.web", "app_module"]
+    
+    for process in process_info:
+        assert process["id"] in processes
     
     

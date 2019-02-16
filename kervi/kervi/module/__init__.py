@@ -22,7 +22,9 @@
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
 import os
-os.system('color')
+import platform
+if platform.system() == "Windows":
+    os.system('color')
 
 import time
 import threading
@@ -201,6 +203,14 @@ class Module(object):
 
 
         self._logger.info("Starting kervi module, please wait")
+
+        try:
+            from kervi.version import VERSION
+        except:
+            VERSION="0.0.0"
+
+        self._logger.verbose("kervi version: %s", VERSION)
+
         self.started = False
         if self.config.module.app_connection_local and not self.config.network.ipc_root_address:
             self._logger.verbose("Locating kervi application...{0}", "")
@@ -247,7 +257,7 @@ class Module(object):
         import kervi.hal as hal
         hal_driver = hal._load()
         if hal_driver:
-            self._logger.verbose("Using HAL driver:", hal_driver)
+            self._logger.verbose("Using HAL driver: %s", hal_driver)
 
         self._actions = _ModuleActions(self)
 

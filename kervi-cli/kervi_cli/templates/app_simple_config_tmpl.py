@@ -4,7 +4,7 @@
         "id": "{id}"
     }},
     "log" : {{
-        "level":"warning",
+        "level":"verbose",
         "file":"{id}.log",
         "resetLog": false
     }},

@@ -21,7 +21,9 @@
 """Module that holds classes for creating / bootstraping a Kervi application or a Kervi module.
 """
 import os
-os.system('color')
+import platform
+if platform.system() == "Windows":
+    os.system('color')
 import time
 import threading
 import logging
@@ -45,7 +47,7 @@ from kervi.application.default_config import get_default_config
 from kervi.plugin.plugin_manager import PluginManager
 from kervi.utility.discovery import KerviAppDiscovery
 from kervi.utility.logging_handler import KerviLogHandler
-
+import logging
 import signal
 
 _app_running = True
@@ -54,7 +56,7 @@ _console_log = 15
 def handler_stop_signals(signum, frame):
     global _app_running
     _app_running = False
-    logging.getLogger().fatal("signal:", signum)
+    logging.getLogger().fatal("signal: %s", signum)
 
 def _pretty_print(d, indent=0):
     if isinstance(d, dict):
@@ -114,7 +116,7 @@ class Application(object):
         import inspect
         import getopt
        
-        
+        self._in_stop = False
         self._discovery_thread = None
         config_files = []
         self._webserver_info = None
@@ -199,6 +201,12 @@ class Application(object):
         self.started = False
         self._webserver_port = None
 
+        try:
+            from kervi.version import VERSION
+        except:
+            VERSION="0.0.0"
+
+        self._logger.verbose("kervi version: %s", VERSION)
 
         import kervi.hal as hal
         hal_driver = hal._load(self.config.platform.driver)
@@ -326,9 +334,9 @@ class Application(object):
         import kervi.utility.application_helpers as app_helpers
 
 
-        if self._as_service:
-            signal.signal(signal.SIGINT, handler_stop_signals)
-            signal.signal(signal.SIGTERM, handler_stop_signals)
+        #if self._as_service:
+        signal.signal(signal.SIGINT, handler_stop_signals)
+        signal.signal(signal.SIGTERM, handler_stop_signals)
 
         self.spine.send_command("startThreads", local_only=True)
         time.sleep(.5)
@@ -362,43 +370,44 @@ class Application(object):
             ]
 
         #print("wait for ready")
-        while not self._is_ready():
+        while not self._is_ready() and self._in_stop:
             time.sleep(1)
 
-        from kervi.dashboards import Dashboard
-        Dashboard._add_default()
+        if not self._in_stop:
+            from kervi.dashboards import Dashboard
+            Dashboard._add_default()
 
-        ready_message = "Your Kervi application is ready"
-        if self._webserver_info:
-            ready_message = "Your Kervi application is ready at http://" + self._webserver_info["ip"] + ":" + str(self._webserver_info["port"])
+            ready_message = "Your Kervi application is ready"
+            if self._webserver_info:
+                ready_message = "Your Kervi application is ready at http://" + self._webserver_info["ip"] + ":" + str(self._webserver_info["port"])
 
-        self._logger.info(ready_message)
+            self._logger.info(ready_message)
 
-        self.spine.send_command("kervi_action_app_main")
-        self.spine.send_command("startWebSocket")
-        
+            self.spine.send_command("kervi_action_app_main")
+            self.spine.send_command("startWebSocket")
+            
 
-        self._logger.info("Press ctrl + c to stop your application")
-        self.spine.trigger_event(
-            "appReady",
-            self.config.application.id
-        )
-
-        self._ip = "127.0.0.1"
-        if self._ip and self.config.discovery.enabled:
-            self._discovery_thread = KerviAppDiscovery(
-                self._ip, 
-                self.config.network.ipc_root_port,
-                self.config.discovery.port, 
-                self.config.application.id, 
-                self.config.discovery.challenge,
-                self.config.application.name,
-                "http://" + self.config.network.ip# + ":" + str(self.config.network.http_port)
+            self._logger.info("Press ctrl + c to stop your application")
+            self.spine.trigger_event(
+                "appReady",
+                self.config.application.id
             )
-            self._discovery_thread.start()
-        else:
-            self._discovery_thread = None
-        
+
+            self._ip = "127.0.0.1"
+            if self._ip and self.config.discovery.enabled:
+                self._discovery_thread = KerviAppDiscovery(
+                    self._ip, 
+                    self.config.network.ipc_root_port,
+                    self.config.discovery.port, 
+                    self.config.application.id, 
+                    self.config.discovery.challenge,
+                    self.config.application.name,
+                    "http://" + self.config.network.ip# + ":" + str(self.config.network.http_port)
+                )
+                self._discovery_thread.start()
+            else:
+                self._discovery_thread = None
+            
     def _input_thread(self, list):
         try:
             raw_input()
@@ -432,20 +441,29 @@ class Application(object):
             self._start()
 
     def stop(self, force_exit=True, restart=False):
+        self._logger.warn("stopping processes")
+        self._in_stop = True
         self.spine.send_command("kervi_action_app_exit")
         
         if self._discovery_thread:
             self._discovery_thread.terminate()
 
-        self._logger.warn("stopping processes")
         import kervi.core.utility.process as process
         process._stop_processes("app-" + self.config.application.id)
         self.spine.trigger_event("processTerminating", None, local_only=True)
         time.sleep(1)
         self.bus_manager.stop()
+        self._log_handler.stop()
+        #time.sleep(1)
         #for thread in threading.enumerate():
         #    print("running thread",thread.name)
         self._logger.info("application stopped")
+        #import psutil
+        #current_process = psutil.Process()
+        #children = current_process.children(recursive=True)
+        #for child in children:
+        #    print('Child pid is {}'.format(child.pid))
+
         if force_exit:
             import os
             os._exit(0)

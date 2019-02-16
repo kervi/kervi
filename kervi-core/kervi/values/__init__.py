@@ -31,7 +31,7 @@ class NumberValue(KerviValue):
             self._ureg = UnitRegistry()
             self._ureg.autoconvert_offset_to_baseunit = True
             self._Q = self._ureg.Quantity
-        except ModuleNotFoundError:
+        except ImportError:
             self._Q = None
 
         self._type = None
