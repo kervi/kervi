@@ -161,7 +161,6 @@ class KerviLogHandler:
                 'handlers': ['console', 'console-verbose', 'console-warning', 'console-error', 'file']
             },
         }
-
         logging.config.dictConfig(log_config)
         self._log_queue = Queue()
         self._logging_thread = threading.Thread(target=logger_thread, args=(self._log_queue,))

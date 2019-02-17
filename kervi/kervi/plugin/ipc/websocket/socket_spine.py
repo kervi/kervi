@@ -281,7 +281,7 @@ class SocketSpine:
         )
 
     def start_socket(self):
-        self._spine.log.debug("start websocket: {0} {1} ", self._config.network.ip, self._config.network.ws_port)
+        self._spine.log.verbose("start websocket: {0} {1} ", self._config.network.ip, self._config.network.ws_port)
         self.loop.run_until_complete(self.coro)
         self._started = True
 

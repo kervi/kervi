@@ -24,8 +24,6 @@ class NumberValue(KerviValue):
         self._min_value = -100
         self._max_value = 100
         
-        KerviValue.__init__(self, name, "number-value", **kwargs)
-        #self.spine = Spine()
         try:
             from pint import UnitRegistry
             self._ureg = UnitRegistry()
@@ -33,6 +31,10 @@ class NumberValue(KerviValue):
             self._Q = self._ureg.Quantity
         except ImportError:
             self._Q = None
+
+        KerviValue.__init__(self, name, "number-value", **kwargs)
+        #self.spine = Spine()
+        
 
         self._type = None
         #self._display_unit = None

@@ -309,6 +309,10 @@ class Application(object):
 
     def _webapp_ready(self, scope, webserver_info):
         self._webserver_info = webserver_info
+        ready_message = "Reach your application at http://" + self._webserver_info["ip"] + ":" + str(self._webserver_info["port"])
+        self.spine.log.info(ready_message)
+        time.sleep(2)
+        self.spine.send_command("startWebSocket")
 
     def _is_ready(self):
         result = True
@@ -377,15 +381,9 @@ class Application(object):
             from kervi.dashboards import Dashboard
             Dashboard._add_default()
 
-            ready_message = "Your Kervi application is ready"
-            if self._webserver_info:
-                ready_message = "Your Kervi application is ready at http://" + self._webserver_info["ip"] + ":" + str(self._webserver_info["port"])
-
-            self._logger.info(ready_message)
-
             self.spine.send_command("kervi_action_app_main")
-            self.spine.send_command("startWebSocket")
-            
+            ready_message = "Your Kervi application is running"
+            self._logger.info(ready_message)
 
             self._logger.info("Press ctrl + c to stop your application")
             self.spine.trigger_event(
@@ -393,10 +391,9 @@ class Application(object):
                 self.config.application.id
             )
 
-            self._ip = "127.0.0.1"
-            if self._ip and self.config.discovery.enabled:
+            if self.config.discovery.enabled:
                 self._discovery_thread = KerviAppDiscovery(
-                    self._ip, 
+                    self.config.network.ip, 
                     self.config.network.ipc_root_port,
                     self.config.discovery.port, 
                     self.config.application.id, 

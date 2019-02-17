@@ -17,7 +17,7 @@ def get_default_config():
         "log" : {
             "levels":["fatal", "error", "warning", "information", "debug"],
             "level":"verbose",
-            "console_level":"warning",
+            "console_level":"verbose",
             "file": "kervi.log",
             "max_file_size": 1000000,
             "resetLog": False

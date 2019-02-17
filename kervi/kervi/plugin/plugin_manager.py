@@ -8,9 +8,12 @@ class _KerviPluginProcess(process._KerviProcess):
     """ Private class that starts a separate process for plugins """
 
     def init_process(self, **kwargs):
+        self.spine.log.debug("init process login: %s", self.name)
+
         plugin_module = kwargs.pop("plugin_module", None)
         plugin_config = kwargs.pop("plugin_config", {})
-        self.plugin = _PluginInfo(plugin_module, plugin_config, None, None, None)
+        self._load_silent = kwargs.pop("load_silent", False)
+        self.plugin = _PluginInfo(plugin_module, plugin_config, None, None, None, load_silent=self._load_silent)
         self.plugin.load()
         self.spine.trigger_event(
             "moduleLoaded",
@@ -31,11 +34,12 @@ class _KerviPluginProcess(process._KerviProcess):
         self.plugin.terminate_process()
 
 class _PluginInfo:
-    def __init__(self, plugin_module, config, plugin_type, load_config, manager=None):
+    def __init__(self, plugin_module, config, plugin_type, load_config, manager=None, load_silent=False):
         self._config = config
         self._plugin_module = plugin_module
         self._plugin_type = plugin_type
         self._load_config = load_config
+        self._load_silent = load_silent
         self.instance = None
         self._manager = manager
         self._first_process_step = True
@@ -50,13 +54,15 @@ class _PluginInfo:
             _KerviPluginProcess,
             plugin_module=self._plugin_module,
             plugin_config=self._config,
-            log_queue = self._manager._log_queue
+            log_queue = self._manager._log_queue,
+            load_silent = self._manager._load_silent
         )
     
     def _create_instance(self):
         try:
-            if (self._manager and not self._manager._load_silent) and True:
+            if not self._load_silent:
                 self._log.verbose("load plugin: %s", self._plugin_module)
+                
             module = __import__(self._plugin_module, fromlist=[''])
             self.instance = module.init_plugin(self._config, self._manager)
             
@@ -146,7 +152,8 @@ class PluginManager:
                     plugin_config, 
                     plugin_type, 
                     self._manager_config.plugin_types[plugin_type],
-                    self
+                    self,
+                    self._load_silent
                 ))
 
     @property

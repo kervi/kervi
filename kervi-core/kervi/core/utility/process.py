@@ -86,7 +86,6 @@ def _launch(scope, name, process_class, config_data, ipc_port, root_close, log_q
     except:
         log.exception("error in process initialization")
         pass
-    print("trm", name)
     process._terminate_process()
 
 def _start_process(scope, name, config, port_idx, process_class, root_close=True, log_queue=None, **kwargs):
