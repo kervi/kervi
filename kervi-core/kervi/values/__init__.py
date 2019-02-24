@@ -568,7 +568,7 @@ class EnumValue(KerviValue):
         if self._persist_value and allow_persist:
             self.settings.store_value("value", self.value)
 
-        timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        #timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
         self._last_reading = time.clock()
 
         #val = {"value_id":self.component_id, "value":new_value, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}

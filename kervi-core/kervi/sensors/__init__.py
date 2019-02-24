@@ -222,7 +222,7 @@ class Sensor(Controller):
         """
         if not self._active and not self._enabled:
             return
-
+        
         if self._dimensions > 1:
             for dimension in range(0, self._dimensions):
                 value = sensor_value[dimension]

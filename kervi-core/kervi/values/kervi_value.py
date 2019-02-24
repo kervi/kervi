@@ -286,7 +286,6 @@ class KerviValue(KerviComponent):
                 "display_value": self.display_value,
                 "display_unit": self.display_unit
             }
-            
             self.spine.trigger_event(
                 "valueChanged",
                 self.component_id,
