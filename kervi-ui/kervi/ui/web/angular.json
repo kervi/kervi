@@ -404,7 +404,10 @@
               "projects/webApp/src/assets"
             ],
             "styles": [
-              "./projects/ngx-kervi-components/src/styles/themes/default/default.scss"
+              "node_modules/primeicons/primeicons.css",
+              "node_modules/primeng/resources/themes/nova-light/theme.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/primeflex/primeflex.css"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
@@ -423,7 +426,6 @@
               "node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js",
               "js-lib/colors.js",
               "js-lib/jqColorPicker.js"
-
             ]
           },
           "configurations": {
@@ -657,7 +659,47 @@
           }
         }
       }
+    },
+    "kervi-primeNG": {
+      "root": "projects/kervi-prime-ng",
+      "sourceRoot": "projects/kervi-prime-ng/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/kervi-prime-ng/tsconfig.lib.json",
+            "project": "projects/kervi-prime-ng/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "project": "projects/kervi-prime-ng/ng-package.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/kervi-prime-ng/src/test.ts",
+            "tsConfig": "projects/kervi-prime-ng/tsconfig.spec.json",
+            "karmaConfig": "projects/kervi-prime-ng/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/kervi-prime-ng/tsconfig.lib.json",
+              "projects/kervi-prime-ng/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
-  "defaultProject": "web"
+  "defaultProject": "webApp"
 }

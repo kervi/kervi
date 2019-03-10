@@ -1,0 +1,19 @@
+
+<p-button 
+    *ngIf="linkParameters.buttonIcon"
+    label="{{ linkParameters.buttonText }}"    
+    iconPos="left"
+    icon="pi pi-{{ linkParameters.buttonIcon }}"
+    (mousedown)="press()" 
+    (mouseup)="release()" 
+    
+></p-button>
+<p-button 
+    *ngIf="!linkParameters.buttonIcon"
+    label="{{ linkParameters.buttonText }}"    
+    (mousedown)="press()" 
+    (mouseup)="release()" 
+></p-button>
+
+<!-- title="{{(title | translate) }}"   -->
+<!-- [attr.title]="title" -->

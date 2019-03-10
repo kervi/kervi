@@ -1,18 +1,19 @@
-//import { NGXKerviService} from 'projects/ngx-kervi/src/public_api';
-//import { KerviBaseService } from 'projects/kervi-js/src/public_api';
 
 import { BrowserModule } from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
+import {ToolbarModule} from 'primeng/toolbar';
+import { MenuModule} from 'primeng/menu';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { ConnectComponent } from './connect/connect.component';
-//import { NGXKerviService, KerviTemplateService} from "ngx-kervi";
 import { Routes, RouterModule } from '@angular/router';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { DashboardComponent } from './prime-dashboard/dashboard.component';
 import { NgxKerviModule } from 'ngx-kervi';
 import { NGXKerviPipesModule } from 'ngx-kervi'
 import { NgxKerviComponentsModule  } from 'ngx-kervi-components'
+import { KerviPrimeNGModule  } from 'kervi-primeNG'
 const ROUTES: Routes = [
   
   { path: 'connect', component: ConnectComponent },
@@ -34,9 +35,13 @@ const ROUTES: Routes = [
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
+    MenuModule,
+    ToolbarModule,
     NgxKerviModule,
     NGXKerviPipesModule,
-    NgxKerviComponentsModule,
+    KerviPrimeNGModule,
+    //NgxKerviComponentsModule,
     RouterModule.forRoot(ROUTES)
   ],
   

@@ -49,6 +49,19 @@ export abstract class KerviValueType<valueType> extends KerviValue{
             this.dashboards.push( new DashboardLink(this, dashboardLink)); 
         }
     }
+
+    get value(){
+       
+        //console.log("gv", this.id, this.value$.value)
+       return this.value$.value 
+    }
+
+    set value(value:valueType){
+        console.log("sv", this.id);
+        this.value$.next(value); 
+        this.kerviService.spine.sendCommand(this.command, value);
+     }
+
     protected abstract getDefaultValue():valueType;
     public set(v:valueType, notify:boolean=true){
         this.value$.next(v);

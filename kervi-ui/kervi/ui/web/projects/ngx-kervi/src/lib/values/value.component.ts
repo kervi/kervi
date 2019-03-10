@@ -15,13 +15,11 @@ export class KerviValueComponent<T extends KerviValue>   {
 	}
 	@Input() value:T = null;
 	
-	//@Input() dashboardPanel: DashboardPanel;
 	@Input() linkParameters:any;
 	@Input() dashboardSizes:DashboardSizes = new DashboardSizes();
 	@Input() inline:boolean;
 	protected kerviService: NGXKerviService;
 	constructor() { 
-		//console.log("cnio",this);
 		this.kerviService = AppInjector.get(NGXKerviService);  
 	}
 

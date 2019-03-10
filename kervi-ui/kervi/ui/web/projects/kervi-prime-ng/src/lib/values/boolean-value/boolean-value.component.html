@@ -1,0 +1,17 @@
+<kervi-switchbutton 
+    *ngIf="displayType!='button'"
+    [dashboardSizes]="dashboardSizes" 
+    [inline]="inline" 
+    [value]="value" 
+    [linkParameters]="linkParameters" 
+></kervi-switchbutton>
+<kervi-button 
+    *ngIf="displayType=='button'"    
+    [dashboardSizes]="dashboardSizes" 
+    [value]="value.value" 
+    [inline]="inline" 
+    [linkParameters]="linkParameters" 
+></kervi-button>
+
+
+

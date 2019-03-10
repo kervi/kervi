@@ -1,0 +1,18 @@
+<p-toolbar>
+	<div class="ui-toolbar-group-left">
+		<p-menu #menu [popup]="true" [model]="items"></p-menu>
+		<button *ngIf="showMenu" type="button" pButton icon="pi pi-bars" label="Show" (click)="menu.toggle($event)"></button>
+	</div>
+	<div class="ui-toolbar-group-right">
+		
+	</div>
+</p-toolbar>
+<div class="p-grid p-align-stretch vertical-container">
+	<div class="p-col">
+		<kervi-dashboard-panel  *ngFor="let panel of dashboard.panels" [dashboardSizes]="defaultSizes" [panel]="panel" class="w-{{panel.width}}"></kervi-dashboard-panel>
+	</div>
+</div>
+
+
+
+
