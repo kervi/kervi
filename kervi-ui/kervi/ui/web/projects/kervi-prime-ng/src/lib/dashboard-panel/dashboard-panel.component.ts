@@ -13,7 +13,6 @@ export class DashboardPanelComponent extends KerviDashboardPanelComponent {
 
   ngOnInit() {
     this.ngOnInitPanel();
-    console.log("x1");
   }
 
 }

@@ -38,9 +38,6 @@ export class KerviBaseService {
     console.log("kervi service constructor");
     var self=this;
     this.application$= new BehaviorSubject<any>(null);
-    
-    
-
      var s1=this.IPCReady$.subscribe(function(connected){
         if (connected){
           console.log("kervi service ipc ready (connected)")
@@ -48,7 +45,6 @@ export class KerviBaseService {
             for (let component of self.components){
               if (component.id==value.id){
                 var dynamicValue = component as any;
-              
                 dynamicValue.valueTS=new Date(this.timestamp + " utc");
                 dynamicValue.set(value.value, false);  
               }

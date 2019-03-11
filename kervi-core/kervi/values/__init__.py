@@ -219,7 +219,6 @@ class NumberValue(KerviValue):
             old_value = self._value
             self._value = new_value
             self.value_changed(new_value, old_value)
-
             for observer in self._observers:
                 if isinstance(observer, tuple):
                     item, transformation = observer
@@ -231,7 +230,6 @@ class NumberValue(KerviValue):
                     observer.kervi_value_changed(self, new_value)
 
             self._check_value_events(new_value, old_value)
-
             if self._persist_value and allow_persist:
                 self.settings.store_value("value", self.value)
 
@@ -251,7 +249,6 @@ class NumberValue(KerviValue):
                 "display_value": self.display_value,
                 "display_unit": self.display_unit
             }
-            
             self.spine.trigger_event(
                 "valueChanged",
                 self.component_id,
@@ -259,6 +256,7 @@ class NumberValue(KerviValue):
                 self._log_values,
                 groups=self.user_groups
             )
+            
 
     def link_to_dashboard(self, dashboard_id=None, panel_id=None, **kwargs):
         r"""
