@@ -237,7 +237,7 @@ class _SpineProtocol(WebSocketServerProtocol):
 
 class SocketSpine:
     def __init__(self, config):
-        coro = None
+        #coro = None
         self._started = False
         self._config = config
         self._spine = Spine()

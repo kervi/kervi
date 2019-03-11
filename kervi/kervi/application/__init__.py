@@ -374,8 +374,10 @@ class Application(object):
             ]
 
         #print("wait for ready")
-        while not self._is_ready() and self._in_stop:
+        while not self._is_ready():
             time.sleep(1)
+
+        #print("pi", self._process_info)
 
         if not self._in_stop:
             from kervi.dashboards import Dashboard
