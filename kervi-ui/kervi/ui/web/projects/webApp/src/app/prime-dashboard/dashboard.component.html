@@ -1,17 +1,45 @@
-<p-toolbar>
-	<div class="ui-toolbar-group-left">
-		<p-menu #menu [popup]="true" [model]="items"></p-menu>
-		<button *ngIf="showMenu" type="button" pButton icon="pi pi-bars" label="Show" (click)="menu.toggle($event)"></button>
-	</div>
-	<div class="ui-toolbar-group-right">
+<nz-layout *ngIf="dashboard">
+	<nz-header>
+		<div nz-row>
+			<div nz-col nzSpan="6">		
+				<ul nz-menu  nzMode="horizontal" >
+					<li nz-submenu *ngIf="showMenu">
+						<span title><i nz-icon type="ellipsis"></i></span>
+						<ul>
+							<ng-container *ngIf="dashboards.length > 1">
+								<li nz-menu-item *ngFor="let dashboard of dashboards" [routerLink]="['/dashboard', dashboard.id]">{{dashboard.name}}</li>
+							</ng-container>
+						</ul>
+					</li>
+					<li nz-menu-item *ngIf="showPanelController">
+						<a  (click)="dashboardPanelsHidden = !dashboardPanelsHidden;">
+							<i nz-icon type="sliders"></i>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="kervi-sys-panel" *ngIf="dashboard && dashboard.sysPanel" nz-col nzSpan="18">
+					<kervi-dashboard-panel [dashboardSizes]="dashboardSizes" [inline]="true" [panel]="dashboard.sysPanel" ></kervi-dashboard-panel>
+			</div>
+		</div>
+	</nz-header>
 		
-	</div>
-</p-toolbar>
-<div class="p-grid p-align-stretch vertical-container">
-	<div class="p-col">
-		<kervi-dashboard-panel  *ngFor="let panel of dashboard.panels" [dashboardSizes]="defaultSizes" [panel]="panel" class="w-{{panel.width}}"></kervi-dashboard-panel>
-	</div>
-</div>
+	<nz-content>
+
+			<kervi-cam-viewer *ngIf="cameraId" [isBackground]="true" [cameraId]="cameraId" [linkParameters]="cameraParameters"></kervi-cam-viewer>
+			<div #leftPad class="kervi-controller-pad" *ngIf="showLeftPad" [style.left.px]="leftPadLeft" [style.top.px]="leftPadTop" >
+				<kervi-controller-pad [autoCenter]="autoCenterLeftPad" [XValue]="leftPadXValue" [YValue]="leftPadYValue"></kervi-controller-pad>
+			</div>
+			<div #rightPad class="kervi-controller-pad" *ngIf="showRightPad" [style.left.px]="rightPadLeft" [style.top.px]="rightPadTop" >
+				<kervi-controller-pad [autoCenter]="autoCenterRightPad" [XValue]="rightPadXValue" [YValue]="rightPadYValue"></kervi-controller-pad>
+			</div>
+			
+
+		<div class="kervi-panels" fxLayout=" row" fxLayout.xs="column" fxLayoutGap="0.5%" fxLayoutAlign=""  *ngIf="!dashboardPanelsHidden" style="position:relative;margin-top:35px;">
+			<kervi-dashboard-panel  *ngFor="let panel of dashboard.panels" [dashboardSizes]="defaultSizes" [panel]="panel" class="w-{{panel.width}}"></kervi-dashboard-panel>
+		</div>
+	</nz-content>
+</nz-layout>
 
 
 

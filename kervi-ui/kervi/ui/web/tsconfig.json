@@ -35,11 +35,11 @@
       "ngx-kervi-components/*": [
         "dist/ngx-kervi-components/*"
       ],
-      "kervi-primeNG": [
-        "dist/kervi-prime-ng"
+      "kervi-material": [
+        "dist/kervi-material"
       ],
-      "kervi-primeNG/*": [
-        "dist/kervi-prime-ng/*"
+      "kervi-material/*": [
+        "dist/kervi-material/*"
       ]
     }
   }

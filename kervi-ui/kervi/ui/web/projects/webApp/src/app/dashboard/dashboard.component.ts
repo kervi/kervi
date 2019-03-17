@@ -25,22 +25,22 @@ export class DashboardComponent extends KerviDashboardComponent implements OnIni
     //this.router.url;
     //console.log("r", this.activatedRoute.params.subscribe)
     this.activatedRoute.params.subscribe(params => {
-      var dashboardId = params['name']; 
-      this.loadDashboard(dashboardId);
-      console.log("rid", dashboardId);
+      // var dashboardId = params['name']; 
+      // this.loadDashboard(dashboardId);
+      // console.log("rid", dashboardId);
       
-      setTimeout(() => {
-        var h = window.innerHeight;
-        var w = window.innerWidth;
+      // setTimeout(() => {
+      //   var h = window.innerHeight;
+      //   var w = window.innerWidth;
 
-        self.leftPadTop = h / 2 - self.padSize/2
-        self.leftPadLeft = w / 4 - self.padSize/2 
+      //   self.leftPadTop = h / 2 - self.padSize/2
+      //   self.leftPadLeft = w / 4 - self.padSize/2 
         
-        self.rightPadTop = h / 2 - self.padSize/2
-        self.rightPadLeft = w - w / 4 - self.padSize/2 
+      //   self.rightPadTop = h / 2 - self.padSize/2
+      //   self.rightPadLeft = w - w / 4 - self.padSize/2 
         
 
-      }, 0);
+      // }, 0);
       
 
 

@@ -10,7 +10,7 @@ import {  Observable } from 'rxjs';
 })
 export class KerviDashboardPanelComponent {
   @Input() dashboardSizes: DashboardSizes;
-  @Input() panel:DashboardPanel;
+  @Input() panel:DashboardPanel=null;
   @Input() inline:boolean = false;
   @Input() inGroup:boolean = false;
   @Input() bodyOnly:boolean = false;
@@ -19,7 +19,7 @@ export class KerviDashboardPanelComponent {
   public width:string = "";
   public showHeader:boolean = false;
   public expanded:boolean = false;
-  public title:string;
+  public title:string = null;
   public bodyComponents:any[]=[];
   public headerComponents: any[] = [];
   public footerComponents: any[] = [];

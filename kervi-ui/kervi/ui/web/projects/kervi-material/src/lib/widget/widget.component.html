@@ -1,0 +1,35 @@
+<ng-container *ngIf="widgetType=='value'">
+    <div fxLayout="row" *ngIf="!inline" class="kervi-block-widget"> 
+        <div fxFlex="60" >
+            <span   *ngIf="linkParameters.labelIcon" class="pi pi-{{linkParameters.labelIcon}}"></span>
+            <span   *ngIf="linkParameters.label">{{linkParameters.label}}</span>
+        </div>
+        
+        <div fxFlex class="kervi-value-section">
+            <kervi-value *ngIf="component.componentType=='KerviValue'" [value]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-value>
+            <kervi-action  *ngIf="component.componentType=='action'" [action]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-action>
+        </div>
+        
+    </div>
+
+    <div *ngIf="inline" class="kervi-inline-widget"> 
+            <span style="display:inline"  *ngIf="linkParameters.labelIcon" class="fa fa-{{linkParameters.labelIcon}}"></span>
+            <span style="display:inline"  *ngIf="linkParameters.label"  >{{linkParameters.label}}</span>
+            <kervi-value *ngIf="component.componentType=='KerviValue'" [value]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-value>
+            <kervi-action  *ngIf="component.componentType=='action'" [action]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-action>
+        
+    </div>
+    <nz-divider></nz-divider>
+</ng-container>    
+<ng-container *ngIf="widgetType=='camera'" class="block-component" >
+    <!-- <kervi-cam-viewer [isBackground]="false" [camera]="component" [linkParameters]="linkParameters"></kervi-cam-viewer> -->
+</ng-container>
+    
+    
+<ng-container *ngIf="widgetType=='gauge'" class="block-component" >
+    <!-- <kervi-gauge [dashboardSizes]="dashboardSizes" [value]="component" [linkParameters]="linkParameters"></kervi-gauge> -->
+</ng-container>
+
+<ng-container *ngIf="widgetType=='chart'" class="" >
+    <kervi-chart [dashboardSizes]="dashboardSizes" [value]="component" [linkParameters]="linkParameters" ></kervi-chart>
+</ng-container>

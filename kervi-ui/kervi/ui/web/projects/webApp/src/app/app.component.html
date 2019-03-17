@@ -1,1 +1,16 @@
-<router-outlet></router-outlet>
+<router-outlet>
+              
+</router-outlet>
+
+<ng-template let-message="data">
+        <div class="ant-notification-notice-content">
+                <div class="ant-notification-notice-with-icon">
+                  <span class="ant-notification-notice-icon"><i nz-icon type="check-circle" style="color: rgb(16, 142, 233);"></i></span>
+                  <div class="ant-notification-notice-message">{{message.sourceName}}</div>
+                  <div class="ant-notification-notice-description">
+                        {{ message.topic }}                
+                  </div>
+                </div>
+              </div>
+    
+</ng-template>

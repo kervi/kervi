@@ -78,6 +78,7 @@ export class DashboardPanel {
     public dashboard: Dashboard;
     public type:string;
     public subPanels: DashboardPanel[] = [];
+    public hasOnlyGroupPanels:boolean = true;
     
     constructor (dashboard, messagePanel){
         this.dashboard=dashboard;
@@ -95,6 +96,8 @@ export class DashboardPanel {
             for(var subMessagePanel of messagePanel.panels){
                 var panel=new DashboardPanel(this, subMessagePanel);
                 this.subPanels.push(panel);
+                if (panel.type !== "group")
+                    this.hasOnlyGroupPanels = false;
             }
         }
     }
