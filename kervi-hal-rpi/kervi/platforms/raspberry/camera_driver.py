@@ -48,7 +48,7 @@ class CameraDriver(FrameCameraDeviceDriver):
 
         if detected:
             with picamera.PiCamera() as camera:
-                self.log.verbose("start Raspberry Pi camera")
+                self.log.verbose("start Raspberry Pi camera", "")
                 camera.resolution = (self.camera.width, self.camera.height)
                 camera.framerate =  self.camera.fps
                 camera.hflip = self.camera.flip_horizontal
