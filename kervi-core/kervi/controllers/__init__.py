@@ -119,7 +119,6 @@ class Controller(KerviComponent):
         )
 
     def _on_app_ready(self, id):
-        #print("ca", id, self._component_id)
         self._active = True
         self.controller_start()
 
