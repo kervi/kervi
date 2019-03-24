@@ -39,7 +39,7 @@ def logger_thread(q):
 
 class KerviLogHandler:
     def __init__(self, config):
-
+        import platform
         
         log_level = config.log.level
             
@@ -165,7 +165,8 @@ class KerviLogHandler:
         self._log_queue = Queue()
         self._logging_thread = threading.Thread(target=logger_thread, args=(self._log_queue,))
         self._logging_thread.deamon = True
-        self._logging_thread.start()
+        if platform.system() == "Windows":
+            self._logging_thread.start()
         #return KerviLog("application")
 
     def stop(self):
