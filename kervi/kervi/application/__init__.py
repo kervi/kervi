@@ -115,7 +115,7 @@ class Application(object):
         print("\033[92mStarting kervi application \033[0m")
         import inspect
         import getopt
-       
+        self._websocket_event = threading.Event()
         self._in_stop = False
         self._discovery_thread = None
         config_files = []
@@ -226,6 +226,7 @@ class Application(object):
         self.spine.register_event_handler("modulePing", self._module_ping)
         self.spine.register_event_handler("processReady", self._process_ready, scope="app-" + self.config.application.id)
         self.spine.register_event_handler("WebAppReady", self._webapp_ready, scope="app-" + self.config.application.id)
+        self.spine.register_event_handler("websocketReady", self._websocket_ready, scope="app-" + self.config.application.id)
         self._module_processes = []
         self._process_info = []
         self._process_info_lock = threading.Lock()
@@ -312,9 +313,12 @@ class Application(object):
         self._webserver_info = webserver_info
         ready_message = "Reach your application at http://" + self._webserver_info["ip"] + ":" + str(self._webserver_info["port"])
         self.spine.log.info(ready_message)
-        time.sleep(2)
+        self._websocket_event.wait()
         self.spine.send_command("startWebSocket")
 
+    def _websocket_ready(self, scope, info):
+        self._websocket_event.set()
+    
     def _is_ready(self):
         result = True
         self._process_info_lock.acquire()
