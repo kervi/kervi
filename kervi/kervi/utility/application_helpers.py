@@ -35,7 +35,7 @@ class _KerviModuleLoader(process._KerviProcess):
         except ImportError:
             self.spine.log.exception("load module:{0}", self.name)
         except:
-            print("excp")
+            self.spine.log.exception("error load module:{0}", self.name)
 
         self.spine.send_command("startThreads", local_only=True)
         self.spine.trigger_event(
