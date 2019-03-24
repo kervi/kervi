@@ -66,6 +66,10 @@ def _load(hw_platform="auto"):
         else:
             raise ValueError("Invalid hw_platform. Valid values are: " + str.join(hal_modules.keys()))
 
+
+def get_board_name():
+    return _DRIVER.get_board_name()
+
 def get_user_inputs():
     return _DRIVER.get_user_inputs()
 
