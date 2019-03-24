@@ -212,6 +212,7 @@ class Application(object):
         hal_driver = hal._load(self.config.platform.driver)
         if hal_driver:
             self._logger.verbose("platform driver: %s", hal_driver)
+            self._logger.verbose("board: %s", hal.get_board_name())
             
         from kervi.plugin.message_bus.bus_manager import BusManager
         self.bus_manager = BusManager(self._log_queue)
