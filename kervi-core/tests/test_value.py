@@ -1,9 +1,9 @@
 from mockup_spine import MockupSpine
 from kervi.values import KerviValue, NumberValue, BooleanValue
-
+from kervi_config import get_test_config
 def test_value_instantitation_input():
     spine = MockupSpine()
-    value = KerviValue("Dynamic Value", "Dynamic-test-value", value_id="dv", spine=spine)
+    value = KerviValue("Dynamic Value", "Dynamic-test-value", value_id="dv", spine=spine, configuration = get_test_config())
 
     assert value.value_id == "dv"
     assert value.name == "Dynamic Value"
