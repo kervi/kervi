@@ -21,3 +21,4 @@ kervi_ui.egg-info
 setup.cfg
 kervi-core/kervi_core.egg-info/PKG-INFO
 node_modules
+kervi.log
