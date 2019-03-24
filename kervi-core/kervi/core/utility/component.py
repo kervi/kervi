@@ -8,6 +8,7 @@ except:
     from kervi.core.utility.udatetime import datetime
 import kervi.spine as spine
 from kervi.core.utility.settings import Settings
+from kervi.config import Configuration, Text
 
 class DasboardSectionLink(object):
     def __init__(self, dashboard_id, section_id, section_caption, param, component):
@@ -27,6 +28,7 @@ class DasboardSectionLink(object):
 class KerviComponent(object):
     def __init__(self, component_id, component_type, name, **kwargs):
         self.spine = kwargs.get("spine", spine.Spine())
+        self._configuration = kwargs.get("configuration", Configuration)
         self._component_id = component_id
         self._component_type = component_type
         self._admin_groups = kwargs.get("admin_groups", [])
@@ -55,6 +57,10 @@ class KerviComponent(object):
     @property
     def component_type(self):
         return self._component_type
+
+    @property
+    def global_config(self):
+        return self._configuration
 
     @property
     def name(self):
