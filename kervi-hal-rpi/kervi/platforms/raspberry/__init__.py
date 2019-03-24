@@ -1,6 +1,6 @@
 def get_board_name():
     revision = getrevision()
-    return revision["model"]
+    return revision["name"] + " (" + revision["ram"] + " ram)"
 
 def get_gpio_driver():
     from . import gpio_driver
