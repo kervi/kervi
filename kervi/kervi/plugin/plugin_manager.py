@@ -76,7 +76,7 @@ class _PluginInfo:
                     self._log.error("Invalid plugin class: %s expected: %s", self.instance, self._manager._plugin_classes)
                     self.instance = None
         except Exception as ex:
-            self._log.error("Could not load plugin: %s", self._plugin_module, ex)
+            self._log.exception("Could not load plugin: %s", self._plugin_module)
 
     def load(self, module_port=None):
         if self.own_process:
