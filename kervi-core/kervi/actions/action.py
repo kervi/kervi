@@ -191,8 +191,10 @@ class Action(KerviComponent):
         self.action_id = action_id
         self._handler = handler
         self._handler.__globals__["exit_action"] = False
-        argspec = inspect.getargspec(handler)
-        self._keywords = argspec.keywords != None
+        sig = inspect.signature(handler)
+        keywords = [p.name for p in sig.parameters.values() if p.kind == p.KEYWORD_ONLY]
+        
+        self._keywords = len(keywords) >0
         self.spine = Spine()
         self.spine.register_command_handler("kervi_action_" + action_id, self._handle_command)
         self.spine.register_command_handler("kervi_action_interrupt_" + action_id, self.interrupt)
