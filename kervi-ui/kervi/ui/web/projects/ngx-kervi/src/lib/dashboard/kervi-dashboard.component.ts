@@ -19,6 +19,10 @@ export class KerviDashboardComponent {
   protected cameraId: string = null;
   protected cameraParameters:any = null;
   
+  public authenticated:Boolean = false;
+  private anonymous:Boolean = true;
+  
+
   protected showLeftPad:boolean = false;
   protected leftPadXValue:NumberValue = null;
   protected leftPadYValue:NumberValue = null;
@@ -28,6 +32,8 @@ export class KerviDashboardComponent {
   protected rightPadXValue:NumberValue = null;
   protected rightPadYValue:NumberValue = null;
   protected autoCenterRightPad:boolean = false;
+
+
 
   private inFullScreen:boolean = false; 
   constructor() {
@@ -41,9 +47,16 @@ export class KerviDashboardComponent {
     
    }
 
+  protected logoff(event){
+    this.kerviService.logoff();
+    event.stopPropagation();
+  }
+
   protected loadDashboard(dashboardId:string){
     this.dashboardId = dashboardId;
     this.dashboard = this.kerviService.getComponent(dashboardId, "dashboard") as Dashboard;
+    this.anonymous = this.kerviService.isAnonymous();
+    this.authenticated = this.kerviService.doAuthenticate;
     if (this.dashboard){
       this.dashboards = this.kerviService.getComponentsByType("dashboard");
       this.isAppEmpty = this.kerviService.isAppEmpty();
@@ -97,6 +110,7 @@ export class KerviDashboardComponent {
   }
 
   toggleFullScreen() {
+    console.log("fs", this.inFullScreen);
     var doc:any;
     doc = document;
     if ((doc.fullScreenElement && doc.fullScreenElement !== null))     

@@ -22,7 +22,6 @@ export class AppComponent implements OnInit {
     var self = this;
 
     this.kerviService.getLogMessages$().subscribe(function(messages){
-      console.log("m", messages);
       if (messages && messages.length){
         var message = messages[0];
         var type="info";

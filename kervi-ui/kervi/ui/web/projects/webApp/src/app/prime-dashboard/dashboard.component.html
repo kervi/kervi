@@ -3,17 +3,21 @@
 		<div nz-row>
 			<div nz-col nzSpan="6">		
 				<ul nz-menu  nzMode="horizontal" >
-					<li nz-submenu *ngIf="showMenu">
-						<span title><i nz-icon type="ellipsis"></i></span>
+					<li nz-submenu  *ngIf="showMenu">
+						
+						<span title><i nz-icon type="ellipsis"></i> {{dashboard.name}}</span>
 						<ul>
 							<ng-container *ngIf="dashboards.length > 1">
 								<li nz-menu-item *ngFor="let dashboard of dashboards" [routerLink]="['/dashboard', dashboard.id]">{{dashboard.name}}</li>
 							</ng-container>
+							<!-- <li nz-menu-item *ngIf="authenticated && dashboardCount > 1" class="dropdown-divider"></li> -->
+							<li nz-menu-item *ngIf="authenticated && anonymous" href="javascript: return false;" (click)="logoff($event)" >{{('login' | translate)}}</li>
+							<li nz-menu-item *ngIf="authenticated && !anonymous" href="javascript: return false;" (click)="logoff($event)">{{('logout' | translate)}}</li>
 						</ul>
 					</li>
 					<li nz-menu-item *ngIf="showPanelController">
 						<a  (click)="dashboardPanelsHidden = !dashboardPanelsHidden;">
-							<i nz-icon type="sliders"></i>
+							<i nz-icon type="dashboard" nzTheme="twotone"></i>
 						</a>
 					</li>
 				</ul>
@@ -35,10 +39,22 @@
 			</div>
 			
 
-		<div class="kervi-panels" fxLayout=" row" fxLayout.xs="column" fxLayoutGap="0.5%" fxLayoutAlign=""  *ngIf="!dashboardPanelsHidden" style="position:relative;margin-top:35px;">
+		<div class="kervi-panels" fxLayout=" row" fxLayout.xs="column" fxLayoutGap="0.5%" fxLayoutAlign=""  *ngIf="!dashboardPanelsHidden" style="">
 			<kervi-dashboard-panel  *ngFor="let panel of dashboard.panels" [dashboardSizes]="defaultSizes" [panel]="panel" class="w-{{panel.width}}"></kervi-dashboard-panel>
 		</div>
 	</nz-content>
+	<nz-footer>
+		<div nz-col nzSpan="8" style="text-align: left">
+			<kervi-dashboard-panel [inline]="true" *ngIf="dashboard.footerLeftPanel" [dashboardSizes]="defaultSizes" [panel]="dashboard.footerLeftPanel"></kervi-dashboard-panel>
+		</div>
+		<div nz-col nzSpan="8" style="text-align:center">
+			<kervi-dashboard-panel [inline]="true" *ngIf="dashboard.footerCenterPanel" [dashboardSizes]="defaultSizes" [panel]="dashboard.footerCenterPanel"></kervi-dashboard-panel>
+		</div>
+		<div nz-col nzSpan="8"  style="text-align: right">
+			<kervi-dashboard-panel [inline]="true" *ngIf="dashboard.footerRightPanel" [dashboardSizes]="defaultSizes" [panel]="dashboard.footerRightPanel"></kervi-dashboard-panel>
+			<button nz-button nzShape="round" (mousedown)="toggleFullScreen()"><i nz-icon [nzType]="inFullScreen ? 'fullscreen' : 'fullscreen-exit'" title="{{( 'toggle_screen' | translate)}}"></i></button>
+		</div>
+	</nz-footer>
 </nz-layout>
 
 

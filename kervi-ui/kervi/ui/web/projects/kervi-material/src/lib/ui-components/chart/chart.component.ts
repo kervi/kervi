@@ -1,110 +1,117 @@
 // Copyright (c) 2016, Tim Wentzlau
 // Licensed under MIT
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { NumberValue, DashboardSizes   } from 'kervi-js';
 import { NGXKerviService, KerviTemplateService } from 'ngx-kervi';
-import { ApexOptions} from 'ng-apexcharts/public_api'
+import { asapScheduler } from 'rxjs';
+
+declare var ApexCharts: any;
+
 @Component({
   selector: 'kervi-chart',
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss'],
 })
 
-export class ChartComponent implements OnInit {
+export class KerviChartComponent implements OnInit {
   @Input() value: NumberValue = null;
   @Input() linkParameters: any = null;
   @Input() type: string;
   @Input() size:number;
   @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
-  data=[];
-  chartOptions={};
-  title="test chart";
-  constructor(private kerviService:NGXKerviService, private templateService:KerviTemplateService ) {  
-    
+  @ViewChild('chart') private chartElement: ElementRef;
+  private series=[];
+  private chartObj: any;
+  private options:any;
+  constructor(private kerviService:NGXKerviService, private templateService:KerviTemplateService ) {
+
+  }
+
+  private createElement(){
+    this.series= [
+    {
+        name: this.value.name,
+        data: [ ]
+    }]
+
+    this.options ={
+      chart: {
+          id: "chart_" + this.value.id,
+          width:300,
+          height:300,
+          animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+              speed: 100
+            }
+          },
+          toolbar: {
+            show: false
+          },
+          zoom: {
+            enabled: false
+          }
+        },
+      dataLabels: {
+          enabled: false
+        },
+      stroke: {
+          curve: 'smooth'
+        },
+
+      title: {
+          text: this.value.name,
+          align: 'left'
+        },
+      markers: {
+          size: 0
+        },
+      xaxis: {
+          type: 'datetime',
+          //range: 1552983230 - 300,
+      },
+      yaxis: {
+          max: 100,
+          min:0
+        },
+      legend: {
+          show: false
+      },
+      series: this.series
+    }
+  
+    if (this.chartObj) {
+      this.chartObj.destroy();
+    }
+    console.log("create chart", this.value.id);
+    this.chartObj = new ApexCharts(
+      this.chartElement.nativeElement,
+      this.options
+    );
+    this.chartObj.render();
   }
 
   private color(style,selector){
     return this.templateService.getColor(style,selector);
-    
   }
-
-  
 
   ngOnInit() {
     var self = this;
+    asapScheduler.schedule(() => {
+      this.createElement();
+    });
 
-    this.chartOptions =  {
-      chart: {
-        type: 'area',
-        stacked: false,
-        height: 350,
-        zoom: {
-          type: 'x',
-          enabled: true
-        },
-        toolbar: {
-          autoSelected: 'zoom'
-        }
-      },
-      dataLabels: {
-        enabled: false
-      },
-      series: [{
-        name: 'XYZ MOTORS',
-        data: this.data
-      }],
-      markers: {
-        size: 0,
-      },
-      title: {
-        text: 'Stock Price Movement',
-        align: 'left'
-      },
-      fill: {
-        type: 'gradient',
-        gradient: {
-          shadeIntensity: 1,
-          inverseColors: false,
-          opacityFrom: 0.5,
-          opacityTo: 0,
-          stops: [0, 90, 100]
-        },
-      },
-      yaxis: {
-        min: this.value.maxValue,
-        max: this.value.minValue,
-        
-        title: {
-          text: 'Price'
-        },
-      },
-      xaxis: {
-        type: 'datetime',
-      },
-
-      tooltip: {
-        shared: false,
-        
+    this.value.value$.subscribe(function(v){
+      if (self.chartObj){
+        self.series[0].data.push([ self.value.valueTS.getTime(), v ]);
+        self.chartObj.updateSeries( self.series);
       }
-    }
-
-
-    
-    
-      
-      this.value.value$.subscribe(function(v){
-        var ds=self.data;
-        ds.push([ self.value.valueTS, v ])
-      });
-
-      
-      
-        
-    
+    });
   }
 
-  
+
 
   public loadPeriod(){
     var self = this;
@@ -117,7 +124,7 @@ export class ChartComponent implements OnInit {
           //var dataItem = sensorData[i]
           //self.chartData.push({ x: new Date(dataItem.ts + " utc"), y: dataItem.value });
         //}
-        //self.chart.render();  
+        //self.chart.render();
         //self.chart.update();
     //});
   }

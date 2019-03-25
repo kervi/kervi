@@ -1,102 +1,114 @@
 // Copyright (c) 2016, Tim Wentzlau
 // Licensed under MIT
 
-import { Component, OnInit, Input, ElementRef, ChangeDetectionStrategy } from '@angular/core';
-import { DashboardSizes, NumberValue, ValueRange, ValueRangeType } from 'kervi-js';
-import { KerviTemplateService } from 'ngx-kervi';
-declare var LinearGauge:any;
-declare var RadialGauge:any;
-declare var jQuery:any;
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { NumberValue, DashboardSizes   } from 'kervi-js';
+import { NGXKerviService, KerviTemplateService } from 'ngx-kervi';
+import { asapScheduler } from 'rxjs';
+
+declare var ApexCharts: any;
+
 @Component({
   selector: 'kervi-gauge',
   templateUrl: './gauge.component.html',
   styleUrls: ['./gauge.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class GaugeComponent implements OnInit {
   @Input() value: NumberValue = null;
   @Input() linkParameters: any = null;
-  @Input() type: string = "radial_gauge";
-  @Input() dashboardSizes: DashboardSizes;
-  protected  unitSize:number = 110;
-  public numberFormat = "1.2-2";
-  canvasId:string="";
-  dataHighlights:any={};
-  private gauge:any=null;
-  private gaugeTypes:string[]=['radial_gauge','vertical_linear_gauge', 'horizontal_linear_gauge', 'compass']
-  constructor(private elementRef:ElementRef, private templateService:KerviTemplateService ) {  
+  @Input() type: string;
+  @Input() size:number;
+  @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
+  @ViewChild('chart') private chartElement: ElementRef;
+  private series=[];
+  private chartObj: any;
+  private options:any;
+  constructor(private kerviService:NGXKerviService, private templateService:KerviTemplateService ) {
+
+  }
+
+  private createElement(){
+    this.series = [this.value.value]
+
+    this.options ={
+      chart: {
+          width:"100%",
+          //height:200,
+          type: 'radialBar',
+      },
+      plotOptions: {
+          radialBar: {
+              hollow: {
+                  size: '70%',
+              }
+          },
+      },
+      series: this.series,
+      labels: [this.value.name],
+
+    }
+  
+    if (this.chartObj) {
+      this.chartObj.destroy();
+    }
+    console.log("create gauge", this.value.id);
+    this.chartObj = new ApexCharts(
+      this.chartElement.nativeElement,
+      this.options
+    );
+    this.chartObj.render();
+  }
+
+  public render(): Promise<void> {
+    return this.chartObj.render();
   }
 
   private color(style,selector){
     return this.templateService.getColor(style,selector);
   }
 
-  
-
   ngOnInit() {
-    var self = this;  
-   
+    var self = this;
+    asapScheduler.schedule(() => {
+      this.createElement();
+    });
 
-    this.numberFormat = this.linkParameters.minIntegerDigits + "." + this.linkParameters.minFractionDigits + "-" + this.linkParameters.maxFractionDigits
-			
-    this.canvasId=this.templateService.makeId();
-    
-    var warningColor = this.color("color",".sensor-template .sensor-warning");
-    var fatalColor = this.color("color",".sensor-template .sensor-fatal");
-    var normalColor = this.color("color",".sensor-template .sensor-major-ticks");
-    
-    var fromLimit=self.value.minValue;
-    
-    this.dataHighlights[self.value.minValue]={color:normalColor}
-    for(var range of self.value.ranges){
-      if (range.type == ValueRangeType.error)
-        this.dataHighlights[range.start]={color: fatalColor};
-      else if (range.type == ValueRangeType.warning)
-        this.dataHighlights[range.start]={color:warningColor};
-      else
-        this.dataHighlights[range.start]={color:normalColor};
-      this.dataHighlights[range.end]={color:normalColor}
-    }
-      console.log("dr", self.value.ranges, this.dataHighlights);
-      var nspan=(self.value.maxValue-self.value.minValue);
-      var tickSpan=nspan/10;
-      var ticks=[];
-      for(var n=self.value.minValue;(n<=self.value.maxValue);n+=tickSpan)
-        ticks.push(n);
-
-      var settings={
-          renderTo: self.canvasId,
-          value:self.value.value$.value,
-          units: self.value.unit,
-          title: self.linkParameters.label,
-          minValue: self.value.minValue,
-          maxValue: self.value.maxValue,
-          highlights: this.dataHighlights,
-          majorTicks:ticks,
-          colorPlate:this.color("background-color",".sensor-template"),
-          borders:false,
-          //colorBorderOuter:"",
-          //colorBorderMiddle:"",
-          //colorBorderInner:"",
-          colorMajorTicks:this.color("color",".sensor-template .sensor-major-ticks"),
-          colorMinorTicks:this.color("color",".sensor-template .sensor-minor-ticks"),
-          colorTitle:this.color("color",".sensor-template .sensor-title"),
-          colorUnits:this.color("color",".sensor-template .sensor-units"),
-          colorNumbers:this.color("color",".sensor-template .sensor-numbers"),
-          colorNeedleStart:this.color("color",".sensor-template .sensor-needle-start"),
-          colorNeedleEnd:this.color("color",".sensor-template .sensor-needle-end"),
-          valueBox:false,
-          animationRule:"bounce",
-          animationDuration:"500",
-          fontValue:"Led",
-          animatedValue:"true"
+    this.value.value$.subscribe(function(v){
+      if (self.chartObj && v){
+        //self.series=[v];
+        self.chartObj.updateSeries( [v]);
       }
-      
-      
-      
-   
-    
+    });
   }
-  
+
+  public loadPeriod(){
+    var self = this;
+    //console.log("lp", this.periodStart, this.periodEnd);
+    //this.kerviService.spine.sendQuery("getSensorData", this.value.id, this.periodStart.toISOString(), this.periodEnd.toISOString(), function (results) {
+        //console.log("gsd", results);
+        //var sensorData = results;
+        //self.chartData.length = 0;
+        //for (var i = 0; (i < sensorData.length); i++) {
+          //var dataItem = sensorData[i]
+          //self.chartData.push({ x: new Date(dataItem.ts + " utc"), y: dataItem.value });
+        //}
+        //self.chart.render();
+        //self.chart.update();
+    //});
+  }
+
+  private cleanData(){
+    // if(this.updateChart){
+    //   var doClean = true;
+    //   var limitTS = this.getPeriodLimit();
+    //   var ds = this.chart.data.datasets[0].data
+    //   while ( ds.length>0 && doClean){
+    //     if (ds[0].x < limitTS)
+    //       ds.shift();
+    //     else
+    //       doClean = false
+    //   }
+    // }
+  }
 }

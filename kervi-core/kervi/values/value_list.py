@@ -52,6 +52,26 @@ class ValueList(object):
         if self.is_input and self.controller:
             item.add_observer(self.controller)
 
+
+    def add_number(self, number_id, name=None, min=None, max=None, unit=None, value=None, persist_value=False):
+        from kervi.values import NumberValue
+        number_name = name
+        if not number_name:
+            number_name = number_id
+        number = self.add(number_id, number_name, NumberValue)
+        if unit:
+            number.unit = unit
+        if min:
+            number.min = min
+        if max:
+            number.max = max
+        if value:
+            number.value = value
+        if persist_value:
+            number.persist_value = persist_value
+
+        return number
+
     @property
     def keys(self):
         return self._items.keys()

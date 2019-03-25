@@ -1,31 +1,24 @@
 <!-- <p>{{panel.name}} - {{panel.type}} - {{groupLayout}} - {{bodyOnly}} - {{inline}} - {{panel.subPanels.length}} - {{panel.components.length}} - {{headerComponents.length}} - {{bodyComponents.length}}</p> -->
 <ng-container *ngIf="!bodyOnly && panel.type=='group'">
-    <div fxFlex="calcWidth(panel, inGroup)"  fxLayout="groupLayout" fxLayout.xs="column"  fxLayoutGap="0.5%" style="border:solid 2px red">
+    <div [fxLayout]="groupLayout" fxLayout.xs="column"  fxLayoutGap="0.5%">
         <ng-container *ngFor="let subPanel of panel.subPanels">
             <ng-container *ngIf="subPanel.type!='group'">
-                    <!-- <div fxFlex="calcWidth(subPanel, false)" style="border:solid 0px yellow;margin:0"> -->
-        
-                <!-- <div class="card-panel" [style.width]="calcWidth(subPanel, false)"> -->
-                        
-                        <kervi-dashboard-panel [bodyOnly]="true" [inGroup]="true" [dashboardSizes]="dashboardSizes"  [panel]="subPanel"></kervi-dashboard-panel>
-                        
-                    <!-- </div> -->
+                        <kervi-dashboard-panel [fxFlex]="calcWidth(subPanel, true)" [bodyOnly]="true" [inGroup]="true" [dashboardSizes]="dashboardSizes"  [panel]="subPanel"></kervi-dashboard-panel>
             </ng-container>
             <ng-container *ngIf="subPanel.type=='group'">
-                <!-- <div class="" fxLayout="row" fxFlex style="border:2px solid blue;margin:0"> -->
-                    <kervi-dashboard-panel  [inGroup]="true" [dashboardSizes]="dashboardSizes"  [panel]="subPanel"></kervi-dashboard-panel>
-                <!-- </div> -->
+                    <kervi-dashboard-panel [fxFlex]="calcWidth(subPanel, true)" fxFlex.xs="100"  [inGroup]="true" [dashboardSizes]="dashboardSizes"  [panel]="subPanel"></kervi-dashboard-panel>
             </ng-container>
         </ng-container>
     </div>
 </ng-container>
 
 <ng-container *ngIf="!bodyOnly && !inline && panel.type!='group'">
-    <kervi-dashboard-panel [bodyOnly]="true" [dashboardSizes]="dashboardSizes"  [panel]="panel"></kervi-dashboard-panel>
+    <kervi-dashboard-panel  [bodyOnly]="true" [dashboardSizes]="dashboardSizes"  [panel]="panel"></kervi-dashboard-panel>
 </ng-container>
 
 <ng-container *ngIf="bodyOnly">
-    <nz-card [nzTitle]="showHeader ? title : null" [nzExtra]="extraTemplate">
+    <nz-card [fxFlex]="calcWidth(panel, inGroup)" fxFlex.xs="100%"  [nzTitle]="showHeader ? title : null" [nzExtra]="headerComponents.length>0 ? extraTemplate : null">
+        
         <ng-template #extraTemplate>
             <ng-container *ngFor="let panelComponent of headerComponents">
                         <kervi-widget [component]="panelComponent.component" [dashboardPanel]="panel" [inline]="inline"  [linkParameters]="panelComponent.parameters"></kervi-widget>
@@ -34,8 +27,6 @@
         <ng-container *ngFor="let panelComponent of bodyComponents">
             <kervi-widget [component]="panelComponent.component" [dashboardPanel]="panel"  [inline]="inline"  [linkParameters]="panelComponent.parameters"></kervi-widget>
         </ng-container>
-            
-        
     
         <div *ngIf="panel.parameters.userLog"  >
             <table class="table">

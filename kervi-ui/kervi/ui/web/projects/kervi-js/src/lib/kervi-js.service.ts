@@ -45,7 +45,8 @@ export class KerviBaseService {
             for (let component of self.components){
               if (component.id==value.id){
                 var dynamicValue = component as any;
-                dynamicValue.valueTS=new Date(this.timestamp + " utc");
+                //console.log("nv", this.timestamp, new Date(this.timestamp));
+                dynamicValue.valueTS=new Date(this.timestamp);
                 dynamicValue.set(value.value, false);  
               }
             }
@@ -232,7 +233,10 @@ export class KerviBaseService {
   private reset(){
     this.components = [];
     this.components$.next(this.components);
-    this.connectionState$.next(ConnectionState.disconnected);
+    if (this.IPCReady$.value)
+      this.connectionState$.next(ConnectionState.authenticate);
+    else
+      this.connectionState$.next(ConnectionState.disconnected);
   }
 
   private getComponentInfo(retryCount, module_load){

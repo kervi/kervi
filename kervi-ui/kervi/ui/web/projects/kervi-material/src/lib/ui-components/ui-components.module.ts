@@ -5,7 +5,7 @@ import { NGXKerviPipesModule  } from 'ngx-kervi'
 import { SparklineComponent } from './sparkline/sparkline.component';
 import { SliderComponent } from './slider/slider.component';
 import { GaugeComponent } from './gauge/gauge.component';
-import { ChartComponent } from './chart/chart.component'
+import { KerviChartComponent } from './chart/chart.component'
 //import { CommonModule } from '@angular/common';
 import { SwitchButtonComponent} from './switch-button/switch-button.component';
 import { ButtonComponent} from './button/button.component';
@@ -27,7 +27,7 @@ import { NgApexchartsModule } from 'ng-apexcharts'
     SliderComponent,
     IconsComponent,
     GaugeComponent,
-    ChartComponent,
+    KerviChartComponent,
     SwitchButtonComponent,
     ButtonComponent,
     //CamViewerComponent,
@@ -43,7 +43,7 @@ import { NgApexchartsModule } from 'ng-apexcharts'
       IconsComponent,
       MPEGViewerComponent,
       GaugeComponent,
-      ChartComponent,
+      KerviChartComponent,
       SwitchButtonComponent,
       ButtonComponent,
       //CamViewerComponent,

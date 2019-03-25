@@ -2,7 +2,7 @@
 // Licensed under MIT
 
 import { Component, OnInit, Input, ElementRef, ChangeDetectionStrategy } from '@angular/core';
-import { DynamicNumberModel, DynamicRange, DynamicRangeType  } from '../../models/dynamicValues.model';
+import { DynamicNumberModel, DynamicRange, DynamicRangeType  } from 'kervi-js';
 import { DashboardSectionModel, DashboardSizes } from '../../models/dashboard.model';
 import { KerviService } from '../../kervi.service';
 import { TemplateService } from '../../template.service';

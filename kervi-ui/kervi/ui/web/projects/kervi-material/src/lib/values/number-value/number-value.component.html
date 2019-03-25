@@ -1,12 +1,9 @@
 <ng-container *ngIf="linkParameters.isInput">
-                <nz-form-control >
-                  <input id="{{value.id}}" nz-input [(ngModel)]="value.value"  >
-                    
-                </nz-form-control>
-              
-    
-        <!-- <ui-slider [value]="(value.value$ | async)" (sliderChanged)="setKerviValue($event)" [minValue]="value.minValue" [maxValue]="value.maxValue" [linkParameters]="linkParameters"></ui-slider> -->
-    
+    <nz-form-control >
+        <input id="{{value.id}}" nz-input [(ngModel)]="value.value"  >
+        
+    </nz-form-control>
+    <!-- <ui-slider [value]="(value.value$ | async)" (sliderChanged)="setKerviValue($event)" [minValue]="value.minValue" [maxValue]="value.maxValue" [linkParameters]="linkParameters"></ui-slider> -->
 </ng-container>
 <ng-container *ngIf="!linkParameters.isInput">
 
@@ -16,11 +13,4 @@
         {{(value.value$ | async | number:numberFormat)}}
         <span *ngIf="linkParameters.displayUnit">{{value.unit}}</span>
     </span>
-</ng-container>
-
-<ng-container *ngIf="inline"> 
-    <ui-slider *ngIf="linkParameters.isInput" (sliderChanged)="setKerviValue($event)" [value]="(value.value$ | async)" [minValue]="value.minValue" [maxValue]="value.maxValue" [linkParameters]="linkParameters"></ui-slider>
-    <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i>
-    <span style="display:inline"  [style.max-width.%]="linkParameters.valueSize"    class="slider-value">{{(value.value$ | async | number:numberFormat)}}</span>
-    <span *ngIf="linkParameters.displayUnit">{{value.unit}}</span>
 </ng-container>

@@ -9,7 +9,7 @@
             <kervi-value *ngIf="component.componentType=='KerviValue'" [value]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-value>
             <kervi-action  *ngIf="component.componentType=='action'" [action]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-action>
         </div>
-        
+            
     </div>
 
     <div *ngIf="inline" class="kervi-inline-widget"> 
@@ -19,15 +19,14 @@
             <kervi-action  *ngIf="component.componentType=='action'" [action]="component" [inline]="false" [dashboardSizes]="dashboardSizes"  [linkParameters]="linkParameters"></kervi-action>
         
     </div>
-    <nz-divider></nz-divider>
 </ng-container>    
 <ng-container *ngIf="widgetType=='camera'" class="block-component" >
-    <!-- <kervi-cam-viewer [isBackground]="false" [camera]="component" [linkParameters]="linkParameters"></kervi-cam-viewer> -->
+    <kervi-cam-viewer [isBackground]="false" [camera]="component" [linkParameters]="linkParameters"></kervi-cam-viewer>
 </ng-container>
     
     
 <ng-container *ngIf="widgetType=='gauge'" class="block-component" >
-    <!-- <kervi-gauge [dashboardSizes]="dashboardSizes" [value]="component" [linkParameters]="linkParameters"></kervi-gauge> -->
+    <kervi-gauge [dashboardSizes]="dashboardSizes" [value]="component" [linkParameters]="linkParameters"></kervi-gauge>
 </ng-container>
 
 <ng-container *ngIf="widgetType=='chart'" class="" >
