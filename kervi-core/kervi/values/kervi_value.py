@@ -7,7 +7,7 @@ except:
     from kervi.core.utility.udatetime import datetime
 
 from kervi.core.utility.component import KerviComponent
-from kervi.config import Configuration, Text
+
 from kervi.actions import Actions
 VALUE_COUNTER = 0
 class KerviValue(KerviComponent):
@@ -339,7 +339,7 @@ class KerviValue(KerviComponent):
             from kervi.core.utility.superformatter import SuperFormatter
             sf = SuperFormatter()
             
-            body_template = Configuration.texts.messages.value_plain
+            body_template = self.global_config.texts.messages.value_plain
             body = sf.format(
                 body_template,
                 message_color=message_color,
@@ -353,7 +353,7 @@ class KerviValue(KerviComponent):
                 level=level
             ) 
 
-            html_template = Configuration.texts.messages.value_html
+            html_template = self.global_config.texts.messages.value_html
             html_body = sf.format(
                 html_template,
                 message_color=message_color,

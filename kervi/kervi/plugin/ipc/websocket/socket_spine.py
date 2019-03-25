@@ -31,6 +31,7 @@ import logging
 
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
+import asyncio
 
 class _ObjectEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -64,7 +65,7 @@ class _WebCommandHandler(object):
         injected = kwargs.get("injected", "")
         if not injected == "socketSpine":
             jsonres = json.dumps({"messageType":"command", "command":self.command, "args":args}, ensure_ascii=False).encode('utf8')
-            self.protocol.sendMessage(jsonres, False)
+            self.protocol.broadcast_message(self.protocol, jsonres)
 
 class _WebQueryHandler(object):
     def __init__(self, query, protocol):
@@ -77,7 +78,7 @@ class _WebQueryHandler(object):
         injected = kwargs.get("injected", "")
         if not injected == "socketSpine":
             jsonres=json.dumps({"messageType":"query", "query":self.query, "args":args}, ensure_ascii=False).encode('utf8')
-            self.protocol.sendMessage(jsonres, False)
+            self.protocol.broadcast_message(self.protocol, jsonres)
 
 class _WebEventHandler(object):
     def __init__(self, event, id_event, protocol):
@@ -106,10 +107,10 @@ class _WebEventHandler(object):
             
             cmd = {"messageType":"event", "event":self.event, "id":id_event, "args":args}
             jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
-            self.protocol.sendMessage(jsonres, False)
+            self.protocol.broadcast_message(self.protocol, jsonres)
 
 class _SpineProtocol(WebSocketServerProtocol):
-
+    loop = None
     def __init__(self):
         self.spine = Spine()
         WebSocketServerProtocol.__init__(self)
@@ -118,6 +119,11 @@ class _SpineProtocol(WebSocketServerProtocol):
         self.session = None
         self.user = None
         self._authorization = Authorization()
+
+    @classmethod
+    def broadcast_message(cls, connection, json_data):
+        #for c in set(cls.connections):
+        cls.loop.call_soon_threadsafe(cls.sendMessage, connection, json_data)
 
     def add_command_handler(self, command):
         found = False
@@ -156,7 +162,7 @@ class _SpineProtocol(WebSocketServerProtocol):
 
     def onConnect(self, request):
         pass
-
+    
     def onOpen(self):
         if self._authorization.active:
             res = {
@@ -171,6 +177,16 @@ class _SpineProtocol(WebSocketServerProtocol):
         jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
         self.sendMessage(jsonres, False)
     
+    # @asyncio.coroutine
+    # def async_query(self, query, query_args, injected, session):
+    #     def do_req():
+    #         return self.spine.send_query(query, *query_args, injected=injected, session=session)
+    #         #self.spine.log.debug("query response:{0}", res)
+    #         #self.send_response(obj["id"], res)
+    #         #return requests.get('https://api.github.com/user', auth=HTTPBasicAuth('user', 'pass'))
+    #     req = self.loop.run_in_executor(None, do_req)
+    #     resp = yield from req
+    #     return resp
     def onMessage(self, payload, is_binary):
         try:
             obj = json.loads(payload.decode('utf8'))
@@ -208,8 +224,9 @@ class _SpineProtocol(WebSocketServerProtocol):
                 if not self.authenticated:
                     pass
                 elif obj["messageType"] == "query":
+                    #res = yield from self.async_query(obj["query"], obj["args"], injected="socketSpine", session=self.user)
                     res = self.spine.send_query(obj["query"], *obj["args"], injected="socketSpine", session=self.user)
-                    #self.spine.log.debug("query response:{0}", res)
+                    self.spine.log.debug("query response:{0}", res)
                     self.send_response(obj["id"], res)
                 elif obj["messageType"] == "registerQueryHandler":
                     self.add_query_handler(obj["query"])
@@ -273,6 +290,7 @@ class SocketSpine:
         self.factory.protocol = _SpineProtocol
 
         self.loop = asyncio.get_event_loop()
+        _SpineProtocol.loop = self.loop
         self.coro = self.loop.create_server(
             self.factory,
             self._config.network.ip,

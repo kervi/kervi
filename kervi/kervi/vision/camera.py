@@ -38,7 +38,8 @@ import kervi.utility.nethelper as nethelper
 import kervi.spine as spine
 import kervi.hal as hal
 from kervi.core.authentication import Authorization
-from kervi.actions import action 
+from kervi.actions import action
+from kervi.core.utility.kervi_logging import KerviLog
 
 try:
     from SimpleHTTPServer import SimpleHTTPRequestHandler
@@ -497,6 +498,7 @@ class FrameCameraDeviceDriver(object):
     def __init__(self):
         self._terminate = False
         self._buffer_type = None
+        self.log = KerviLog("FramedCameraDeviceDriver")
 
     @property
     def buffer_type(self):

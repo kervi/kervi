@@ -6,6 +6,13 @@ class WebSocketIPCPlugin(KerviPlugin):
         from kervi.plugin.ipc.websocket.socket_spine import SocketSpine
         self._socket_spine = SocketSpine(self.global_config)
         self.spine.register_command_handler("startWebSocket", self._start_socket)
+        self.spine.trigger_event(
+            "websocketReady", 
+            None,
+            {
+            
+            }
+        )
         
     def _start_socket(self):
         self._socket_spine.start_socket()

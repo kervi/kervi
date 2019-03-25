@@ -334,8 +334,9 @@ class ZMQBus():
         groups = kwargs.get("groups", None)
         scopes = kwargs.get("scopes", [])
 
-        argspec = inspect.getargspec(func)
-        self._handlers.add(tag, (func, groups, scopes, argspec.keywords != None))
+        sig = inspect.signature(func)
+        keywords = [p.name for p in sig.parameters.values() if p.kind == p.KEYWORD_ONLY]
+        self._handlers.add(tag, (func, groups, scopes, len(keywords)>0))
 
     
     def _unregister_handler(self, tag, func, **kwargs):

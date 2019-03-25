@@ -37,18 +37,18 @@ class CameraDriver(FrameCameraDeviceDriver):
         try:
             c.index("supported=1")
         except ValueError:
-            self.spine.log.error("Camera not enabled in raspi config")
+            self.log.error("Camera not enabled in raspi config")
 
         try:
             c.index("detected=1")
             detected = True
         except ValueError:
-            self.spine.log.error("PI camera not connected")
+            self.log.error("PI camera not connected")
             pass
 
         if detected:
             with picamera.PiCamera() as camera:
-                self.spine.log.verbose("start Raspberry Pi camera")
+                self.log.verbose("start Raspberry Pi camera", "")
                 camera.resolution = (self.camera.width, self.camera.height)
                 camera.framerate =  self.camera.fps
                 camera.hflip = self.camera.flip_horizontal

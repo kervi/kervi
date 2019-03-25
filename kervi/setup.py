@@ -18,6 +18,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
+    python_requires='>=3.5.0',
     name='kervi',
     author='Tim Wentzlau',
     author_email='tim.wentzlau@gmail.com',

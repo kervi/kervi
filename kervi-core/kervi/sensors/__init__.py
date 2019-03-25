@@ -44,7 +44,7 @@ class Sensor(Controller):
 
     """
     def __init__(self, sensor_id, name, device=None, **kwargs):
-        Controller.__init__(self, sensor_id, name)
+        Controller.__init__(self, sensor_id, name, **kwargs)
         self._device = device
         self._sub_sensors = []
         self._dimensions = 1
@@ -303,6 +303,10 @@ class Sensor(Controller):
     def delta(self, value):
         self._sensor_value.delta = value
 
+    @property
+    def value(self):
+        return self._sensor_value.value
+    
     @property
     def max(self):
         """
