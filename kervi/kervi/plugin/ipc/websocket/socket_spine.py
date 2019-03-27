@@ -195,7 +195,10 @@ class _SpineProtocol(WebSocketServerProtocol):
                 session, user = self._authorization.authorize(obj["userName"], obj["password"])
                 
                 if session is None:
-                    self.spine.log.warning("authorization failed for:", obj["userName"])
+                    if obj["userName"] == "anonymous":
+                        self.spine.log.warning("Anonymous user disabled")
+                    else:
+                        self.spine.log.warning("authorization failed for: %s", obj["userName"])
                     res = {
                         "messageType":"authentication_failed",
                     }

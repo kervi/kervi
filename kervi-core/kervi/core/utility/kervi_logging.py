@@ -47,6 +47,9 @@ class KerviLog(object):
     def warn(self, message, *args):
         self.logger.warning(BraceMessage(message, *args))
 
+    def warning(self, message, *args):
+        self.logger.warning(BraceMessage(message, *args))
+
     def debug(self, message, *args):
         if args:
             self.logger.debug(BraceMessage(message, *args))
