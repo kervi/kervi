@@ -40,6 +40,7 @@ export class KerviChartComponent implements OnInit {
           id: "chart_" + this.value.id,
           width:300,
           height:300,
+          type: 'area',
           animations: {
             enabled: true,
             easing: 'linear',
@@ -48,17 +49,29 @@ export class KerviChartComponent implements OnInit {
             }
           },
           toolbar: {
-            show: false
+            show: true,
+            tools: {
+              download: true,
+              selection: true,
+              zoom: true,
+              zoomin: true,
+              zoomout: true,
+              pan: true,
+              reset: true ,
+              customIcons: []
+            },
+            autoSelected: 'zoom' 
           },
           zoom: {
-            enabled: false
+            enabled: true
           }
         },
       dataLabels: {
           enabled: false
         },
       stroke: {
-          curve: 'smooth'
+          curve: 'smooth',
+          width:1
         },
 
       title: {
@@ -79,6 +92,7 @@ export class KerviChartComponent implements OnInit {
       legend: {
           show: false
       },
+      colors: ['#9fd037'],
       series: this.series
     }
   

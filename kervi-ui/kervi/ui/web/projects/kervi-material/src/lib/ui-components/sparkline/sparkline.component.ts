@@ -33,7 +33,7 @@ export class SparklineComponent implements OnInit {
 
     this.options ={
       chart: {
-          height: 30,
+          height: 14,
           width:60,
           type: 'area',
           sparkline: {
@@ -41,7 +41,8 @@ export class SparklineComponent implements OnInit {
           }
       },
       stroke: {
-        curve: 'straight'
+        curve: 'straight',
+        width:1
       },
       fill: {
         opacity: 0.3,
@@ -52,7 +53,7 @@ export class SparklineComponent implements OnInit {
       yaxis: {
         min: 0
       },
-      colors: ['#DCE6EC'],
+      colors: ['#9fd037'],
     }
   
     if (this.chartObj) {
