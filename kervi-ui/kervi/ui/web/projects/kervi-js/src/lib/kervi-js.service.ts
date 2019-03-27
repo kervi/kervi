@@ -33,6 +33,10 @@ export class KerviBaseService {
   IPCReady$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   authenticationFailed$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   
+  private _resolveSelf;
+  private _rejectSelf;
+  private authPromise:Promise<string>=null;
+
   constructor() 
   { 
     console.log("kervi service constructor");
@@ -197,9 +201,14 @@ export class KerviBaseService {
   }
 
   authenticate(userName, password){
-    this.authenticationFailed$.next(false);
-    
+    //this.authenticationFailed$.next(false);
+    console.log("ksa", userName, password);
+    this.authPromise=new Promise<string>((resolve, reject) =>{
+      this._resolveSelf = resolve;
+      this._rejectSelf = reject;
+    });
     this.spine.authenticate(userName, password);
+    return this.authPromise;
   }
 
   logoff(){
@@ -212,13 +221,14 @@ export class KerviBaseService {
 
   private onAuthenticate(){
     this.doAuthenticate = true;
-    this.connectionState$.next(ConnectionState.authenticate);
+    //this.connectionState$.next(ConnectionState.authenticate);
     this.reset();
+    this._resolveSelf("ok");
   }
 
   private onAuthenticateFailed(){
-    this.authenticationFailed$.next(true);
-    
+    //this.authenticationFailed$.next(true);
+    this._rejectSelf("error");
   }
 
   private onLogoff(){

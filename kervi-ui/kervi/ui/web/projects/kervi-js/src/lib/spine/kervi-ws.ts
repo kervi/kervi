@@ -36,9 +36,10 @@ export class  KerviWSSpine extends KerviSpineBase{
 	public authenticate(userName, password){
 		this.options.userName = userName;
 		this.options.password = password;
-		if (this.options.onAuthenticateStart)
-			this.options.onAuthenticateStart.call(this.options.targetScope);
-		var cmd={id:this.messageId++,"messageType":"authenticate","userName":this.options.userName, "password": this.options.password};
+		//if (this.options.onAuthenticateStart)
+		//	this.options.onAuthenticateStart.call(this.options.targetScope);
+		var cmd={id:this.messageId++,"messageType":"authenticate","userName":userName, "password": password};
+		console.log("swa", cmd);
 		this.websocket.send(JSON.stringify(cmd));
 	}
 

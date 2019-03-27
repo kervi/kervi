@@ -1,33 +1,43 @@
-<form nz-form 
-  [nzLayout]="'inline'" 
-  [formGroup]="loginForm" 
-  (ngSubmit)="submitForm()"
->
-    <nz-form-item>
-      <nz-form-control>
-        <nz-input-group [nzPrefix]="prefixUser">
-          <input formControlName="userName" nz-input placeholder="Username" />
-        </nz-input-group>
-        <nz-form-explain *ngIf="loginForm.get('userName')?.dirty && loginForm.get('userName')?.errors"
-          >Please input your username!</nz-form-explain
+<nz-layout>
+  <nz-content class="kervi-app-initializing">
+    <div nz-row>
+      <div nz-col nzSpan="12" nzOffset="6">
+        <form nz-form 
+          [formGroup]="loginForm" 
+          (ngSubmit)="submitForm()"
         >
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-control>
-        <nz-input-group [nzPrefix]="prefixLock">
-          <input formControlName="password" nz-input type="password" placeholder="Password" />
-        </nz-input-group>
-        <nz-form-explain *ngIf="loginForm.get('password')?.dirty && loginForm.get('password')?.errors"
-          >Please input your Password!</nz-form-explain
-        >
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-control>
-        <button nz-button nzType="primary" [disabled]="!loginForm.valid">Log in</button>
-      </nz-form-control>
-    </nz-form-item>
-  </form>
-  <ng-template #prefixUser><i nz-icon type="user"></i></ng-template>
-  <ng-template #prefixLock><i nz-icon type="lock"></i></ng-template>
+            <nz-form-item>
+              <nz-form-control>
+                <nz-input-group [nzPrefix]="prefixUser">
+                  <input formControlName="userName" nz-input placeholder="Username" />
+                </nz-input-group>
+                <nz-form-explain *ngIf="loginForm.get('userName')?.dirty && loginForm.get('userName')?.errors"
+                  >Please input your username!</nz-form-explain
+                >
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-control>
+                <nz-input-group [nzPrefix]="prefixLock">
+                  <input formControlName="password" nz-input type="password" placeholder="Password" />
+                </nz-input-group>
+                <nz-form-explain *ngIf="loginForm.get('password')?.dirty && loginForm.get('password')?.errors"
+                  >Please input your Password!</nz-form-explain
+                >
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-control>
+                <button nz-button nzType="primary" [disabled]="!loginForm.valid">Log in</button>
+                <nz-form-explain *ngIf="invalidCredentials"
+                  >Invalid user name or password</nz-form-explain
+                >
+              </nz-form-control>
+            </nz-form-item>
+          </form>
+          <ng-template #prefixUser><i nz-icon type="user"></i></ng-template>
+          <ng-template #prefixLock><i nz-icon type="lock"></i></ng-template>
+      </div>
+    </div>
+  </nz-content>
+</nz-layout>
