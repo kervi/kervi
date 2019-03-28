@@ -33,17 +33,35 @@ export class GaugeComponent implements OnInit {
 
     this.options ={
       chart: {
-          width:"100%",
-          //height:200,
-          type: 'radialBar',
+        width:"100%",
+        type: 'radialBar',
       },
       plotOptions: {
-          radialBar: {
-              hollow: {
-                  size: '70%',
-              }
+        radialBar: {
+          startAngle: -135,
+          endAngle:135,  
+          hollow: {
+            size: '70%',
           },
+          
+          track:{
+            startAngle: -135,
+            endAngle: 135,
+          },
+          dataLabels: {
+            name: {
+              show: true,
+              color: "#2d353c",
+              fontSize:"14px"
+            },
+            value: {
+              fontSize: "24px",
+              show: true
+            }
+          }
+        } 
       },
+      colors: ['#9fd037'],
       series: this.series,
       labels: [this.value.name],
 

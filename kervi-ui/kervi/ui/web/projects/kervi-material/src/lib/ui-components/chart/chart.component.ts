@@ -49,7 +49,7 @@ export class KerviChartComponent implements OnInit {
             }
           },
           toolbar: {
-            show: true,
+            show: false,
             tools: {
               download: true,
               selection: true,
