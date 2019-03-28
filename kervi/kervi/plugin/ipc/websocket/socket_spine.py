@@ -269,7 +269,7 @@ class SocketSpine:
             import trollius as asyncio
 
         from autobahn.asyncio.websocket import WebSocketServerFactory
-
+ 
         ssl_context = None
 
         if encryption.enabled():
@@ -289,6 +289,7 @@ class SocketSpine:
             self._config.network.ip,
             self._config.network.ws_port
         )
+
         self.factory = WebSocketServerFactory()
         self.factory.protocol = _SpineProtocol
 
@@ -301,10 +302,21 @@ class SocketSpine:
             ssl=ssl_context
         )
 
+
+
     def start_socket(self):
-        self._spine.log.verbose("start websocket: {0} {1} ", self._config.network.ip, self._config.network.ws_port)
-        self.loop.run_until_complete(self.coro)
-        self._started = True
+        try:
+            print("d")
+            self.loop.run_until_complete(self.coro)
+            self._started = True
+            self._spine.log.verbose("start websocket: {0} {1} ", self._config.network.ip, self._config.network.ws_port)
+        except:
+            print("x")
+            self._spine.log.exception(
+                "start websocket on:{0}, port:{1}",
+                self._config.network.ip,
+                self._config.network.ws_port
+            )
 
     def step(self):
         if self._started:

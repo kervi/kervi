@@ -33,6 +33,7 @@ class UserLogPlugin(MessagePlugin):
         log_type = kwargs.get("log_type", "information")
         level = kwargs.get("level", 3)
         timestamp = kwargs.get("timestamp", 0)
+        print("l", subject, level)
         self.spine.trigger_event("userLogMessage", None, {
             "source_id": source_id,
             "source_name": source_name,

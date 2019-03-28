@@ -366,7 +366,6 @@ class KerviValue(KerviComponent):
                 level=level,
                 unit=self._display_unit
             ) 
-
             kwargs = dict(kwargs, source_id=self.component_id, source_name=self.name, user_groups = self._user_groups, level=level, body=body, body_html=html_body)
             Messaging.send_message(message, **kwargs)
             
