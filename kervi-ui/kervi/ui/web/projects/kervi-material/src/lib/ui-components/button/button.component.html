@@ -3,9 +3,8 @@
     nz-button nzType="primary"
     (mousedown)="press()" 
     (mouseup)="release()" 
-    
 >
-<i *ngIf="!linkParameters.buttonIcon" nz-icon [type]="linkParameters.buttonIcon"></i>
+<i *ngIf="linkParameters.buttonIcon" nz-icon [type]="linkParameters.buttonIcon"></i>
 {{ linkParameters.buttonText }}
 </button>
 

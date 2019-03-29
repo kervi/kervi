@@ -35,12 +35,5 @@ export class SwitchButtonComponent implements OnInit {
       this.width = this.dashboardSizes.switchWidth;
       this.height = this.dashboardSizes.switchHeight;
     }
-
-    var onText= this.linkParameters && this.linkParameters.onIcon ? "<i class='fa fa-" + this.linkParameters.onIcon + "'></i> " : ""; 
-    var offText= this.linkParameters && this.linkParameters.offIcon ? "<i class='fa fa-" + this.linkParameters.offIcon + "'></i> " : ""; 
-    
-    onText+= this.linkParameters && this.linkParameters.onText ? this.linkParameters.onText : ""; 
-    offText+= this.linkParameters && this.linkParameters.offText ? this.linkParameters.offText : ""; 
-
   }
 }
