@@ -1,6 +1,6 @@
 <ng-container *ngIf="linkParameters.isInput">
     <nz-form-control >
-        <input id="{{value.id}}" nz-input [(ngModel)]="value.value"  >
+        <nz-input-number id="{{value.id}}" [nzMin]="value.minValue" [nzMax]="value.maxValue" [nzStep]="1" [(ngModel)]="value.value"  ></nz-input-number>
         
     </nz-form-control>
     <!-- <ui-slider [value]="(value.value$ | async)" (sliderChanged)="setKerviValue($event)" [minValue]="value.minValue" [maxValue]="value.maxValue" [linkParameters]="linkParameters"></ui-slider> -->

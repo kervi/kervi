@@ -8,9 +8,11 @@
 						<span title><i nz-icon nzTheme="twotone" type="dashboard" [nzTwotoneColor]="'#9fd037'"></i> {{dashboard.name}}</span>
 						<ul>
 							<ng-container *ngIf="dashboards.length > 1">
-								<li nz-menu-item *ngFor="let dashboard of idashboards" [routerLink]="['/dashboard', dashboard.id]">{{dashboard.name}}</li>
+								<li nz-menu-item *ngFor="let dashboard of dashboards" [routerLink]="['/dashboard', dashboard.id]">{{dashboard.name}}</li>
 							</ng-container>
-							<li *ngIf="authenticated && dashboards.length > 1"><nz-divider></nz-divider></li>
+							<li *ngIf="authenticated && dashboards.length > 1">
+								<nz-divider></nz-divider>
+							</li>
 							<li nz-menu-item *ngIf="authenticated && anonymous" href="javascript: return false;" (click)="logoff($event)" ><i nz-icon type="login"></i> {{('login' | translate)}}</li>
 							<li nz-menu-item *ngIf="authenticated && !anonymous" href="javascript: return false;" (click)="logoff($event)"><i nz-icon type="logout"></i>{{('logout' | translate)}}</li>
 						</ul>
