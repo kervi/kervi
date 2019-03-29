@@ -2,7 +2,7 @@
 // Licensed under MIT
 
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { DashboardSizes } from 'kervi-js';
+import { DashboardSizes, BooleanValue } from 'kervi-js';
 import { BehaviorSubject } from 'rxjs';
 
 declare var jQuery:any;
@@ -13,7 +13,7 @@ declare var jQuery:any;
 })
 
 export class ButtonComponent implements OnInit {
-  @Input() value: Boolean = null;
+  @Input() value: BooleanValue;
   @Input() linkParameters: any = null;
   @Input() type: string;
   @Input() inline:boolean = false;
@@ -47,10 +47,12 @@ export class ButtonComponent implements OnInit {
   }
 
   public press() {
-    this.buttonState.emit(true);
+
+    console.log("p", this.value);
+    this.value.set(true);
   }
 
   public release() {
-    this.buttonState.emit(false);
+    this.value.set(false);
   }
 }
