@@ -15,6 +15,7 @@ import { KerviDateTimeComponent } from './values/kervi-datetime-value.component'
 import { KerviActionComponent } from './actions/kervi-action.component'
 import { KerviCameraComponent } from './camera/kervi-camera.component'
 import { KerviWidgetComponent } from './dashboard/kervi-widget.component'
+import { KerviUserLogComponent } from './user-log/user-log.component'
 @NgModule({
   imports: [
   ],
@@ -31,7 +32,8 @@ import { KerviWidgetComponent } from './dashboard/kervi-widget.component'
     KerviActionComponent,
     KerviValueComponent,
     KerviWidgetComponent,
-    KerviCameraComponent
+    KerviCameraComponent,
+    KerviUserLogComponent
   ],
   providers: [NGXKerviService, KerviTemplateService],
   exports: [
@@ -46,7 +48,8 @@ import { KerviWidgetComponent } from './dashboard/kervi-widget.component'
     KerviColorComponent,
     KerviDateTimeComponent,
     KerviActionComponent,
-    KerviCameraComponent
+    KerviCameraComponent,
+    KerviUserLogComponent
   ]
 })
 export class NgxKerviModule {

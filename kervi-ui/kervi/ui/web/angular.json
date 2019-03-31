@@ -649,38 +649,38 @@
         }
       }
     },
-    "kervi-material": {
-      "root": "projects/kervi-material",
-      "sourceRoot": "projects/kervi-material/src",
+    "kervi-zorro": {
+      "root": "projects/kervi-zorro",
+      "sourceRoot": "projects/kervi-zorro/src",
       "projectType": "library",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "projects/kervi-material/tsconfig.lib.json",
-            "project": "projects/kervi-material/ng-package.json"
+            "tsConfig": "projects/kervi-zorro/tsconfig.lib.json",
+            "project": "projects/kervi-zorro/ng-package.json"
           },
           "configurations": {
             "production": {
-              "project": "projects/kervi-material/ng-package.prod.json"
+              "project": "projects/kervi-zorro/ng-package.prod.json"
             }
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/kervi-material/src/test.ts",
-            "tsConfig": "projects/kervi-material/tsconfig.spec.json",
-            "karmaConfig": "projects/kervi-material/karma.conf.js"
+            "main": "projects/kervi-zorro/src/test.ts",
+            "tsConfig": "projects/kervi-zorro/tsconfig.spec.json",
+            "karmaConfig": "projects/kervi-zorro/karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/kervi-material/tsconfig.lib.json",
-              "projects/kervi-material/tsconfig.spec.json"
+              "projects/kervi-zorro/tsconfig.lib.json",
+              "projects/kervi-zorro/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"

@@ -35,11 +35,11 @@
       "ngx-kervi-components/*": [
         "dist/ngx-kervi-components/*"
       ],
-      "kervi-material": [
-        "dist/kervi-material"
+      "kervi-zorro": [
+        "dist/kervi-zorro"
       ],
-      "kervi-material/*": [
-        "dist/kervi-material/*"
+      "kervi-zorro/*": [
+        "dist/kervi-zorro/*"
       ]
     }
   }

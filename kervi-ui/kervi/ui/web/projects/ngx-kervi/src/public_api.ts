@@ -16,6 +16,8 @@ export { KerviCameraComponent } from './lib/camera/kervi-camera.component'
 export { KerviColorComponent } from './lib/values/kervi-color-value.component'
 export { KerviDateTimeComponent } from './lib/values/kervi-datetime-value.component'
 export { KerviStringComponent } from './lib/values/kervi-string-value.component'
+export { KerviUserLogComponent } from './lib/user-log/user-log.component'
+
 export  { AppInjector } from './lib/app-injector.service'
 
 export * from './lib/ngx-kervi.component';

@@ -1,0 +1,19 @@
+<nz-date-picker 
+*ngIf="type=='datetime'"
+nzShowTime
+[(ngModel)]="dateTime.value"
+[nzFormat] = "format"
+></nz-date-picker>
+
+<nz-date-picker 
+*ngIf="type=='date'"
+[(ngModel)]="dateTime.value"
+[nzFormat] = "format"
+></nz-date-picker>
+
+
+<nz-time-picker 
+*ngIf="type=='time'"
+[(ngModel)]="dateTime.value"
+[nzFormat] = "format"
+></nz-time-picker>

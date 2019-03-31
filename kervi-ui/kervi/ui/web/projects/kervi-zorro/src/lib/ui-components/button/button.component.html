@@ -1,0 +1,12 @@
+
+<button 
+    nz-button nzType="primary"
+    (mousedown)="press()" 
+    (mouseup)="release()" 
+>
+<i *ngIf="linkParameters.buttonIcon" nz-icon [type]="linkParameters.buttonIcon"></i>
+{{ linkParameters.buttonText }}
+</button>
+
+<!-- title="{{(title | translate) }}"   -->
+<!-- [attr.title]="title" -->

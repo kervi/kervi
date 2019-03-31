@@ -13,7 +13,7 @@ declare var kerviSocketAddress : any;
 declare var socketProtocol : any;
 
 export enum ConnectionState {disconnected, loading, authenticate, connected};
-
+export enum UserLogStateType {normal, warning, error};
 @Injectable()
 export class KerviBaseService {
   public spine: KerviSpineBase = null;
@@ -27,11 +27,17 @@ export class KerviBaseService {
   public  application$: BehaviorSubject<any>;
   public doAuthenticate: boolean = false;
   public componentsChanged$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
+  
+  
+  
   private logMessages:DashboardMessageModel[] = [];
   private logMessages$: BehaviorSubject<DashboardMessageModel[]> = new  BehaviorSubject<DashboardMessageModel[]>([]);
+  private lastLogMessage$: BehaviorSubject<DashboardMessageModel> = new  BehaviorSubject<DashboardMessageModel>(null);
+  private LogMessageCount$: BehaviorSubject<number> = new  BehaviorSubject<number>(0);
+  private LogMessageState$: BehaviorSubject<UserLogStateType> = new  BehaviorSubject<UserLogStateType>(UserLogStateType.normal);
   
   IPCReady$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
-  authenticationFailed$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
+  //authenticationFailed$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   
   private _resolveSelf;
   private _rejectSelf;
@@ -80,15 +86,31 @@ export class KerviBaseService {
         self.spine.addEventHandler("userLogMessage", null, function(v){
           var messages = self.logMessages$.value
           //Wconsole.log("lm", this);
-          messages.unshift(new DashboardMessageModel(this));
+          var newMessage = new DashboardMessageModel(this);
+          messages.unshift(newMessage);
           if (messages.length>10)
               messages.pop();
-          self.logMessages$.next(messages);   
-       });
 
+          var hasErrors = 0;
+          var hasWarnings = 0;
+          for(var message of messages)  {
+              if (message.level == 1)
+                  hasErrors ++;
+              if (message.level == 2)
+                  hasWarnings ++;    
+          };
+          if (hasErrors)
+              self.LogMessageState$.next(UserLogStateType.error)
+          else if (hasWarnings)
+            self.LogMessageState$.next(UserLogStateType.warning)
+          else
+            self.LogMessageState$.next(UserLogStateType.normal)
+          self.LogMessageCount$.next(messages.length)
+          self.lastLogMessage$.next(newMessage);
+          self.logMessages$.next(messages);
+       });
       }
     });
-
   }
 
   public text(key:string, defaultValue:string=""):string{
@@ -107,6 +129,18 @@ export class KerviBaseService {
    public getLogMessages$():Observable<DashboardMessageModel[]>{
      return this.logMessages$.asObservable();
    }
+
+   public getLastLogMessage$():Observable<DashboardMessageModel>{
+    return this.lastLogMessage$.asObservable();
+  }
+
+  public getLogState$():Observable<UserLogStateType>{
+    return this.LogMessageState$.asObservable();
+  }
+
+  public getLogMessageCount$():Observable<number>{
+    return this.LogMessageCount$.asObservable();
+  }
 
   public isAppEmpty(){
     return this.components.length == 0;

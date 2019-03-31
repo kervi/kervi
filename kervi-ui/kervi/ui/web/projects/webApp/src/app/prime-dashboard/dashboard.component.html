@@ -25,8 +25,10 @@
 				</ul>
 			</div>
 			<div class="kervi-sys-panel" *ngIf="dashboard && dashboard.sysPanel" nz-col nzSpan="18">
-					<kervi-dashboard-panel [dashboardSizes]="dashboardSizes" [inline]="true" [panel]="dashboard.sysPanel" ></kervi-dashboard-panel>
+				<kervi-dashboard-panel [dashboardSizes]="dashboardSizes" [inline]="true" [panel]="dashboard.sysPanel" ></kervi-dashboard-panel>
+				<kervi-message-button></kervi-message-button>
 			</div>
+			
 		</div>
 	</nz-header>
 		
@@ -42,7 +44,7 @@
 			
 
 		<div class="kervi-panels" fxLayout=" row" fxLayout.xs="column" fxLayoutGap="0.5%" fxLayoutAlign=""  *ngIf="!dashboardPanelsHidden" style="">
-			<kervi-dashboard-panel  *ngFor="let panel of dashboard.panels" [dashboardSizes]="defaultSizes" [panel]="panel" class="w-{{panel.width}}"></kervi-dashboard-panel>
+			<kervi-dashboard-panel [fxFlex]="panel.width" fxFlex.xs="100%" *ngFor="let panel of dashboard.panels" [dashboardSizes]="defaultSizes" [panel]="panel"></kervi-dashboard-panel>
 		</div>
 	</nz-content>
 	<nz-footer>

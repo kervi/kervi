@@ -18,7 +18,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { DashboardComponent } from './prime-dashboard/dashboard.component';
 import { NgxKerviModule } from 'ngx-kervi';
 import { NGXKerviPipesModule } from 'ngx-kervi'
-import { KerviMaterialModule  } from 'kervi-material'
+import { KerviZorroModule  } from 'kervi-zorro'
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 
@@ -57,7 +57,7 @@ const ROUTES: Routes = [
     BrowserAnimationsModule,
     NgxKerviModule,
     NGXKerviPipesModule,
-    KerviMaterialModule,
+    KerviZorroModule,
     FlexLayoutModule,
     NgZorroAntdModule,
     //NgxKerviComponentsModule,
