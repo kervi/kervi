@@ -410,9 +410,7 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
               "node_modules/apexcharts/dist/apexcharts.min.js",
-              "js-lib/jquery.sparkline.js",
               "js-lib/jquery.kontrol.js",
-              "node_modules/moment/min/moment-with-locales.js",
               "node_modules/photoswipe/dist/photoswipe.js",
               "node_modules/photoswipe/dist/photoswipe-ui-default.js",
               "js-lib/colors.js",
