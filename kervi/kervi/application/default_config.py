@@ -111,9 +111,9 @@ def get_default_config():
                         "volumne": "l",
                         "weight": "g",
                         "datetime" :{
-                            "time": "HH:mm",
-                            "date": "DD-MM-YYYY",
-                            "datetime": "HH:mm DD-MM-YYYY",
+                            "time": "HH:mm:ss",
+                            "date": "dd-MM-yyyy",
+                            "datetime": "HH:mm dd-MM-yyyy",
                             "chart":{
                                 "millisecond": "h:mm:ss.SSS",
                                 "second": "h:mm:ss",

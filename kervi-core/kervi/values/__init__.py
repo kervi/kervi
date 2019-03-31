@@ -382,7 +382,10 @@ class DateTimeValue(KerviValue):
     def value(self):
         """Current value of the component"""
         if self._value:
-            return datetime.strptime(self._value,'%Y-%m-%dT%H:%M:%SZ')
+            try:
+                return datetime.strptime(self._value,'%Y-%m-%dT%H:%M:%SZ')
+            except ValueError:
+                return datetime.strptime(self._value,'%Y-%m-%dT%H:%M:%S.%fZ')
         return None
 
     @property
@@ -390,13 +393,17 @@ class DateTimeValue(KerviValue):
         """Current value of the component"""
         if self._value:
             return datetime.strptime(self._value[:10],'%Y-%m-%d')
+            
         return None
 
     @property
     def time(self):
         """Current value of the component"""
         if self._value:
-            return datetime.strptime(self._value[10:],'T%H:%M:%SZ')
+            try:
+                return datetime.strptime(self._value[10:],'T%H:%M:%SZ')
+            except ValueError:
+                return datetime.strptime(self._value[10:],'T%H:%M:%S.%fZ')
         return None
 
 
