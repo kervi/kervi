@@ -15,7 +15,7 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { ConnectComponent } from './connect/connect.component';
 import { Routes, RouterModule } from '@angular/router';
-import { DashboardComponent } from './prime-dashboard/dashboard.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { NgxKerviModule } from 'ngx-kervi';
 import { NGXKerviPipesModule } from 'ngx-kervi'
 import { KerviZorroModule  } from 'kervi-zorro'
