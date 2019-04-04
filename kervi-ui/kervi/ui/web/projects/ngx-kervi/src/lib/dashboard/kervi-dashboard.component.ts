@@ -56,10 +56,10 @@ export class KerviDashboardComponent {
     this.dashboardId = dashboardId;
     this.dashboard = this.kerviService.getComponent(dashboardId, "dashboard") as Dashboard;
     this.anonymous = this.kerviService.isAnonymous();
+    this.isAppEmpty = this.kerviService.isAppEmpty();
     this.authenticated = this.kerviService.doAuthenticate;
     if (this.dashboard){
       this.dashboards = this.kerviService.getComponentsByType("dashboard");
-      this.isAppEmpty = this.kerviService.isAppEmpty();
       this.showMenu = (this.dashboards.length > 1 || this.kerviService.doAuthenticate);
       this.showPanelController=false;
       this.cameraId = null;
@@ -104,7 +104,6 @@ export class KerviDashboardComponent {
             this.autoCenterRightPad = true;
         }
       }
-
       console.log("load db", dashboardId, this.dashboard, this);
     }
   }

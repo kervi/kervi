@@ -17,12 +17,14 @@ export class DashboardComponent extends KerviDashboardComponent implements OnIni
   
   public rightPadTop:number;
   public rightPadLeft:number;
+  
   constructor(private router:Router, private activatedRoute:ActivatedRoute ) {
     super();
    }
 
   ngOnInit() {
     var self = this;
+
     this.activatedRoute.params.subscribe(params => {
       var dashboardId = params['name'];
       console.log("dbi", dashboardId);

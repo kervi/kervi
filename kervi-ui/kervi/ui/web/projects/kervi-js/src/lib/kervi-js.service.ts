@@ -143,7 +143,10 @@ export class KerviBaseService {
   }
 
   public isAppEmpty(){
-    return this.components.length == 0;
+    var defaultDashboard = this.getDefaultDashboard();
+    if (defaultDashboard)
+      return defaultDashboard.isEmpty();
+    return true;
   }
 
   public getComponent(id:string, componentType:string = null){
@@ -169,6 +172,8 @@ export class KerviBaseService {
         if (dashboard.isDefault)
             return dashboard
     }
+    if (dashboards.length>0)
+      return dashboards[0];
     return null;
 }
 

@@ -38,7 +38,7 @@ export class KerviChartComponent implements OnInit {
     this.options ={
       chart: {
           id: "chart_" + this.value.id,
-          width:300,
+          width:"100%",
           height:300,
           type: 'area',
           animations: {

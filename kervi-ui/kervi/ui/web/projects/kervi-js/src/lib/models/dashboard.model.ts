@@ -60,13 +60,27 @@ export class DashboardPanelParameters{
     
     constructor(messageParameters){
         this.title=messageParameters.label;
-        this.height=messageParameters.height;
-        this.width=messageParameters.width;
+        this.height= this.calcSize(messageParameters.height);
+        this.width=this.calcSize(messageParameters.width);
         this.userLog=messageParameters.userLog;
         this.logLength = messageParameters.logLength;
         
         if (messageParameters.type)
             this.type=messageParameters.type;
+    }
+
+    private calcSize(value){
+        if (value==null)
+            return ""
+        else if (value==="")
+            return ""
+        else if (isNaN(value)){
+            return value;
+        } else
+            if (value>0)
+                return value + "%";
+            else
+                return "";
     }
 }
 
@@ -175,9 +189,7 @@ export class Dashboard implements IComponent{
     public visible:boolean;
     public ui:any;
     public dashboards:any[] = [];
-
-
-
+    
     constructor(message){
         this.id=message.id;
         this.name=message.name;
@@ -234,7 +246,7 @@ export class Dashboard implements IComponent{
                                 "panels":[],
                                 "uiParameters":{
                                     "title":"",
-                                    "width":0,
+                                    "width":100,
                                     "height":0,
                                     "userLog":false,
                                     "logLength":0
@@ -256,48 +268,10 @@ export class Dashboard implements IComponent{
             }
         }
     }
-
-    /*removePanelRef(deleteComponents:IComponent[], panel:DashboardPanelModel, removeEmpty:boolean){
-        var removeComponentPanels:DashboardPanelComponentModel[] = [];
-        for(var panelComponent of panel.components){
-            for(var deleteComponent of deleteComponents){
-                if (deleteComponent.id == panelComponent.component.id){
-                    console.log("dlc", panelComponent)
-                    removeComponentPanels.push(panelComponent)
-                    
-                }
-            }
-        }
-        for(var component of removeComponentPanels){
-            panel.components.splice(panel.components.indexOf(component))
-        }
-        var removePanels:DashboardPanelModel[] = [];
-        for(var subPanel of panel.subPanels){
-            this.removePanelRef(deleteComponents, subPanel, removeEmpty)
-            if (subPanel.components.length == 0){
-                removePanels.push(subPanel)
-            }
-        }
-        for(var subPanel of removePanels){
-            panel.subPanels.splice(panel.subPanels.indexOf(subPanel))
-        }
-    }*/
-
-    removeReferences(deleteComponents:IComponent[]){
-        // console.log("remove ref", deleteComponents)
-        // for(var panel of this.sysPanels){
-        //     this.removePanelRef(deleteComponents, panel, false)
-        // }
-        // var removePanels:DashboardPanelModel[] = [];
-        // for(var panel of this.panels){
-        //     this.removePanelRef(deleteComponents, panel, true)
-        //     if (panel.components.length == 0)
-        //         removePanels.push(panel)
-        // }
-        // for(var panel of removePanels){
-        //     this.panels.splice(this.panels.indexOf(panel))
-        // }
-    };
+    public isEmpty(){
+        return this.panels.length == 0;
+    }
+    removeReferences(deleteComponents:IComponent[]){};
     updateReferences(){};
     reload(component:IComponent){
         var source = component as Dashboard;

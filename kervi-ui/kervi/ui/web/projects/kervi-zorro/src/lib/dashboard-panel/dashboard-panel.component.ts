@@ -15,7 +15,7 @@ export class DashboardPanelComponent extends KerviDashboardPanelComponent {
   ngOnInit() {
     this.ngOnInitPanel();
     if (this.panel.hasOnlyGroupPanels)
-      this.groupLayout = "column";
+      this.groupLayout = "row";
   }
 
 }
