@@ -1,7 +1,7 @@
 <!-- <p>{{panel.name}} - {{panel.type}} - {{groupLayout}} - {{bodyOnly}} - {{inline}} - {{panel.subPanels.length}} - {{panel.components.length}} - {{headerComponents.length}} - {{bodyComponents.length}}</p> -->
 <!-- <p>w={{width}} - {{inGroup}}</p> -->
 <ng-container *ngIf="panel.type=='group'">
-    <div [fxLayout]="groupLayout" fxLayout.xs="column"  fxLayoutGap="0.5%">
+    <div class="kervi-panel-deck" [fxLayout]="panel.parameters.layout" fxLayout.xs="column"  fxLayoutGap="0.5%">
         <ng-container *ngFor="let subPanel of panel.subPanels">
             <ng-container *ngIf="subPanel.type!='group'">
                         <kervi-dashboard-panel fxFlex.xs="100" [fxFlex]="subPanel.parameters.width" [bodyOnly]="true" [inGroup]="true" [dashboardSizes]="dashboardSizes"  [panel]="subPanel"></kervi-dashboard-panel>

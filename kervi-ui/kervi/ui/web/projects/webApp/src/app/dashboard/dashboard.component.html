@@ -56,7 +56,7 @@
 			<kervi-controller-pad [autoCenter]="autoCenterRightPad" [XValue]="rightPadXValue" [YValue]="rightPadYValue"></kervi-controller-pad>
 		</div>
 
-		<div class="kervi-panels" fxLayout=" row" fxLayout.xs="column" fxLayoutGap="0.5%" fxLayoutAlign=""  *ngIf="!dashboardPanelsHidden" style="">
+		<div class="kervi-panels" fxLayout=" column" fxLayout.xs="column" fxLayoutGap="0.5%" fxLayoutAlign=""  *ngIf="!dashboardPanelsHidden" style="">
 			<ng-container *ngFor="let panel of dashboard.panels">
 					<kervi-dashboard-panel [fxFlex]="panel.parameters.width" fxFlex.xs="100%" [dashboardSizes]="defaultSizes" [panel]="panel"></kervi-dashboard-panel>
 				
