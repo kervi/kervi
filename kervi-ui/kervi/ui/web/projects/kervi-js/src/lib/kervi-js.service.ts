@@ -28,8 +28,6 @@ export class KerviBaseService {
   public doAuthenticate: boolean = false;
   public componentsChanged$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
   
-  
-  
   private logMessages:DashboardMessageModel[] = [];
   private logMessages$: BehaviorSubject<DashboardMessageModel[]> = new  BehaviorSubject<DashboardMessageModel[]>([]);
   private lastLogMessage$: BehaviorSubject<DashboardMessageModel> = new  BehaviorSubject<DashboardMessageModel>(null);
@@ -282,6 +280,13 @@ export class KerviBaseService {
   private reset(){
     this.components = [];
     this.components$.next(this.components);
+
+    var messages = [];
+    this.LogMessageState$.next(UserLogStateType.normal);
+    this.LogMessageCount$.next(messages.length);
+    this.logMessages$.next(messages);
+    
+
     if (this.IPCReady$.value)
       this.connectionState$.next(ConnectionState.authenticate);
     else

@@ -34,8 +34,13 @@ export class KerviUserLogComponent {
         this.lastMessage$ = this.kerviService.getLastLogMessage$();
         this.messageCount$ = this.kerviService.getLogMessageCount$();
         this.logState$ = this.kerviService.getLogState$();
+        this.messageCount$.subscribe(function(v){
+          this.messageCount = v;
+          console.log("lc", this.messageCount);
+        })
     }
 
     protected ngOnInitUserLog() {
+
     }
 }

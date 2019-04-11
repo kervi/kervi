@@ -16,7 +16,6 @@ export class UserMessagesComponent extends KerviUserLogComponent implements OnIn
         super(); 
         var self = this;
         this.lastMessage$.subscribe(function(message){
-          console.log("lm", message);
           if (message){
             self.notification.template(self.messageTemplate, { nzData: message });
           }
