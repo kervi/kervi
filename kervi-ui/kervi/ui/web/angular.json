@@ -394,6 +394,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "extractCss": true,
             "outputPath": "../../plugin/ui/web/http_docs",
             "index": "projects/webApp/src/index.html",
             "main": "projects/webApp/src/main.ts",
@@ -404,7 +405,7 @@
               "projects/webApp/src/assets"
             ],
             "styles": [
-              "projects/webApp/src/styles.less"
+              "projects/webApp/src/theme/dark.less"
               
             ],
             "scripts": [

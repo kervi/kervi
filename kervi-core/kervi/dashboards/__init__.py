@@ -39,6 +39,7 @@ class DashboardPanelGroup(object):
             "label":kwargs.get("title", ""),
             "width":kwargs.get("width", 0),
             "height":kwargs.get("height", 0),
+            "layout":kwargs.get("layout", "row"),
             "gauge_width":kwargs.get("gauge_width", 0),
             "gauge_height":kwargs.get("gauge_height", 0),
             "panel_width":kwargs.get("panel_width", 0),

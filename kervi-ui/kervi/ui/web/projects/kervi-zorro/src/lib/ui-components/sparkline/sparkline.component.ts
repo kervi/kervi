@@ -53,7 +53,7 @@ export class SparklineComponent implements OnInit {
       yaxis: {
         min: 0
       },
-      colors: ['#9fd037'],
+      colors: [this.color("color",".kervi-sparkline")],
     }
   
     if (this.chartObj) {

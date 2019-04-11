@@ -33,8 +33,8 @@ export class GaugeComponent implements OnInit {
 
     this.options ={
       chart: {
-        width:"100%",
         type: 'radialBar',
+        height: this.linkParameters.gaugeSize
       },
       plotOptions: {
         radialBar: {
@@ -61,7 +61,7 @@ export class GaugeComponent implements OnInit {
           }
         } 
       },
-      colors: ['#9fd037'],
+      colors: [this.color("color",".kervi-chart")],// ['#9fd037'],
       series: this.series,
       labels: [this.value.name],
 
@@ -95,6 +95,7 @@ export class GaugeComponent implements OnInit {
     this.value.value$.subscribe(function(v){
       if (self.chartObj && v){
         //self.series=[v];
+        console.log("gv", v);
         self.chartObj.updateSeries( [v]);
       }
     });

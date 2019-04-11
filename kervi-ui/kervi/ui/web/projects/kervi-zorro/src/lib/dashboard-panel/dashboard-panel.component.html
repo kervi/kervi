@@ -1,24 +1,21 @@
 <!-- <p>{{panel.name}} - {{panel.type}} - {{groupLayout}} - {{bodyOnly}} - {{inline}} - {{panel.subPanels.length}} - {{panel.components.length}} - {{headerComponents.length}} - {{bodyComponents.length}}</p> -->
-<!-- <p>w={{width}}</p> -->
-<ng-container *ngIf="!bodyOnly && panel.type=='group'">
-    <div [fxLayout]="groupLayout" [fxFlex]="width" fxLayout.xs="column"  fxLayoutGap="0.5%">
+<!-- <p>w={{width}} - {{inGroup}}</p> -->
+<ng-container *ngIf="panel.type=='group'">
+    <div class="kervi-panel-deck" [fxLayout]="panel.parameters.layout" fxLayout.xs="column"  fxLayoutGap="0.5%">
         <ng-container *ngFor="let subPanel of panel.subPanels">
             <ng-container *ngIf="subPanel.type!='group'">
-                        <kervi-dashboard-panel [fxFlex]="width" [bodyOnly]="true" [inGroup]="true" [dashboardSizes]="dashboardSizes"  [panel]="subPanel"></kervi-dashboard-panel>
+                        <kervi-dashboard-panel fxFlex.xs="100" [fxFlex]="subPanel.parameters.width" [bodyOnly]="true" [inGroup]="true" [dashboardSizes]="dashboardSizes"  [panel]="subPanel"></kervi-dashboard-panel>
             </ng-container>
             <ng-container *ngIf="subPanel.type=='group'">
-                    <kervi-dashboard-panel [fxFlex]="width" fxFlex.xs="100"  [inGroup]="true" [dashboardSizes]="dashboardSizes"  [panel]="subPanel"></kervi-dashboard-panel>
+                    <kervi-dashboard-panel fxFlex.xs="100" [fxFlex]="subPanel.parameters.width" [inGroup]="true" [dashboardSizes]="dashboardSizes"  [panel]="subPanel"></kervi-dashboard-panel>
             </ng-container>
         </ng-container>
     </div>
 </ng-container>
 
-<ng-container *ngIf="!bodyOnly && !inline && panel.type!='group'">
-    <kervi-dashboard-panel  [bodyOnly]="true" [dashboardSizes]="dashboardSizes"  [panel]="panel"></kervi-dashboard-panel>
-</ng-container>
-
-<ng-container *ngIf="bodyOnly">
-    <nz-card [fxFlex]="calcWidth(panel, inGroup)" fxFlex.xs="100%"  [nzTitle]="showHeader ? title : null" [nzExtra]="headerComponents.length>0 ? extraTemplate : null">
+<ng-container *ngIf="panel.type!='group' && !inline">
+    
+    <nz-card  [nzTitle]="showHeader ? title : null" [nzExtra]="headerComponents.length>0 ? extraTemplate : null">
         
         <ng-template #extraTemplate>
             <ng-container *ngFor="let panelComponent of headerComponents">
@@ -36,7 +33,7 @@
     </nz-card>
 </ng-container>
 
-<ng-template [ngIf]="!bodyOnly && inline && panel.components.length>0" >
+<ng-template [ngIf]="inline && panel.components.length>0" >
     <ng-container *ngFor="let panelComponent of panel.components" >
         <kervi-widget [component]="panelComponent.component"  [inline]="inline" [dashboardPanel]="panel"  [linkParameters]="panelComponent.parameters"></kervi-widget>
     </ng-container>

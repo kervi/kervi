@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 // -------- import official less file -----------
-@import "../../../node_modules/ng-zorro-antd/ng-zorro-antd.less";
+@import "../../../../node_modules/ng-zorro-antd/ng-zorro-antd.less";
 
 
 
@@ -584,126 +584,19 @@
 @statistic-font-family: Tahoma, 'Helvetica Neue', @font-family;
 
 
-.body{
-    padding-top:50px;
-}
 
-.kervi-sys-panel{
-    text-align: right;
-}
-.kervi-panels {
-    background: @body-background;
-    padding: .5%;
-    z-index:900;
-    position:absolute;
-    margin-top:50px;
-    width:100%;
-}
+@kervi-panels-background: @body-background;
 
-.kervi-controller-pad{
-    position:absolute;
-    z-index: 900;
-}
+@kervi-widget-border-bottom:1px solid @border-color-split;
+@kervi-main-menu-icon-size: 24px;
 
-.kervi-block-widget{
-    display: block;
-    align-items: center;
-    border-bottom:1px solid @border-color-split;
-    padding-top:4px;
-    padding-bottom: 4px;
-}
+@kervi-chart-color: @primary-color;
 
-kervi-widget:last-child{
-    .kervi-block-widget{
-        border-bottom: 0;
-        padding-bottom:0;
-    }
-}
+@kervi-sparkline-color: @primary-color;
 
-kervi-widget:first-child{
-    .kervi-block-widget{
-        padding-top: 0;
-    }
-}
+@kervi-gauge-color: @primary-color;
 
-kervi-message-button{
-    .ant-badge-count{
-        height:16px;
-        font-size: 9px;
-        line-height: 16px;
-        margin-top:6px;
-    }
-}
+@kervi-header-bottom: 5px solid @border-color-split;
+@kervi-footer-top: 5px solid @border-color-split;
 
-
-.kervi-inline-widget{
-    display: inline-block;
-    margin-left:5px;
-}
-
-
-.kervi-value-label{
-    margin-right:5px;
-    display: inline;
-}
-
-value-sparkline{
-    display: inline-block;
-}
-.kervi-app-initializing{
-    display: block !important;
-    top:50%;
-    left:50%;
-    width: 100%;
-    position: absolute;
-    transform: translate3d(-50%,-50%, 0);
-}
-
-.kervi-value-section{
-    text-align: right;
-    white-space: nowrap;
-    display: inline;
-}
-
-.kervi-main-menu{
-    >li {
-        .anticon{
-        font-size:24px;
-        }
-    }
-}
-
-.ant-divider{
-    margin:5px 0;
-}
-
-.ant-card-head{
-    font-weight: bold;
-    min-height: 42px;
-}
-
-
-
-.ant-layout-header {
-    position: fixed;
-    width:100%;
-    height:50px;
-    top:0px;
-    z-index:1010;    
-    border-bottom:5px solid @border-color-split;
-}
-
-.ant-layout-footer {
-    position: fixed;
-    width:100%;
-    height:50px;
-    bottom:0px;
-    z-index:1010; 
-    padding: 10px 50px;
-    border-top:5px solid @border-color-split;
-}
-
-.cdk-overlay-container{
-    z-index: 2000;
-}
-
+@import "kervi-layout.less";

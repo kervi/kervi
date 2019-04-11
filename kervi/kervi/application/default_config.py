@@ -60,7 +60,7 @@ def get_default_config():
         },
         "plugins":{
             "kervi.plugin.message_bus.zmq": True,
-            "kervi.plugin.authentication.plain": True,
+            "kervi.plugin.authentication.plain": False,
             "kervi.plugin.storage.sqlite_temp": True,
             "kervi.plugin.storage.sqlite": True,
             "kervi.plugin.messaging.email": False,

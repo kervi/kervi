@@ -75,6 +75,7 @@ export class KerviDashboardPanelComponent {
             else
                 this.width = this.templateService.getSizeValue(this.panel.parameters.width);
         } else
-            this.width = this.inGroup ? "100%" : this.templateService.getSizeValue(this.panel.parameters.width);;
+            //this.width = this.inGroup ? "100%" : this.templateService.getSizeValue(this.panel.parameters.width);
+            this.width = this.templateService.getSizeValue(this.panel.parameters.width);
     }
   }
