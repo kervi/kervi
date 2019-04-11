@@ -27,7 +27,7 @@ export class KerviChartComponent implements OnInit {
   constructor(private kerviService:NGXKerviService, private templateService:KerviTemplateService ) {
 
   }
-
+  
   private createElement(){
     this.series= [
     {
@@ -35,12 +35,13 @@ export class KerviChartComponent implements OnInit {
         data: [ ]
     }]
 
+    
     this.options ={
       chart: {
           id: "chart_" + this.value.id,
           width:"100%",
           height:300,
-          type: 'area',
+          type: this.linkParameters.chartType,
           animations: {
             enabled: true,
             easing: 'linear',
@@ -75,7 +76,7 @@ export class KerviChartComponent implements OnInit {
         },
 
       title: {
-          text: this.value.name,
+          text: this.linkParameters.chartTitle,
           align: 'left'
         },
       markers: {
@@ -86,19 +87,38 @@ export class KerviChartComponent implements OnInit {
           //range: 1552983230 - 300,
       },
       yaxis: {
-          max: 100,
-          min:0
+          max: this.value.maxValue,
+          min:this.value.minValue
         },
       legend: {
           show: false
       },
-      colors: ['#9fd037'],
+      grid: {
+        show: this.linkParameters.chartGrid,
+        xaxis: {
+          lines: {
+            show: true,
+            animate: true
+          }
+        },
+        yaxis: {
+          lines: {
+            show: true,
+            animate: true
+          }
+        }
+      },
+      colors: [this.color("color",".kervi-chart")],// ['#9fd037'],
       series: this.series
     }
   
     if (this.chartObj) {
       this.chartObj.destroy();
     }
+
+    if (!this.linkParameters.chartTitle)
+      delete(this.options["title"]);
+
     console.log("create chart", this.value.id);
     this.chartObj = new ApexCharts(
       this.chartElement.nativeElement,

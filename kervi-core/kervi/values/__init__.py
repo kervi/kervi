@@ -51,9 +51,14 @@ class NumberValue(KerviValue):
         self._ui_parameters["pad_auto_center"] = False
         self._ui_parameters["chart_buttons"] = True
         self._ui_parameters["chart_grid"] = True
+        self._ui_parameters["chart_x_axis"] = True
+        self._ui_parameters["chart_y_axis"] = True
+        self._ui_parameters["chart_title"] = self.name
         self._ui_parameters["chart_interval"] = "5min"
-        self._ui_parameters["chart_fill"] = True
+        #self._ui_parameters["chart_fill"] = True
         self._ui_parameters["chart_point"] = 0
+        self._ui_parameters["chart_type"] = "area"
+        self._ui_parameters["gauge_size"] = 250
         if Configuration:
             unit_system = Configuration.unit_system
             chart_time_format = Configuration.display.unit_systems.systems[unit_system].datetime.chart
