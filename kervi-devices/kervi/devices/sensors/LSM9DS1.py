@@ -20,21 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-
+#This driver is derived from Tony DoCola's work and adapted to the api of the kervi framework.
 
 import time
 try:
     import struct
 except ImportError:
     import ustruct as struct
-from kervi.hal import get_i2c
+from kervi.hal import get_i2c, SensorDeviceDriver
 
 # Internal constants and register values:
 # pylint: disable=bad-whitespace
-_LSM9DS1_ADDRESS_ACCELGYRO       = const(0x6B)
-_LSM9DS1_ADDRESS_MAG             = const(0x1E)
-_LSM9DS1_XG_ID                   = const(0b01101000)
-_LSM9DS1_MAG_ID                  = const(0b00111101)
+_LSM9DS1_ADDRESS_ACCELGYRO       = 0x6B
+_LSM9DS1_ADDRESS_MAG             = 0x1E
+_LSM9DS1_XG_ID                   = 0b01101000
+_LSM9DS1_MAG_ID                  = 0b00111101
 _LSM9DS1_ACCEL_MG_LSB_2G         = 0.061
 _LSM9DS1_ACCEL_MG_LSB_4G         = 0.122
 _LSM9DS1_ACCEL_MG_LSB_8G         = 0.244
@@ -47,47 +47,47 @@ _LSM9DS1_GYRO_DPS_DIGIT_245DPS   = 0.00875
 _LSM9DS1_GYRO_DPS_DIGIT_500DPS   = 0.01750
 _LSM9DS1_GYRO_DPS_DIGIT_2000DPS  = 0.07000
 _LSM9DS1_TEMP_LSB_DEGREE_CELSIUS = 8 # 1°C = 8, 25° = 200, etc.
-_LSM9DS1_REGISTER_WHO_AM_I_XG    = const(0x0F)
-_LSM9DS1_REGISTER_CTRL_REG1_G    = const(0x10)
-_LSM9DS1_REGISTER_CTRL_REG2_G    = const(0x11)
-_LSM9DS1_REGISTER_CTRL_REG3_G    = const(0x12)
-_LSM9DS1_REGISTER_TEMP_OUT_L     = const(0x15)
-_LSM9DS1_REGISTER_TEMP_OUT_H     = const(0x16)
-_LSM9DS1_REGISTER_STATUS_REG     = const(0x17)
-_LSM9DS1_REGISTER_OUT_X_L_G      = const(0x18)
-_LSM9DS1_REGISTER_OUT_X_H_G      = const(0x19)
-_LSM9DS1_REGISTER_OUT_Y_L_G      = const(0x1A)
-_LSM9DS1_REGISTER_OUT_Y_H_G      = const(0x1B)
-_LSM9DS1_REGISTER_OUT_Z_L_G      = const(0x1C)
-_LSM9DS1_REGISTER_OUT_Z_H_G      = const(0x1D)
-_LSM9DS1_REGISTER_CTRL_REG4      = const(0x1E)
-_LSM9DS1_REGISTER_CTRL_REG5_XL   = const(0x1F)
-_LSM9DS1_REGISTER_CTRL_REG6_XL   = const(0x20)
-_LSM9DS1_REGISTER_CTRL_REG7_XL   = const(0x21)
-_LSM9DS1_REGISTER_CTRL_REG8      = const(0x22)
-_LSM9DS1_REGISTER_CTRL_REG9      = const(0x23)
-_LSM9DS1_REGISTER_CTRL_REG10     = const(0x24)
-_LSM9DS1_REGISTER_OUT_X_L_XL     = const(0x28)
-_LSM9DS1_REGISTER_OUT_X_H_XL     = const(0x29)
-_LSM9DS1_REGISTER_OUT_Y_L_XL     = const(0x2A)
-_LSM9DS1_REGISTER_OUT_Y_H_XL     = const(0x2B)
-_LSM9DS1_REGISTER_OUT_Z_L_XL     = const(0x2C)
-_LSM9DS1_REGISTER_OUT_Z_H_XL     = const(0x2D)
-_LSM9DS1_REGISTER_WHO_AM_I_M     = const(0x0F)
-_LSM9DS1_REGISTER_CTRL_REG1_M    = const(0x20)
-_LSM9DS1_REGISTER_CTRL_REG2_M    = const(0x21)
-_LSM9DS1_REGISTER_CTRL_REG3_M    = const(0x22)
-_LSM9DS1_REGISTER_CTRL_REG4_M    = const(0x23)
-_LSM9DS1_REGISTER_CTRL_REG5_M    = const(0x24)
-_LSM9DS1_REGISTER_STATUS_REG_M   = const(0x27)
-_LSM9DS1_REGISTER_OUT_X_L_M      = const(0x28)
-_LSM9DS1_REGISTER_OUT_X_H_M      = const(0x29)
-_LSM9DS1_REGISTER_OUT_Y_L_M      = const(0x2A)
-_LSM9DS1_REGISTER_OUT_Y_H_M      = const(0x2B)
-_LSM9DS1_REGISTER_OUT_Z_L_M      = const(0x2C)
-_LSM9DS1_REGISTER_OUT_Z_H_M      = const(0x2D)
-_LSM9DS1_REGISTER_CFG_M          = const(0x30)
-_LSM9DS1_REGISTER_INT_SRC_M      = const(0x31)
+_LSM9DS1_REGISTER_WHO_AM_I_XG    = 0x0F
+_LSM9DS1_REGISTER_CTRL_REG1_G    = 0x10
+_LSM9DS1_REGISTER_CTRL_REG2_G    = 0x11
+_LSM9DS1_REGISTER_CTRL_REG3_G    = 0x12
+_LSM9DS1_REGISTER_TEMP_OUT_L     = 0x15
+_LSM9DS1_REGISTER_TEMP_OUT_H     = 0x16
+_LSM9DS1_REGISTER_STATUS_REG     = 0x17
+_LSM9DS1_REGISTER_OUT_X_L_G      = 0x18
+_LSM9DS1_REGISTER_OUT_X_H_G      = 0x19
+_LSM9DS1_REGISTER_OUT_Y_L_G      = 0x1A
+_LSM9DS1_REGISTER_OUT_Y_H_G      = 0x1B
+_LSM9DS1_REGISTER_OUT_Z_L_G      = 0x1C
+_LSM9DS1_REGISTER_OUT_Z_H_G      = 0x1D
+_LSM9DS1_REGISTER_CTRL_REG4      = 0x1E
+_LSM9DS1_REGISTER_CTRL_REG5_XL   = 0x1F
+_LSM9DS1_REGISTER_CTRL_REG6_XL   = 0x20
+_LSM9DS1_REGISTER_CTRL_REG7_XL   = 0x21
+_LSM9DS1_REGISTER_CTRL_REG8      = 0x22
+_LSM9DS1_REGISTER_CTRL_REG9      = 0x23
+_LSM9DS1_REGISTER_CTRL_REG10     = 0x24
+_LSM9DS1_REGISTER_OUT_X_L_XL     = 0x28
+_LSM9DS1_REGISTER_OUT_X_H_XL     = 0x29
+_LSM9DS1_REGISTER_OUT_Y_L_XL     = 0x2A
+_LSM9DS1_REGISTER_OUT_Y_H_XL     = 0x2B
+_LSM9DS1_REGISTER_OUT_Z_L_XL     = 0x2C
+_LSM9DS1_REGISTER_OUT_Z_H_XL     = 0x2D
+_LSM9DS1_REGISTER_WHO_AM_I_M     = 0x0F
+_LSM9DS1_REGISTER_CTRL_REG1_M    = 0x20
+_LSM9DS1_REGISTER_CTRL_REG2_M    = 0x21
+_LSM9DS1_REGISTER_CTRL_REG3_M    = 0x22
+_LSM9DS1_REGISTER_CTRL_REG4_M    = 0x23
+_LSM9DS1_REGISTER_CTRL_REG5_M    = 0x24
+_LSM9DS1_REGISTER_STATUS_REG_M   = 0x27
+_LSM9DS1_REGISTER_OUT_X_L_M      = 0x28
+_LSM9DS1_REGISTER_OUT_X_H_M      = 0x29
+_LSM9DS1_REGISTER_OUT_Y_L_M      = 0x2A
+_LSM9DS1_REGISTER_OUT_Y_H_M      = 0x2B
+_LSM9DS1_REGISTER_OUT_Z_L_M      = 0x2C
+_LSM9DS1_REGISTER_OUT_Z_H_M      = 0x2D
+_LSM9DS1_REGISTER_CFG_M          = 0x30
+_LSM9DS1_REGISTER_INT_SRC_M      = 0x31
 _MAGTYPE                         = True
 _XGTYPE                          = False
 _SENSORS_GRAVITY_STANDARD        = 9.80665
@@ -118,13 +118,8 @@ def _twos_comp(val, bits):
 class _LSM9DS1():
     """Driver for the LSM9DS1 accelerometer, magnetometer, gyroscope."""
 
-    # Class-level buffer for reading and writing data with the sensor.
-    # This reduces memory allocations but means the code is not re-entrant or
-    # thread safe!
-    _BUFFER = bytearray(6)
-
     def __init__(self):
-        I2CSensorDeviceDriver.__init__(self, address, bus)
+        self._BUFFER = bytearray(6)
         # soft reset & reboot accel/gyro
         self._write_u8(_XGTYPE, _LSM9DS1_REGISTER_CTRL_REG8, 0x05)
         # soft reset & reboot magnetometer
@@ -236,8 +231,7 @@ class _LSM9DS1():
         accelerometer property!
         """
         # Read the accelerometer
-        self._read_bytes(_XGTYPE, 0x80 | _LSM9DS1_REGISTER_OUT_X_L_XL, 6,
-                         self._BUFFER)
+        self._read_bytes(_XGTYPE, 0x80 | _LSM9DS1_REGISTER_OUT_X_L_XL, 6,  self._BUFFER)
         raw_x, raw_y, raw_z = struct.unpack_from('<hhh', self._BUFFER[0:6])
         return (raw_x, raw_y, raw_z)
 
@@ -257,8 +251,7 @@ class _LSM9DS1():
         magnetometer property!
         """
         # Read the magnetometer
-        self._read_bytes(_MAGTYPE, 0x80 | _LSM9DS1_REGISTER_OUT_X_L_M, 6,
-                         self._BUFFER)
+        self._read_bytes(_MAGTYPE, 0x80 | _LSM9DS1_REGISTER_OUT_X_L_M, 6, self._BUFFER)
         raw_x, raw_y, raw_z = struct.unpack_from('<hhh', self._BUFFER[0:6])
         return (raw_x, raw_y, raw_z)
 
@@ -277,8 +270,7 @@ class _LSM9DS1():
         gyroscope property!
         """
         # Read the gyroscope
-        self._read_bytes(_XGTYPE, 0x80 | _LSM9DS1_REGISTER_OUT_X_L_G, 6,
-                         self._BUFFER)
+        self._read_bytes(_XGTYPE, 0x80 | _LSM9DS1_REGISTER_OUT_X_L_G, 6,  self._BUFFER)
         raw_x, raw_y, raw_z = struct.unpack_from('<hhh', self._BUFFER[0:6])
         return (raw_x, raw_y, raw_z)
 
@@ -296,8 +288,7 @@ class _LSM9DS1():
         want to use the temperature property!
         """
         # Read temp sensor
-        self._read_bytes(_XGTYPE, 0x80 | _LSM9DS1_REGISTER_TEMP_OUT_L, 2,
-                         self._BUFFER)
+        self._read_bytes(_XGTYPE, 0x80 | _LSM9DS1_REGISTER_TEMP_OUT_L, 2, self._BUFFER)
         temp = ((self._BUFFER[1] << 8) | self._BUFFER[0]) >> 4
         return _twos_comp(temp, 12)
 
@@ -335,10 +326,9 @@ class _LSM9DS1():
 
 class _LSM9DS1_I2C(_LSM9DS1):
     """Driver for the LSM9DS1 connect over I2C."""
-
-    def __init__(self, accl_address=I2C_ACCL_ADDRESS, gyro_address=I2C_GYRO_ADDRESS, bus=None):
-        self._mag_device = get_i2c(_LSM9DS1_ADDRESS_MAG, bus)
-        self._xg_device = get_i2c(_LSM9DS1_ADDRESS_ACCELGYRO, bus)
+    def __init__(self, acclgyro_address=_LSM9DS1_ADDRESS_ACCELGYRO, mag_address=_LSM9DS1_ADDRESS_MAG, bus=None):
+        self._mag_device = get_i2c(mag_address, bus)
+        self._xg_device = get_i2c(acclgyro_address, bus)
         super().__init__()
 
     def _read_u8(self, sensor_type, address):
@@ -346,41 +336,35 @@ class _LSM9DS1_I2C(_LSM9DS1):
             device = self._mag_device
         else:
             device = self._xg_device
-        with device as i2c:
-            self._BUFFER[0] = address & 0xFF
-            i2c.write(self._BUFFER, end=1, stop=False)
-            i2c.readinto(self._BUFFER, end=1)
-        return self._BUFFER[0]
+        
+        #self._BUFFER[0] = address & 0xFF
+        #device.write_U8(0xFF)
+        return device.read_U8(address)
+        #return self._BUFFER[0]
 
     def _read_bytes(self, sensor_type, address, count, buf):
         if sensor_type == _MAGTYPE:
             device = self._mag_device
         else:
             device = self._xg_device
-        with device as i2c:
-            buf[0] = address & 0xFF
-            i2c.write(buf, end=1, stop=False)
-            i2c.readinto(buf, end=count)
+        #buf[0] = address & 0xFF
+        #i2c.write(buf, end=1, stop=False)
+        #i2c.readinto(buf, end=count)
+        buf = device.read_list(address, count)
 
     def _write_u8(self, sensor_type, address, val):
         if sensor_type == _MAGTYPE:
             device = self._mag_device
         else:
             device = self._xg_device
-        with device as i2c:
-            self._BUFFER[0] = address & 0xFF
-            self._BUFFER[1] = val & 0xFF
-            i2c.write(self._BUFFER, end=2)
+        #self._BUFFER[0] = address & 0xFF
+        #self._BUFFER[1] = val & 0xFF
+        device.write_U8(address, val)
 
-
-class LSM9DS0OrientationDeviceDriver(I2CSensorDeviceDriver):
-    def __init__(self, is_flipped=False, accl_address=I2C_ACCL_ADDRESS, gyro_address=I2C_GYRO_ADDRESS, bus=None):
-        
-
+class LSM9DS1AccelerationDeviceDriver(SensorDeviceDriver):
+    def __init__(self, is_flipped=False, acclgyro_address=_LSM9DS1_ADDRESS_ACCELGYRO, mag_address=_LSM9DS1_ADDRESS_MAG, bus=None):
+        self._device = _LSM9DS1_I2C(acclgyro_address,mag_address, bus)
         self.is_flipped = is_flipped
-
-        
-
         self.last_reading = None
 
     @property
@@ -389,43 +373,70 @@ class LSM9DS0OrientationDeviceDriver(I2CSensorDeviceDriver):
 
     @property
     def dimension_labels(self):
-        return ["heading","pitch", "roll"]
+        return ["x","y", "z"]
     
     @property
     def type(self):
-        return "orientation"
+        return "acceleration"
 
     @property
     def unit(self):
-        return "degree"
+        return "m/s^2"
 
     def read_value(self):
+        x,y,z = self._device.acceleration
+        return [x, y, z]
 
-        
 
-        return [heading, pitch, roll]
 
-class LSM9DS0GravityDeviceDriver(I2CSensorDeviceDriver):
-    def __init__(self, is_flipped=False, address=I2C_ACCL_ADDRESS, bus=None):
-        self.accl = LSM9DS0RawAcclDeviceDriver(address, bus)
+class LSM9DS1GyroDeviceDriver(SensorDeviceDriver):
+    def __init__(self, is_flipped=False, acclgyro_address=_LSM9DS1_ADDRESS_ACCELGYRO, mag_address=_LSM9DS1_ADDRESS_MAG, bus=None):
+        self._device = _LSM9DS1_I2C(acclgyro_address,mag_address, bus)
+        self.is_flipped = is_flipped
+        self.last_reading = None
 
     @property
     def dimensions(self):
         return 3
-    
+
     @property
     def dimension_labels(self):
         return ["x","y", "z"]
     
     @property
     def type(self):
-        return "gravity"
+        return "gyro"
 
     @property
     def unit(self):
-        return "G"
-    
+        return "degrees/second"
+
     def read_value(self):
-        acc_x, acc_y, acc_z = self.accl.read_value()
-        return [(acc_x * 0.224)/1000, (acc_y * 0.224)/1000, (acc_z * 0.224)/1000]
+        x,y,z = self._device.gyro
+        return [x, y, z]
+
+class LSM9DS1MagneticDeviceDriver(SensorDeviceDriver):
+    def __init__(self, is_flipped=False, acclgyro_address=_LSM9DS1_ADDRESS_ACCELGYRO, mag_address=_LSM9DS1_ADDRESS_MAG, bus=None):
+        self._device = _LSM9DS1_I2C(acclgyro_address,mag_address, bus)
+        self.is_flipped = is_flipped
+        self.last_reading = None
+
+    @property
+    def dimensions(self):
+        return 3
+
+    @property
+    def dimension_labels(self):
+        return ["x","y", "z"]
     
+    @property
+    def type(self):
+        return "magnetic"
+
+    @property
+    def unit(self):
+        return "gauss"
+
+    def read_value(self):
+        x,y,z = self._device.magnetic
+        return [x, y, z]
