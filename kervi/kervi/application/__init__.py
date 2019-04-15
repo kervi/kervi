@@ -86,19 +86,19 @@ class _AppActions(Controller):
 
         self._app = app
 
-    @action
+    @action(confirm=True, confirm_message="Shutdown device")
     def shutdown(self):
         self._app._shutdown_action()
 
-    @action
+    @action(confirm=True, confirm_message="Reboot device")
     def reboot(self):
         self._app._reboot_action()
 
-    @action
+    @action(confirm=True, confirm_message="Restart application")
     def restart(self):
         self._app._restart_action()
 
-    @action
+    @action(confirm=True, confirm_message="Stop application")
     def stop(self):
         self._app._stop_action()
 
@@ -473,19 +473,19 @@ class Application(object):
             os._exit(0)
 
     def _stop_action(self):
-        self._logger.verbose("stop action")
+        self._logger.verbose("stop action","")
         self.stop()
 
     def _restart_action(self):
-        self._logger.verbose("restart action")
+        self._logger.verbose("restart action","")
         self.stop(restart=True)
 
     def _reboot_action(self):
-        self._logger.verbose("reboot action")
+        self._logger.verbose("reboot action","")
         import kervi.hal as hal
         hal.device_reboot()
 
     def _shutdown_action(self):
-        self._logger.verbose("shutdown action")
+        self._logger.verbose("shutdown action","")
         import kervi.hal as hal
         hal.device_shutdown()

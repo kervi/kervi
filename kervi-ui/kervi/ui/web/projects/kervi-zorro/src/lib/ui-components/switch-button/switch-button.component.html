@@ -1,6 +1,7 @@
 <nz-switch 
-    [(ngModel)]="value.value"
+    [(ngModel)]="value"
     [nzCheckedChildren]="checkedTemplate" [nzUnCheckedChildren]="unCheckedTemplate"
+    (ngModelChange)="modelChange($event)"
 >
 
 </nz-switch>

@@ -42,6 +42,7 @@ export class KerviActionComponent {
     
         self.state.next(this.action.running$.value);
         this.action.running$.subscribe(function(v){
+            console.log("ar", self.action.id, v)
             self.state.next(v);
         })
     }

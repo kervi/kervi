@@ -14,6 +14,10 @@ export class BooleanComponent extends KerviBooleanComponent implements OnInit {
 		super();
 	}
 
+	changeState(event){
+		this.value.set(event);
+	}
+
 	ngOnInit() {
 		this.ngOnInitBoolean();
 	}

@@ -46,13 +46,19 @@ export class ButtonComponent implements OnInit {
     }
   }
 
+  public confirm() {
+    console.log("c", this.value);
+    this.buttonState.emit(true);
+    this.buttonState.emit(false);
+  }
+
   public press() {
 
     console.log("p", this.value);
-    this.value.set(true);
+    this.buttonState.emit(true);
   }
 
   public release() {
-    this.value.set(false);
+    this.buttonState.emit(false);
   }
 }

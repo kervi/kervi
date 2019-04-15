@@ -54,10 +54,10 @@ class Controller(KerviComponent):
                         method_qual_name = self.__class__.__name__ + "." + method_name
                     
                     if Actions.is_unbound(method_qual_name):
-                        action_id, name = Actions.get_unbound(method_qual_name)
+                        action_id, name, ukwargs = Actions.get_unbound(method_qual_name)
                         setattr(self, "kervi_action_"+ method.__name__, method)
                         copy_method = getattr(self, "kervi_action_"+ method.__name__)
-                        action = Action(copy_method, self.controller_id + "." + action_id, name)
+                        action = Action(copy_method, self.controller_id + "." + action_id, name, **ukwargs)
                         Actions.add(action)
                         self.actions[action_id] = action
                         setattr(self, method.__name__, action)

@@ -156,7 +156,7 @@ class KerviComponent(object):
             if key in ui_param:
                 ui_param[key] = value
             else:
-                raise ValueError("illigal ui parameter name:" + key)
+                raise ValueError("illegal ui parameter name:" + key)
 
         if "link_to_header" not in ui_param:
             ui_param["link_to_header"] = False
