@@ -186,7 +186,7 @@ class _ActionInterrupt():
 
 class Action(KerviComponent):
     """The Action class is used by the action decorator. A function or method that is marked with @actions os converted to an Action class"""
-    def __init__(self, handler, action_id, name=None):
+    def __init__(self, handler, action_id, name=None, **kwargs):
         super().__init__(action_id, "KerviAction", name)
         self.action_id = action_id
         self._handler = handler
@@ -279,6 +279,10 @@ class Action(KerviComponent):
         #self._ui_parameters["interrupt_command"] = "kervi_action_interrupt_" + action_id
         self._ui_parameters["interrupt_parameters"] = []
         self._ui_parameters["interrupt_enabled"] = False
+        self._ui_parameters["confirm"] = kwargs.get("confirm", False)
+        self._ui_parameters["confirm_message"] = kwargs.get("confirm_message", "Execute " + self.name + "?")
+        self._ui_parameters["confirm_interrupt"] = kwargs.get("confirm_interrupt", False)
+        self._ui_parameters["confirm_interrupt_message"] = kwargs.get("confirm_message", "Interrupt " + self.name + "?")
 
     def _send_message(self, message_type, message_text=None, **kwargs):
         
@@ -390,6 +394,7 @@ class Action(KerviComponent):
             self._state = ACTION_FAILED
         self.spine.trigger_event("actionDone", self.action_id, self._state, result)
         self._last_result = result
+        self._action_lock.acquire(False)
         self._action_lock.release()
         self._is_running = False
         self._send_message("stop", **kwargs)
@@ -441,7 +446,7 @@ class Action(KerviComponent):
                         result = thread
                 return result
             except Exception as ex:
-                self.spine.log.exception(ex)
+                self.spine.log.exception("Error executeing:" + self.action_id, ex)
                 self._action_lock.release()
             finally:
                 pass
@@ -624,8 +629,8 @@ class Action(KerviComponent):
         """
         
         def action_wrap(f):
-            action_id = kwargs.get("action_id", f.__name__)
-            name = kwargs.get("name", action_id)
+            action_id = kwargs.pop("action_id", f.__name__)
+            name = kwargs.pop("name", action_id)
             if inspect.ismethod(f): # not "." in f.__qualname__:
                 self._interrupt = _ActionInterrupt(f)
                 self._ui_parameters["interrupt_enabled"] = True
@@ -637,7 +642,8 @@ class Action(KerviComponent):
                     qual_name = owner_class + "." + f.__name__
 
                 if qual_name:
-                    Actions.add_unbound_interrupt(qual_name, self)
+                    from kervi.actions.actions_list import Actions as _Actions
+                    _Actions.add_unbound_interrupt(qual_name, action_id, self)
                 else:
                     import logging 
                     logging.getLogger().error("using upython? if yes you need to pass the name of the controller class via the controller_class parameter.")    

@@ -2,17 +2,18 @@
 // Licensed under MIT
 
 import { Component, OnInit, Input, Output, ElementRef, ViewEncapsulation, EventEmitter } from '@angular/core';
-import { DashboardSizes, KerviValueType, BooleanValue } from 'kervi-js'
+import { DashboardSizes } from 'kervi-js'
 @Component({
   selector: 'kervi-switchbutton',
   templateUrl: './switch-button.component.html',
   styleUrls: ['./switch-button.component.scss'],
 })
 export class SwitchButtonComponent implements OnInit {
-  @Input() value: KerviValueType<BooleanValue>;
+  @Input() value: Boolean;
   @Input() linkParameters:any;
   @Input() inline:boolean = false;
   @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
+  @Output() buttonState = new EventEmitter();
   public width:string;
   public height:string;
   constructor() { }
@@ -35,5 +36,9 @@ export class SwitchButtonComponent implements OnInit {
       this.width = this.dashboardSizes.switchWidth;
       this.height = this.dashboardSizes.switchHeight;
     }
+  }
+
+  modelChange(state){
+    this.buttonState.emit(state);
   }
 }
