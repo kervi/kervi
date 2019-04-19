@@ -187,15 +187,13 @@ class _ActionInterrupt():
 class Action(KerviComponent):
     """The Action class is used by the action decorator. A function or method that is marked with @actions os converted to an Action class"""
     def __init__(self, handler, action_id, name=None, **kwargs):
-        super().__init__(action_id, "KerviAction", name)
+        super().__init__(action_id, "KerviAction", name, **kwargs)
         self.action_id = action_id
         self._handler = handler
         self._handler.__globals__["exit_action"] = False
-        sig = inspect.signature(handler)
-        keywords = [p.name for p in sig.parameters.values() if p.kind == p.KEYWORD_ONLY]
-        
-        self._keywords = len(keywords) >0
-        self.spine = Spine()
+
+        argspec = inspect.getargspec(handler)
+        self._keywords = argspec.keywords != None
         self.spine.register_command_handler("kervi_action_" + action_id, self._handle_command)
         self.spine.register_command_handler("kervi_action_interrupt_" + action_id, self.interrupt)
         self._state = ACTION_STOPPED
