@@ -336,40 +336,37 @@ class _LSM9DS1_I2C(_LSM9DS1):
             device = self._mag_device
         else:
             device = self._xg_device
-        
-        #self._BUFFER[0] = address & 0xFF
-        #device.write_U8(0xFF)
         return device.read_U8(address)
-        #return self._BUFFER[0]
 
     def _read_bytes(self, sensor_type, address, count, buf):
         if sensor_type == _MAGTYPE:
             device = self._mag_device
         else:
             device = self._xg_device
-        #buf[0] = address & 0xFF
-        #i2c.write(buf, end=1, stop=False)
-        #i2c.readinto(buf, end=count)
-        buf = device.read_list(address, count)
+        r= device.read_list(address, count)
+        buf[:] = r
 
     def _write_u8(self, sensor_type, address, val):
         if sensor_type == _MAGTYPE:
             device = self._mag_device
         else:
             device = self._xg_device
-        #self._BUFFER[0] = address & 0xFF
-        #self._BUFFER[1] = val & 0xFF
-        device.write_U8(address, val)
+        device.write8(address, val)
 
 class LSM9DS1AccelerationDeviceDriver(SensorDeviceDriver):
-    def __init__(self, is_flipped=False, acclgyro_address=_LSM9DS1_ADDRESS_ACCELGYRO, mag_address=_LSM9DS1_ADDRESS_MAG, bus=None):
+    def __init__(self, accel_range=ACCELRANGE_2G, acclgyro_address=_LSM9DS1_ADDRESS_ACCELGYRO, mag_address=_LSM9DS1_ADDRESS_MAG, bus=None):
+        SensorDeviceDriver.__init__(self)
         self._device = _LSM9DS1_I2C(acclgyro_address,mag_address, bus)
-        self.is_flipped = is_flipped
-        self.last_reading = None
+        self._device.accel_range = accel_range
 
     @property
     def dimensions(self):
         return 3
+
+    @property
+    def value_type(self):
+        return "number"
+    
 
     @property
     def dimension_labels(self):
@@ -387,13 +384,15 @@ class LSM9DS1AccelerationDeviceDriver(SensorDeviceDriver):
         x,y,z = self._device.acceleration
         return [x, y, z]
 
-
-
 class LSM9DS1GyroDeviceDriver(SensorDeviceDriver):
-    def __init__(self, is_flipped=False, acclgyro_address=_LSM9DS1_ADDRESS_ACCELGYRO, mag_address=_LSM9DS1_ADDRESS_MAG, bus=None):
+    def __init__(self, gyro_scale=GYROSCALE_245DPS, acclgyro_address=_LSM9DS1_ADDRESS_ACCELGYRO, mag_address=_LSM9DS1_ADDRESS_MAG, bus=None):
+        SensorDeviceDriver.__init__(self)
         self._device = _LSM9DS1_I2C(acclgyro_address,mag_address, bus)
-        self.is_flipped = is_flipped
-        self.last_reading = None
+        self._device.gyro_scale = gyro_scale
+
+    @property
+    def value_type(self):
+        return "number"
 
     @property
     def dimensions(self):
@@ -415,11 +414,12 @@ class LSM9DS1GyroDeviceDriver(SensorDeviceDriver):
         x,y,z = self._device.gyro
         return [x, y, z]
 
+        
 class LSM9DS1MagneticDeviceDriver(SensorDeviceDriver):
-    def __init__(self, is_flipped=False, acclgyro_address=_LSM9DS1_ADDRESS_ACCELGYRO, mag_address=_LSM9DS1_ADDRESS_MAG, bus=None):
+    def __init__(self, gain=MAGGAIN_4GAUSS, acclgyro_address=_LSM9DS1_ADDRESS_ACCELGYRO, mag_address=_LSM9DS1_ADDRESS_MAG, bus=None):
+        SensorDeviceDriver.__init__(self)
         self._device = _LSM9DS1_I2C(acclgyro_address,mag_address, bus)
-        self.is_flipped = is_flipped
-        self.last_reading = None
+        self._device.mag_gain = gain
 
     @property
     def dimensions(self):
@@ -436,6 +436,10 @@ class LSM9DS1MagneticDeviceDriver(SensorDeviceDriver):
     @property
     def unit(self):
         return "gauss"
+
+    @property
+    def value_type(self):
+        return "number"
 
     def read_value(self):
         x,y,z = self._device.magnetic
