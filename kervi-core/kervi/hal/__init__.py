@@ -117,6 +117,10 @@ class SensorDeviceDriver(object):
         return 1
 
     @property
+    def value_type(self):
+        return "number"
+
+    @property
     def dimension_labels(self):
         return []
 

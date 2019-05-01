@@ -56,7 +56,7 @@ class Sensor(Controller):
         elif device.value_type == "number":
             self._sensor_value = self.outputs.add(sensor_id, name, NumberValue)
         else:
-            raise ValueError("Can not handle device value type: " + str(device.value_type))
+            raise ValueError("Can not handle device value type: " + device.value_type)
         
         if self._device:
             self.value_type = self._device.type

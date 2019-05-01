@@ -70,7 +70,6 @@ def action(method=None, **kwargs) -> Action:
         action_id = kwargs.pop("action_id", f.__name__)
         name = kwargs.pop("name", action_id)
         if not _is_method(f): # not "." in f.__qualname__:
-            print("a", action_id, "-", name, "-", kwargs)
             action = Action(f, action_id, name, **kwargs)
             Actions.add(action)
             return action
