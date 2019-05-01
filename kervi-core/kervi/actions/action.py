@@ -203,7 +203,7 @@ class Action(KerviComponent):
         self._interrupt = None
         self._observers = []
         self._spine_observers = {}
-
+        self._interrupted = False
         texts = Configuration.texts.messages
         self._action_messages = {
             "start":{
@@ -372,6 +372,7 @@ class Action(KerviComponent):
         self._set_message("start", level=message_level)
 
     def _execute(self, *args, **kwargs):
+        print("yy")
         kwargs.pop("injected", None) # signaling from zmq bus
         self._send_message("start", **kwargs)
         self._state = ACTION_RUNNING
@@ -421,9 +422,11 @@ class Action(KerviComponent):
 
             
          """
+        print("xx")
         timeout = kwargs.pop("timeout", -1)
         execute_async = kwargs.pop("run_async", False)
         result = None
+        self._interrupted = False
         if self._action_lock.acquire(False):
             try:
                 self.spine.trigger_event("actionStarted", self.action_id)
@@ -457,12 +460,17 @@ class Action(KerviComponent):
 
     def interrupt(self, *args, **kwargs):
         self._send_message("interrupted", **kwargs)
+        self._interrupted = True
         if self._interrupt:
             self._interrupt(*args, **kwargs)
         else:
             self._handler.__globals__["exit_action"] = True
         
 
+    @property
+    def interrupted(self):
+        return self._interrupted
+    
     @property
     def is_running(self):
         """"Is true if the action is executing. You can use it together with the timeout parameter in the call to execute"""

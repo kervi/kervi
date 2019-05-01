@@ -39,7 +39,7 @@ class _SetInterrupt():
         return f
 
 #from kervi.actions.action_list import _Actions
-def action(method=None, **kwargs):
+def action(method=None, **kwargs) -> Action:
     """
         Decorator that turns a function or controller method into an kervi action.
         it is possible to call the action in other kervi processes or modules.
