@@ -40,7 +40,7 @@ class _KerviModuleLoader(process._KerviProcess):
         self.spine.send_command("startThreads", local_only=True)
         self.spine.trigger_event(
             "moduleLoaded",
-            self.name,
+            self.name
         )
 
     def terminate_process(self):

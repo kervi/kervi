@@ -225,5 +225,8 @@ Action {action_name} {state}
                 "record": "Record video",
                 "media_folder": "Media folder"
             }
+        },
+        "development":{
+            "debug_threads": False
         }
     }

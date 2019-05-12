@@ -45,18 +45,17 @@ class MessageManager(Controller):
                 ingroup = any(i in groups for i in user.groups)
                 if ingroup:
                     users += [user]
-        if users:
-            for message_channel in message_channels:
-                
-                if message_channel in self._channels.keys():
-                    channel = self._channels[message_channel]
-                    channel_users = []
-                    if channel.address_based:
-                        for user in users:
-                            if user.addresses.get(message_channel, None):
-                                channel_users.append(user)
-                        
-                        if channel_users:
-                            channel.send_message(channel_users, subject, **kwargs)
-                    else:
-                        channel.send_message([], subject, **kwargs)
+        for message_channel in message_channels:
+            
+            if message_channel in self._channels.keys():
+                channel = self._channels[message_channel]
+                channel_users = []
+                if channel.address_based:
+                    for user in users:
+                        if user.addresses.get(message_channel, None):
+                            channel_users.append(user)
+                    
+                    if channel_users:
+                        channel.send_message(channel_users, subject, **kwargs)
+                else:
+                    channel.send_message([], subject, **kwargs)
