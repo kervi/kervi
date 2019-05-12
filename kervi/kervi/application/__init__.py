@@ -300,12 +300,13 @@ class Application(object):
                         module.module_id
                     )
 
-    def _process_ready(self, scope, process_id):
+    def _process_ready(self, scope, process_id, pid):
         self._process_info_lock.acquire()
         try:
             for process in self._process_info:
                 if process["id"] == process_id:
                     process["ready"] = True
+                    process["pid"] = pid
         finally:
             self._process_info_lock.release()
 
@@ -355,7 +356,7 @@ class Application(object):
         plugin_modules = pluginManager.prepare_load()
         for plugin_module in plugin_modules:
             self._process_info.append(
-                {"id":plugin_module, "ready": False}
+                {"id":plugin_module, "ready": False, "pid": None}
             )
         self._process_info_lock.release()
 
@@ -363,7 +364,7 @@ class Application(object):
 
         for module in self.config.modules:
             self._process_info_lock.acquire()
-            self._process_info += [{"id":module, "ready":False}]
+            self._process_info += [{"id":module, "ready":False, "pid":None}]
             self._process_info_lock.release()
 
             module_port += 1
@@ -458,15 +459,18 @@ class Application(object):
         time.sleep(1)
         self.bus_manager.stop()
         self._log_handler.stop()
-        #time.sleep(1)
-        #for thread in threading.enumerate():
-        #    print("running thread",thread.name)
+        
+        if self.config.development.debug_threads:
+            time.sleep(1)
+            for thread in threading.enumerate():
+                print("running thread",thread.name)
         self._logger.info("application stopped")
-        #import psutil
-        #current_process = psutil.Process()
-        #children = current_process.children(recursive=True)
-        #for child in children:
-        #    print('Child pid is {}'.format(child.pid))
+        
+        import psutil
+        current_process = psutil.Process()
+        children = current_process.children(recursive=True)
+        for child in children:
+            child.kill()
 
         if force_exit:
             import os
