@@ -10,6 +10,7 @@ import kervi.spine as spine
 #import sys
 import kervi.core.utility.kervi_logging as k_logging
 import logging
+import os
 
 class _KerviProcess(object):
     def __init__(self, scope, name, config, ipcPort, root_close, log_queue=None, **kwargs):
@@ -19,7 +20,7 @@ class _KerviProcess(object):
         self.port = ipcPort
         self.config = config
         self._log_queue = log_queue
-        
+        self._pid = os.getpid()
         self.spine = self.load_spine(name, ipcPort, "tcp://" + config.network.ipc_root_address + ":" + str(config.network.ipc_root_port), config.network.ip)
         self.spine.register_command_handler("terminateProcess", self.terminate, scopes=[scope])
         self.spine.register_query_handler("getProcessInfo", self.get_process_info)
@@ -73,7 +74,7 @@ def _launch(scope, name, process_class, config_data, ipc_port, root_close, log_q
             while not process.do_terminate:
                 if not process._is_connected and process.spine.is_connected:
                     process._is_connected = True
-                    process.spine.trigger_event("processReady", scope, name)
+                    process.spine.trigger_event("processReady", scope, name, process._pid)
                 process.process_step()
 
         except KeyboardInterrupt:

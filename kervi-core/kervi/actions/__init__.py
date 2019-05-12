@@ -91,4 +91,3 @@ def action(method=None, **kwargs) -> Action:
         return action_wrap(method)
     else:
         return action_wrap
-    

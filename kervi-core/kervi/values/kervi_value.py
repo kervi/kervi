@@ -7,7 +7,8 @@ except:
     from kervi.core.utility.udatetime import datetime
 
 from kervi.core.utility.component import KerviComponent
-
+from kervi.core.utility.schedule import default_scheduler
+from kervi.values.value_job import ValueJob
 from kervi.actions import Actions
 VALUE_COUNTER = 0
 class KerviValue(KerviComponent):
@@ -93,7 +94,6 @@ class KerviValue(KerviComponent):
     @property
     def display_value(self):
         return self._value
-
     
     @property
     def unit(self):
@@ -144,6 +144,20 @@ class KerviValue(KerviComponent):
         else:
             self._persist_value = do_persist
 
+    def every(self, interval=1):
+        """
+        Schedule an action to run periodically.
+        :param interval: A quantity of a certain time unit
+        """
+        if self.is_input:
+            job = ValueJob(interval, default_scheduler, self._job_set_value)
+            return job
+
+        raise Exception("It is only possible to schedule inputs")
+    
+    def _job_set_value(self, value):
+        self._set_value(value)
+    
     def _query_value(self, id):
         if self.component_id == id:
             return self.value

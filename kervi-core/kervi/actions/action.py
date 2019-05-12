@@ -6,10 +6,13 @@ import threading
 import traceback
 import sys
 import types
+import datetime
 from kervi.spine import Spine
 from kervi.core.utility.component import KerviComponent
 from kervi.core.utility.superformatter import SuperFormatter
-from kervi.config import Configuration            
+from kervi.config import Configuration
+from kervi.actions.action_job import ActionJob
+from kervi.core.utility.schedule import default_scheduler     
 
 ACTION_STOPPED = "stopped"
 ACTION_RUNNING = "running"
@@ -163,6 +166,7 @@ class _LinkedAction(object):
 class _ActionThread(threading.Thread):
     def __init__(self, action, args, kwargs):
         super().__init__(name="_ActionThread:"+action.action_id)
+        
         self._action = action
         self.deamon = True
         self._args = args
@@ -171,9 +175,23 @@ class _ActionThread(threading.Thread):
 
     def run(self):
         self.result = self._action._execute(*self._args, **self._kwargs)
-        
+
+class _ActionInterruptThread(threading.Thread):
+    def __init__(self, action, interrupt_at):
+        super().__init__(name="_ActionInterruptThread:"+action.action_id)
+        self._interrupt_at = interrupt_at
+        self._action = action
+        self.deamon = True
+
+    def run(self):
+        terminate = False
+        while not terminate:
+            if datetime.datetime.now() > self._interrupt_at:
+                terminate = True
+                self._action.interrupt()
+
 class _ActionInterrupt():
-    def __init__(self, interrupt):
+    def __init__(self, interrupt, **kwargs):
         self._interrupt = interrupt
         argspec = inspect.getargspec(interrupt)
         self._keywords = argspec.keywords != None
@@ -203,7 +221,6 @@ class Action(KerviComponent):
         self._interrupt = None
         self._observers = []
         self._spine_observers = {}
-        self._interrupted = False
         texts = Configuration.texts.messages
         self._action_messages = {
             "start":{
@@ -285,10 +302,10 @@ class Action(KerviComponent):
     def _send_message(self, message_type, message_text=None, **kwargs):
         
         #kwargs.pop("state", None)
+        
         message = self._action_messages[message_type]
         if not message["active"]:
             return
-        #message_type = ""
         message_color = "#28a745"
         if message["level"]==1:
             #message_type = "Error"
@@ -372,7 +389,6 @@ class Action(KerviComponent):
         self._set_message("start", level=message_level)
 
     def _execute(self, *args, **kwargs):
-        print("yy")
         kwargs.pop("injected", None) # signaling from zmq bus
         self._send_message("start", **kwargs)
         self._state = ACTION_RUNNING
@@ -422,19 +438,21 @@ class Action(KerviComponent):
 
             
          """
-        print("xx")
         timeout = kwargs.pop("timeout", -1)
         execute_async = kwargs.pop("run_async", False)
         result = None
-        self._interrupted = False
         if self._action_lock.acquire(False):
             try:
                 self.spine.trigger_event("actionStarted", self.action_id)
                 if timeout == -1 and not execute_async:
                     result = self._execute(*args, **kwargs)
                 else:
+                    interrupt_at = kwargs.pop("interrupt_at", None)
                     thread = _ActionThread(self, args, kwargs)
                     thread.start()
+                    if interrupt_at:
+                        interrupt_thread = _ActionInterruptThread(self, interrupt_at)
+                        interrupt_thread.start()
                     if not execute_async:
                         thread.join(timeout)
                         if thread.is_alive():
@@ -460,17 +478,11 @@ class Action(KerviComponent):
 
     def interrupt(self, *args, **kwargs):
         self._send_message("interrupted", **kwargs)
-        self._interrupted = True
         if self._interrupt:
             self._interrupt(*args, **kwargs)
         else:
             self._handler.__globals__["exit_action"] = True
-        
 
-    @property
-    def interrupted(self):
-        return self._interrupted
-    
     @property
     def is_running(self):
         """"Is true if the action is executing. You can use it together with the timeout parameter in the call to execute"""
@@ -637,11 +649,12 @@ class Action(KerviComponent):
         def action_wrap(f):
             action_id = kwargs.pop("action_id", f.__name__)
             name = kwargs.pop("name", action_id)
-            if inspect.ismethod(f): # not "." in f.__qualname__:
+            if not inspect.ismethod(f): # not "." in f.__qualname__:
                 self._interrupt = _ActionInterrupt(f)
                 self._ui_parameters["interrupt_enabled"] = True
                 return self._interrupt
             else:
+                
                 qual_name = getattr(f, "__qualname__", None)
                 owner_class = kwargs.get("controller_class", None)
                 if owner_class:
@@ -659,3 +672,11 @@ class Action(KerviComponent):
             return action_wrap(method)
         else:
             return action_wrap
+    
+    def run_every(self, interval=1):
+        """
+        Schedule an action to run periodically.
+        :param interval: A quantity of a certain time unit
+        """
+        job = ActionJob(interval, default_scheduler, self)
+        return job
