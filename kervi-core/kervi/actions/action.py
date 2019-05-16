@@ -82,6 +82,14 @@ class _LinkedAction(object):
         if self._action_lock.acquire(False):
             self._process_locked = True
 
+    def run_every(self, interval=1):
+        """
+        Schedule an action to run periodically.
+        :param interval: A quantity of a certain time unit
+        """
+        job = ActionJob(interval, default_scheduler, self)
+        return job
+    
     @property
     def is_running(self):
         return self._is_running
