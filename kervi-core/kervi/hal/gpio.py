@@ -48,9 +48,9 @@ class LogicIOChannel(BooleanValue):
     def _input_changed(self,v):
         self.value = self._device.get(self._channel)
 
-    def define_as_input(self, pullup=False, bounce_time=200):
+    def define_as_input(self, pull_up=False, bounce_time=200):
         self.is_input = False
-        self._device.define_as_input(self._channel, pullup)
+        self._device.define_as_input(self._channel, pull_up)
         self._device.listen(self._channel, self._input_changed, bounce_time)
 
     def define_as_output(self):

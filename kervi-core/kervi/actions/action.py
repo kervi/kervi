@@ -1,4 +1,4 @@
-#Copyright 2018 Tim Wentlau.
+#Copyright 2018 Tim Wentzlau.
 #Distributed under the MIT License. See LICENSE in root of project.
 
 import inspect
@@ -435,7 +435,7 @@ class Action(KerviComponent):
     def execute(self, *args, **kwargs):
         """ 
             Executes the action and returns the result. 
-            You dont have to call this function directly as the class is callable (implements __call__)
+            You don't have to call this function directly as the class is callable (implements __call__)
             you just call the @action marked function as normal.
 
             @action
@@ -654,10 +654,16 @@ class Action(KerviComponent):
 
         """
         
+        def _is_method(func):
+            spec = inspect.signature(func)
+            if len(spec.parameters) > 0:
+                if list(spec.parameters.keys())[0] == 'self':
+                    return True
+            return False
+        
         def action_wrap(f):
             action_id = kwargs.pop("action_id", f.__name__)
-            name = kwargs.pop("name", action_id)
-            if not inspect.ismethod(f): # not "." in f.__qualname__:
+            if not _is_method(f): # not "." in f.__qualname__:
                 self._interrupt = _ActionInterrupt(f)
                 self._ui_parameters["interrupt_enabled"] = True
                 return self._interrupt

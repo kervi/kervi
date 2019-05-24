@@ -44,22 +44,22 @@ export class KerviBaseService {
   constructor() 
   { 
     console.log("kervi service constructor");
-    var self=this;
-    this.application$= new BehaviorSubject<any>(null);
-     var s1=this.IPCReady$.subscribe(function(connected){
+    var self = this;
+    this.application$ = new BehaviorSubject<any>(null);
+     var s1 = this.IPCReady$.subscribe(function(connected){
         if (connected){
           console.log("kervi service ipc ready (connected)")
           self.spine.addEventHandler("valueChanged","",function(id, value){
             for (let component of self.components){
-              if (component.id==value.id){
-                var dynamicValue = component as any;
-                //console.log("nv", this.timestamp, new Date(this.timestamp));
-                dynamicValue.valueTS=new Date(this.timestamp);
-                dynamicValue.set(value.value, false);  
+              if (component.id == value.id){
+                const dynamicValue = component as any;
+                //console.log("nv", component.id, value.value, this.timestamp, new Date(this.timestamp));
+                dynamicValue.valueTS = new Date(this.timestamp);
+                dynamicValue.set(value.value, false);
               }
             }
           });
-        
+
         self.spine.addEventHandler("actionStarted","",function(id){
           console.log("as", id);
           for (let component of self.components){
