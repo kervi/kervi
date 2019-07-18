@@ -1,4 +1,8 @@
 
+pip install zmq
+pip install pillow
+pip install autobahn
+
 pip install -e ./kervi-devices
 pip install -e ./kervi-hal-generic
 pip install -e ./kervi-hal-rpi
