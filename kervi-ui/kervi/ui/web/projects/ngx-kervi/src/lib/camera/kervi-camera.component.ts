@@ -16,7 +16,7 @@ export class KerviCameraComponent {
     private cam:Controller;
     @Input() set cameraId(id: string){
         console.log("setcamid", id);
-        
+
         this.camera = this.kerviService.getComponent(id) as Controller;    
     };
     @Input() set camera(v:Controller){
@@ -33,14 +33,14 @@ export class KerviCameraComponent {
             if (v.ui.source)
               this.cameraSource = v.ui.source.server + v.ui.source.path;
         }
-        
+
     };
 
-    get camera(){return this.cam;}
+    get camera(){ return this.cam; }
     @Input() linkParameters: any = null;
-    @Input() inline:boolean = false;
-    @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
-    @Input() isBackground: boolean = false;
+    @Input() inline = false;
+    @Input() dashboardSizes = new DashboardSizes();
+    @Input() isBackground = false;
   
     protected kerviService:NGXKerviService;
     public pan:NumberValue;

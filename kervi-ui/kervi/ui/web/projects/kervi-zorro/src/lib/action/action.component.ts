@@ -13,14 +13,10 @@ import { KerviActionComponent } from 'ngx-kervi';
 
 export class ActionComponent extends KerviActionComponent implements OnInit {
     constructor() {
-        super(); 
-    
+        super();
     }
 
   ngOnInit() {
-   this.ngOnInitAction(); 
+   this.ngOnInitAction();
   }
-
-  
-  
 }
