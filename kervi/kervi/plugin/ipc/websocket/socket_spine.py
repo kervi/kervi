@@ -28,6 +28,7 @@ import kervi.utility.nethelper as nethelper
 from kervi.core.authentication import Authorization
 import kervi.utility.encryption as encryption
 import logging
+import threading
 
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
@@ -306,12 +307,11 @@ class SocketSpine:
 
     def start_socket(self):
         try:
-            print("d")
             self.loop.run_until_complete(self.coro)
+            time.sleep(2)
             self._started = True
             self._spine.log.verbose("start websocket: {0} {1} ", self._config.network.ip, self._config.network.ws_port)
         except:
-            print("x")
             self._spine.log.exception(
                 "start websocket on:{0}, port:{1}",
                 self._config.network.ip,
@@ -320,6 +320,7 @@ class SocketSpine:
 
     def step(self):
         if self._started:
-            self.loop.run_until_complete(self.coro)
-        #loop.run_until_complete(coro_local)
-        time.sleep(.001)
+            self.loop.run_forever()
+            
+        
+        time.sleep(.1)
