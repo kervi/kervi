@@ -55,7 +55,7 @@ class CameraBase(Controller):
     def __init__(self, camera_id, name, **kwargs):
         Controller.__init__(self, camera_id, name)
         self.type = "camera"
-        self.media_config = Configuration.media
+        #self.media_config = Configuration.media
         self.inputs.add("pan", "Pan", NumberValue)
         self.inputs.add("tilt", "Tilt", NumberValue)
 
@@ -70,17 +70,17 @@ class CameraBase(Controller):
 
         self.actions["take_picture"].set_ui_parameter("button_icon", "camera")
         self.actions["take_picture"].set_ui_parameter("inline", True)
-        self.actions["take_picture"].set_ui_parameter("type", "button")
+        self.actions["take_picture"].set_ui_parameter("display_type", "button")
         self.actions["take_picture"].set_ui_parameter("label", None)
         self.actions["take_picture"].set_ui_parameter("button_text", None)
-
-
+        self.actions["take_picture"].stop_message_enabled = False
+        
         self.actions["record"].set_ui_parameter("button_icon", "video")
         self.actions["record"].set_ui_parameter("inline", True)
-        self.actions["record"].set_ui_parameter("type", "button")
+        self.actions["record"].set_ui_parameter("display_type", "switch")
         self.actions["record"].set_ui_parameter("label", None)
         self.actions["record"].set_ui_parameter("button_text", None)
-
+        
 
         self._ui_parameters["height"] = kwargs.get("height", 480)
         self._ui_parameters["width"] = kwargs.get("width", 640)
@@ -169,10 +169,13 @@ class CameraBase(Controller):
         raise NotImplementedError
 
 
-    def _record(self):
+    def _record_start(self):
         """abstract method"""
         raise NotImplementedError
 
+    def _record_stop(self):
+        """abstract method"""
+        raise NotImplementedError
 
     @action
     def take_picture(self):
@@ -180,7 +183,11 @@ class CameraBase(Controller):
 
     @action
     def record(self):
-        self._record()
+        self._record_start()
+        while not exit_action:
+            pass
+
+        self._record_stop()
     
     def link_to_dashboard(self, dashboard_id=None, panel_id=None, **kwargs):
         r"""
@@ -450,17 +457,23 @@ class CameraStreamer(CameraBase):
 
     def _take_picture(self):
         if self.current_frame:
-            image_name = "/img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
-            image_path = self.media_config.folders.images + image_name
-            if not os.path.exists(os.path.dirname(image_path)):
-                os.makedirs(os.path.dirname(image_path))
+            image_name = "img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
+            
+            output = BytesIO()
             if self._frame_format == "jpeg":
                 image = Image.open(BytesIO(self.current_frame))
-                image.save(image_path, "PNG")
+                image.save(output, "PNG")
             else:
-                self.current_frame.save(image_path, "PNG")
+                self.current_frame.save(output, "PNG")
 
-    def _record(self):
+            from kervi.io import save_file
+            output.seek(0)
+            save_file(self.component_id, "images", image_name, output)
+
+    def _record_start(self):
+        pass
+
+    def _record_stop(self):
         pass
 
     def _get_media(self):

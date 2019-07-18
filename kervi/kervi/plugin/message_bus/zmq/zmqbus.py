@@ -34,6 +34,7 @@ from kervi.plugin.message_bus.zmq.named_lists import NamedLists
 import kervi.utility.nethelper as nethelper
 from  kervi.core.utility.kervi_logging import KerviLog
 from kervi.config.configuration import _KerviConfig
+import base64
 
 _KERVI_COMMAND_ADDRESS = "inproc://kervi_commands"
 _KERVI_QUERY_ADDRESS = "inproc://kervi_query"
@@ -45,7 +46,11 @@ class _ObjectEncoder(json.JSONEncoder):
         
         if o and isinstance(o, datetime.datetime):
            return o.strftime("%Y-%m-%dT%H:%M:%SZ")
-        elif isinstance(o, _KerviConfig):
+        elif o and isinstance(o, bytes):
+            return base64.b64encode(o).decode("utf8")
+        elif o and isinstance(o, bytearray):
+            return base64.b64encode(o).decode('utf8')
+        elif o and isinstance(o, _KerviConfig):
             return o.as_dict()
         else:
             return json.JSONEncoder.default(self, o)
