@@ -8,14 +8,14 @@ declare var window:any;
   styleUrls: ['./cam-viewer.component.css']
 })
 export class CamViewerComponent extends KerviCameraComponent implements AfterViewInit {
-  public camHeight:number;
-  public camWidth:number;
-  public camPadLeft:number;
-  public camPadTop:number;
-  public showCamPad:boolean = false;
-  @ViewChild("videoViewer") videoViewer:ElementRef;
-  padSize:number=180;
-  constructor(private elementRef: ElementRef) { 
+  public camHeight: number;
+  public camWidth: number;
+  public camPadLeft: number;
+  public camPadTop: number;
+  public showCamPad: boolean = false;
+  @ViewChild("videoViewer") videoViewer: ElementRef;
+  padSize = 180;
+  constructor(private elementRef: ElementRef) {
     super();
   }
 
