@@ -60,6 +60,7 @@ def get_default_config():
         },
         "plugins":{
             "kervi.plugin.message_bus.zmq": True,
+            "kervi.plugin.io.files": True,
             "kervi.plugin.authentication.plain": False,
             "kervi.plugin.storage.sqlite_temp": True,
             "kervi.plugin.storage.sqlite": True,
@@ -93,12 +94,6 @@ def get_default_config():
             "use_ssl": False,
             "cert_file": "kervi.cert",
             "key_file": "kervi.key"
-        },
-        "media":{
-            "folders":{
-                "images":"images",
-                "videos":"videos"
-            }
         },
         "unit_system": "metric",
         "display":{
