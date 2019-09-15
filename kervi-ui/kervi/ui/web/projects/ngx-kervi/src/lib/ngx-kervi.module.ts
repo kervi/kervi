@@ -6,16 +6,17 @@ import { KerviDashboardPanelComponent } from './dashboard/kervi-dashboard-panel.
 import { KerviControllerPadComponent } from './dashboard/kervi-controller-pad.component';
 import { NGXKerviService } from './ngx-kervi.service';
 import { KerviTemplateService } from './ngx-kervi-template.service';
-import { KerviValueComponent } from './values/value.component'
-import { KerviNumberComponent } from './values/kervi-number-value.component'
-import { KerviStringComponent } from './values/kervi-string-value.component'
-import { KerviBooleanComponent } from './values/kervi-boolean-value.component'
-import { KerviColorComponent } from './values/kervi-color-value.component'
-import { KerviDateTimeComponent } from './values/kervi-datetime-value.component'
-import { KerviActionComponent } from './actions/kervi-action.component'
-import { KerviCameraComponent } from './camera/kervi-camera.component'
-import { KerviWidgetComponent } from './dashboard/kervi-widget.component'
-import { KerviUserLogComponent } from './user-log/user-log.component'
+import { KerviValueComponent } from './values/value.component';
+import { KerviNumberComponent } from './values/kervi-number-value.component';
+import { KerviStringComponent } from './values/kervi-string-value.component';
+import { KerviBooleanComponent } from './values/kervi-boolean-value.component';
+import { KerviColorComponent } from './values/kervi-color-value.component';
+import { KerviDateTimeComponent } from './values/kervi-datetime-value.component';
+import { KerviActionComponent } from './actions/kervi-action.component';
+import { KerviCameraComponent } from './camera/kervi-camera.component';
+import { KerviWidgetComponent } from './dashboard/kervi-widget.component';
+import { KerviUserLogComponent } from './user-log/user-log.component';
+import { KerviDirectoryComponent } from './files/kervi-directory.component';
 @NgModule({
   imports: [
   ],
@@ -33,7 +34,8 @@ import { KerviUserLogComponent } from './user-log/user-log.component'
     KerviValueComponent,
     KerviWidgetComponent,
     KerviCameraComponent,
-    KerviUserLogComponent
+    KerviUserLogComponent,
+    KerviDirectoryComponent
   ],
   providers: [NGXKerviService, KerviTemplateService],
   exports: [
@@ -49,7 +51,8 @@ import { KerviUserLogComponent } from './user-log/user-log.component'
     KerviDateTimeComponent,
     KerviActionComponent,
     KerviCameraComponent,
-    KerviUserLogComponent
+    KerviUserLogComponent,
+    KerviActionComponent
   ]
 })
 export class NgxKerviModule {
