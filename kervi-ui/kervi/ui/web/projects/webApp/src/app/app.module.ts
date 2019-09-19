@@ -21,7 +21,7 @@ import { NgxKerviModule } from 'ngx-kervi';
 import { NGXKerviPipesModule } from 'ngx-kervi'
 import { KerviZorroModule  } from 'kervi-zorro'
 import { FlexLayoutModule } from '@angular/flex-layout';
-
+import { ImgViewerComponent } from './image-viewer/image-viewer.component'
 
 
 registerLocaleData(en);
@@ -51,7 +51,8 @@ const ROUTES: Routes = [
     LoginComponent,
     ConnectComponent,
     DashboardComponent,
-    MediaComponent
+    MediaComponent,
+    ImgViewerComponent
   ],
   imports: [
     FormsModule,

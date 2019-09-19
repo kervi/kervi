@@ -26,7 +26,6 @@ class FilesPlugin(KerviPlugin):
         with os.scandir(self._root + path) as it:
             for entry in it:
                 stat = entry.stat()
-                print("f", stat, entry)
                 file_info = {
                     "name": entry.name,
                     "is_file": entry.is_file(),
@@ -38,7 +37,9 @@ class FilesPlugin(KerviPlugin):
         return result
 
     def get_file(self, file_path):
-        pass
+        print("gf", self._root + file_path)
+        with open(self._root + file_path, 'rb') as f:
+            return f.read()
 
     def get_thumbnail(self, file_path):
         from PIL import Image

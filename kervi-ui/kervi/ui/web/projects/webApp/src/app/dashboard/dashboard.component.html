@@ -26,10 +26,11 @@
 			</div>
 			<div class="kervi-sys-panel" *ngIf="dashboard && dashboard.sysPanel" nz-col nzSpan="18">
 				<kervi-dashboard-panel [dashboardSizes]="dashboardSizes" [inline]="true" [panel]="dashboard.sysPanel" ></kervi-dashboard-panel>
-				<kervi-message-button></kervi-message-button>
-				<a  (click)="mediaHidden = !mediaHidden;">
-					<i nz-icon type="sliders" nzTheme="twotone" [nzTwotoneColor]="'#9fd037'"></i>
+				&nbsp;<a  (click)="mediaHidden = !mediaHidden;">
+						<i nz-icon nzType="folder-open" nzTheme="twotone" [nzTwotoneColor]="'#9fd037'"> </i>
 				</a>
+				<kervi-message-button></kervi-message-button>
+				
 			</div>
 			
 		</div>
@@ -87,7 +88,8 @@
 	(nzOnCancel)="handleMediaClose()"
 	
 >
-	<app-media></app-media>
+<div style="display:inline-block;width:100%"> <app-media ></app-media></div>	
+
 </nz-modal>
 
 

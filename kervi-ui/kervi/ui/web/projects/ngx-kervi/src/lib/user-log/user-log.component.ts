@@ -2,10 +2,8 @@
 // Licensed under MIT
 
 import { Component, Input } from '@angular/core';
-import { Action } from 'kervi-js';
 import { DashboardSizes, DashboardMessageModel, UserLogStateType } from 'kervi-js';
 import { NGXKerviService } from '../ngx-kervi.service';
-import { BehaviorSubject } from 'rxjs';
 import { AppInjector } from '../app-injector.service';
 import {  Observable } from 'rxjs';
 
@@ -16,19 +14,19 @@ import {  Observable } from 'rxjs';
 })
 
 export class KerviUserLogComponent {
-    @Input() logLength:number = 10;
+    @Input() logLength = 10;
     @Input() linkParameters: any = null;
-    @Input() inline:boolean = false;
-    @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
-    protected kerviService:NGXKerviService;
+    @Input() inline = false;
+    @Input() dashboardSizes: DashboardSizes = new DashboardSizes();
+    protected kerviService: NGXKerviService;
     lastMessage$: Observable<DashboardMessageModel> = null;
     messages$: Observable<DashboardMessageModel[]> = null;
-    messageCount$:Observable<number> = null;
-    logState$:Observable<UserLogStateType> = null;
+    messageCount$: Observable<number> = null;
+    logState$: Observable<UserLogStateType> = null;
     public messageCount = 0;
-    public UserLogState:UserLogStateType = UserLogStateType.normal;
-    
-    constructor() { 
+    public UserLogState: UserLogStateType = UserLogStateType.normal;
+
+    constructor() {
         this.kerviService = AppInjector.get(NGXKerviService);
         this.messages$ = this.kerviService.getLogMessages$();
         this.lastMessage$ = this.kerviService.getLastLogMessage$();
@@ -36,8 +34,7 @@ export class KerviUserLogComponent {
         this.logState$ = this.kerviService.getLogState$();
         this.messageCount$.subscribe(function(v){
           this.messageCount = v;
-          console.log("lc", this.messageCount);
-        })
+        });
     }
 
     protected ngOnInitUserLog() {

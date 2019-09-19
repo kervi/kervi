@@ -114,8 +114,8 @@ export class KerviBaseService {
     });
   }
 
-  public GetDirectory(path: string) {
-    const promise = new Promise((resolve, reject) => {
+  public GetDirectory(path: string): Promise<Directory> {
+    const promise = new Promise<Directory>((resolve, reject) => {
       const directory = new Directory(path);
       this.spine.sendQuery('files_get_dir', path, function(directoryFiles) {
         directory.updateFiles(directoryFiles);
@@ -125,8 +125,8 @@ export class KerviBaseService {
     return promise;
   }
 
-  public GetThumbnail(path: string) {
-    const promise = new Promise((resolve, reject) => {
+  public GetThumbnail(path: string): Promise<string> {
+    const promise = new Promise<string>((resolve, reject) => {
       this.spine.sendQuery('files_get_thumbnail', path, function(thumbnail) {
         resolve(thumbnail);
       });
@@ -134,8 +134,8 @@ export class KerviBaseService {
     return promise;
   }
 
-  public GetFile(path: string) {
-    const promise = new Promise((resolve, reject) => {
+  public GetFile(path: string): Promise<string> {
+    const promise = new Promise<string>((resolve, reject) => {
       this.spine.sendQuery('files_get_file', path, function(file) {
         resolve(file);
       });

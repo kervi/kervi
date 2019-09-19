@@ -1,7 +1,10 @@
+// Copyright (c) 2019, Tim Wentzlau
+// Licensed under MIT
+
 import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
-import { ActivatedRoute, Router} from '@angular/router';
 import { KerviDirectoryComponent } from 'ngx-kervi';
 import { NzFormatEmitEvent, NzTreeNodeOptions, NzTreeComponent } from 'ng-zorro-antd';
+import { ImgViewerComponent } from '../image-viewer/image-viewer.component';
 
 @Component({
   selector: 'app-media',
@@ -9,12 +12,14 @@ import { NzFormatEmitEvent, NzTreeNodeOptions, NzTreeComponent } from 'ng-zorro-
   styleUrls: ['./media.component.css']
 })
 export class MediaComponent extends KerviDirectoryComponent implements OnInit {
-  @ViewChild('nzTreeComponent', { static: false }) nzTreeComponent: NzTreeComponent;
+  @ViewChild('nzTreeComponent') nzTreeComponent: NzTreeComponent;
+  @ViewChild('imageViewer') imageViewer: ImgViewerComponent;
   @Input() files = [
 
   ];
-
+  showImageViewer = false;
   directoryFiles = {};
+
 
   @Input() nodes: NzTreeNodeOptions[] = [
     { title: 'root', key: '/' }
@@ -27,20 +32,19 @@ export class MediaComponent extends KerviDirectoryComponent implements OnInit {
    }
 
   ngOnInit() {
-    const self = this;
   }
 
   nzEvent(event: Required<NzFormatEmitEvent>): void {
-    console.log("trev", event);
+    console.log('trev', event);
     const node = event.node;
-    if (event.eventName == 'click') {
+    if (event.eventName === 'click') {
       this.files = [];
-      const d = this.kerviService.GetDirectory(node.key).then( d => {
+      this.kerviService.GetDirectory(node.key).then( d => {
         const files = d.files$.getValue();
         for(const file of files) {
           if (file.isFile){
             this.kerviService.GetThumbnail(file.path).then( t =>{
-              this.files.push( { title: file.name, key: file.path, data: t});
+              this.files.push( { title: file.name, key: file.path, thumb: t});
             });
           }
         }
@@ -48,17 +52,39 @@ export class MediaComponent extends KerviDirectoryComponent implements OnInit {
     }
     if (event.eventName === 'expand') {
       if (node && node.getChildren().length === 0 && node.isExpanded) {
-        const d = this.kerviService.GetDirectory(node.key).then( d =>{
+        this.kerviService.GetDirectory(node.key).then( d => {
           const files = d.files$.getValue();
           const dirs = [];
           for(const file of files) {
-              if (!file.isFile){
-                dirs.push({ title: file.name, key: file.path, isLeaf: false});
-              }
+            if (!file.isFile) {
+              dirs.push({ title: file.name, key: file.path, isLeaf: false});
             }
-            node.addChildren(dirs);
+          }
+          node.addChildren(dirs);
         });
       }
     }
+  }
+
+  showImage(filePath) {
+    this.showImageViewer = true;
+    this.imageViewer.imgTotal = this.files.length;
+    this.kerviService.GetFile(filePath).then( f => {
+      this.imageViewer.images = ['data:image/png;base64,' + f];
+      this.imageViewer.showImg();
+    });
+  }
+
+  nextImage(event){
+    console.log("ni", event);
+    const filePath = this.files[this.imageViewer.currentImgIndex-1].key;
+    this.kerviService.GetFile(filePath).then( f => {
+      this.imageViewer.images = ['data:image/png;base64,' + f];
+      this.imageViewer.showImg();
+    });
+  }
+
+  closeViewer(){
+    this.showImageViewer = false;
   }
 }
