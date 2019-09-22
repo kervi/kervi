@@ -40,6 +40,7 @@ _KERVI_COMMAND_ADDRESS = "inproc://kervi_commands"
 _KERVI_QUERY_ADDRESS = "inproc://kervi_query"
 _KERVI_QUERY_RESPONSE_ADDRESS = "inproc://kervi_query_response"
 _KERVI_EVENT_ADDRESS = "inproc://kervi_events"
+_KERVI_STREAM_ADDRESS = "inproc://kervi_streams"
 
 class _ObjectEncoder(json.JSONEncoder):
     def default(self, o):
@@ -263,6 +264,9 @@ class ZMQBus():
         self._event_socket = self._context.socket(zmq.PUB)
         self._event_socket.bind(_KERVI_EVENT_ADDRESS)
 
+        self._stream_socket = self._context.socket(zmq.PUB)
+        self._stream_socket.bind(_KERVI_STREAM_ADDRESS)
+
         self._command_socket = self._context.socket(zmq.PUB)
         self._command_socket.bind(_KERVI_COMMAND_ADDRESS)
 
@@ -272,6 +276,7 @@ class ZMQBus():
         self._message_handler = ZMQMessageThread(self, self._signal_address, True)
         self._query_handler = ZMQMessageThread(self, _KERVI_QUERY_ADDRESS)
         self._event_handler = ZMQMessageThread(self, _KERVI_EVENT_ADDRESS)
+        self._stream_handler = ZMQMessageThread(self, _KERVI_STREAM_ADDRESS)
         self._command_handler = ZMQMessageThread(self, _KERVI_COMMAND_ADDRESS)
 
         self._register_handler("signal:ping", self._on_ping)
@@ -286,11 +291,13 @@ class ZMQBus():
         self._message_handler.register("signal:exit")
         self._query_handler.register("signal:exit")
         self._event_handler.register("signal:exit")
+        self._stream_handler.register("signal:exit")
         self._command_handler.register("signal:exit")
 
         self._ping_thread = ZMQPingThread(self)
         self._command_lock = threading.Lock()
         self._event_lock = threading.Lock()
+        self._stream_lock = threading.Lock()
         self._query_lock = threading.Lock()
 
         self.register_query_handler("GetRoutingInfo", self._get_routing_info)
@@ -437,8 +444,6 @@ class ZMQBus():
         if "args" in message:
             message_args += message["args"]
 
-        
-
         message_kwargs = dict(message_kwargs, injected=injected, session=session, topic_tag=tag, response_address=response_address, process_id=process_id)
         send_response = True
         try:
@@ -498,11 +503,13 @@ class ZMQBus():
         self._message_handler.start()
         #time.sleep(1)
         self._event_handler.connect()
+        self._stream_handler.connect()
         self._command_handler.connect()
         self._query_handler.connect()
 
         self._query_handler.start()
         self._event_handler.start()
+        self._stream_handler.start()
         self._command_handler.start()
 
         if self._root_address:
@@ -512,6 +519,7 @@ class ZMQBus():
         if self._is_root:
             logger = logging.getLogger()
             self.log.verbose("IPC address: %s", self._signal_address)
+
     def stop(self):
         exit_tag = "signal:exit"
         package = [exit_tag.encode(), json.dumps({}, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')]
@@ -537,13 +545,19 @@ class ZMQBus():
         finally:
             self._event_lock.release()
 
+        self._stream_lock.acquire()
+        try:
+            self._stream_socket.send_multipart(package)
+        finally:
+            self._stream_lock.release()
+
         time.sleep(1)
         self._ping_thread.stop()
         self._ping_thread.join()
         
         self._message_handler.stop()
         self._event_handler.stop()
-
+        self._stream_handler.stop()
         self._command_handler.stop()
         self._query_handler.stop()
         
@@ -747,6 +761,55 @@ class ZMQBus():
         tag = "event:"+event +":"
         if component_id:
             tag +=  component_id
+        
+        if func:
+            self._unregister_handler(tag, func, **kwargs)
+        self._event_handler.unregister(tag)
+        self._message_handler.unregister(tag)
+
+    def stream_data(self, stream_id, stream_event, data, *args, **kwargs):
+        injected = kwargs.pop("injected", "")
+        scope = kwargs.pop("scope", None)
+        groups = kwargs.pop("groups", None)
+        session = kwargs.pop("session", None)
+        local_only = kwargs.pop("local_only", False)
+        event_message = {
+            'event':stream_event,
+            'id':stream_id,
+            'args':args,
+            "injected":injected,
+            "scope":scope,
+            "groups":groups,
+            "session":session,
+            "kwargs": kwargs,
+            "process_id": self._process_id
+        }
+        p = json.dumps(event_message, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')
+        event_tag = "stream:" + stream_id + ":" + stream_event + ":"
+        package = [event_tag.encode(), p]
+        self._stream_lock.acquire()
+        try:
+            self._stream_socket.send_multipart(package)
+        finally:
+            self._stream_lock.release()
+
+        if not local_only:
+            for connection in self._connections:
+                connection.send_package(package)
+
+    def register_stream_handler(self, stream_id, func, stream_event=None, **kwargs):
+        tag = "stream:" + stream_id + ":"
+        if stream_event:
+            tag +=  stream_event
+        if func:
+            self._register_handler(tag, func, **kwargs)
+        self._event_handler.register(tag)
+        self._message_handler.register(tag)
+
+    def unregister_stream_handler(self, stream_id, func, stream_event=None, **kwargs):
+        tag = "stream:" + stream_id + ":"
+        if stream_event:
+            tag +=  stream_event
         
         if func:
             self._unregister_handler(tag, func, **kwargs)

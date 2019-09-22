@@ -110,12 +110,40 @@ class _WebEventHandler(object):
             jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
             self.protocol.broadcast_message(self.protocol, jsonres)
 
+class _WebStreamHandler(object):
+    def __init__(self, stream_id, stream_event, protocol):
+        self.protocol = protocol
+        self.stream_event = stream_event
+        self.stream_id = stream_id
+        self.spine = Spine()
+        self.spine.register_stream_handler(stream_id, self.on_event, stream_event, injected="socketSpine")
+        
+    def on_event(self, stream_id, stream_event, data, *args, **kwargs):
+        injected = kwargs.get("injected", "")
+        groups = kwargs.get("groups", None)
+        process_id = kwargs.get("process_id", None)
+        #self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
+
+        authorized = True
+
+        if self.protocol.user != None and self.protocol.user["groups"] != None and groups != None and len(groups) > 0:
+            for group in groups:
+                if group in self.protocol.user["groups"]:
+                    break
+            else:
+                authorized = False
+
+        if authorized and self.protocol.authenticated and not injected == "socketSpine":
+            cmd = {"messageType":"stream", "streamId":self.stream_id, "streamEvent":self.stream_event, "args":args, "data": data}
+            jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
+            self.protocol.broadcast_message(self.protocol, jsonres)
+
 class _SpineProtocol(WebSocketServerProtocol):
     loop = None
     def __init__(self):
         self.spine = Spine()
         WebSocketServerProtocol.__init__(self)
-        self.handlers = {"command":[], "query":[], "event":[]}
+        self.handlers = {"command":[], "query":[], "event":[], "stream":[]}
         self.authenticated = False
         self.session = None
         self.user = None
@@ -149,6 +177,14 @@ class _SpineProtocol(WebSocketServerProtocol):
                 found = True
         if not found:
             self.handlers["event"] += [_WebEventHandler(event, id_event, self)]
+
+    def add_stream_handler(self, stream_id, stream_event):
+        found = False
+        for stream_handler in self.handlers["stream"]:
+            if stream_handler.stream_id == stream_id:
+                found = True
+        if not found:
+            self.handlers["event"] += [_WebStreamHandler(stream_id, stream_event, self)]
 
     def send_response(self, id, response, state="ok", message=""):
         res = {
@@ -250,6 +286,10 @@ class _SpineProtocol(WebSocketServerProtocol):
                     self.send_response(obj["id"], None)
                 elif obj["messageType"] == "registerEventHandler":
                     self.add_event_handler(obj["event"], obj["eventId"])
+                    self.send_response(obj["id"], None)
+                elif obj["messageType"] == "registerStreamHandler":
+                    print("o", obj)
+                    self.add_stream_handler(obj["streamId"], obj["streamEvent"])
                     self.send_response(obj["id"], None)
         except:
             self.spine.log.exception("WS onMessage exception")

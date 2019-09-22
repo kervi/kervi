@@ -17,6 +17,6 @@ export class KerviDirectoryComponent {
     }
 
     protected loadDirectory() {
-        this.directory = this.kerviService.GetDirectory(this.path);
+        //this.directory = this.kerviService.GetDirectory(this.path);
     }
 }

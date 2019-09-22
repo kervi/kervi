@@ -337,7 +337,7 @@ except:
             self.terminate = False
             self.mutex = mutex
 
-class CameraStreamer(CameraBase):
+class CameraHTTPStreamer(CameraBase):
     r"""
     Camera controller that streams video to the ui.
 
@@ -446,6 +446,137 @@ class CameraStreamer(CameraBase):
             self.mutex.acquire()
             self.current_frame = frame
             self.current_frame_number += 1
+            self.mutex.release()
+
+    def frame_captured(self, image):
+        """
+        Abstract method that is called when a new frame is ready from the camera.
+        You can use this method to post process images before they are streamed.
+        """
+        pass
+
+    def _take_picture(self):
+        if self.current_frame:
+            image_name = "img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
+            
+            output = BytesIO()
+            if self._frame_format == "jpeg":
+                image = Image.open(BytesIO(self.current_frame))
+                image.save(output, "PNG")
+            else:
+                self.current_frame.save(output, "PNG")
+
+            from kervi.io import save_file
+            output.seek(0)
+            save_file(self.component_id, "images", image_name, output)
+
+    def _record_start(self):
+        pass
+
+    def _record_stop(self):
+        pass
+
+    def _get_media(self):
+        import glob
+        media_files = glob.glob(self.media_config.folders.images+"/*.png")
+        result = {
+            "path": self.source["server"] + self.source["path"]+"/media",
+            "files": []
+        }
+        for media in media_files:
+            result["files"].append({
+                "name": media[7:]
+            })
+        return result
+
+
+class CameraStreamer(CameraBase):
+    r"""
+    Camera controller that streams video to the ui.
+
+    :param camera_id:
+        Id of the camera. The id is used to reference the camera in other parts of the kervi application.
+    :type camera_id: str
+
+    :param name:
+        Name of the camera used in ui.
+    :type name: str
+
+    :param camera_source:
+        A frame driver that is used to capture frames from a camera.
+
+    :type camera_source: The name of the camera source to use.
+
+    :param \**kwargs:
+            See below
+
+    :Keyword Arguments:
+            * *height* (``int``) --
+                Height of video frame. Default value is 480.
+
+            * *width* (``int``) --
+                Width of video frame. Default value is 640.
+
+            * *fps* (``int``) --
+                Frames per second.
+    """
+    def __init__(self, camera_id, name, camera_source = None, **kwargs):
+        CameraBase.__init__(self, camera_id, name, type="frame", **kwargs)
+        self._device_driver = hal.get_camera_driver(camera_source)
+
+        self._device_driver.camera = self
+        self._frame_format = self._device_driver.buffer_type
+
+        
+        self.current_frame = None
+        self.current_frame_number = 0
+
+        from threading import Lock
+        self.mutex = Lock()
+
+
+        self.frame_thread = _CameraFrameThread(self, self.mutex)
+
+    def exit(self):
+        self.terminate = True
+        self._terminate = True
+        self.server.shutdown()
+
+    @property
+    def _terminate(self):
+        """
+        Flag to signal that the get_frames method should exit
+        """
+        return self._device_driver.terminate
+
+    @_terminate.setter
+    def _terminate(self, value):
+        self._device_driver.terminate = value
+
+    def get_font(self, name="Fanwood", size=16):
+        """
+        Returns a font that can be used by pil image functions.
+        This default font is "Fanwood" that is available on all platforms.
+        """
+        import kervi.vision as vision
+        from PIL import ImageFont
+        vision_path = os.path.dirname(vision.__file__)
+        fontpath = os.path.join(vision_path, "fonts", name + ".otf")
+        font = ImageFont.truetype(fontpath, size)
+        return font
+
+    def _capture_frames(self):
+        self._device_driver.capture_frames()
+
+    def _frame_ready(self, frame):
+        if frame:
+            self.mutex.acquire()
+            self.current_frame = frame
+            self.current_frame_number += 1
+            buf = BytesIO()
+            self.current_frame.save(buf, format='png')
+            data = buf.getvalue()
+            self.spine.stream_data(self.component_id,"IMAGE_FRAME", data)
             self.mutex.release()
 
     def frame_captured(self, image):

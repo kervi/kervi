@@ -17,7 +17,7 @@ export class KerviCameraComponent {
     @Input() set cameraId(id: string){
         console.log("setcamid", id);
 
-        this.camera = this.kerviService.getComponent(id) as Controller;    
+        this.camera = this.kerviService.getComponent(id) as Controller;
     };
     @Input() set camera(v:Controller){
         console.log("setcam", v);
@@ -30,8 +30,11 @@ export class KerviCameraComponent {
         }
         this.cameraType = v.ui.type; 
         if (this.cameraType == "frame" ){
-            if (v.ui.source)
-              this.cameraSource = v.ui.source.server + v.ui.source.path;
+            if (v.ui.source){
+              //this.cameraSource = v.ui.source.server + v.ui.source.path;
+              this.cameraSource = this.cam.id;
+            }
+            this.cameraSource = this.cam.id;
         }
 
     };

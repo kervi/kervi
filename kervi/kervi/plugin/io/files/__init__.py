@@ -33,11 +33,10 @@ class FilesPlugin(KerviPlugin):
                     "m_time": stat.st_mtime
                 }
                 result.append(file_info)
-                print(entry.name, entry.path)
+               
         return result
 
     def get_file(self, file_path):
-        print("gf", self._root + file_path)
         with open(self._root + file_path, 'rb') as f:
             return f.read()
 

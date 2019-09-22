@@ -10,6 +10,7 @@ import { ComponentFactory } from './models/factory';
 import { DashboardMessageModel } from './models/dashboard.model';
 import { Dashboard } from './models/dashboard.model';
 import { FileBase, Directory } from './models/file.model';
+import { Stream } from './models/stream.model';
 declare var kerviSocketAddress: any;
 declare var socketProtocol: any;
 
@@ -36,7 +37,7 @@ export class KerviBaseService {
   private LogMessageCount$: BehaviorSubject<number> = new  BehaviorSubject<number>(0);
   private LogMessageState$: BehaviorSubject<UserLogStateType> = new  BehaviorSubject<UserLogStateType>(UserLogStateType.normal);
 
-  private Files = {};
+  private streams = {}
 
   IPCReady$: BehaviorSubject<Boolean> = new  BehaviorSubject<Boolean>(false);
 
@@ -141,6 +142,10 @@ export class KerviBaseService {
       });
     });
     return promise;
+  }
+
+  public GetStream(streamId: string) {
+    return new Stream(streamId, [], this);
   }
 
   public text(key: string, defaultValue: string= ''): string {

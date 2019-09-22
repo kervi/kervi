@@ -10,6 +10,7 @@ export * from './lib/models/action.model';
 export * from './lib/models/IComponent.model';
 export * from './lib/models/controller.model';
 export * from './lib/models/file.model';
+export * from './lib/models/stream.model';
 
 export { KerviValue, ValueRange, ValueRangeType } from './lib/models/KerviValues.model';
 
