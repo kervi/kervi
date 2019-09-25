@@ -58,9 +58,14 @@ class CameraBase(Controller):
         #self.media_config = Configuration.media
         self.inputs.add("pan", "Pan", NumberValue)
         self.inputs.add("tilt", "Tilt", NumberValue)
+        self.fpc_start_time = time.time()
+        self.fpc_counter = 0
 
         self.pan = self.outputs.add("pan", "Pan", NumberValue)
         self.tilt = self.outputs.add("tilt", "Tilt", NumberValue)
+
+        self.fpsc = self.outputs.add("fpsc", "Frames pr second", NumberValue)
+        
 
         self.flip_vertical = kwargs.get("flip_vertical", False)
         self.flip_horizontal = kwargs.get("flip_horizontal", False)
@@ -85,7 +90,7 @@ class CameraBase(Controller):
         self._ui_parameters["height"] = kwargs.get("height", 480)
         self._ui_parameters["width"] = kwargs.get("width", 640)
         self._ui_parameters["type"] = kwargs.get("type", "")
-        self._ui_parameters["fps"] = kwargs.get("fps", 10)
+        self._ui_parameters["fps"] = kwargs.get("fps", 20)
         self._ui_parameters["source"] = kwargs.get("source", "")
         self._ui_parameters["show_pan_tilt"] = kwargs.get("show_pan_tilt", False)
         self._ui_parameters["show_buttons"] = kwargs.get("show_buttons", True)
@@ -540,7 +545,6 @@ class CameraStreamer(CameraBase):
     def exit(self):
         self.terminate = True
         self._terminate = True
-        self.server.shutdown()
 
     @property
     def _terminate(self):
@@ -573,6 +577,14 @@ class CameraStreamer(CameraBase):
             self.mutex.acquire()
             self.current_frame = frame
             self.current_frame_number += 1
+            self.fpc_counter += 1
+            seconds = time.time() - self.fpc_start_time 
+            if (seconds) > 1 :
+                fpc = self.fpc_counter / seconds
+                #print("FPS: ", self.fpc_counter, seconds, fpc)
+                self.fpc_counter = 0
+                self.fpc_start_time = time.time()
+                self.fpsc.value = fpc
             buf = BytesIO()
             self.current_frame.save(buf, format='png')
             data = buf.getvalue()
@@ -607,18 +619,18 @@ class CameraStreamer(CameraBase):
     def _record_stop(self):
         pass
 
-    def _get_media(self):
-        import glob
-        media_files = glob.glob(self.media_config.folders.images+"/*.png")
-        result = {
-            "path": self.source["server"] + self.source["path"]+"/media",
-            "files": []
-        }
-        for media in media_files:
-            result["files"].append({
-                "name": media[7:]
-            })
-        return result
+    # def _get_media(self):
+    #     import glob
+    #     media_files = glob.glob(self.media_config.folders.images+"/*.png")
+    #     result = {
+    #         "path": self.source["server"] + self.source["path"]+"/media",
+    #         "files": []
+    #     }
+    #     for media in media_files:
+    #         result["files"].append({
+    #             "name": media[7:]
+    #         })
+    #     return result
 
 class IPCamera(CameraBase):
     def __init__(self, camera_id, name, dashboards, source):
@@ -643,6 +655,7 @@ class FrameCameraDeviceDriver(object):
         self._terminate = False
         self._buffer_type = None
         self.log = KerviLog("FramedCameraDeviceDriver")
+        self.last_frame_time = time.time()
 
     @property
     def buffer_type(self):
@@ -681,7 +694,15 @@ class FrameCameraDeviceDriver(object):
         """
         Waits for next frame.
         """
-        time.sleep(1.0 / self.camera.fps)
+        sleep = 1.0 / self.camera.fps
+        now = time.time()
+        process_time = now - self.last_frame_time
+        sleep -= process_time
+        if sleep < 0:
+            sleep = 0
+        time.sleep(sleep)
+        self.last_frame_time = time.time()
+        #print("s", s , af - bf, (s-(af-bf))*1000, of)
 
     def frame_ready(self, frame):
         """

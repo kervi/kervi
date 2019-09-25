@@ -29,12 +29,14 @@ from kervi.core.authentication import Authorization
 import kervi.utility.encryption as encryption
 import logging
 import threading
+import base64
+import datetime
 
 #from kervi.utility.kerviThread import KerviThread
 from autobahn.asyncio.websocket import WebSocketServerProtocol
 import asyncio
 
-class _ObjectEncoder(json.JSONEncoder):
+class _ObjectEncoderx(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, "to_json"):
             return self.default(obj.to_json())
@@ -54,6 +56,18 @@ class _ObjectEncoder(json.JSONEncoder):
             )
             return self.default(data)
         return obj
+
+class _ObjectEncoder(json.JSONEncoder):
+    def default(self, o):
+        
+        if o and isinstance(o, datetime.datetime):
+           return o.strftime("%Y-%m-%dT%H:%M:%SZ")
+        elif o and isinstance(o, bytes):
+            return base64.b64encode(o).decode("utf8")
+        elif o and isinstance(o, bytearray):
+            return base64.b64encode(o).decode('utf8')
+        else:
+            return json.JSONEncoder.default(self, o)
 
 class _WebCommandHandler(object):
     def __init__(self, command, protocol):
@@ -122,8 +136,7 @@ class _WebStreamHandler(object):
         injected = kwargs.get("injected", "")
         groups = kwargs.get("groups", None)
         process_id = kwargs.get("process_id", None)
-        #self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
-
+        
         authorized = True
 
         if self.protocol.user != None and self.protocol.user["groups"] != None and groups != None and len(groups) > 0:
@@ -134,9 +147,12 @@ class _WebStreamHandler(object):
                 authorized = False
 
         if authorized and self.protocol.authenticated and not injected == "socketSpine":
-            cmd = {"messageType":"stream", "streamId":self.stream_id, "streamEvent":self.stream_event, "args":args, "data": data}
+            cmd = {"messageType":"stream", "streamId":self.stream_id, "streamEvent":self.stream_event, "args":args}
             jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
-            self.protocol.broadcast_message(self.protocol, jsonres)
+            jsonlen = len(jsonres)
+            jsonres = jsonlen.to_bytes(4, byteorder='little') + jsonres + data
+            #print(jsonlen, jsonres)
+            self.protocol.broadcast_message(self.protocol, jsonres, True)
 
 class _SpineProtocol(WebSocketServerProtocol):
     loop = None
@@ -150,9 +166,10 @@ class _SpineProtocol(WebSocketServerProtocol):
         self._authorization = Authorization()
 
     @classmethod
-    def broadcast_message(cls, connection, json_data):
+    def broadcast_message(cls, connection, data, is_binary=False):
         #for c in set(cls.connections):
-        cls.loop.call_soon_threadsafe(cls.sendMessage, connection, json_data)
+        cls.loop.call_soon_threadsafe(cls.sendMessage, connection, data, is_binary)
+        
 
     def add_command_handler(self, command):
         found = False
@@ -288,7 +305,6 @@ class _SpineProtocol(WebSocketServerProtocol):
                     self.add_event_handler(obj["event"], obj["eventId"])
                     self.send_response(obj["id"], None)
                 elif obj["messageType"] == "registerStreamHandler":
-                    print("o", obj)
                     self.add_stream_handler(obj["streamId"], obj["streamEvent"])
                     self.send_response(obj["id"], None)
         except:

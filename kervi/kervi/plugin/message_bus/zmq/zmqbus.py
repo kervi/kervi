@@ -152,8 +152,8 @@ class ZMQHandlerThread(threading.Thread):
         self._terminate = False
         self._messages = queue.Queue()
 
-    def add_message(self, tag, message):
-        self._messages.put((tag, message))
+    def add_message(self, tag, message, stream_data):
+        self._messages.put((tag, message, stream_data))
 
     def stop(self):
         self._terminate = True
@@ -161,8 +161,8 @@ class ZMQHandlerThread(threading.Thread):
     def run(self):
         while not self._terminate:
             try:
-                tag, message = self._messages.get(True, 1)
-                self._bus._handle_message(tag, message)
+                tag, message, stream_data = self._messages.get(True, 1)
+                self._bus._handle_message(tag, message, stream_data)
                 self._messages.task_done()
             except queue.Empty:
                 pass
@@ -198,7 +198,11 @@ class ZMQMessageThread(threading.Thread):
             connection_message = None
             try:
                 connection_message = self._socket.recv_multipart()
-                [tag, json_message] = connection_message
+                stream_data = None
+                if len(connection_message) == 2:
+                    [tag, json_message] = connection_message
+                if len(connection_message) == 3:
+                    [tag, json_message, stream_data] = connection_message
                 message = json.loads(json_message.decode('utf8'))
                 if tag == b"signal:exit":
                     if not self._bind:
@@ -206,7 +210,7 @@ class ZMQMessageThread(threading.Thread):
                 elif tag == b"queryResponse":
                     self._bus.resolve_response(message)
                 else:
-                    self._bus._add_message(tag.decode('utf-8'), message)
+                    self._bus._add_message(tag.decode('utf-8'), message, stream_data)
             except zmq.ZMQError as e:
                 if e.errno == zmq.EAGAIN:
                     time.sleep(.001)
@@ -367,18 +371,18 @@ class ZMQBus():
             result += [{"process": connection.process_id, "address": connection.address}]
         return result
 
-    def _add_message(self, tag, message):
+    def _add_message(self, tag, message, stream_data):
         with self._message_threads_lock:
             if tag.startswith("query:"):
                 query = ZMQQueryThread(self, tag, message)
                 query.start()
             else:
-                self._message_threads[self._message_thread].add_message(tag, message)
+                self._message_threads[self._message_thread].add_message(tag, message, stream_data)
                 self._message_thread += 1
                 if self._message_thread >= len(self._message_threads):
                     self._message_thread = 0
 
-    def _handle_message(self, tag, message):
+    def _handle_message(self, tag, message, stream_data=None):
         func_list = [] 
         func_list += self._linked_handlers
         functions = self._handlers.get_list_data(tag)
@@ -388,6 +392,17 @@ class ZMQBus():
         if tag.startswith("event:"):
             tag_parts = tag.split(":")
             event = "event:" + tag_parts[1] +":"
+            if event!=tag:
+                functions = self._handlers.get_list_data(event)
+                if functions:
+                    func_list += functions
+
+        
+        stream_event = None
+        if tag.startswith("stream:"):
+            tag_parts = tag.split(":")
+            event = "stream:" + tag_parts[1] +":"
+            stream_event = tag_parts[1]
             if event!=tag:
                 functions = self._handlers.get_list_data(event)
                 if functions:
@@ -427,6 +442,12 @@ class ZMQBus():
                 message_kwargs["query_id"] = message["id"]
             else:
                 message_args += [message["id"]]
+
+        if stream_event:
+            message_args += [stream_event]
+
+        if stream_data:
+            message_args += [stream_data]
 
         response_address = None
         if "responseAddress" in message:
@@ -776,6 +797,7 @@ class ZMQBus():
         event_message = {
             'event':stream_event,
             'id':stream_id,
+            #'data': data,
             'args':args,
             "injected":injected,
             "scope":scope,
@@ -786,7 +808,7 @@ class ZMQBus():
         }
         p = json.dumps(event_message, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')
         event_tag = "stream:" + stream_id + ":" + stream_event + ":"
-        package = [event_tag.encode(), p]
+        package = [event_tag.encode(), p, data]
         self._stream_lock.acquire()
         try:
             self._stream_socket.send_multipart(package)

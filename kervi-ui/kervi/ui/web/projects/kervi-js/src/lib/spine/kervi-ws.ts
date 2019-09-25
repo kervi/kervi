@@ -15,6 +15,7 @@ export class  KerviWSSpine extends KerviSpineBase{
         }
         var self=this;
         this.websocket= new WebSocket(this.options.protocol + "://" + this.options.address);
+        this.websocket.binaryType = 'ArrayBuffer';
         this.websocket.onopen = function(evt) { 
             console.log("kervi spine on open");
             self.onOpen(evt);
@@ -23,11 +24,23 @@ export class  KerviWSSpine extends KerviSpineBase{
         this.websocket.onclose = function(evt) { 
             self.onClose(evt) 
         };
-        
+
         this.websocket.onmessage = function(evt) { 
-            self.onMessage(evt) 
+            if (typeof evt.data === 'string') {
+                var message=JSON.parse(evt.data);
+                self.onMessage(message)
+            } else {
+                evt.data.slice(0, 4).arrayBuffer().then(function(d){
+                    const jsonLen = new Int32Array(d)[0];
+                    const jsonBlob = evt.data.slice(4,jsonLen+4);
+                    const streamBlob = evt.data.slice(4 + jsonLen);
+                    jsonBlob.text().then(function(j){
+                        self.onMessage(JSON.parse(j), streamBlob);
+                    });
+                });
+            }
         };
-        
+
         this.websocket.onerror = function(evt) {
             self.onError(evt) 
         };
@@ -52,9 +65,9 @@ export class  KerviWSSpine extends KerviSpineBase{
         this.websocket.send(JSON.stringify(cmd));
     }
 
-    onMessage(evt){
+    onMessage(message, streamBlob=null){
         //console.log("on m",evt.data);
-        var message=JSON.parse(evt.data);
+        
         var self = this;
         
         if (message.messageType=="authenticate"){
@@ -63,7 +76,7 @@ export class  KerviWSSpine extends KerviSpineBase{
             if (this.options.userName)
                 this.authenticate(this.options.userName, this.options.password)
             else
-                this.options.onAuthenticate.call(this.options.targetScope,evt);
+                this.options.onAuthenticate.call(this.options.targetScope,message);
         }
         else if (message.messageType=="authentication_failed"){
             console.log("authentication failed", this.options.userName);
@@ -75,10 +88,10 @@ export class  KerviWSSpine extends KerviSpineBase{
                 console.log("x", self.options)
                 if (self.options.onLogOff){
                     console.log("x1")
-                    self.options.onLogOff.call(self.options.targetScope,evt);
+                    self.options.onLogOff.call(self.options.targetScope,message);
                 }
             } else
-                this.options.onAuthenticateFailed.call(this.options.targetScope,evt);
+                this.options.onAuthenticateFailed.call(this.options.targetScope,message);
         }
         else if (message.messageType=="session_authenticated"){
             var date = new Date();
@@ -92,13 +105,13 @@ export class  KerviWSSpine extends KerviSpineBase{
             setTimeout(function(){
                 console.log("to", self.options);
                 if (self.options.onOpen)
-                    self.options.onOpen.call(self.options.targetScope, self.firstOnOpen,evt);
+                    self.options.onOpen.call(self.options.targetScope, self.firstOnOpen,message);
                     self.firstOnOpen = false;
             }, 100
             );
         } else if (message.messageType == "session_logoff"){ 
             if (self.options.onLogOff)
-                self.options.onLogOff.call(self.options.targetScope,evt);
+                self.options.onLogOff.call(self.options.targetScope,message);
             if (this.allowAnonymous && this.options.userName != "anonymous"){
                 this.authenticate("anonymous", null)
             } else {
@@ -111,11 +124,11 @@ export class  KerviWSSpine extends KerviSpineBase{
         else if (message.messageType=="event")
             this.handleEvent(message);
         else if (message.messageType=="stream")
-            this.handleStream(message);
+            this.handleStream(message, streamBlob);
         else if (message.messageType=="command")
             this.handleCommand(message);
         else
-            console.log("Kervi spine message unknown",this.rpcQueue,evt);
+            console.log("Kervi spine message unknown",this.rpcQueue, message);
     }
 
     onError(evt){

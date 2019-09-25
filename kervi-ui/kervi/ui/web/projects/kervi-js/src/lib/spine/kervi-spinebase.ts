@@ -125,19 +125,14 @@ export class  KerviSpineBase{
         }
     }
 
-    protected handleStream(message) {
-        console.log('ev', message);
+    protected handleStream(message, streamBlob) {
         const streamTag = message.streamId + '/' + message.streamEvent ;
-        let value = null;
-        if (message.args && message.args.length){
-            value = message.args[0];
-        }
-        for(let n = 0; (n < this.streamHandlers.length); n++) {
+        for (let n = 0; (n < this.streamHandlers.length); n++) {
             const h = this.streamHandlers[n];
             if (h.streamTag === streamTag) {
-                h.callback.call(message.streamId, message.streamEvent, value);
+                h.callback.call(message.streamId, message.streamId, message.streamEvent, streamBlob);
             } else if (h.streamTag === message.streamId) {
-                h.callback.call(message.streamId, message.streamEvent,value);
+                h.callback.call(message.streamId, message.streamId, message.streamEvent, streamBlob);
             }
         }
     }
