@@ -64,7 +64,7 @@ class CameraBase(Controller):
         self.pan = self.outputs.add("pan", "Pan", NumberValue)
         self.tilt = self.outputs.add("tilt", "Tilt", NumberValue)
 
-        self.fpsc = self.outputs.add("fpsc", "Frames pr second", NumberValue)
+        self.streamed_fps = self.outputs.add("stream_fps", "Streamed frames pr second", NumberValue)
         
 
         self.flip_vertical = kwargs.get("flip_vertical", False)
@@ -584,7 +584,7 @@ class CameraStreamer(CameraBase):
                 #print("FPS: ", self.fpc_counter, seconds, fpc)
                 self.fpc_counter = 0
                 self.fpc_start_time = time.time()
-                self.fpsc.value = fpc
+                self.streamed_fps.value = fpc
             buf = BytesIO()
             self.current_frame.save(buf, format='png')
             data = buf.getvalue()
@@ -608,6 +608,7 @@ class CameraStreamer(CameraBase):
                 image.save(output, "PNG")
             else:
                 self.current_frame.save(output, "PNG")
+                self.spine.stream_data(self.component_id,"LAST_PICTURE", output)
 
             from kervi.io import save_file
             output.seek(0)

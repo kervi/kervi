@@ -214,7 +214,7 @@ export class  KerviSpineBase{
         
     };
 
-    public addStreamHandler = function(streamId: string, streamEvent: string, callback){
+    public addStreamHandler = function(streamId: string, streamEvent: string[], callback){
         
     };
 

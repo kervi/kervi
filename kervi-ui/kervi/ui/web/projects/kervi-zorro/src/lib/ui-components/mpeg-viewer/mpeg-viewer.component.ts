@@ -31,7 +31,7 @@ export class MPEGViewerComponent implements OnInit{
 
   ngOnInit() {
     const self = this;
-    this.stream = this.kerviService.GetStream(this.cameraSource);
+    this.stream = this.kerviService.GetStream(this.cameraSource, ['IMAGE_FRAME']);
     this.stream.events$.subscribe( function(event) {
       //console.log('ce', event);
       if (event) {

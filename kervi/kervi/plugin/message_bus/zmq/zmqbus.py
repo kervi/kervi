@@ -822,10 +822,10 @@ class ZMQBus():
     def register_stream_handler(self, stream_id, func, stream_event=None, **kwargs):
         tag = "stream:" + stream_id + ":"
         if stream_event:
-            tag +=  stream_event
+            tag +=  stream_event + ":"
         if func:
             self._register_handler(tag, func, **kwargs)
-        self._event_handler.register(tag)
+        self._stream_handler.register(tag)
         self._message_handler.register(tag)
 
     def unregister_stream_handler(self, stream_id, func, stream_event=None, **kwargs):
@@ -835,7 +835,7 @@ class ZMQBus():
         
         if func:
             self._unregister_handler(tag, func, **kwargs)
-        self._event_handler.unregister(tag)
+        self._stream_handler.unregister(tag)
         self._message_handler.unregister(tag)
 
     def resolve_response(self, message):

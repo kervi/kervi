@@ -157,15 +157,30 @@ export class  KerviWSSpine extends KerviSpineBase{
         this.websocket.send(JSON.stringify(cmd));
     };
 
-    public addStreamHandler = function(streamId: string, streamEvent: string, callback) {
-        if (streamEvent) {
-            this.streamHandlers.push({'streamTag': streamId + '/' + streamEvent,callback:callback});
+    public addStreamHandler = function(streamId: string, streamEvents: string[], callback) {
+        if (streamEvents && streamEvents.length > 0) {
+            for (let event of streamEvents) {
+                this.streamHandlers.push({'streamTag': streamId + '/' + event, callback: callback});
+                const cmd = {
+                    id: this.messageId++,
+                    'messageType': 'registerStreamHandler',
+                    'streamId': streamId,
+                    'streamEvent': event
+                };
+                console.log("as", cmd);
+                this.websocket.send(JSON.stringify(cmd));
+            }
         } else {
             this.streamHandlers.push({'streamTag': streamId, callback: callback});
+            const cmd = {
+                id: this.messageId++,
+                'messageType': 'registerStreamHandler',
+                'streamId': streamId,
+                'streamEvent': event
+            };
+            console.log('as', cmd);
+            this.websocket.send(JSON.stringify(cmd));
         }
-        const cmd = {id: this.messageId++, 'messageType': 'registerStreamHandler', 'streamId': streamId, 'streamEvent': streamEvent};
-        console.log("as", cmd);
-        this.websocket.send(JSON.stringify(cmd));
     };
 
     public sendCommand(command:string,...p:any[]){

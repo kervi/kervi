@@ -138,7 +138,6 @@ class _WebStreamHandler(object):
         process_id = kwargs.get("process_id", None)
         
         authorized = True
-
         if self.protocol.user != None and self.protocol.user["groups"] != None and groups != None and len(groups) > 0:
             for group in groups:
                 if group in self.protocol.user["groups"]:
@@ -199,7 +198,10 @@ class _SpineProtocol(WebSocketServerProtocol):
         found = False
         for stream_handler in self.handlers["stream"]:
             if stream_handler.stream_id == stream_id:
-                found = True
+                if stream_event and stream_handler.stream_event == stream_event:
+                    found = True
+                elif not stream_event:
+                    found = True
         if not found:
             self.handlers["event"] += [_WebStreamHandler(stream_id, stream_event, self)]
 

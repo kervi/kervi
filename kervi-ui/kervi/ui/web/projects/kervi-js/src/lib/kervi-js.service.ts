@@ -144,8 +144,8 @@ export class KerviBaseService {
     return promise;
   }
 
-  public GetStream(streamId: string) {
-    return new Stream(streamId, [], this);
+  public GetStream(streamId: string, events = []) {
+    return new Stream(streamId, events, this);
   }
 
   public text(key: string, defaultValue: string= ''): string {

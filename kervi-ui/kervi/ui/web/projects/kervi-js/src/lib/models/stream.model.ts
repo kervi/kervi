@@ -18,10 +18,15 @@ export class Stream {
 
     constructor(private streamId: string, private events: string[], private kerviService: KerviBaseService){
         const self = this;
-        // this.events$ =  new BehaviorSubject<StreamEvent>(null)
-        kerviService.spine.addStreamHandler(streamId, null, function(estreamId: string, estreamEvent: string, edata: any) {
-                const event = new StreamEvent(estreamId, estreamEvent, edata);
+        kerviService.spine.addStreamHandler(streamId, events, function(e_streamId: string, e_streamEvent: string, e_data: any) {
+            const event = new StreamEvent(e_streamId, e_streamEvent, e_data);
+            let notify = false;
+            if (events === null || events.length === 0 || events.indexOf(e_streamEvent) >= 0) {
+                notify = true;
+            }
+            if (notify) {
                 self.events$.next(event);
+            }
         });
     }
 
