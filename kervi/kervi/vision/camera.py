@@ -95,7 +95,7 @@ class CameraBase(Controller):
         self._ui_parameters["show_pan_tilt"] = kwargs.get("show_pan_tilt", False)
         self._ui_parameters["show_buttons"] = kwargs.get("show_buttons", True)
 
-        self.spine.register_query_handler(camera_id + ".getMedia", self._get_media)
+        #self.spine.register_query_handler(camera_id + ".getMedia", self._get_media)
 
     def input_changed(self, changed_input):
         if changed_input == self.inputs["pan"]:
