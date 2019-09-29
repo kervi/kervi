@@ -3,25 +3,26 @@ import time
 from kervi.controllers import Controller
 from kervi.values import NumberValue
 
-class StreamObserver(Controller):
-    def __init__(self, stream_id, stream_event, observer_id, handler=None, name="stream", observer_type="stream_observer"):
+class RegionObserver(Controller):
+    def __init__(self, stream_id, region_group, observer_id, handler=None, name="stream", observer_type="stream_observer"):
         Controller.__init__(self, observer_id, name)
         self.type = observer_type
         self.observer_id = observer_id
         self.stream_id = stream_id
-        self.stream_event = stream_event
+        self.region_group = region_group
         self._epc_start_time = time.time()
         self._epc_counter = 0
         self._handler = handler
 
         self.streamed_eps = self.outputs.add("source_eps", "Events per second", NumberValue)
 
-        self.spine.register_stream_handler(stream_id, self._on_event, stream_event)
+        self.spine.register_event_handler("visionRegionChange",self._on_event, stream_id)
 
     def __call__(self, *args, **kwargs):
         return self._handler(*args, **kwargs)
 
-    def _on_event(self, stream_id, stream_event, data):
+    def _on_event(self, region_id, region_data):
+        #print("oev",region_id, region_data, data)
         self._epc_counter += 1
         seconds = time.time() - self._epc_start_time 
         if (seconds) > 1 :
@@ -30,7 +31,7 @@ class StreamObserver(Controller):
             self._epc_counter = 0
             self._epc_start_time = time.time()
             self.streamed_eps.value = epc
-        self.on_event(stream_event, data)
+        self.on_event(region_data["action"], region_data["region"])
 
     
     def on_event(self, stream_event, data):

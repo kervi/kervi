@@ -1,8 +1,12 @@
 
 
-def stream_data(stream_id, event, image_data):
+def stream_data(stream_id, event, data):
     from kervi.spine import Spine
-    Spine().stream_data(stream_id,event, image_data)
+    Spine().stream_data(stream_id,event, data)
+
+def stream_images(stream_id, image_data, event="IMAGE_FRAME"):
+    from kervi.spine import Spine
+    Spine().stream_data(stream_id, event, image_data,)
 
 from kervi.streams.stream_observer import StreamObserver
 from kervi.streams._stream_observers import stream_observers
@@ -35,7 +39,6 @@ def stream_observer(method=None, **kwargs) -> StreamObserver:
     """
 
     def stream_wrap(f):
-        print("sw", f)
         stream_id = kwargs.pop("stream_id", None)
         stream_event = kwargs.pop("stream_event", None)
         observer_id = kwargs.pop("observer_id", f.__name__)
