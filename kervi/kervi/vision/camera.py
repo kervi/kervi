@@ -527,7 +527,11 @@ class CameraStreamer(CameraBase):
     """
     def __init__(self, camera_id, name, camera_source = None, **kwargs):
         CameraBase.__init__(self, camera_id, name, type="frame", **kwargs)
-        self._device_driver = hal.get_camera_driver(camera_source)
+        if camera_source == "kervi_test_driver":
+            from .test_camera_driver import TestCameraDriver
+            self._device_driver = TestCameraDriver()
+        else:
+            self._device_driver = hal.get_camera_driver(camera_source)
 
         self._device_driver.camera = self
         self._frame_format = self._device_driver.buffer_type
@@ -608,7 +612,7 @@ class CameraStreamer(CameraBase):
                 image.save(output, "PNG")
             else:
                 self.current_frame.save(output, "PNG")
-                self.spine.stream_data(self.component_id,"LAST_PICTURE", output)
+                #self.spine.stream_data(self.component_id,"LAST_PICTURE", output)
 
             from kervi.io import save_file
             output.seek(0)

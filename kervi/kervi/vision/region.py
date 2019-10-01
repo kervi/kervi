@@ -41,7 +41,8 @@ class _Regions:
         self._regions[region.region_id] = region
 
     def clear(self, region_group=None, stream_id=None):
-        for region in self._regions:
+        for region_id in list(self._regions):
+            region = self._regions[region_id]
             invalidate = False
             if not region_group and not stream_id:
                 invalidate = True
@@ -56,7 +57,11 @@ class _Regions:
     def remove(self, region):
             del self._regions[region.region_id]
 
-Regions = _Regions()
+Regions = None
+
+if not Regions:
+    Regions = _Regions()
+
 
 class Region:
     def __init__(self, region_group, stream_id, position_x, position_y, caption=None, width=0, height=0, focus_x=None, focus_y=None, text=None, region_id=None):

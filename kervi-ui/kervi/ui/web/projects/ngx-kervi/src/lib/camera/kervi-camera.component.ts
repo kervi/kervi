@@ -67,9 +67,10 @@ export class KerviCameraComponent {
         var self = this;
         if (!this.linkParameters)
               this.linkParameters = this.camera.ui;
-    
+
         if (!this.inline && this.linkParameters.inline){
             this.inline = true;
-		}
+        }
+
     }
 }

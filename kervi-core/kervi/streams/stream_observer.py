@@ -1,5 +1,6 @@
 
 import time
+from threading import Lock
 from kervi.controllers import Controller
 from kervi.values import NumberValue
 
@@ -13,6 +14,8 @@ class StreamObserver(Controller):
         self._epc_start_time = time.time()
         self._epc_counter = 0
         self._handler = handler
+        self._lock = Lock()
+        
 
         self.streamed_eps = self.outputs.add("source_eps", "Events per second", NumberValue)
 
@@ -30,12 +33,14 @@ class StreamObserver(Controller):
             self._epc_counter = 0
             self._epc_start_time = time.time()
             self.streamed_eps.value = epc
-        self.on_event(stream_event, data)
+        if self._lock.acquire(False):
+            self.on_event(stream_event, data)
+            self._lock.release()
 
     
     def on_event(self, stream_event, data):
         if self._handler:
-            self._handler(stream_event, data)
+            self._handler(self, stream_event, data)
 
     def link_to_dashboard(self, dashboard_id=None, panel_id=None, **kwargs):
         r"""

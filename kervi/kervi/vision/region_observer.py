@@ -36,7 +36,7 @@ class RegionObserver(Controller):
     
     def on_event(self, stream_event, data):
         if self._handler:
-            self._handler(stream_event, data)
+            self._handler(self, stream_event, data)
 
     def link_to_dashboard(self, dashboard_id=None, panel_id=None, **kwargs):
         r"""

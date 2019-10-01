@@ -203,7 +203,7 @@ class _SpineProtocol(WebSocketServerProtocol):
                 elif not stream_event:
                     found = True
         if not found:
-            self.handlers["event"] += [_WebStreamHandler(stream_id, stream_event, self)]
+            self.handlers["stream"] += [_WebStreamHandler(stream_id, stream_event, self)]
 
     def send_response(self, id, response, state="ok", message=""):
         res = {

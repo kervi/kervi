@@ -18,7 +18,7 @@ export class  KerviSpineBase{
     controllers={};
     sensorTypes=[];
     controllerTypes=[];
-    pointOfInterests=[];
+    visionRegions=[];
     application=null;
     allowAnonymous = true;
     firstOnOpen = true;
