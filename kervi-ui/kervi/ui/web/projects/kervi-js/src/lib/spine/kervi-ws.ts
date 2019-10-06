@@ -15,43 +15,39 @@ export class  KerviWSSpine extends KerviSpineBase{
         }
         var self=this;
         this.websocket= new WebSocket(this.options.protocol + "://" + this.options.address);
-        this.websocket.binaryType = 'ArrayBuffer';
+        this.websocket.binaryType = 'arraybuffer';
         this.websocket.onopen = function(evt) { 
             console.log("kervi spine on open");
             self.onOpen(evt);
         };
-        
-        this.websocket.onclose = function(evt) { 
-            self.onClose(evt) 
+
+        this.websocket.onclose = function(evt) {
+            self.onClose(evt) ;
         };
 
-        this.websocket.onmessage = function(evt) { 
+        this.websocket.onmessage = function(evt) {
             if (typeof evt.data === 'string') {
-                var message=JSON.parse(evt.data);
-                self.onMessage(message)
+                const message = JSON.parse(evt.data);
+                self.onMessage(message);
             } else {
-                evt.data.slice(0, 4).arrayBuffer().then(function(d){
-                    const jsonLen = new Int32Array(d)[0];
-                    const jsonBlob = evt.data.slice(4,jsonLen+4);
-                    const streamBlob = evt.data.slice(4 + jsonLen);
-                    jsonBlob.text().then(function(j){
-                        self.onMessage(JSON.parse(j), streamBlob);
-                    });
-                });
+                const jsonLen = new Int32Array(evt.data.slice(0, 4))[0];
+                const jsonBlob = evt.data.slice(4, jsonLen + 4);
+                const streamBlob = evt.data.slice(4 + jsonLen);
+                const utf8decoder = new TextDecoder();
+                const j = utf8decoder.decode(jsonBlob);
+                self.onMessage(JSON.parse(j), streamBlob);
             }
         };
 
         this.websocket.onerror = function(evt) {
-            self.onError(evt) 
+            self.onError(evt);
         };
     }
 
     public authenticate(userName, password){
         this.options.userName = userName;
         this.options.password = password;
-        //if (this.options.onAuthenticateStart)
-        //	this.options.onAuthenticateStart.call(this.options.targetScope);
-        var cmd={id:this.messageId++,"messageType":"authenticate","userName":userName, "password": password};
+        var cmd = {id:this.messageId++, "messageType":"authenticate","userName":userName, "password": password};
         console.log("swa", cmd);
         this.websocket.send(JSON.stringify(cmd));
     }

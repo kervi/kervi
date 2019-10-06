@@ -1,65 +1,60 @@
-import { Component, ElementRef,AfterViewInit, ViewChild } from '@angular/core';
-import { KerviCameraComponent } from 'ngx-kervi'
-declare var window:any;
+import { Component, ElementRef, OnInit, AfterViewInit, ViewChild, Input } from '@angular/core';
+import { KerviCameraComponent } from 'ngx-kervi';
+declare var window: any;
 
 @Component({
   selector: 'kervi-cam-viewer',
   templateUrl: './cam-viewer.component.html',
   styleUrls: ['./cam-viewer.component.css']
 })
-export class CamViewerComponent extends KerviCameraComponent implements AfterViewInit {
+export class CamViewerComponent extends KerviCameraComponent implements OnInit, AfterViewInit {
   public camHeight: number;
   public camWidth: number;
   public camPadLeft: number;
   public camPadTop: number;
-  public showCamPad: boolean = false;
-  @ViewChild("videoViewer") videoViewer: ElementRef;
+  public showCamPad = false;
+  @Input()
+  public selectedSource: string; 
+  @ViewChild('videoViewer') videoViewer: ElementRef;
   padSize = 180;
   constructor(private elementRef: ElementRef) {
     super();
   }
 
-  imageLoaded(){
-      var h = this.videoViewer.nativeElement.offsetHeight;
-      var w = this.elementRef.nativeElement.offsetWidth;
-       //this.camPadTop = h / 2 - this.padSize/2;
-       //this.camPadLeft = w / 2 - this.padSize/2;
+  imageLoaded() {
   }
 
-  ngAfterViewInit(){
-    var self = this; 
-    var element = self.videoViewer.nativeElement;
-    var viewPortHeight = window.innerHeight;
-    var viewPortWidth = window.innerWidth;
+  ngAfterViewInit() {
+    const self = this;
+    const element = self.videoViewer.nativeElement;
+    const viewPortHeight = window.innerHeight;
+    const viewPortWidth = window.innerWidth;
 
     this.camHeight = viewPortHeight - 65;
     this.camWidth = viewPortWidth;
-    console.log("avic", this.camHeight,this.camWidth);
-    
+    console.log('avic', this.camHeight, this.camWidth);
+
     setTimeout(() => {
-      
-      var h = element.offsetHeight;
-      var w = element.offsetWidth;
-      if (w < self.padSize){
-        self.padSize=w-10;
-          //jQuery(".camPad", self.elementRef.nativeElement).css({ width: self.padSize, height:  self.padSize });
+
+      const h = element.offsetHeight;
+      const w = element.offsetWidth;
+      if (w < self.padSize) {
+        self.padSize = w - 10;
       }
-      console.log("cami", h,w, self.padSize, element);
-      self.camPadTop = h / 2 - (self.padSize/2)
+      console.log('cami', h, w, self.padSize, element);
+      self.camPadTop = h / 2 - (self.padSize / 2);
       self.camPadLeft =  w / 2 - (self.padSize / 2);
       self.showCamPad = true;
     }, 0);
-
-    // jQuery(window).bind('resize', function () {
-    //     var h = element.offsetHeight;
-    //     var w = element.offsetWidth;
-    //     self.camPadTop = h / 2 - (self.padSize/2)
-    //     self.camPadLeft =  w / 2 - (self.padSize / 2);
-    // })
-  };
-  
+  }
 
   ngOnInit() {
     this.ngOnInitCamera();
+    this.selectedSource = this.cameraSource;
+  }
+
+  changeSource(source: string) {
+    console.log("cs", source);
+    this.selectedSource = source;
   }
 }

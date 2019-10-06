@@ -13,44 +13,54 @@ import { AppInjector } from '../app-injector.service';
   styleUrls: [],
 })
 export class KerviCameraComponent {
-    private cam:Controller;
-    @Input() set cameraId(id: string){
-        console.log("setcamid", id);
+    public streamObservers: Controller[] = [];
+    private cam: Controller;
+
+    @Input() set cameraId(id: string) {
+        console.log('setcamid', id);
 
         this.camera = this.kerviService.getComponent(id) as Controller;
     };
-    @Input() set camera(v:Controller){
-        console.log("setcam", v);
+    @Input() set camera(v: Controller) {
+        console.log('setcam', v);
         this.cam = v;
-        for(var i of v.outputs){
-        if (i.id.endsWith(".pan"))
-            this.pan=i as NumberValue;
-        else if (i.id.endsWith(".tilt"))
-            this.tilt=i as NumberValue;
+        for (let i of v.outputs) {
+            if (i.id.endsWith('.pan')) {
+                this.pan = i as NumberValue;
+            } else if (i.id.endsWith('.tilt')) {
+                this.tilt = i as NumberValue;
+            }
         }
-        this.cameraType = v.ui.type; 
-        if (this.cameraType == "frame" ){
-            if (v.ui.source){
-              //this.cameraSource = v.ui.source.server + v.ui.source.path;
-              this.cameraSource = this.cam.id;
+        this.cameraType = v.ui.type;
+        if (this.cameraType === 'frame' ) {
+            if (v.ui.source) {
+                this.cameraSource = this.cam.id;
             }
             this.cameraSource = this.cam.id;
         }
+        const controllers = this.kerviService.getComponentsByType('controller');
+        for (let controller of controllers) {
+            if (controller.type === 'stream_observer') {
+                if (controller.ui.sourceStream === this.cameraSource) {
+                    this.streamObservers.push(controller);
+                }
+            }
+        }
+        console.log("obs", this.streamObservers);
+    }
 
-    };
-
-    get camera(){ return this.cam; }
+    get camera() { return this.cam; }
     @Input() linkParameters: any = null;
     @Input() inline = false;
     @Input() dashboardSizes = new DashboardSizes();
     @Input() isBackground = false;
-  
-    protected kerviService:NGXKerviService;
-    public pan:NumberValue;
-    public tilt:NumberValue;
-    public cameraType:string;
-	public cameraSource:string;
-    constructor() { 
+
+    protected kerviService: NGXKerviService;
+    public pan: NumberValue;
+    public tilt: NumberValue;
+    public cameraType: string;
+    public cameraSource: string;
+    constructor() {
         this.kerviService = AppInjector.get(NGXKerviService);
     }
 
@@ -71,6 +81,7 @@ export class KerviCameraComponent {
         if (!this.inline && this.linkParameters.inline){
             this.inline = true;
         }
+
 
     }
 }

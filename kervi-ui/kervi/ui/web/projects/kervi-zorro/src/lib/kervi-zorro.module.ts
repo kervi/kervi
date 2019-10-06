@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { NgxKerviModule, NGXKerviPipesModule  } from 'ngx-kervi'
 import { DashboardPanelComponent } from './dashboard-panel/dashboard-panel.component';
 import { WidgetComponent } from './widget/widget.component';
@@ -12,7 +13,6 @@ import { UIComponentsModule} from './ui-components/ui-components.module'
 import { UserLogComponent} from './log/user-log/user-log.component'
 import { UserMessagesComponent } from './log/messages/messages.component'
 import { UserMessageButtonComponent } from './log/message-button/message-button.component'
-import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { FlexLayoutModule } from '@angular/flex-layout';
 @NgModule({
   imports: [

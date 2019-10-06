@@ -150,7 +150,7 @@ class _WebStreamHandler(object):
             jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
             jsonlen = len(jsonres)
             jsonres = jsonlen.to_bytes(4, byteorder='little') + jsonres + data
-            #print(jsonlen, jsonres)
+            #print(cmd)
             self.protocol.broadcast_message(self.protocol, jsonres, True)
 
 class _SpineProtocol(WebSocketServerProtocol):

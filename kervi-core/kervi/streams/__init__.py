@@ -6,7 +6,7 @@ def stream_data(stream_id, event, data):
 
 def stream_images(stream_id, image_data, event="IMAGE_FRAME"):
     from kervi.spine import Spine
-    Spine().stream_data(stream_id, event, image_data,)
+    Spine().stream_data(stream_id, event, image_data)
 
 from kervi.streams.stream_observer import StreamObserver
 from kervi.streams._stream_observers import stream_observers

@@ -304,6 +304,8 @@ class ZMQBus():
         self._stream_lock = threading.Lock()
         self._query_lock = threading.Lock()
 
+        self._observed_streams = []
+
         self.register_query_handler("GetRoutingInfo", self._get_routing_info)
 
     def _get_routing_info(self):
@@ -400,9 +402,19 @@ class ZMQBus():
         
         stream_event = None
         if tag.startswith("stream:"):
+            
             tag_parts = tag.split(":")
             event = "stream:" + tag_parts[1] +":"
-            stream_event = tag_parts[1]
+            if len(tag_parts)>2:
+                stream_event = tag_parts[2]
+            
+            try:
+                self._observed_streams.index(tag)
+            except ValueError:
+                #print("s", tag, event, stream_event, self._process_id)
+                self._observed_streams.append(tag)
+
+            
             if event!=tag:
                 functions = self._handlers.get_list_data(event)
                 if functions:
@@ -825,6 +837,8 @@ class ZMQBus():
             tag +=  stream_event + ":"
         if func:
             self._register_handler(tag, func, **kwargs)
+        
+        #print("rsh", self._process_id, tag, func)
         self._stream_handler.register(tag)
         self._message_handler.register(tag)
 

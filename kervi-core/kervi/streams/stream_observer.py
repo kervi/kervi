@@ -3,6 +3,7 @@ import time
 from threading import Lock
 from kervi.controllers import Controller
 from kervi.values import NumberValue
+from kervi.streams import stream_data
 
 class StreamObserver(Controller):
     def __init__(self, stream_id, stream_event, observer_id, handler=None, name="stream", observer_type="stream_observer"):
@@ -15,8 +16,10 @@ class StreamObserver(Controller):
         self._epc_counter = 0
         self._handler = handler
         self._lock = Lock()
-        
 
+        self._ui_parameters["source_stream"] = stream_id
+        self._ui_parameters["stream"] = stream_id + "." + self.observer_id
+        
         self.streamed_eps = self.outputs.add("source_eps", "Events per second", NumberValue)
 
         self.spine.register_stream_handler(stream_id, self._on_event, stream_event)
@@ -29,18 +32,20 @@ class StreamObserver(Controller):
         seconds = time.time() - self._epc_start_time 
         if (seconds) > 1 :
             epc = self._epc_counter / seconds
-            #print("FPS: ", self.fpc_counter, seconds, fpc)
             self._epc_counter = 0
             self._epc_start_time = time.time()
             self.streamed_eps.value = epc
         if self._lock.acquire(False):
-            self.on_event(stream_event, data)
+            observer_res = self.on_event(stream_event, data)
+            if observer_res:
+                #print("os", stream_id + "." + self.observer_id, stream_event)
+                stream_data(stream_id + "." + self.observer_id, stream_event, observer_res)
             self._lock.release()
 
-    
     def on_event(self, stream_event, data):
         if self._handler:
-            self._handler(self, stream_event, data)
+            return self._handler(self, stream_event, data)
+        return None
 
     def link_to_dashboard(self, dashboard_id=None, panel_id=None, **kwargs):
         r"""
