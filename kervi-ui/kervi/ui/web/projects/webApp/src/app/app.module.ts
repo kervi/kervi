@@ -16,11 +16,12 @@ import { LoginComponent } from './login/login.component';
 import { ConnectComponent } from './connect/connect.component';
 import { Routes, RouterModule } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { MediaComponent } from './media/media.component' ;
 import { NgxKerviModule } from 'ngx-kervi';
 import { NGXKerviPipesModule } from 'ngx-kervi'
 import { KerviZorroModule  } from 'kervi-zorro'
 import { FlexLayoutModule } from '@angular/flex-layout';
-
+import { ImgViewerComponent } from './image-viewer/image-viewer.component'
 
 
 registerLocaleData(en);
@@ -32,10 +33,11 @@ const icons: IconDefinition[] = Object.keys(antDesignIcons).map(key => antDesign
 
 
 const ROUTES: Routes = [
-  
+
   { path: 'connect', component: ConnectComponent },
   { path: 'authenticate', component: LoginComponent },
   { path: 'dashboard/:name', component: DashboardComponent },
+  { path: 'media', component: MediaComponent },
   {
     path: '',
     redirectTo: '',
@@ -48,7 +50,9 @@ const ROUTES: Routes = [
     AppComponent,
     LoginComponent,
     ConnectComponent,
-    DashboardComponent
+    DashboardComponent,
+    MediaComponent,
+    ImgViewerComponent
   ],
   imports: [
     FormsModule,

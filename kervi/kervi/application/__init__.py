@@ -83,7 +83,6 @@ def _pretty_print(d, indent=0):
 class _AppActions(Controller):
     def __init__(self, app):
         super().__init__("app", "App controller")
-
         self._app = app
 
     @action(confirm=True, confirm_message="Shutdown device")
@@ -115,6 +114,7 @@ class Application(object):
         print("\033[92mStarting kervi application \033[0m")
         import inspect
         import getopt
+        self.char_list = []
         self._websocket_event = threading.Event()
         self._in_stop = False
         self._discovery_thread = None
@@ -380,9 +380,13 @@ class Application(object):
             ]
 
         #print("wait for ready")
-        while not self._is_ready():
-            time.sleep(1)
-
+        try:
+            while not self.char_list and not self._is_ready():
+                #print(self.char_list)
+                time.sleep(1)
+        except KeyboardInterrupt:
+            pass
+        
         #print("pi", self._process_info)
 
         if not self._in_stop:
@@ -424,13 +428,11 @@ class Application(object):
 
     def run(self):
         """Run the application loop. The application will continue until termination with ctrl-c"""
-
+        thread.start_new_thread(self._input_thread, (self.char_list,))
         if not self.started:
             self._start()
         try:
-            char_list = []
-            thread.start_new_thread(self._input_thread, (char_list,))
-            while not char_list and _app_running:
+            while not self.char_list and _app_running:
                 self._check_kervi_modules()
                 time.sleep(1)
 

@@ -1,6 +1,6 @@
 import { Component, ElementRef,AfterViewInit, ViewChild } from '@angular/core';
 import { KerviCameraComponent } from 'ngx-kervi'
-declare var window:any;
+declare var window: any;
 
 @Component({
   selector: 'kervi-cam-viewer',
@@ -8,20 +8,20 @@ declare var window:any;
   styleUrls: ['./cam-viewer.component.css']
 })
 export class CamViewerComponent extends KerviCameraComponent implements AfterViewInit {
-  public camHeight:number;
-  public camWidth:number;
-  public camPadLeft:number;
-  public camPadTop:number;
-  public showCamPad:boolean = false;
-  @ViewChild("videoViewer") videoViewer:ElementRef;
-  padSize:number=180;
-  constructor(private elementRef: ElementRef) { 
+  public camHeight: number;
+  public camWidth: number;
+  public camPadLeft: number;
+  public camPadTop: number;
+  public showCamPad = false;
+  @ViewChild("videoViewer") videoViewer: ElementRef;
+  padSize= 180;
+  constructor(private elementRef: ElementRef) {
     super();
   }
 
   imageLoaded(){
-      var h = this.videoViewer.nativeElement.offsetHeight;
-      var w = this.elementRef.nativeElement.offsetWidth;
+      //var h = this.videoViewer.nativeElement.offsetHeight;
+      //var w = this.elementRef.nativeElement.offsetWidth;
        //this.camPadTop = h / 2 - this.padSize/2;
        //this.camPadLeft = w / 2 - this.padSize/2;
   }

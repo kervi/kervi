@@ -188,14 +188,14 @@ export class Dashboard implements IComponent{
     public RightPadYPanel: DashboardPanel=null;
     //public background: DashboardBackgroundModel=null;
     public unitSize: number;
-    
+
     //not used in dashboards
     public visible:boolean;
     public ui:any;
     public dashboards:any[] = [];
 
     private currentPanel:DashboardPanel = null;
-    
+ 
     constructor(message){
         this.id=message.id;
         this.name=message.name;

@@ -1,3 +1,17 @@
 .dashboard-panels-hidden{
     display: none;
 }
+
+::ng-deep .vertical-center-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index:4000;
+    /* width:90%; */
+    height:90%;
+    
+  }
+
+  ::ng-deep .vertical-center-modal .ant-modal {
+    top: 0;
+  }

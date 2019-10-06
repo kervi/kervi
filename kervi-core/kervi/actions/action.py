@@ -287,7 +287,7 @@ class Action(KerviComponent):
             "height":0
         }
 
-        self._ui_parameters["type"] = "button"
+        self._ui_parameters["display_type"] = "button"
         self._ui_parameters["on_text"] = "On"
         self._ui_parameters["off_text"] = "Off"
         self._ui_parameters["on_icon"] = None
@@ -395,6 +395,46 @@ class Action(KerviComponent):
 
     def set_start_message(self, message, message_level, **kwargs):
         self._set_message("start", level=message_level)
+
+    @property
+    def start_message_enabled(self):
+        return self._action_messages["start"]["active"] 
+
+    @start_message_enabled.setter
+    def start_message_enabled(self, v):
+        self._action_messages["start"]["active"] = v
+
+    @property
+    def stop_message_enabled(self):
+        return self._action_messages["stop"]["active"] 
+
+    @stop_message_enabled.setter
+    def stop_message_enabled(self, v):
+        self._action_messages["stop"]["active"] = v
+
+    @property
+    def failed_message_enabled(self):
+        return self._action_messages["failed"]["active"] 
+
+    @failed_message_enabled.setter
+    def failed_message_enabled(self, v):
+        self._action_messages["failed"]["active"] = v
+
+    @property
+    def interrupt_message_enabled(self):
+        return self._action_messages["interrupted"]["active"] 
+
+    @interrupt_message_enabled.setter
+    def interrupt_message_enabled(self, v):
+        self._action_messages["interrupted"]["active"] = v
+
+    @property
+    def progress_message_enabled(self):
+        return self._action_messages["progress"]["active"] 
+
+    @progress_message_enabled.setter
+    def progress_message_enabled(self, v):
+        self._action_messages["progress"]["active"] = v
 
     def _execute(self, *args, **kwargs):
         kwargs.pop("injected", None) # signaling from zmq bus

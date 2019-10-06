@@ -55,12 +55,17 @@ class CameraBase(Controller):
     def __init__(self, camera_id, name, **kwargs):
         Controller.__init__(self, camera_id, name)
         self.type = "camera"
-        self.media_config = Configuration.media
+        #self.media_config = Configuration.media
         self.inputs.add("pan", "Pan", NumberValue)
         self.inputs.add("tilt", "Tilt", NumberValue)
+        self.fpc_start_time = time.time()
+        self.fpc_counter = 0
 
         self.pan = self.outputs.add("pan", "Pan", NumberValue)
         self.tilt = self.outputs.add("tilt", "Tilt", NumberValue)
+
+        self.streamed_fps = self.outputs.add("stream_fps", "Streamed frames pr second", NumberValue)
+        
 
         self.flip_vertical = kwargs.get("flip_vertical", False)
         self.flip_horizontal = kwargs.get("flip_horizontal", False)
@@ -70,27 +75,27 @@ class CameraBase(Controller):
 
         self.actions["take_picture"].set_ui_parameter("button_icon", "camera")
         self.actions["take_picture"].set_ui_parameter("inline", True)
-        self.actions["take_picture"].set_ui_parameter("type", "button")
+        self.actions["take_picture"].set_ui_parameter("display_type", "button")
         self.actions["take_picture"].set_ui_parameter("label", None)
         self.actions["take_picture"].set_ui_parameter("button_text", None)
-
-
+        self.actions["take_picture"].stop_message_enabled = False
+        
         self.actions["record"].set_ui_parameter("button_icon", "video")
         self.actions["record"].set_ui_parameter("inline", True)
-        self.actions["record"].set_ui_parameter("type", "button")
+        self.actions["record"].set_ui_parameter("display_type", "switch")
         self.actions["record"].set_ui_parameter("label", None)
         self.actions["record"].set_ui_parameter("button_text", None)
-
+        
 
         self._ui_parameters["height"] = kwargs.get("height", 480)
         self._ui_parameters["width"] = kwargs.get("width", 640)
         self._ui_parameters["type"] = kwargs.get("type", "")
-        self._ui_parameters["fps"] = kwargs.get("fps", 10)
+        self._ui_parameters["fps"] = kwargs.get("fps", 20)
         self._ui_parameters["source"] = kwargs.get("source", "")
         self._ui_parameters["show_pan_tilt"] = kwargs.get("show_pan_tilt", False)
         self._ui_parameters["show_buttons"] = kwargs.get("show_buttons", True)
 
-        self.spine.register_query_handler(camera_id + ".getMedia", self._get_media)
+        #self.spine.register_query_handler(camera_id + ".getMedia", self._get_media)
 
     def input_changed(self, changed_input):
         if changed_input == self.inputs["pan"]:
@@ -169,10 +174,13 @@ class CameraBase(Controller):
         raise NotImplementedError
 
 
-    def _record(self):
+    def _record_start(self):
         """abstract method"""
         raise NotImplementedError
 
+    def _record_stop(self):
+        """abstract method"""
+        raise NotImplementedError
 
     @action
     def take_picture(self):
@@ -180,7 +188,11 @@ class CameraBase(Controller):
 
     @action
     def record(self):
-        self._record()
+        self._record_start()
+        while not exit_action:
+            pass
+
+        self._record_stop()
     
     def link_to_dashboard(self, dashboard_id=None, panel_id=None, **kwargs):
         r"""
@@ -330,7 +342,7 @@ except:
             self.terminate = False
             self.mutex = mutex
 
-class CameraStreamer(CameraBase):
+class CameraHTTPStreamer(CameraBase):
     r"""
     Camera controller that streams video to the ui.
 
@@ -450,17 +462,23 @@ class CameraStreamer(CameraBase):
 
     def _take_picture(self):
         if self.current_frame:
-            image_name = "/img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
-            image_path = self.media_config.folders.images + image_name
-            if not os.path.exists(os.path.dirname(image_path)):
-                os.makedirs(os.path.dirname(image_path))
+            image_name = "img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
+            
+            output = BytesIO()
             if self._frame_format == "jpeg":
                 image = Image.open(BytesIO(self.current_frame))
-                image.save(image_path, "PNG")
+                image.save(output, "PNG")
             else:
-                self.current_frame.save(image_path, "PNG")
+                self.current_frame.save(output, "PNG")
 
-    def _record(self):
+            from kervi.io import save_file
+            output.seek(0)
+            save_file(self.component_id, "images", image_name, output)
+
+    def _record_start(self):
+        pass
+
+    def _record_stop(self):
         pass
 
     def _get_media(self):
@@ -475,6 +493,149 @@ class CameraStreamer(CameraBase):
                 "name": media[7:]
             })
         return result
+
+
+class CameraStreamer(CameraBase):
+    r"""
+    Camera controller that streams video to the ui.
+
+    :param camera_id:
+        Id of the camera. The id is used to reference the camera in other parts of the kervi application.
+    :type camera_id: str
+
+    :param name:
+        Name of the camera used in ui.
+    :type name: str
+
+    :param camera_source:
+        A frame driver that is used to capture frames from a camera.
+
+    :type camera_source: The name of the camera source to use.
+
+    :param \**kwargs:
+            See below
+
+    :Keyword Arguments:
+            * *height* (``int``) --
+                Height of video frame. Default value is 480.
+
+            * *width* (``int``) --
+                Width of video frame. Default value is 640.
+
+            * *fps* (``int``) --
+                Frames per second.
+    """
+    def __init__(self, camera_id, name, camera_source = None, **kwargs):
+        CameraBase.__init__(self, camera_id, name, type="frame", **kwargs)
+        if camera_source == "kervi_test_driver":
+            from .test_camera_driver import TestCameraDriver
+            self._device_driver = TestCameraDriver()
+        else:
+            self._device_driver = hal.get_camera_driver(camera_source)
+
+        self._device_driver.camera = self
+        self._frame_format = self._device_driver.buffer_type
+
+        
+        self.current_frame = None
+        self.current_frame_number = 0
+
+        from threading import Lock
+        self.mutex = Lock()
+
+
+        self.frame_thread = _CameraFrameThread(self, self.mutex)
+
+    def exit(self):
+        self.terminate = True
+        self._terminate = True
+
+    @property
+    def _terminate(self):
+        """
+        Flag to signal that the get_frames method should exit
+        """
+        return self._device_driver.terminate
+
+    @_terminate.setter
+    def _terminate(self, value):
+        self._device_driver.terminate = value
+
+    def get_font(self, name="Fanwood", size=16):
+        """
+        Returns a font that can be used by pil image functions.
+        This default font is "Fanwood" that is available on all platforms.
+        """
+        import kervi.vision as vision
+        from PIL import ImageFont
+        vision_path = os.path.dirname(vision.__file__)
+        fontpath = os.path.join(vision_path, "fonts", name + ".otf")
+        font = ImageFont.truetype(fontpath, size)
+        return font
+
+    def _capture_frames(self):
+        self._device_driver.capture_frames()
+
+    def _frame_ready(self, frame):
+        if frame:
+            self.mutex.acquire()
+            self.current_frame = frame
+            self.current_frame_number += 1
+            self.fpc_counter += 1
+            seconds = time.time() - self.fpc_start_time 
+            if (seconds) > 1 :
+                fpc = self.fpc_counter / seconds
+                #print("FPS: ", self.fpc_counter, seconds, fpc)
+                self.fpc_counter = 0
+                self.fpc_start_time = time.time()
+                self.streamed_fps.value = fpc
+            buf = BytesIO()
+            self.current_frame.save(buf, format='png')
+            data = buf.getvalue()
+            self.spine.stream_data(self.component_id,"IMAGE_FRAME", data)
+            self.mutex.release()
+
+    def frame_captured(self, image):
+        """
+        Abstract method that is called when a new frame is ready from the camera.
+        You can use this method to post process images before they are streamed.
+        """
+        pass
+
+    def _take_picture(self):
+        if self.current_frame:
+            image_name = "img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
+            
+            output = BytesIO()
+            if self._frame_format == "jpeg":
+                image = Image.open(BytesIO(self.current_frame))
+                image.save(output, "PNG")
+            else:
+                self.current_frame.save(output, "PNG")
+                #self.spine.stream_data(self.component_id,"LAST_PICTURE", output)
+
+            from kervi.io import save_file
+            output.seek(0)
+            save_file(self.component_id, "images", image_name, output)
+
+    def _record_start(self):
+        pass
+
+    def _record_stop(self):
+        pass
+
+    # def _get_media(self):
+    #     import glob
+    #     media_files = glob.glob(self.media_config.folders.images+"/*.png")
+    #     result = {
+    #         "path": self.source["server"] + self.source["path"]+"/media",
+    #         "files": []
+    #     }
+    #     for media in media_files:
+    #         result["files"].append({
+    #             "name": media[7:]
+    #         })
+    #     return result
 
 class IPCamera(CameraBase):
     def __init__(self, camera_id, name, dashboards, source):
@@ -499,6 +660,7 @@ class FrameCameraDeviceDriver(object):
         self._terminate = False
         self._buffer_type = None
         self.log = KerviLog("FramedCameraDeviceDriver")
+        self.last_frame_time = time.time()
 
     @property
     def buffer_type(self):
@@ -537,7 +699,15 @@ class FrameCameraDeviceDriver(object):
         """
         Waits for next frame.
         """
-        time.sleep(1.0 / self.camera.fps)
+        sleep = 1.0 / self.camera.fps
+        now = time.time()
+        process_time = now - self.last_frame_time
+        sleep -= process_time
+        if sleep < 0:
+            sleep = 0
+        time.sleep(sleep)
+        self.last_frame_time = time.time()
+        #print("s", s , af - bf, (s-(af-bf))*1000, of)
 
     def frame_ready(self, frame):
         """

@@ -17,6 +17,8 @@ export class DashboardComponent extends KerviDashboardComponent implements OnIni
   
   public rightPadTop:number;
   public rightPadLeft:number;
+
+  mediaHidden = true;
   
   constructor(private router:Router, private activatedRoute:ActivatedRoute ) {
     super();
@@ -45,4 +47,10 @@ export class DashboardComponent extends KerviDashboardComponent implements OnIni
       }, 0);
     });
   }
+
+  handleMediaClose(): void {
+    console.log('click ok');
+    this.mediaHidden = true;
+  }
+
 }

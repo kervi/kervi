@@ -43,6 +43,8 @@ class Controller(KerviComponent):
         self.spine.register_event_handler("appReady", self._on_app_ready)
         self.spine.register_event_handler("moduleStarted", self._on_app_ready)
         self.actions = {}
+        self.stream_observers = {}
+        self.region_observers = {}
 
         method_list = [func for func in dir(self)]
         for method_name in method_list:
@@ -61,6 +63,26 @@ class Controller(KerviComponent):
                         Actions.add(action)
                         self.actions[action_id] = action
                         setattr(self, method.__name__, action)
+
+                    from kervi.streams._stream_observers import stream_observers
+                    from kervi.streams.stream_observer import StreamObserver
+                    if stream_observers.is_unbound(method_qual_name):
+                        observer_id, name, stream_id, stream_event, ukwargs = stream_observers.get_unbound(method_qual_name)
+                        setattr(self, "kervi_stream_observer_"+ method.__name__, method)
+                        copy_method = getattr(self, "kervi_stream_observer_"+ method.__name__)
+                        observer = StreamObserver(stream_id, stream_event, self.controller_id + "." + observer_id, copy_method, name, **ukwargs)
+                        self.stream_observers[observer_id] = observer
+                        setattr(self, method.__name__, observer)
+
+                    from kervi.vision._region_observers import region_observers
+                    from kervi.vision.region_observer import RegionObserver
+                    if region_observers.is_unbound(method_qual_name):
+                        observer_id, name, stream_id, region_group, ukwargs = stream_observers.get_unbound(method_qual_name)
+                        setattr(self, "kervi_region_observer_"+ method.__name__, method)
+                        copy_method = getattr(self, "kervi_region_observer_"+ method.__name__)
+                        observer = RegionObserver(stream_id, stream_event, self.controller_id + "." + observer_id, copy_method, name, **ukwargs)
+                        self.region_observers[observer_id] = observer
+                        setattr(self, method.__name__, observer)
             except KeyError:
                 pass
 
