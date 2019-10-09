@@ -31,11 +31,13 @@ setup(
     long_description_content_type="text/markdown",
     packages=[
         'kervi/application',
+        'kervi/io',
         'kervi/messaging',
         'kervi/module',
         'kervi/plugin',
         'kervi/plugin/authentication',
         'kervi/plugin/authentication/plain',
+        'kervi/plugin/io/files',
         'kervi/plugin/ipc/websocket',
         'kervi/plugin/message_bus',
         'kervi/plugin/message_bus/zmq',
