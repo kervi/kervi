@@ -589,10 +589,7 @@ class CameraStreamer(CameraBase):
                 self.fpc_counter = 0
                 self.fpc_start_time = time.time()
                 self.streamed_fps.value = fpc
-            buf = BytesIO()
-            self.current_frame.save(buf, format='png')
-            data = buf.getvalue()
-            self.spine.stream_data(self.component_id,"IMAGE_FRAME", data)
+            self.spine.stream_data(self.component_id,"IMAGE_FRAME", frame)
             self.mutex.release()
 
     def frame_captured(self, image):

@@ -49,7 +49,7 @@ export class MPEGViewerComponent implements OnInit{
     this.streamSubscription = this.stream.events$.subscribe( function(event) {
       //console.log('ce', event);
       if (event) {
-        var blob = new Blob( [ event.data ], { type: "image/png" } );
+        var blob = new Blob( [ event.data ], { type: "image/jpeg" } );
         self.streamData = self.domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
         self.fpsCounter += 1;
         const now   = new Date();

@@ -11,7 +11,7 @@ class TestCameraDriver(FrameCameraDeviceDriver):
     def capture_frames(self):
         im = APNG.open("C:/Users/tim/Downloads/ezgif.com-video-to-apng.png")
         frames = []
-        basewidth = 320
+        basewidth = 720
         hsize = None
         for i, (png, control) in enumerate(im.frames):
             image = Image.open(io.BytesIO(png.to_bytes()))
