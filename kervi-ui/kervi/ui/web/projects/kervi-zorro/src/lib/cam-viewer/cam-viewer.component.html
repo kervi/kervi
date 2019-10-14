@@ -1,4 +1,4 @@
-<ng-container *ngIf="isBackground">
+<ng-container *ngIf="isBackground && camera!==null">
 	<div #videoViewer id="video-viewer" class="video video-background" style="text-align:center;position:fixed;top:60px;left:0px;height:100%;" [style.height.px]="camHeight" [style.width.px]="camWidth">
 		<div style="position:fixed;z-index:3000" *ngIf="streamObservers.length > 0">
 			<button (click)="changeSource(cameraSource)" >base</button>
@@ -20,7 +20,7 @@
 	</div>
 </ng-container>
 
-<ng-container *ngIf="!isBackground">
+<ng-container *ngIf="!isBackground && camera!==null">
 	<div #videoViewer id="video-viewer" class="video" style="overflow:hidden;position:relative;width:100%">
 		<span class="camImage" style="top:0px;left:0px;height:100%;width:100%">
 			<kervi-mpeg-viewer (imageLoaded)="imageLoaded()" [width]=100  [cameraSource]="cameraSource" > </kervi-mpeg-viewer>

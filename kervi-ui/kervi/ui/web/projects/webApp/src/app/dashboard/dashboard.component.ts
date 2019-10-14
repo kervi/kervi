@@ -14,18 +14,30 @@ export class DashboardComponent extends KerviDashboardComponent implements OnIni
   private isConnected:false;
   public leftPadTop:number;
   public leftPadLeft:number;
-  
+
   public rightPadTop:number;
   public rightPadLeft:number;
-
+  cameraIdx = "";
   mediaHidden = true;
-  
+
   constructor(private router:Router, private activatedRoute:ActivatedRoute ) {
     super();
    }
 
   ngOnInit() {
     var self = this;
+    this.cameraId$.subscribe(function(camId){
+      console.log("db cid", camId);
+      this.cameraIdx = camId;
+    })
+    this.kerviService.componentsChanged$.subscribe(function() {
+      console.log("adb changed");
+      const id = self.dashboardId;
+      //self.loadDashboard("0");
+      self.loadDashboard(id);
+      
+      
+    });
 
     this.activatedRoute.params.subscribe(params => {
       var dashboardId = params['name'];

@@ -6,6 +6,7 @@ import { Controller, NumberValue } from 'kervi-js';
 import { DashboardSizes  } from 'kervi-js';
 import { NGXKerviService } from '../ngx-kervi.service';
 import { AppInjector } from '../app-injector.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'kervi-camera-base',
@@ -13,40 +14,36 @@ import { AppInjector } from '../app-injector.service';
   styleUrls: [],
 })
 export class KerviCameraComponent {
-    public streamObservers: Controller[] = [];
+    @Input() streamObservers: Controller[] = [];
+    @Input() public selectedSource: string;
     private cam: Controller;
 
     @Input() set cameraId(id: string) {
         console.log('setcamid', id);
 
         this.camera = this.kerviService.getComponent(id) as Controller;
-    };
+    }
     @Input() set camera(v: Controller) {
         console.log('setcam', v);
+
         this.cam = v;
-        for (let i of v.outputs) {
-            if (i.id.endsWith('.pan')) {
-                this.pan = i as NumberValue;
-            } else if (i.id.endsWith('.tilt')) {
-                this.tilt = i as NumberValue;
-            }
-        }
-        this.cameraType = v.ui.type;
-        if (this.cameraType === 'frame' ) {
-            if (v.ui.source) {
-                this.cameraSource = this.cam.id;
-            }
-            this.cameraSource = this.cam.id;
-        }
-        const controllers = this.kerviService.getComponentsByType('controller');
-        for (let controller of controllers) {
-            if (controller.type === 'stream_observer') {
-                if (controller.ui.sourceStream === this.cameraSource) {
-                    this.streamObservers.push(controller);
+        if (v){
+            for (let i of v.outputs) {
+                if (i.id.endsWith('.pan')) {
+                    this.pan = i as NumberValue;
+                } else if (i.id.endsWith('.tilt')) {
+                    this.tilt = i as NumberValue;
                 }
             }
+            this.cameraType = v.ui.type;
+            if (this.cameraType === 'frame' ) {
+                if (v.ui.source) {
+                    this.cameraSource = this.cam.id;
+                }
+                this.cameraSource = this.cam.id;
+            }
+            this.updateStreamObservers();
         }
-        console.log("obs", this.streamObservers);
     }
 
     get camera() { return this.cam; }
@@ -61,27 +58,52 @@ export class KerviCameraComponent {
     public cameraType: string;
     public cameraSource: string;
     constructor() {
+        const self = this;
         this.kerviService = AppInjector.get(NGXKerviService);
     }
 
-    public setPan(v){
+    updateStreamObservers() {
+        const streamObservers = [];
+        const controllers = this.kerviService.getComponentsByType('controller');
+        for (let controller of controllers) {
+            if (controller.type === 'stream_observer') {
+                if (controller.ui.sourceStream === this.cameraSource) {
+                    streamObservers.push(controller);
+                }
+            }
+        }
+        this.streamObservers = streamObservers;
+        if (this.selectedSource !== this.cameraSource){
+            this.selectedSource = this.cameraSource;
+        }
+    }
+
+    public setPan(v) {
         this.pan.set(v);
     }
 
-    public setTilt(v){
+    public setTilt(v) {
         this.tilt.set(v);
     }
 
     ngOnInitCamera() {
-        console.log("ngi cam");
-        var self = this;
-        if (!this.linkParameters)
+        console.log('ngi cam', this.camera.id);
+        const self = this;
+        if (!this.linkParameters) {
               this.linkParameters = this.camera.ui;
-
-        if (!this.inline && this.linkParameters.inline){
+        }
+        if (!this.inline && this.linkParameters.inline) {
             this.inline = true;
         }
-
-
+        this.kerviService.componentsChanged$.subscribe(function() {
+            self.updateStreamObservers();
+        });
+        this.updateStreamObservers();
+        this.selectedSource = this.cameraSource;
     }
+
+    changeSource(source: string) {
+        console.log('cs', source);
+        this.selectedSource = source;
+      }
 }

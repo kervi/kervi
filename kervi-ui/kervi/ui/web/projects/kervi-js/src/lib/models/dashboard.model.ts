@@ -402,7 +402,7 @@ export class Dashboard implements IComponent{
             if (panel){
                 panel.components.push(new DashboardPanelComponent(link));
             } else {
-                console.log("adh",link);
+                // console.log("adh",link);
                 var messagePanel ={
                     id:link.panelId,
                     name:link.panelName,

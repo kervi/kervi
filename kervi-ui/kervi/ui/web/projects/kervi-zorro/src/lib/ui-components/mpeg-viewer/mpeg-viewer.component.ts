@@ -57,7 +57,7 @@ export class MPEGViewerComponent implements OnInit{
         const seconds = fpsDiff / 1000;
         if (seconds > 1) {
           self.fps = self.fpsCounter / seconds;
-          console.log('fps', self.fpsCounter, seconds, source, self.fps);
+          //console.log('fps', self.fpsCounter, seconds, source, self.fps);
           self.fpsCounter = 0;
           self.fpsTime = now;
         }
