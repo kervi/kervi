@@ -1,7 +1,7 @@
 // Copyright (c) 2016, Tim Wentzlau
 // Licensed under MIT
 
-import { Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy} from '@angular/core';
 import { NGXKerviService } from 'ngx-kervi';
 import { Stream } from 'kervi-js';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -10,7 +10,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   templateUrl: './mpeg-viewer.component.html',
   styleUrls: ['./mpeg-viewer.component.scss']
 })
-export class MPEGViewerComponent implements OnInit{
+export class MPEGViewerComponent implements OnInit, OnDestroy{
   @Input() set cameraSource(id: string) {
     console.log('set cam source', id);
     this.setSource(id);
@@ -38,11 +38,19 @@ export class MPEGViewerComponent implements OnInit{
     const self = this;
   }
 
+  ngOnDestroy() {
+    if (this.stream) {
+      this.streamSubscription.unsubscribe();
+      this.stream.close();
+    }
+  }
+
   setSource(source: string) {
     console.log("sc", source);
     const self = this;
     if (this.stream) {
       this.streamSubscription.unsubscribe();
+      this.stream.close();
     }
     this.stream = this.kerviService.GetStream(source, ['IMAGE_FRAME']);
     console.log("scx", this.stream);

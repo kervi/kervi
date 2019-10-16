@@ -846,7 +846,7 @@ class ZMQBus():
     def unregister_stream_handler(self, stream_id, func, stream_event=None, **kwargs):
         tag = "stream:" + stream_id + ":"
         if stream_event:
-            tag +=  stream_event
+            tag +=  stream_event + ":"
         
         if func:
             self._unregister_handler(tag, func, **kwargs)
