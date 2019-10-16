@@ -642,6 +642,7 @@ class ZMQBus():
         self.log.warn("connection not found %s %s %s", address, tag, message)
 
     def _on_ping(self, address, process_id, process_list):
+        #print("p", address, process_id)
         self._connections_lock.acquire()
         new_connection = True
         connection_list = []

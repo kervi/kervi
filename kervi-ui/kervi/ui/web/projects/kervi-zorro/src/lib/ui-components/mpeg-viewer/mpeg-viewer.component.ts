@@ -49,7 +49,7 @@ export class MPEGViewerComponent implements OnInit{
     this.streamSubscription = this.stream.events$.subscribe( function(event) {
       //console.log('ce', event);
       if (event) {
-        var blob = new Blob( [ event.data ], { type: "image/png" } );
+        var blob = new Blob( [ event.data ], { type: "image/jpeg" } );
         self.streamData = self.domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
         self.fpsCounter += 1;
         const now   = new Date();
@@ -57,7 +57,7 @@ export class MPEGViewerComponent implements OnInit{
         const seconds = fpsDiff / 1000;
         if (seconds > 1) {
           self.fps = self.fpsCounter / seconds;
-          console.log('fps', self.fpsCounter, seconds, source, self.fps);
+          //console.log('fps', self.fpsCounter, seconds, source, self.fps);
           self.fpsCounter = 0;
           self.fpsTime = now;
         }

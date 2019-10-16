@@ -527,9 +527,9 @@ class CameraStreamer(CameraBase):
     """
     def __init__(self, camera_id, name, camera_source = None, **kwargs):
         CameraBase.__init__(self, camera_id, name, type="frame", **kwargs)
-        if camera_source == "kervi_test_driver":
-            from .test_camera_driver import TestCameraDriver
-            self._device_driver = TestCameraDriver()
+        if camera_source == "zip_streamer":
+            from .zip_camera_driver import ZipCameraDriver
+            self._device_driver = ZipCameraDriver(kwargs.get("zip_file"))
         else:
             self._device_driver = hal.get_camera_driver(camera_source)
 
@@ -589,10 +589,7 @@ class CameraStreamer(CameraBase):
                 self.fpc_counter = 0
                 self.fpc_start_time = time.time()
                 self.streamed_fps.value = fpc
-            buf = BytesIO()
-            self.current_frame.save(buf, format='png')
-            data = buf.getvalue()
-            self.spine.stream_data(self.component_id,"IMAGE_FRAME", data)
+            self.spine.stream_data(self.component_id,"IMAGE_FRAME", frame)
             self.mutex.release()
 
     def frame_captured(self, image):

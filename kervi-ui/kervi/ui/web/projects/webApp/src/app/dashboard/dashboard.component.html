@@ -36,7 +36,7 @@
 		</div>
 	</nz-header>
 		
-	<nz-content>
+	<nz-content >
 
 		<ng-container *ngIf="isAppEmpty">
 			<div nz-row>
@@ -52,7 +52,7 @@
 				</div>
 			</div>
 		</ng-container>
-		<kervi-cam-viewer *ngIf="cameraId" [isBackground]="true" [cameraId]="cameraId" [linkParameters]="cameraParameters"></kervi-cam-viewer>
+		<kervi-cam-viewer *ngIf="cameraId" [isBackground]="true" [cameraId]="(cameraId$| async)" [linkParameters]="cameraParameters"></kervi-cam-viewer>
 		<div #leftPad class="kervi-controller-pad" *ngIf="showLeftPad" [style.left.px]="leftPadLeft" [style.top.px]="leftPadTop" >
 			<kervi-controller-pad [autoCenter]="autoCenterLeftPad" [XValue]="leftPadXValue" [YValue]="leftPadYValue"></kervi-controller-pad>
 		</div>

@@ -1,50 +1,45 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Dashboard, DashboardSizes, NumberValue } from 'kervi-js';
 import { NGXKerviService } from '../ngx-kervi.service';
-import { AppInjector } from '../app-injector.service'
+import { AppInjector } from '../app-injector.service';
+import { BehaviorSubject } from 'rxjs';
 @Component({
   selector: 'kervi-dashboard',
   template: ''
 })
 export class KerviDashboardComponent {
-  private dashboardId:string=null;
-  protected dashboard:Dashboard = null;
-  protected kerviService:NGXKerviService;
-  protected dashboards:Dashboard[] = null;
-  protected dashboardSizes:DashboardSizes = null;
-  protected isAppEmpty:boolean = true;
-  protected showMenu:boolean = false;
-  protected dashboardPanelsHidden:boolean=false;
-  protected showPanelController:boolean = false;
-  protected cameraId: string = null;
-  protected cameraParameters:any = null;
-  
-  public authenticated:Boolean = false;
-  private anonymous:Boolean = true;
-  
+  protected dashboardId: string = null;
+  protected dashboard: Dashboard = null;
+  protected kerviService: NGXKerviService;
+  protected dashboards: Dashboard[] = null;
+  protected dashboardSizes: DashboardSizes = null;
+  protected isAppEmpty = true;
+  protected showMenu = false;
+  protected dashboardPanelsHidden = false;
+  protected showPanelController = false;
+  @Input() protected cameraId: string = null;
+  @Input() protected cameraParameters: any = null;
+  protected cameraId$: BehaviorSubject<string> = new BehaviorSubject<string>(null);
+  public authenticated: Boolean = false;
+  private anonymous: Boolean = true;
 
-  protected showLeftPad:boolean = false;
-  protected leftPadXValue:NumberValue = null;
-  protected leftPadYValue:NumberValue = null;
-  protected autoCenterLeftPad:boolean = false;
-  
-  protected showRightPad:boolean = false;
-  protected rightPadXValue:NumberValue = null;
-  protected rightPadYValue:NumberValue = null;
-  protected autoCenterRightPad:boolean = false;
+  protected showLeftPad: boolean = false;
+  protected leftPadXValue: NumberValue = null;
+  protected leftPadYValue: NumberValue = null;
+  protected autoCenterLeftPad: boolean = false;
 
+  protected showRightPad: boolean = false;
+  protected rightPadXValue: NumberValue = null;
+  protected rightPadYValue: NumberValue = null;
+  protected autoCenterRightPad: boolean = false;
 
-
-  private inFullScreen:boolean = false; 
+  private inFullScreen: boolean = false;
   constructor() {
     this.kerviService = AppInjector.get(NGXKerviService);
     var self = this;
-    this.kerviService.componentsChanged$.subscribe(function(){
-      //var dashboard = self.kerviService.getComponent(self.dashboardId, "dashboard") as Dashboard
-      //if (dashboard)
-        self.loadDashboard(self.dashboardId);
-    })
-    
+    this.kerviService.componentsChanged$.subscribe(function() {
+      self.loadDashboard(self.dashboardId);
+    });
    }
 
   protected logoff(event){
@@ -52,14 +47,14 @@ export class KerviDashboardComponent {
     event.stopPropagation();
   }
 
-  protected loadDashboard(dashboardId:string){
+  protected loadDashboard(dashboardId: string) {
     this.dashboardId = dashboardId;
-    this.dashboard = this.kerviService.getComponent(dashboardId, "dashboard") as Dashboard;
+    this.dashboard = this.kerviService.getComponent(dashboardId, 'dashboard') as Dashboard;
     this.anonymous = this.kerviService.isAnonymous();
     this.isAppEmpty = this.kerviService.isAppEmpty();
     this.authenticated = this.kerviService.doAuthenticate;
     if (this.dashboard){
-      this.dashboards = this.kerviService.getComponentsByType("dashboard");
+      this.dashboards = this.kerviService.getComponentsByType('dashboard');
       this.showMenu = (this.dashboards.length > 1 || this.kerviService.doAuthenticate);
       this.showPanelController=false;
       this.cameraId = null;
@@ -73,8 +68,9 @@ export class KerviDashboardComponent {
           this.dashboardPanelsHidden=true;
           this.showPanelController=true;
           this.cameraId=this.dashboard.backgroundPanel.components[0].component.id;
+          this.cameraId$.next(this.cameraId);
           this.cameraParameters=this.dashboard.backgroundPanel.components[0].parameters;
-          console.log("cam", this.cameraId, this.cameraParameters);
+          console.log("db set cam", this.cameraId, this.cameraParameters);
         } 
       }
       if (this.dashboard.LeftPadXPanel && this.dashboard.LeftPadXPanel.components.length || this.dashboard.LeftPadYPanel && this.dashboard.LeftPadYPanel.components.length){
