@@ -3636,9 +3636,9 @@ var KerviJsModule = /** @class */ (function () {
 /***/ }),
 
 /***/ "../../dist/kervi-zorro/fesm5/kervi-zorro.js":
-/*!**********************************************************************************************!*\
-  !*** D:/tim privat/github/kervi/kervi-ui/kervi/ui/web/dist/kervi-zorro/fesm5/kervi-zorro.js ***!
-  \**********************************************************************************************/
+/*!**************************************************************************************!*\
+  !*** D:/dev/kervi/kervi/kervi-ui/kervi/ui/web/dist/kervi-zorro/fesm5/kervi-zorro.js ***!
+  \**************************************************************************************/
 /*! exports provided: KerviZorroService, KerviZorroModule, ɵw, ɵv, ɵu, ɵs, ɵy, ɵz, ɵx, ɵo, ɵm, ɵr, ɵq, ɵl, ɵk, ɵp, ɵj, ɵi, ɵn, ɵh, ɵc, ɵg, ɵf, ɵd, ɵb, ɵe, ɵa, ɵt */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -8197,7 +8197,7 @@ Object(_angular_platform_browser_dynamic__WEBPACK_IMPORTED_MODULE_1__["platformB
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\tim privat\github\kervi\kervi-ui\kervi\ui\web\projects\webApp\src\main.ts */"./src/main.ts");
+module.exports = __webpack_require__(/*! D:\dev\kervi\kervi\kervi-ui\kervi\ui\web\projects\webApp\src\main.ts */"./src/main.ts");
 
 
 /***/ })

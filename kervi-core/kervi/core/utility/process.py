@@ -61,6 +61,7 @@ class _KerviProcess(object):
         pass
 
 def _launch(scope, name, process_class, config_data, ipc_port, root_close, log_queue, **kwargs):
+    process = None
     try:
         from kervi.config import Configuration
         Configuration._load(json_data=config_data)
@@ -87,7 +88,8 @@ def _launch(scope, name, process_class, config_data, ipc_port, root_close, log_q
     except:
         log.exception("error in process initialization")
         pass
-    process._terminate_process()
+    if process:
+        process._terminate_process()
 
 def _start_process(scope, name, config, port_idx, process_class, root_close=True, log_queue=None, **kwargs):
     config_data = config.to_json()
