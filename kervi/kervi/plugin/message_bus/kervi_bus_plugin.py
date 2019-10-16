@@ -5,7 +5,7 @@ class KerviBusPlugin(KerviPlugin):
         KerviPlugin.__init__(self, name, config, manager)
         self._bus = None
 
-    def load(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+    def load(self, process_id, spine_port, root_address = None, ip=None):
         raise NotImplementedError
 
     @property

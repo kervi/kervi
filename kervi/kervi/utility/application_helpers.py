@@ -46,7 +46,7 @@ class _KerviModuleLoader(process._KerviProcess):
     def terminate_process(self):
         pass
 
-    def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+    def load_spine(self, process_id, spine_port, root_address = None, ip=None):
         from kervi.plugin.message_bus.bus_manager import BusManager
         self._bus_manager = BusManager()
         self._bus_manager.load(process_id, spine_port, root_address, ip)

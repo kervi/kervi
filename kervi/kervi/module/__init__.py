@@ -213,7 +213,7 @@ class Module(object):
 
         self.started = False
         if self.config.module.app_connection_local and not self.config.network.ipc_root_address:
-            self._logger.verbose("Locating kervi application...{0}", "")
+            self._logger.verbose("Locating kervi application with id {0}...", self.config.application.id)
             from kervi.utility.discovery import find_kervi_app
             address, port = find_kervi_app(self.config.application.id)
             if address:
@@ -227,8 +227,8 @@ class Module(object):
 
         from kervi.plugin.message_bus.bus_manager import BusManager
         self.bus_manager = BusManager()
-        self.config.network.ipc_root_port = nethelper.get_free_port([self.config.network.ipc_root_port])
-        
+        #self.config.network.ipc_root_port = nethelper.get_free_port([self.config.network.ipc_root_port])
+        self._logger.verbose("ip: {0}", self.config.network.ip)
         if self.config.module.app_connection_local:
             self.bus_manager.load(
                 "kervi-module", 
@@ -271,12 +271,13 @@ class Module(object):
     def get_process_info(self):
         return {"id": "application"}
 
-    def _process_ready(self, scope, process_id):
+    def _process_ready(self, scope, process_id, pid):
         self._process_info_lock.acquire()
         try:
             for process in self._process_info:
                 if process["id"] == process_id:
                     process["ready"] = True
+                    process["pid"] = pid
         finally:
             self._process_info_lock.release()
 
@@ -316,7 +317,7 @@ class Module(object):
         plugin_modules = pluginManager.prepare_load()
         for plugin_module in plugin_modules:
             self._process_info.append(
-                {"id":plugin_module, "ready": False}
+                {"id":plugin_module, "ready": False, "pid":None}
             )
         self._process_info_lock.release()
 
@@ -329,7 +330,7 @@ class Module(object):
         for module in self.config.modules:
             module_port += 1
             self._process_info_lock.acquire()
-            self._process_info += [{"id":module, "ready":False}]
+            self._process_info += [{"id":module, "ready":False, "pid":None}]
             self._process_info_lock.release()
                 
             self._module_processes += [

@@ -32,7 +32,7 @@ class KerviAppDiscovery(threading.Thread):
 
 	def run(self):
 		from kervi.core.utility.kervi_logging import KerviLog
-		KerviLog("discovery").verbose("Listining for discovery requests on port: %s", self._discovery_port)
+		KerviLog("discovery").verbose("Listining for discovery requests on port: %s, app id:%s", self._discovery_port, self._app_id)
 		while not self._terminate:
 			try:
 				data, address = self._sock.recvfrom(4096)

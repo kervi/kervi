@@ -30,7 +30,7 @@ class _KerviProcess(object):
     def __del__(self):
         pass
 
-    def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+    def load_spine(self, process_id, spine_port, root_address = None, ip=None):
         raise NotImplementedError
 
     def get_process_info(self):

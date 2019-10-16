@@ -242,7 +242,7 @@ class ZMQBus():
     def root_gone(self):
         return not self._is_root and time.time() - self._last_ping > 10
 
-    def reset_bus(self, process_id, signal_port, ip="127.0.0.1", root_address=None, event_port=None):
+    def reset_bus(self, process_id, signal_port, ip=None, root_address=None, event_port=None):
         self._handlers = NamedLists()
         self._process_id = process_id
         self._query_id_count = 0
@@ -703,7 +703,7 @@ class ZMQBus():
             p = json.dumps(ping_message, ensure_ascii=False, cls=_ObjectEncoder).encode('utf8')
             ping_tag = "signal:ping"
             package = [ping_tag.encode(), p]
-
+            
             for connection in self._connections:
                 connection.send_package(package)
         

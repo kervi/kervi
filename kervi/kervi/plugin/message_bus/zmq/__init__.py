@@ -30,7 +30,7 @@ class ZMQPlugin(KerviBusPlugin):
     def __init__(self, config, manager):
         KerviBusPlugin.__init__(self, "ZMQBus", config, manager)
 
-    def load(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+    def load(self, process_id, spine_port, root_address = None, ip=None):
         from kervi.plugin.message_bus.zmq.zmqbus import ZMQBus
         self._bus = ZMQBus()
         self._bus.set_log(process_id)
