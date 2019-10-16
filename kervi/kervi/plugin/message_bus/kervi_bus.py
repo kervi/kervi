@@ -10,7 +10,7 @@ class KerviBus:
         raise NotImplementedError
     
     
-    def reset(self, process_id, signal_port, ip="127.0.0.1", root_address=None, event_port=None):
+    def reset(self, process_id, signal_port, ip=None, root_address=None, event_port=None):
         raise NotImplementedError
 
     def stop(self):
