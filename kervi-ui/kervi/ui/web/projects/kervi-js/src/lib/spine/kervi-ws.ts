@@ -179,6 +179,32 @@ export class  KerviWSSpine extends KerviSpineBase{
         }
     };
 
+    public removeStreamHandler = function(streamId: string, streamEvents: string[]) {
+        if (streamEvents && streamEvents.length > 0) {
+            for (let event of streamEvents) {
+                //this.streamHandlers.push({'streamTag': streamId + '/' + event, callback: callback});
+                const cmd = {
+                    id: this.messageId++,
+                    'messageType': 'removeStreamHandler',
+                    'streamId': streamId,
+                    'streamEvent': event
+                };
+                console.log("as", cmd);
+                this.websocket.send(JSON.stringify(cmd));
+            }
+        } else {
+            //this.streamHandlers.push({'streamTag': streamId, callback: callback});
+            const cmd = {
+                id: this.messageId++,
+                'messageType': 'removeStreamHandler',
+                'streamId': streamId,
+                'streamEvent': event
+            };
+            console.log('as', cmd);
+            this.websocket.send(JSON.stringify(cmd));
+        }
+    };
+
     public sendCommand(command:string,...p:any[]){
         console.log("sec",arguments);
         var args=[];

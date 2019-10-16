@@ -131,8 +131,20 @@ class _WebStreamHandler(object):
         self.stream_id = stream_id
         self.spine = Spine()
         self.spine.register_stream_handler(stream_id, self.on_event, stream_event, injected="socketSpine")
+        self._epc_counter = 0
+        self._epc_start_time = time.time()
         
+    def close(self):
+        self.spine.unregister_stream_handler(self.stream_id, self.on_event, self.stream_event)
+    
     def on_event(self, stream_id, stream_event, data, *args, **kwargs):
+        self._epc_counter += 1
+        seconds = time.time() - self._epc_start_time 
+        if (seconds) > 1 :
+            epc = self._epc_counter / seconds
+            self._epc_counter = 0
+            self._epc_start_time = time.time()
+            #print("epc", self.stream_id, self.stream_event, epc)
         injected = kwargs.get("injected", "")
         groups = kwargs.get("groups", None)
         process_id = kwargs.get("process_id", None)
@@ -204,6 +216,19 @@ class _SpineProtocol(WebSocketServerProtocol):
                     found = True
         if not found:
             self.handlers["stream"] += [_WebStreamHandler(stream_id, stream_event, self)]
+    
+    def remove_stream_handler(self, stream_id, stream_event):
+        #print("r", stream_id, stream_event)
+        found_handler = None
+        for stream_handler in self.handlers["stream"]:
+            if stream_handler.stream_id == stream_id:
+                if stream_event and stream_handler.stream_event == stream_event:
+                    found_handler = stream_handler
+                elif not stream_event:
+                    found_handler = stream_handler
+        if found_handler:
+            found_handler.close()
+            self.handlers["stream"].remove(found_handler)
 
     def send_response(self, id, response, state="ok", message=""):
         res = {
@@ -308,6 +333,9 @@ class _SpineProtocol(WebSocketServerProtocol):
                     self.send_response(obj["id"], None)
                 elif obj["messageType"] == "registerStreamHandler":
                     self.add_stream_handler(obj["streamId"], obj["streamEvent"])
+                    self.send_response(obj["id"], None)
+                elif obj["messageType"] == "removeStreamHandler":
+                    self.remove_stream_handler(obj["streamId"], obj["streamEvent"])
                     self.send_response(obj["id"], None)
         except:
             self.spine.log.exception("WS onMessage exception")

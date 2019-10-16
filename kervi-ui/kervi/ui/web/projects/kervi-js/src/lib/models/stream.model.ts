@@ -31,6 +31,6 @@ export class Stream {
     }
 
     public close() {
-        //this.kerviService.spine.removeStreamHandler(streamId)
+        this.kerviService.spine.removeStreamHandler(this.streamId, this.events, null);
     }
 }

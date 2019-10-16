@@ -36,8 +36,8 @@ class ZMQPlugin(KerviBusPlugin):
         self._bus.set_log(process_id)
         self._bus.reset_bus(process_id, spine_port, ip, root_address)
         self._bus.run()
-        if root_address:
-            self._bus.wait_for_root()
+        #if root_address:
+        #    self._bus.wait_for_root()
         return self
 
 

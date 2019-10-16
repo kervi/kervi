@@ -218,6 +218,10 @@ export class  KerviSpineBase{
         
     };
 
+    public removeStreamHandler = function(streamId: string, streamEvent: string[], callback){
+        
+    };
+
     public sendCommand(command:string,...p:any[]){
         
     };
