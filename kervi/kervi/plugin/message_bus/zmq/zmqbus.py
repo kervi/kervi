@@ -609,7 +609,7 @@ class ZMQBus():
         connection.connect(self._root_address)
         self._connections_lock.release()
 
-    def wait_for_root(self, timeout=20):
+    def wait_for_root(self, timeout=10):
         if self._root_event:
             if self._root_event.wait(timeout):
                 pass
