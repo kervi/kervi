@@ -1,0 +1,44 @@
+<div fxLayout="row" *ngIf="!inline" class="kervi-block-widget"> 
+    <div fxFlex="60" class="kervi-value-label">
+        web socket messages 
+    </div>
+    
+    <div fxFlex class="kervi-value-section">
+        <span class="value-value" >
+            <!-- <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i> -->
+            <!-- <value-sparkline [value]="value"></value-sparkline> -->
+            {{mps}}
+        </span>
+    </div>
+        
+</div>
+
+<div fxLayout="row" *ngIf="!inline" class="kervi-block-widget"> 
+    <div fxFlex="60" class="kervi-value-label">
+        Ping diff 
+    </div>
+    
+    <div fxFlex class="kervi-value-section">
+        <span class="value-value" >
+            <!-- <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i> -->
+            <!-- <value-sparkline [value]="value"></value-sparkline> -->
+            {{pingDiff}}
+        </span>
+    </div>
+        
+</div>
+
+<div fxLayout="row" *ngIf="!inline" class="kervi-block-widget"> 
+    <div fxFlex="60" class="kervi-value-label">
+        Ping delay 
+    </div>
+    
+    <div fxFlex class="kervi-value-section">
+        <span class="value-value" >
+            <!-- <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i> -->
+            <!-- <value-sparkline [value]="value"></value-sparkline> -->
+            {{pingDelay}}
+        </span>
+    </div>
+        
+</div>

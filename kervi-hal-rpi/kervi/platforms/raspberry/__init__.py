@@ -126,6 +126,21 @@ def getrevision():
         "revisions": ["a020d3"],
         "name": "Pi 3 Model B+",
         "ram": "1GB"
+    },
+    {
+        "revisions": ["a03111"],
+        "name": "Pi 4",
+        "ram": "1GB"
+    },
+    {
+        "revisions": ["b03111"],
+        "name": "Pi 4",
+        "ram": "2GB"
+    },
+    {
+        "revisions": ["c03111"],
+        "name": "Pi 4",
+        "ram": "4GB"
     }
     
       

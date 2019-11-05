@@ -20,7 +20,11 @@ export enum UserLogStateType {normal, warning, error}
 @Injectable()
 export class KerviBaseService {
   public spine: KerviSpineBase = null;
-
+  private lastAppPingTime: Date = null;
+  private lastPingDiff = 0;
+  public appPingDiff$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  public appPingDelay$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  public mps$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   private appInfo = null;
   private  texts: {} = null;
   private components: IComponent[] = [];
@@ -58,6 +62,23 @@ export class KerviBaseService {
               const dynamicValue = component as any;
               dynamicValue.valueTS = new Date(this.timestamp);
               dynamicValue.set(value.value, false);
+            }
+          }
+        });
+
+        self.spine.addEventHandler('appPing', null, function(id, data) {
+          // console.log('appPing', self.lastAppPingTime, id, data);
+          if (self.lastAppPingTime === null) {
+            self.lastAppPingTime = new Date();
+          } else {
+            const now = new Date();
+            const pingDiff = now.getTime() - self.lastAppPingTime.getTime() - 1000;
+            const pingDelay = now.getTime() - data.ts * 1000;
+            self.appPingDelay$.next(pingDelay);
+            self.lastAppPingTime = now;
+            if (pingDiff !== self.lastPingDiff) {
+              self.lastPingDiff = pingDiff;
+              self.appPingDiff$.next(self.lastPingDiff);
             }
           }
         });
@@ -242,6 +263,7 @@ export class KerviBaseService {
       onAuthenticateFailed: this.onAuthenticateFailed,
       onLogOff: this.onLogoff,
       onAuthenticateStart: this.onAuthenticateStart,
+      onMPS: this.onMPS,
       targetScope: this
     });
   }
@@ -377,6 +399,10 @@ export class KerviBaseService {
     this.reset();
     console.log('ks on close');
     this.IPCReady$.next(false);
+  }
+
+  private onMPS(mps: number) {
+    this.mps$.next(mps);
   }
 
   private onHeartbeat() {

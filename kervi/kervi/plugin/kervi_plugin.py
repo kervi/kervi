@@ -16,6 +16,10 @@ class KerviPlugin(object):
 
         from kervi.spine import Spine
         self.spine = Spine()
+
+        from kervi.core.utility.bind_decorators import bind_decorators_to_class
+
+        bind_decorators_to_class(self)
     
     @property
     def manager(self):

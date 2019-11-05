@@ -2,6 +2,22 @@ import os
 import base64
 from io import BytesIO
 from kervi.plugin.kervi_plugin import KerviPlugin
+from kervi.streams.stream_observer import StreamObserver
+
+#stream_id, stream_event, observer_id, handler=None, name="stream", observer_type="stream_observer"
+class _FileChunkObserver(StreamObserver):
+    def __init__(self, plugin, file_id, file):
+        StreamObserver.__init__(self, file_id, None,file_id + ".observer")
+        self._plugin = plugin
+        self._file_id = file_id
+        self._file = file
+
+    def on_event(self, stream_event, data=None):
+        #print("x", stream_event)
+        if stream_event == "FILE_CHUNK":
+            self._file.write(data)
+        if stream_event == "FILE_CLOSE":
+            self._plugin.close_file(self._file_id)
 
 class FilesPlugin(KerviPlugin):
     def __init__(self, name, configuration, manager):
@@ -11,6 +27,11 @@ class FilesPlugin(KerviPlugin):
         self.spine.register_query_handler("files_get_file", self.get_file)
         self.spine.register_command_handler("files_save_file", self.save_file)
         self.spine.register_query_handler("files_get_thumbnail", self.get_thumbnail)
+        self.spine.register_command_handler("files_open_file", self.open_file)
+        #self.spine.register_command_handler("files_write_file", self.write_file)
+        #self.spine.register_command_handler("files_close_file", self.close_file)
+
+        self._open_files = {}
     
     def get_default_config(self):
         return {
@@ -46,7 +67,7 @@ class FilesPlugin(KerviPlugin):
         im = Image.open( self._root + file_path)
         im.thumbnail((128, 128), Image.ANTIALIAS)
         buf = BytesIO()
-        im.save(buf, format='png')
+        im.save(buf, format='jpg')
         data = buf.getvalue()
         return data
     
@@ -61,6 +82,22 @@ class FilesPlugin(KerviPlugin):
             f.write(data)
 
         self.spine.trigger_event("FilesFileSaved", file_type, source, file_name)
+
+    def open_file(self, file_id, source, file_type, file_name, meta_data=None, b64_data=None):
+        file_path = os.path.join(self._root, file_type, source, file_name)
+        dir_path = os.path.dirname(file_path)
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+        f = open(file_path, 'wb')
+        if b64_data:
+            f.write(base64.b64decode(b64_data))
+        
+        self._open_files[file_id] = _FileChunkObserver(self, file_id, f)
+
+    def close_file(self, file_id):
+        self._open_files[file_id]._file.close()
+        del self._open_files[file_id]
 
 def init_plugin(config, manager):
     return FilesPlugin("Files", config, manager)

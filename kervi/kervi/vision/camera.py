@@ -22,6 +22,7 @@
 import os
 import threading
 import time
+import inspect
 from PIL import Image
 import kervi.utility.encryption as encryption
 from kervi.config import Configuration
@@ -40,7 +41,8 @@ import kervi.hal as hal
 from kervi.core.authentication import Authorization
 from kervi.actions import action
 from kervi.core.utility.kervi_logging import KerviLog
-
+from kervi.streams.stream_observer import StreamObserver
+from kervi.streams._stream_observers import stream_observers
 try:
     from SimpleHTTPServer import SimpleHTTPRequestHandler
 except:
@@ -462,18 +464,11 @@ class CameraHTTPStreamer(CameraBase):
 
     def _take_picture(self):
         if self.current_frame:
-            image_name = "img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
+            image_name = "img-" + time.strftime("%Y%m%d-%H%M%S") + ".jpg"
             
-            output = BytesIO()
-            if self._frame_format == "jpeg":
-                image = Image.open(BytesIO(self.current_frame))
-                image.save(output, "PNG")
-            else:
-                self.current_frame.save(output, "PNG")
-
             from kervi.io import save_file
             output.seek(0)
-            save_file(self.component_id, "images", image_name, output)
+            save_file(self.component_id, "images", image_name, self.current_frame)
 
     def _record_start(self):
         pass
@@ -539,6 +534,7 @@ class CameraStreamer(CameraBase):
         
         self.current_frame = None
         self.current_frame_number = 0
+        self._current_file = None
 
         from threading import Lock
         self.mutex = Lock()
@@ -590,6 +586,8 @@ class CameraStreamer(CameraBase):
                 self.fpc_start_time = time.time()
                 self.streamed_fps.value = fpc
             self.spine.stream_data(self.component_id,"IMAGE_FRAME", frame)
+            if self._current_file:
+                self.spine.stream_data(self._current_file,"FILE_CHUNK", frame)
             self.mutex.release()
 
     def frame_captured(self, image):
@@ -601,25 +599,30 @@ class CameraStreamer(CameraBase):
 
     def _take_picture(self):
         if self.current_frame:
-            image_name = "img-" + time.strftime("%Y%m%d-%H%M%S") + ".png"
+            image_name = "img-" + time.strftime("%Y%m%d-%H%M%S") + ".jpg"
             
-            output = BytesIO()
-            if self._frame_format == "jpeg":
-                image = Image.open(BytesIO(self.current_frame))
-                image.save(output, "PNG")
-            else:
-                self.current_frame.save(output, "PNG")
-                #self.spine.stream_data(self.component_id,"LAST_PICTURE", output)
+            # output = BytesIO()
+            # if self._frame_format == "jpeg":
+            #     image = Image.open(BytesIO(self.current_frame))
+            #     image.save(output, "jpg")
+            # else:
+            #     self.current_frame.save(output, "jpg")
+            #     #self.spine.stream_data(self.component_id,"LAST_PICTURE", output)
 
             from kervi.io import save_file
-            output.seek(0)
-            save_file(self.component_id, "images", image_name, output)
+            # output.seek(0)
+            save_file(self.component_id, "images", image_name, self.current_frame)
 
     def _record_start(self):
-        pass
+        video_name = "video-" + time.strftime("%Y%m%d-%H%M%S") + ".mjpg"
+            
+        from kervi.io import open_file
+        self._current_file = open_file(self.component_id, "videos", video_name)
 
     def _record_stop(self):
-        pass
+        from kervi.io import close_file
+        close_file(self._current_file)
+        self._current_file = None
 
     # def _get_media(self):
     #     import glob
@@ -723,4 +726,75 @@ class FrameCameraDeviceDriver(object):
         Abstract method that should stop active recording
         """
         raise NotImplementedError
+
+
+class CameraObserver(StreamObserver):
+    def __init__(self, stream_id, stream_event, observer_id, handler=None, name="stream", observer_type="stream_observer"):
+        StreamObserver.__init__(self, stream_id, stream_event, observer_id, handler, name, observer_type)
+        self._last_frame = None
     
+    def _on_event_res(self, stream_event, data):
+        self._last_frame = data
+
+    @action
+    def take_picture(self):
+        if self._last_frame:
+            image_name = "img-" + time.strftime("%Y%m%d-%H%M%S") + ".jpg"
+            
+            from kervi.io import save_file
+            save_file(self.component_id, "images", image_name, self._last_frame)
+
+    @action
+    def record(self):
+        pass
+
+def _is_method(func):
+    spec = inspect.signature(func)
+    if len(spec.parameters) > 0:
+        if list(spec.parameters.keys())[0] == 'self':
+            return True
+    return False
+
+def camera_observer(method=None, **kwargs) -> CameraObserver:
+    """
+        Decorator that turns a function or controller method into an kervi camera stream observer.
+        
+        @stream_observer
+        def my_observer(stream_id, stream_event, stream_data)
+            ...
+
+        :Keyword Arguments:
+
+            * *observer_id* (``str``) -- 
+                By default the decorator takes the name of function but you can override it with observer_id.
+
+            * *name* (``str``) -- Name to show in UI if the observer is linked to a panel.
+            
+    """
+
+    def stream_wrap(f):
+        stream_id = kwargs.pop("stream_id", None)
+        stream_event = kwargs.pop("stream_event", None)
+        observer_id = kwargs.pop("observer_id", f.__name__)
+        name = kwargs.pop("name", observer_id)
+        if not _is_method(f): # not "." in f.__qualname__:
+            observer = CameraObserver(stream_id, stream_event, observer_id, f, name, **kwargs)
+            stream_observers.add(observer)
+            return observer
+        else:
+            qual_name = getattr(f, "__qualname__", None)
+            owner_class = kwargs.get("controller_class", None)
+            if owner_class:
+                qual_name = owner_class + "." + f.__name__
+
+            if qual_name:    
+                stream_observers.add_unbound(qual_name, observer_id, name, stream_id, stream_event, CameraObserver, kwargs)
+            else:
+                import logging
+                logging.getLogger().error("using upython? if yes you need to pass the name of the controller class via the controller_class parameter.")
+            return f
+
+    if method:
+        return stream_wrap(method)
+    else:
+        return stream_wrap    

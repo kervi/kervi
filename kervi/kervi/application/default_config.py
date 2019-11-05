@@ -55,6 +55,10 @@ def get_default_config():
                 "message_bus": {
                     "own_process": False,
                     "managed": True
+                },
+                "io": {
+                    "own_process": True,
+                    "managed": False
                 }
             }
         },

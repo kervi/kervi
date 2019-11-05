@@ -54,7 +54,7 @@ def stream_observer(method=None, **kwargs) -> StreamObserver:
                 qual_name = owner_class + "." + f.__name__
 
             if qual_name:    
-                stream_observers.add_unbound(qual_name, observer_id, name, stream_id, stream_event, kwargs)
+                stream_observers.add_unbound(qual_name, observer_id, name, stream_id, stream_event, StreamObserver, kwargs)
             else:
                 import logging
                 logging.getLogger().error("using upython? if yes you need to pass the name of the controller class via the controller_class parameter.")

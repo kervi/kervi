@@ -434,6 +434,7 @@ class Application(object):
         try:
             while not self.char_list and _app_running:
                 self._check_kervi_modules()
+                self.spine.trigger_event("appPing", self.config.application.id, {"ts": int(time.time())})
                 time.sleep(1)
 
         except KeyboardInterrupt:

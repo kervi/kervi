@@ -1,70 +1,74 @@
 // Copyright (c) 2016, Tim Wentzlau
 // Licensed under MIT
 
-export class  KerviSpineBase{
+export class  KerviSpineBase {
 
-    public isConnected: Boolean = false;
-    public doAuthenticate:boolean = false;
+    public isConnected = false;
+    public doAuthenticate = false;
 
     sessionId = null;
-    queryHandlers=[];
-    commandHandlers=[];
-    eventHandlers=[];
-    streamHandlers=[];
-    rpcQueue={};
-    ready=false;
-    messageId=0;
-    sensors={};
-    controllers={};
-    sensorTypes=[];
-    controllerTypes=[];
-    visionRegions=[];
-    application=null;
+    queryHandlers = [];
+    commandHandlers = [];
+    eventHandlers = [];
+    streamHandlers = [];
+    rpcQueue = {};
+    ready = false;
+    messageId = 0;
+    sensors = {};
+    controllers = {};
+    sensorTypes = [];
+    controllerTypes = [];
+    visionRegions = [];
+    application = null;
     allowAnonymous = true;
     firstOnOpen = true;
+    messageCount = 0;
+    mpsTime = new Date;
+    mps = 0;
 
     protected websocket = null;
-    
-    public options: any=  {
-            userName: "anonymous",
+
+    public options: any = {
+            userName: 'anonymous',
             password: null,
-            address:null,
-            onOpen:null,
-            onClose:null,
-            onAuthenticate:null,
-            onAuthenticateFailed:null,
-            onAuthenticateStart:null,
+            address: null,
+            onOpen: null,
+            onClose: null,
+            onAuthenticate: null,
+            onAuthenticateFailed: null,
+            onAuthenticateStart: null,
             onLogOff: null,
-            autoConnect:true,
-            targetScope:null,
-            protocol:"ws",
-            apiToken:null
+            onMPS: null,
+            autoConnect: true,
+            targetScope: null,
+            protocol: 'ws',
+            apiToken: null
     }
-    
-    constructor(public constructorOptions){
-        console.log("Kervi base spine init",this.options,constructorOptions);
-        this.options = this.extend(this.options,constructorOptions);
-        console.log("kbo", this.options);
+
+    constructor(public constructorOptions) {
+        console.log('Kervi base spine init', this.options, constructorOptions);
+        this.options = this.extend(this.options, constructorOptions);
+        console.log('kbo', this.options);
         this.connect();
-        var self = this;
+        const self = this;
         setInterval(
-            function(){
-                var hangingNodes=[]
-                for(let id in self.rpcQueue){
-                    var query = self.rpcQueue[id]
-                    if (query["callbackTimeout"]){
-                        if (Date.now() - query["ts"] > query["timeout"]){
-                            var callback = query["callbackTimeout"]; 
+            function() {
+                var hangingNodes = []
+                for(let id in self.rpcQueue) {
+                    var query = self.rpcQueue[id];
+                    if (query['callbackTimeout']) {
+                        if (Date.now() - query['ts'] > query['timeout']){
+                            var callback = query['callbackTimeout']; 
                             hangingNodes.push(id);
                             callback.call(self.options.targetScope);
                         }
                     }
                 }
-                for(var id of hangingNodes){
+                for(let id of hangingNodes) {
                     delete self.rpcQueue[id];
                 }
             }
-        ,1)
+        , 1);
     }
 
     protected extend(...p: any[])
@@ -79,21 +83,20 @@ export class  KerviSpineBase{
         return p[0];
     }
 
-    protected addRPCCallback(id:string, callback, callbackTimeout, timeout)
-    {
-        if (callback){
-            this.rpcQueue[id]={
-                "callback":callback,
-                "callbackTimeout":callbackTimeout,
-                "timeout": timeout,
-                "ts":Date.now(),
+    protected addRPCCallback(id: string, callback, callbackTimeout, timeout) {
+        if (callback) {
+            this.rpcQueue[id] = {
+                'callback': callback,
+                'callbackTimeout': callbackTimeout,
+                'timeout': timeout,
+                'ts': Date.now(),
              };
         }
     }
 
     protected handleRPCResponse(message){
         if (message.id in this.rpcQueue){
-            var callback = this.rpcQueue[message.id]["callback"];
+            var callback = this.rpcQueue[message.id]['callback'];
             if (callback){
                 delete this.rpcQueue[message.id];
                 callback.call(this.options.targetScope,message.response,message.response);
@@ -102,25 +105,25 @@ export class  KerviSpineBase{
     }
 
     protected handleEvent(message){
-        //console.log("ev", message)
-        var eventName=message.event;
-        var id=message.id;
-        
-        var eventPath=eventName;
-        if (id){
-            eventPath+="/"+id;
+        // console.log('ev', message)
+        const eventName = message.event;
+        const id = message.id;
+
+        let eventPath=eventName;
+        if (id) {
+            eventPath += '/' + id;
         }
-        
-        var value=null;
-        if(message.args && message.args.length){
-            value=message.args[0];
+
+        let value = null;
+        if(message.args && message.args.length) {
+            value = message.args[0];
         }
-        for(var n=0;(n<this.eventHandlers.length);n++)
+        for(var n = 0; (n < this.eventHandlers.length); n++)
         {
-            var h=this.eventHandlers[n];
-            if (h.eventName==eventPath)
+            let h = this.eventHandlers[n];
+            if (h.eventName === eventPath)
                 h.callback.call(value,id,value);
-            else if (h.eventName==eventName)
+            else if (h.eventName === eventName)
                 h.callback.call(value,id,value);
         }
     }
@@ -138,7 +141,7 @@ export class  KerviSpineBase{
     }
 
     protected handleCommand(message){
-        console.log("cmd",this,message);
+        console.log('cmd',this,message);
         var command=message.command
         
         var args=null;
@@ -154,87 +157,85 @@ export class  KerviSpineBase{
         }
     }
 
-    protected connect(){
-        
+    protected connect() {
+
     }
 
-    protected onOpen(evt){
-        console.log("Kervi open",this,evt);
-        
-        var self=this
-        this.isConnected=true;
-        
+    protected onOpen(evt) {
+        console.log('Kervi open', this, evt);
+
+        this.isConnected = true;
         this.eventHandlers = [];
         this.streamHandlers = [];
         this.commandHandlers = [];
-        this.queryHandlers = [];	
-        console.log("Kervi spine ready")
-        
+        this.queryHandlers = [];
+        console.log('Kervi spine ready');
+
     }
 
-    protected onClose(evt){
-        console.log("Kervi spine on close",evt);
-        this.isConnected=false;
-        var self = this;
+    protected onClose(evt) {
+        console.log('Kervi spine on close', evt);
+        this.isConnected = false;
+        const self = this;
         if (this.options.onClose)
             this.options.onClose.call(this.options.targetScope,evt);
-        this.firstOnOpen=true;
-        if (this.options.autoConnect){
-            setTimeout(function(){
+        this.firstOnOpen = true;
+        if (this.options.autoConnect) {
+            setTimeout(function() {
                 self.connect();
-            } ,1000);
+            }, 1000);
         }
     }
 
-    public authenticate(userName, password){
-        
+    public authenticate(userName, password) {
+
     }
 
-    public logoff(){
-        
+    public logoff() {
+
     }
 
-    protected onMessage(evt){
-        
+    protected onMessage(evt) {
+
     }
 
-    protected onError(evt){
-        console.log("Kervi on error",evt);
+    protected onError(evt) {
+        console.log('Kervi on error', evt);
     }
 
-    public addCommandHandler (command:string,callback){
-        
+    public addCommandHandler (command: string, callback) {
+
+    }
+
+    public addQueryHandler(query: string, callback) {
+
+    }
+
+    public addEventHandler = function(eventName: string, id: string, callback) {
+
     };
 
-    public addQueryHandler(query:string,callback){
-        
-    };
+    public addStreamHandler = function(streamId: string, streamEvent: string[], callback) {
 
-    public addEventHandler=function(eventName:string,id:string,callback){
-        
-    };
+    }
 
-    public addStreamHandler = function(streamId: string, streamEvent: string[], callback){
-        
-    };
+    public removeStreamHandler = function(streamId: string, streamEvent: string[], callback) {
 
-    public removeStreamHandler = function(streamId: string, streamEvent: string[], callback){
-        
-    };
+    }
 
-    public sendCommand(command:string,...p:any[]){
-        
-    };
+    public sendCommand(command: string, ...p: any[]) {
 
-    public sendQuery(query,...p:any[]){
-        
-    };
+    }
 
-    public triggerEvent(eventName:string,id:string){
-        
-    };
+    public sendQuery(query, ...p: any[]) {
 
-    public streamData(stream_id:string, event:string , data:any){
-        
-    };
+    }
+
+    public triggerEvent(eventName: string, id: string) {
+
+    }
+
+    public streamData(stream_id: string, event: string , data: any) {
+
+    }
 }

@@ -102,13 +102,22 @@ class _WebEventHandler(object):
         self.id_event = id_event
         self.spine = Spine()
         self.spine.register_event_handler(event, self.on_event, id_event, injected="socketSpine")
+        self._eps_counter = 0
+        self._eps_start_time = time.time()
+        self._eps = 0
         
     def on_event(self, id_event, *args, **kwargs):
         injected = kwargs.get("injected", "")
         groups = kwargs.get("groups", None)
-        process_id = kwargs.get("process_id", None)
+        #process_id = kwargs.get("process_id", None)
         #self.spine.log.debug("WS relay event:{0} injected:{1}", self.event, injected)
-
+        self._eps_counter += 1
+        now = time.time()
+        seconds = now - self._eps_start_time 
+        if (seconds) > 1 :
+            self._eps = self._eps_counter / seconds
+            self._eps_counter = 0
+            self._eps_start_time = now
         authorized = True
 
         if self.protocol.user != None and self.protocol.user["groups"] != None and groups != None and len(groups) > 0:
@@ -120,7 +129,7 @@ class _WebEventHandler(object):
 
         if authorized and self.protocol.authenticated and not injected == "socketSpine":
             
-            cmd = {"messageType":"event", "event":self.event, "id":id_event, "args":args}
+            cmd = {"messageType":"event", "event":self.event, "id":id_event, "args":args, "eps": self._eps, "ts": now}
             jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
             self.protocol.broadcast_message(self.protocol, jsonres)
 
@@ -131,23 +140,25 @@ class _WebStreamHandler(object):
         self.stream_id = stream_id
         self.spine = Spine()
         self.spine.register_stream_handler(stream_id, self.on_event, stream_event, injected="socketSpine")
-        self._epc_counter = 0
-        self._epc_start_time = time.time()
+        self._eps_counter = 0
+        self._eps_start_time = time.time()
+        self._eps = 0
         
     def close(self):
         self.spine.unregister_stream_handler(self.stream_id, self.on_event, self.stream_event)
     
     def on_event(self, stream_id, stream_event, data, *args, **kwargs):
-        self._epc_counter += 1
-        seconds = time.time() - self._epc_start_time 
+        self._eps_counter += 1
+        now = time.time()
+        seconds = now - self._eps_start_time 
         if (seconds) > 1 :
-            epc = self._epc_counter / seconds
-            self._epc_counter = 0
-            self._epc_start_time = time.time()
+            self._eps = self._eps_counter / seconds
+            self._eps_counter = 0
+            self._eps_start_time = now
             #print("epc", self.stream_id, self.stream_event, epc)
         injected = kwargs.get("injected", "")
         groups = kwargs.get("groups", None)
-        process_id = kwargs.get("process_id", None)
+        #process_id = kwargs.get("process_id", None)
         
         authorized = True
         if self.protocol.user != None and self.protocol.user["groups"] != None and groups != None and len(groups) > 0:
@@ -158,7 +169,7 @@ class _WebStreamHandler(object):
                 authorized = False
 
         if authorized and self.protocol.authenticated and not injected == "socketSpine":
-            cmd = {"messageType":"stream", "streamId":self.stream_id, "streamEvent":self.stream_event, "args":args}
+            cmd = {"messageType":"stream", "streamId":self.stream_id, "streamEvent":self.stream_event, "args":args, "eps": self._eps, "ts": now}
             jsonres = json.dumps(cmd, cls=_ObjectEncoder, ensure_ascii=False).encode('utf8')
             jsonlen = len(jsonres)
             jsonres = jsonlen.to_bytes(4, byteorder='little') + jsonres + data
