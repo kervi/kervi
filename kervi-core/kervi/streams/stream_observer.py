@@ -15,6 +15,7 @@ class StreamObserver(Controller):
         self._epc_start_time = time.time()
         self._epc_counter = 0
         self._handler = handler
+        self._last_event_frame = None
         self._lock = Lock()
 
         self._ui_parameters["source_stream"] = stream_id
@@ -27,7 +28,7 @@ class StreamObserver(Controller):
     def __call__(self, *args, **kwargs):
         return self._handler(*args, **kwargs)
 
-    def _on_event(self, stream_id, stream_event, data):
+    def _on_event(self, stream_id, stream_event, data=None):
         self._epc_counter += 1
         seconds = time.time() - self._epc_start_time 
         if (seconds) > 1 :
@@ -40,12 +41,16 @@ class StreamObserver(Controller):
             if observer_res:
                 #print("os", stream_id + "." + self.observer_id, stream_event)
                 stream_data(stream_id + "." + self.observer_id, stream_event, observer_res)
+                self._on_new_event_res(stream_event, observer_res)
             self._lock.release()
 
     def on_event(self, stream_event, data):
         if self._handler:
             return self._handler(self, stream_event, data)
         return None
+
+    def _on_new_event_res(self, stream_event, data):
+        pass
 
     def link_to_dashboard(self, dashboard_id=None, panel_id=None, **kwargs):
         r"""

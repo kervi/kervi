@@ -18,8 +18,9 @@ export { KerviDateTimeComponent } from './lib/values/kervi-datetime-value.compon
 export { KerviStringComponent } from './lib/values/kervi-string-value.component';
 export { KerviUserLogComponent } from './lib/user-log/user-log.component';
 export { KerviDirectoryComponent } from './lib/files/kervi-directory.component';
+export { KerviAppHealthComponent } from './lib/dashboard/app-health.component';
 
-export  { AppInjector } from './lib/app-injector.service'
+export  { AppInjector } from './lib/app-injector.service';
 
 export * from './lib/ngx-kervi.component';
 export * from './lib/ngx-kervi.module';

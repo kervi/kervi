@@ -94,8 +94,7 @@ export class GaugeComponent implements OnInit {
 
     this.value.value$.subscribe(function(v){
       if (self.chartObj && v){
-        //self.series=[v];
-        console.log("gv", v);
+        // console.log("gv", v);
         self.chartObj.updateSeries( [v]);
       }
     });

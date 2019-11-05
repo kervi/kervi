@@ -17,6 +17,8 @@ import { KerviCameraComponent } from './camera/kervi-camera.component';
 import { KerviWidgetComponent } from './dashboard/kervi-widget.component';
 import { KerviUserLogComponent } from './user-log/user-log.component';
 import { KerviDirectoryComponent } from './files/kervi-directory.component';
+import { KerviAppHealthComponent } from './dashboard/app-health.component';
+
 @NgModule({
   imports: [
   ],
@@ -35,7 +37,8 @@ import { KerviDirectoryComponent } from './files/kervi-directory.component';
     KerviWidgetComponent,
     KerviCameraComponent,
     KerviUserLogComponent,
-    KerviDirectoryComponent
+    KerviDirectoryComponent,
+    KerviAppHealthComponent
   ],
   providers: [NGXKerviService, KerviTemplateService],
   exports: [
@@ -52,7 +55,8 @@ import { KerviDirectoryComponent } from './files/kervi-directory.component';
     KerviActionComponent,
     KerviCameraComponent,
     KerviUserLogComponent,
-    KerviActionComponent
+    KerviActionComponent,
+    KerviAppHealthComponent
   ]
 })
 export class NgxKerviModule {

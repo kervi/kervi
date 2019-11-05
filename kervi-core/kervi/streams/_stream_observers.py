@@ -9,8 +9,8 @@ class _StreamObservers(object):
     def add(self, observer):
         _StreamObservers.__observers[observer.observer_id] = observer
 
-    def add_unbound(self, handler_name, observer_id, name, stream_id, stream_event, kwargs):
-        _StreamObservers.__unbound_observers[handler_name] = (observer_id, name, stream_id, stream_event, kwargs)
+    def add_unbound(self, handler_name, observer_id, name, stream_id, stream_event, observer_class, kwargs):
+        _StreamObservers.__unbound_observers[handler_name] = (observer_id, name, stream_id, stream_event, observer_class, kwargs)
 
     def is_unbound(self, handler_name):
         return handler_name in _StreamObservers.__unbound_observers

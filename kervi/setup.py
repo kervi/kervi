@@ -85,7 +85,7 @@ setup(
         'kervi-hal-generic==' + VERSION,
         'kervi-device-library==' + VERSION,
         'autobahn',
-        'pyzmq',
+        'pyzmq>=18.1.0',
         'pillow',
         'kervi-hal-win==' + VERSION,
         'kervi-hal-rpi==' + VERSION

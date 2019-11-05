@@ -14,6 +14,7 @@ from kervi.values.kervi_value import KerviValue
 from kervi.values import NumberValue
 from kervi.actions import Actions
 from kervi.actions.action import Action, _ActionInterrupt
+from kervi.core.utility.bind_decorators import bind_decorators_to_class
 
 class Controller(KerviComponent):
     """
@@ -42,64 +43,63 @@ class Controller(KerviComponent):
         self.spine.register_event_handler("processTerminating", self._on_terminate)
         self.spine.register_event_handler("appReady", self._on_app_ready)
         self.spine.register_event_handler("moduleStarted", self._on_app_ready)
-        self.actions = {}
-        self.stream_observers = {}
-        self.region_observers = {}
+        
+        bind_decorators_to_class(self)
 
-        method_list = [func for func in dir(self)]
-        for method_name in method_list:
-            try:
-                if hasattr(self, method_name):
-                    method = getattr(self, method_name)
-                    method_qual_name = getattr(method, "__qualname__", None)
-                    if not method_qual_name:
-                        method_qual_name = self.__class__.__name__ + "." + method_name
+        # method_list = [func for func in dir(self)]
+        # for method_name in method_list:
+        #     try:
+        #         if hasattr(self, method_name):
+        #             method = getattr(self, method_name)
+        #             method_qual_name = getattr(method, "__qualname__", None)
+        #             if not method_qual_name:
+        #                 method_qual_name = self.__class__.__name__ + "." + method_name
                     
-                    if Actions.is_unbound(method_qual_name):
-                        action_id, name, ukwargs = Actions.get_unbound(method_qual_name)
-                        setattr(self, "kervi_action_"+ method.__name__, method)
-                        copy_method = getattr(self, "kervi_action_"+ method.__name__)
-                        action = Action(copy_method, self.controller_id + "." + action_id, name, **ukwargs)
-                        Actions.add(action)
-                        self.actions[action_id] = action
-                        setattr(self, method.__name__, action)
+        #             if Actions.is_unbound(method_qual_name):
+        #                 action_id, name, ukwargs = Actions.get_unbound(method_qual_name)
+        #                 setattr(self, "kervi_action_"+ method.__name__, method)
+        #                 copy_method = getattr(self, "kervi_action_"+ method.__name__)
+        #                 action = Action(copy_method, self.controller_id + "." + action_id, name, **ukwargs)
+        #                 Actions.add(action)
+        #                 self.actions[action_id] = action
+        #                 setattr(self, method.__name__, action)
 
-                    from kervi.streams._stream_observers import stream_observers
-                    from kervi.streams.stream_observer import StreamObserver
-                    if stream_observers.is_unbound(method_qual_name):
-                        observer_id, name, stream_id, stream_event, ukwargs = stream_observers.get_unbound(method_qual_name)
-                        setattr(self, "kervi_stream_observer_"+ method.__name__, method)
-                        copy_method = getattr(self, "kervi_stream_observer_"+ method.__name__)
-                        observer = StreamObserver(stream_id, stream_event, self.controller_id + "." + observer_id, copy_method, name, **ukwargs)
-                        self.stream_observers[observer_id] = observer
-                        setattr(self, method.__name__, observer)
+        #             from kervi.streams._stream_observers import stream_observers
+        #             from kervi.streams.stream_observer import StreamObserver
+        #             if stream_observers.is_unbound(method_qual_name):
+        #                 observer_id, name, stream_id, stream_event, observer_class, ukwargs = stream_observers.get_unbound(method_qual_name)
+        #                 setattr(self, "kervi_stream_observer_"+ method.__name__, method)
+        #                 copy_method = getattr(self, "kervi_stream_observer_"+ method.__name__)
+        #                 observer = observer_class(stream_id, stream_event, self.controller_id + "." + observer_id, copy_method, name, **ukwargs)
+        #                 self.stream_observers[observer_id] = observer
+        #                 setattr(self, method.__name__, observer)
 
-                    from kervi.vision._region_observers import region_observers
-                    from kervi.vision.region_observer import RegionObserver
-                    if region_observers.is_unbound(method_qual_name):
-                        observer_id, name, stream_id, region_group, ukwargs = stream_observers.get_unbound(method_qual_name)
-                        setattr(self, "kervi_region_observer_"+ method.__name__, method)
-                        copy_method = getattr(self, "kervi_region_observer_"+ method.__name__)
-                        observer = RegionObserver(stream_id, stream_event, self.controller_id + "." + observer_id, copy_method, name, **ukwargs)
-                        self.region_observers[observer_id] = observer
-                        setattr(self, method.__name__, observer)
-            except KeyError:
-                pass
+        #             from kervi.vision._region_observers import region_observers
+        #             from kervi.vision.region_observer import RegionObserver
+        #             if region_observers.is_unbound(method_qual_name):
+        #                 observer_id, name, stream_id, region_group, ukwargs = stream_observers.get_unbound(method_qual_name)
+        #                 setattr(self, "kervi_region_observer_"+ method.__name__, method)
+        #                 copy_method = getattr(self, "kervi_region_observer_"+ method.__name__)
+        #                 observer = RegionObserver(stream_id, stream_event, self.controller_id + "." + observer_id, copy_method, name, **ukwargs)
+        #                 self.region_observers[observer_id] = observer
+        #                 setattr(self, method.__name__, observer)
+        #     except KeyError:
+        #         pass
 
-        for method_name in method_list:
-            try:
-                if hasattr(self, method_name):
-                    method = getattr(self, method_name)
-                    method_qual_name = getattr(method, "__qualname__", None)
-                    if not method_qual_name:
-                        method_qual_name = self.__class__.__name__ + "." + method_name
-                    if Actions.is_unbound_interrupt(method_qual_name):
-                        action_id = Actions.get_unbound_interrupt(method_qual_name)
-                        action = self.actions[action_id]
-                        action._interrupt = _ActionInterrupt(method)
-                        action.set_ui_parameter("interrupt_enabled", True)
-            except KeyError:
-                pass
+        # for method_name in method_list:
+        #     try:
+        #         if hasattr(self, method_name):
+        #             method = getattr(self, method_name)
+        #             method_qual_name = getattr(method, "__qualname__", None)
+        #             if not method_qual_name:
+        #                 method_qual_name = self.__class__.__name__ + "." + method_name
+        #             if Actions.is_unbound_interrupt(method_qual_name):
+        #                 action_id = Actions.get_unbound_interrupt(method_qual_name)
+        #                 action = self.actions[action_id]
+        #                 action._interrupt = _ActionInterrupt(method)
+        #                 action.set_ui_parameter("interrupt_enabled", True)
+        #     except KeyError:
+        #         pass
 
     @property
     def controller_id(self):

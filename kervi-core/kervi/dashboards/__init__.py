@@ -26,13 +26,9 @@ class DashboardPanelGroup(object):
         :Keyword Arguments:
             * *title* (``str``) -- Title of the group.
             * *columns* (``int``) -- Number of columns in this group, default is 1.
-            * *rows* (``int``) -- Number of rows in this panel, default is 1.
-            * *user_log* (``bool``) -- This panel shows user log messages. Any components that are linked to a user log panel are ignored.
-            * *collapsed* (``bool``) -- If true the body of the panel is collapsed.
-
+            
         """
     def __init__(self, panels=None, **kwargs):
-        #KerviComponent.__init__(self, panel_id, "Dashboard-panel", name)
         self.spine = spine.Spine()
         self.group_id = kwargs.get("title", None)
         self.ui_parameters = {
@@ -114,14 +110,11 @@ class DashboardPanel(object):
 
         :Keyword Arguments:
             * *title* (``str``) -- Title of the panel.
-            * *columns* (``int``) -- Number of columns in this panel, default is 1.
-            * *rows* (``int``) -- Number of rows in this panel, default is 1.
             * *user_log* (``bool``) -- This panel shows user log messages. Any components that are linked to a user log panel are ignored.
             * *collapsed* (``bool``) -- If true the body of the panel is collapsed.
 
         """
     def __init__(self, panel_id, **kwargs):
-        #KerviComponent.__init__(self, panel_id, "Dashboard-panel", name)
         self.spine = spine.Spine()
         self.panel_id = panel_id
 
@@ -130,6 +123,7 @@ class DashboardPanel(object):
             "width":kwargs.pop("width", 0),
             "height":kwargs.pop("height", 0),
             "userLog":kwargs.pop("user_log", False),
+            "app_health":kwargs.pop("app_health", False),
             "logLength":kwargs.pop("log_length", 5),
             "gauge_width":kwargs.pop("gauge_width", 0),
             "gauge_height":kwargs.pop("gauge_height", 0),

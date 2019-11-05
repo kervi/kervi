@@ -22,3 +22,6 @@ setup.cfg
 kervi-core/kervi_core.egg-info/PKG-INFO
 node_modules
 kervi.log
+.pytest_cache/v/cache/lastfailed
+.pytest_cache/v/cache/nodeids
+.pytest_cache/v/cache/stepwise

@@ -9,10 +9,11 @@ import {  ValuesModule } from './values/values.module';
 import { ControllerPadComponent } from './controller-pad/controller-pad.component';
 import { CamViewerComponent } from './cam-viewer/cam-viewer.component';
 import { ActionComponent } from './action/action.component';
-import { UIComponentsModule} from './ui-components/ui-components.module'
-import { UserLogComponent} from './log/user-log/user-log.component'
-import { UserMessagesComponent } from './log/messages/messages.component'
-import { UserMessageButtonComponent } from './log/message-button/message-button.component'
+import { UIComponentsModule} from './ui-components/ui-components.module';
+import { UserLogComponent} from './log/user-log/user-log.component';
+import { AppHealthComponent} from './app-health/app-health.component';
+import { UserMessagesComponent } from './log/messages/messages.component';
+import { UserMessageButtonComponent } from './log/message-button/message-button.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 @NgModule({
   imports: [
@@ -33,7 +34,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     ActionComponent,
     UserLogComponent,
     UserMessageButtonComponent,
-    UserMessagesComponent
+    UserMessagesComponent,
+    AppHealthComponent
   ],
   exports: [
     DashboardPanelComponent,
@@ -41,7 +43,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     CamViewerComponent,
     UserLogComponent,
     UserMessageButtonComponent,
-    UserMessagesComponent
+    UserMessagesComponent,
+    AppHealthComponent
   ]
 })
 export class KerviZorroModule { }
