@@ -24,15 +24,17 @@ class NumberValue(KerviValue):
         self._min_value = -100
         self._max_value = 100
         
-        KerviValue.__init__(self, name, "number-value", **kwargs)
-        #self.spine = Spine()
         try:
             from pint import UnitRegistry
             self._ureg = UnitRegistry()
             self._ureg.autoconvert_offset_to_baseunit = True
             self._Q = self._ureg.Quantity
-        except ModuleNotFoundError:
+        except ImportError:
             self._Q = None
+
+        KerviValue.__init__(self, name, "number-value", **kwargs)
+        #self.spine = Spine()
+        
 
         self._type = None
         #self._display_unit = None
@@ -49,9 +51,14 @@ class NumberValue(KerviValue):
         self._ui_parameters["pad_auto_center"] = False
         self._ui_parameters["chart_buttons"] = True
         self._ui_parameters["chart_grid"] = True
+        self._ui_parameters["chart_x_axis"] = True
+        self._ui_parameters["chart_y_axis"] = True
+        self._ui_parameters["chart_title"] = self.name
         self._ui_parameters["chart_interval"] = "5min"
-        self._ui_parameters["chart_fill"] = True
+        #self._ui_parameters["chart_fill"] = True
         self._ui_parameters["chart_point"] = 0
+        self._ui_parameters["chart_type"] = "area"
+        self._ui_parameters["gauge_size"] = 250
         if Configuration:
             unit_system = Configuration.unit_system
             chart_time_format = Configuration.display.unit_systems.systems[unit_system].datetime.chart
@@ -217,7 +224,6 @@ class NumberValue(KerviValue):
             old_value = self._value
             self._value = new_value
             self.value_changed(new_value, old_value)
-
             for observer in self._observers:
                 if isinstance(observer, tuple):
                     item, transformation = observer
@@ -229,7 +235,6 @@ class NumberValue(KerviValue):
                     observer.kervi_value_changed(self, new_value)
 
             self._check_value_events(new_value, old_value)
-
             if self._persist_value and allow_persist:
                 self.settings.store_value("value", self.value)
 
@@ -249,7 +254,6 @@ class NumberValue(KerviValue):
                 "display_value": self.display_value,
                 "display_unit": self.display_unit
             }
-            
             self.spine.trigger_event(
                 "valueChanged",
                 self.component_id,
@@ -257,6 +261,7 @@ class NumberValue(KerviValue):
                 self._log_values,
                 groups=self.user_groups
             )
+            
 
     def link_to_dashboard(self, dashboard_id=None, panel_id=None, **kwargs):
         r"""
@@ -382,7 +387,10 @@ class DateTimeValue(KerviValue):
     def value(self):
         """Current value of the component"""
         if self._value:
-            return datetime.strptime(self._value,'%Y-%m-%dT%H:%M:%SZ')
+            try:
+                return datetime.strptime(self._value,'%Y-%m-%dT%H:%M:%SZ')
+            except ValueError:
+                return datetime.strptime(self._value,'%Y-%m-%dT%H:%M:%S.%fZ')
         return None
 
     @property
@@ -390,13 +398,17 @@ class DateTimeValue(KerviValue):
         """Current value of the component"""
         if self._value:
             return datetime.strptime(self._value[:10],'%Y-%m-%d')
+            
         return None
 
     @property
     def time(self):
         """Current value of the component"""
         if self._value:
-            return datetime.strptime(self._value[10:],'T%H:%M:%SZ')
+            try:
+                return datetime.strptime(self._value[10:],'T%H:%M:%SZ')
+            except ValueError:
+                return datetime.strptime(self._value[10:],'T%H:%M:%S.%fZ')
         return None
 
 
@@ -566,7 +578,7 @@ class EnumValue(KerviValue):
         if self._persist_value and allow_persist:
             self.settings.store_value("value", self.value)
 
-        timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        #timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
         self._last_reading = time.clock()
 
         #val = {"value_id":self.component_id, "value":new_value, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}

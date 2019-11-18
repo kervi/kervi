@@ -45,7 +45,10 @@ class KerviLog(object):
             self.logger._log(VERBOSE, message, *args)
     
     def warn(self, message, *args):
-        self.logger.warn(BraceMessage(message, *args))
+        self.logger.warning(BraceMessage(message, *args))
+
+    def warning(self, message, *args):
+        self.logger.warning(BraceMessage(message, *args))
 
     def debug(self, message, *args):
         if args:
@@ -63,7 +66,7 @@ class KerviLog(object):
         self.logger.fatal(BraceMessage(message, *args))
 
 def init_process_logging(process_name, config, log_queue=None):
-    logger = logging.getLogger(process_name)
+    logger = logging.getLogger()
     
     if config.level == "verbose":
         logger.setLevel(VERBOSE)
@@ -74,7 +77,6 @@ def init_process_logging(process_name, config, log_queue=None):
     elif config.level == "debug":
         logger.setLevel(logging.DEBUG)    
         
-
     if log_queue:
         queue_handler = logging.handlers.QueueHandler(log_queue)
         logger.addHandler(queue_handler)

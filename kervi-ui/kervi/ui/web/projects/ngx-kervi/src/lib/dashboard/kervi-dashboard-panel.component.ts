@@ -1,16 +1,16 @@
 import { Component, Input } from '@angular/core';
-import { DashboardSizes, DashboardPanel, DashboardMessageModel } from 'kervi-js';
+import { DashboardSizes, DashboardPanel } from 'kervi-js';
 import { NGXKerviService } from '../ngx-kervi.service';
 import { KerviTemplateService } from '../ngx-kervi-template.service';
 import { AppInjector } from '../app-injector.service';
-import {  Observable } from 'rxjs';
+
 @Component({
   selector: 'kervi-dashboard-panel-base',
   template: ''
 })
 export class KerviDashboardPanelComponent {
   @Input() dashboardSizes: DashboardSizes;
-  @Input() panel:DashboardPanel;
+  @Input() panel:DashboardPanel=null;
   @Input() inline:boolean = false;
   @Input() inGroup:boolean = false;
   @Input() bodyOnly:boolean = false;
@@ -19,19 +19,18 @@ export class KerviDashboardPanelComponent {
   public width:string = "";
   public showHeader:boolean = false;
   public expanded:boolean = false;
-  public title:string;
+  public title:string = null;
   public bodyComponents:any[]=[];
   public headerComponents: any[] = [];
   public footerComponents: any[] = [];
   //messages: DashboardMessageModel[] = [];
-  messages$: Observable<DashboardMessageModel[]> = null;
+  
   //panelComponents:IComponent[] = []
   protected templateService: KerviTemplateService = null;
   protected kerviService:NGXKerviService = null;
   constructor (){
     this.templateService = AppInjector.get(KerviTemplateService);    
     this.kerviService = AppInjector.get(NGXKerviService);  
-    this.messages$ = this.kerviService.getLogMessages$(); 
   }
 
     calcWidth(panel:DashboardPanel, inGroup){
@@ -68,23 +67,15 @@ export class KerviDashboardPanelComponent {
         }
         
         this.showHeader = (this.panel.parameters.title != null && this.panel.parameters.title.length>0) || (this.headerComponents.length > 0)
-        if (this.panel.parameters.userLog){
-            this.kerviService.spine.sendQuery("getLogItems",0, this.panel.parameters.logLength,function(v){
-                //console.log('lm', v);
-                //var messages = DashboardFactory.createLogMessages(v)
-                //self.messages$.next(messages);
-                
-            });
-            /*this.kerviService.spine.addEventHandler("userLogMessage", null, function(v){
-                var messages = self.messages$.value
-                console.log("lm", this);
-                messages.unshift(new DashboardMessageModel(this));
-                if (messages.length>self.panel.parameters.logLength)
-                    messages.pop();
-                self.messages$.next(messages);   
-            });*/
-        }
+        
 
-         this.width = this.inGroup ? "" : this.templateService.getSizeValue(self.panel.parameters.width);
+        if (this.panel.type=="group"){
+            if (this.panel.parameters.width==null || this.panel.parameters.width=="0" || this.panel.parameters.width=="")
+                this.width = "100%"
+            else
+                this.width = this.templateService.getSizeValue(this.panel.parameters.width);
+        } else
+            //this.width = this.inGroup ? "100%" : this.templateService.getSizeValue(this.panel.parameters.width);
+            this.width = this.templateService.getSizeValue(this.panel.parameters.width);
     }
   }

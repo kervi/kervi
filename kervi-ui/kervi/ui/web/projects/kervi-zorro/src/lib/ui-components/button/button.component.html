@@ -1,0 +1,20 @@
+<ng-template #buttonContentTemplate>
+    <i *ngIf="linkParameters.buttonIcon" nz-icon [type]="linkParameters.buttonIcon"></i>
+    {{ linkParameters.buttonText }}
+</ng-template>
+<button
+    *ngIf = "linkParameters.confirm"
+    nz-button nzType="primary"
+    (nzOnConfirm)="confirm()"
+    nz-popconfirm [nzTitle]="linkParameters.confirmMessage"
+>
+<ng-container *ngTemplateOutlet="buttonContentTemplate"></ng-container>
+</button>
+<button
+    *ngIf = "!linkParameters.confirm"
+    nz-button nzType="primary"
+    (mousedown)="press()" 
+    (mouseup)="release()"
+>
+<ng-container *ngTemplateOutlet="buttonContentTemplate"></ng-container>
+</button>

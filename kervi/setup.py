@@ -18,6 +18,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
+    python_requires='>=3.5.0',
     name='kervi',
     author='Tim Wentzlau',
     author_email='tim.wentzlau@gmail.com',
@@ -30,11 +31,13 @@ setup(
     long_description_content_type="text/markdown",
     packages=[
         'kervi/application',
+        'kervi/io',
         'kervi/messaging',
         'kervi/module',
         'kervi/plugin',
         'kervi/plugin/authentication',
         'kervi/plugin/authentication/plain',
+        'kervi/plugin/io/files',
         'kervi/plugin/ipc/websocket',
         'kervi/plugin/message_bus',
         'kervi/plugin/message_bus/zmq',
@@ -52,7 +55,7 @@ setup(
         'kervi/storage',
         'kervi/utility',
         'kervi/version',
-        'kervi/vision',
+        'kervi/vision'
     ],
     version=VERSION,
     
@@ -82,10 +85,12 @@ setup(
         'kervi-hal-generic==' + VERSION,
         'kervi-device-library==' + VERSION,
         'autobahn',
-        'pyzmq',
+        'pyzmq>=18.1.0',
+        'pillow',
         'kervi-hal-win==' + VERSION,
         'kervi-hal-rpi==' + VERSION
     ],
+    include_package_data=True
     # extras_require={
     #     'rpi':  ['kervi-hal-rpi'],
     #     'raspberry':  ['kervi-hal-rpi'],

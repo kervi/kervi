@@ -1,68 +1,96 @@
-<nav class="navbar row navbar-toggleable-md navbar-fixed-top navbar-light bg-faded page-header">
-	<div class="row" style="width:100%">
-		<div class="col-xs-4 col-sm-4">
-			<ul class="navbar-nav flex-nowrap flex-row" >
-				<li class="nav-item dropdown">
-					<a *ngIf="showMenu" class="dropdown btn nav-link" title="{{( 'dashboards' | translate)}}" style="padding-top:0;cursor: pointer" data-toggle="dropdown"><i class="fa fa-bars fa-lg" aria-hidden="true"></i></a>
-					<div  class="dropdown-menu  multi-leve ul.nav.navbar-nav.no-collapse">
-						<!--<span class="dropdown-divider">&nbsp; Dashboards</span>-->
-						<div class="dropdown-submenu">
+<nz-layout *ngIf="dashboard">
+	<nz-header *ngIf='!isAppEmpty'>
+		<div nz-row>
+			<div nz-col nzSpan="6">		
+				<ul nz-menu  nzMode="horizontal" class="kervi-main-menu">
+					<li nz-submenu  *ngIf="showMenu">
+						
+						<span title><i nz-icon nzTheme="twotone" type="dashboard" [nzTwotoneColor]="'#9fd037'"></i> {{dashboard.name}}</span>
+						<ul>
 							<ng-container *ngIf="dashboards.length > 1">
-							<a  *ngFor="let dashboard of dashboards" class="dropdown-item" [routerLink]="['/dashboard', dashboard.id]">{{dashboard.name}}</a>
+								<li nz-menu-item *ngFor="let dashboard of dashboards" [routerLink]="['/dashboard', dashboard.id]">{{dashboard.name}}</li>
 							</ng-container>
-							<div *ngIf="authenticated && dashboardCount > 1" class="dropdown-divider"></div>
-							<a *ngIf="authenticated && anonymous" href="javascript: return false;" (click)="logoff($event)" class="dropdown-item" >{{('login' | translate)}}</a>
-							<a *ngIf="authenticated && !anonymous" href="javascript: return false;" (click)="logoff($event)" class="dropdown-item" >{{('logout' | translate)}}</a>
-						</div>
-					</div>
-				</li>
-				<li class="nav-item" *ngIf="showPanelController">
-					<a  class="nav-link btn" (click)="dashboardPanelsHidden = !dashboardPanelsHidden;"><i class="fa fa-sliders-h fa-lg" aria-hidden="true" style="transform:rotate(90deg);"></i>{{dashboardPanelsVisible}}</a>
-				</li>
-				<li *ngIf="dashboard" style="display:inline-block;white-space:nowrap">&nbsp;&nbsp;&nbsp;{{dashboard.name}}</li>
-			</ul>
-		</div>	
-		<div *ngIf="dashboard && dashboard.sysPanel" class="col-xs-8 col-sm-8 core-sensors text-xs-center text-sm-right" style="display:inline-block">
-				&nbsp;<kervi-dashboard-panel [dashboardSizes]="dashboardSizes" [inline]="true" [panel]="dashboard.sysPanel" ></kervi-dashboard-panel>
+							<li *ngIf="authenticated && dashboards.length > 1">
+								<nz-divider></nz-divider>
+							</li>
+							<li nz-menu-item *ngIf="authenticated && anonymous" href="javascript: return false;" (click)="logoff($event)" ><i nz-icon type="login"></i> {{('login' | translate)}}</li>
+							<li nz-menu-item *ngIf="authenticated && !anonymous" href="javascript: return false;" (click)="logoff($event)"><i nz-icon type="logout"></i>{{('logout' | translate)}}</li>
+						</ul>
+					</li>
+					<li nz-menu-item *ngIf="showPanelController">
+						<a  (click)="dashboardPanelsHidden = !dashboardPanelsHidden;">
+							<i nz-icon type="sliders" nzTheme="twotone" [nzTwotoneColor]="'#9fd037'"></i>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="kervi-sys-panel" *ngIf="dashboard && dashboard.sysPanel" nz-col nzSpan="18">
+				<kervi-dashboard-panel [dashboardSizes]="dashboardSizes" [inline]="true" [panel]="dashboard.sysPanel" ></kervi-dashboard-panel>
+				&nbsp;<a  (click)="mediaHidden = !mediaHidden;">
+						<i nz-icon nzType="folder-open" nzTheme="twotone" [nzTwotoneColor]="'#9fd037'"> </i>
+				</a>
+				<kervi-message-button></kervi-message-button>
+				
+			</div>
+			
 		</div>
-	</div>
-</nav>
+	</nz-header>
+		
+	<nz-content >
 
-
-	
-	<kervi-cam-viewer *ngIf="cameraId" [isBackground]="true" [cameraId]="cameraId" [linkParameters]="cameraParameters"></kervi-cam-viewer>
-	<div #leftPad class="controller-pad" *ngIf="showLeftPad" [style.left.px]="leftPadLeft" [style.top.px]="leftPadTop" style="position:absolute;z-index: 1500">
-    	<kervi-controller-pad [autoCenter]="autoCenterLeftPad" [XValue]="leftPadXValue" [YValue]="leftPadYValue"></kervi-controller-pad>
-	</div>
-	<div #rightPad class="controller-pad" *ngIf="showRightPad" [style.left.px]="rightPadLeft" [style.top.px]="rightPadTop" style="position:absolute;z-index: 1500">
-    	<kervi-controller-pad [autoCenter]="autoCenterRightPad" [XValue]="rightPadXValue" [YValue]="rightPadYValue"></kervi-controller-pad>
-	</div>
-	<div class="container-fluid" style="top:0;padding-top:10px;z-index:1999;position:absolute;padding-bottom:30px;" >
 		<ng-container *ngIf="isAppEmpty">
-			<div class="card-deck">
-				<div class="card-body"   style="position:relative;margin-top:35px;">
-					<h1>{{( 'hello_world' | translate)}}</h1>
-					<p>{{( 'empty_app' | translate)}}</p>
+			<div nz-row>
+				<div nz-col nzSpan="12" nzOffset="6">
+					<nz-alert
+						nzType="error"
+						[nzMessage] ="'hello_world' | translate"
+						[nzDescription]=" 'empty_app' | translate"
+						nzShowIcon	
+					  >
+					  </nz-alert>
+					
 				</div>
 			</div>
 		</ng-container>
-		
-		<div  [ngClass]="{'dashboard-panels-hidden' : dashboardPanelsHidden }" style="position:relative;margin-top:35px;">
-			<kervi-dashboard-panel  *ngFor="let panel of dashboard.panels" [dashboardSizes]="defaultSizes" [panel]="panel" class="w-{{panel.width}}"></kervi-dashboard-panel>
-		</div>  
-	</div>
+		<kervi-cam-viewer *ngIf="cameraId" [isBackground]="true" [cameraId]="(cameraId$| async)" [linkParameters]="cameraParameters"></kervi-cam-viewer>
+		<div #leftPad class="kervi-controller-pad" *ngIf="showLeftPad" [style.left.px]="leftPadLeft" [style.top.px]="leftPadTop" >
+			<kervi-controller-pad [autoCenter]="autoCenterLeftPad" [XValue]="leftPadXValue" [YValue]="leftPadYValue"></kervi-controller-pad>
+		</div>
+		<div #rightPad class="kervi-controller-pad" *ngIf="showRightPad" [style.left.px]="rightPadLeft" [style.top.px]="rightPadTop" >
+			<kervi-controller-pad [autoCenter]="autoCenterRightPad" [XValue]="rightPadXValue" [YValue]="rightPadYValue"></kervi-controller-pad>
+		</div>
 
-<footer class="footer" *ngIf="dashboard">
-	<div class="row">
-		<div class="col-sm-4 text-left" style="text-align: left">
+		<div class="kervi-panels" fxLayout=" column" fxLayout.xs="column" fxLayoutGap="0.5%" fxLayoutAlign=""  *ngIf="!dashboardPanelsHidden" style="">
+			<ng-container *ngFor="let panel of dashboard.panels">
+					<kervi-dashboard-panel [fxFlex]="panel.parameters.width" fxFlex.xs="100%" [dashboardSizes]="defaultSizes" [panel]="panel"></kervi-dashboard-panel>
+				
+			</ng-container>
+		</div>
+	</nz-content>
+	<nz-footer *ngIf='!isAppEmpty'>
+		<div nz-col nzSpan="8" style="text-align: left">
 			<kervi-dashboard-panel [inline]="true" *ngIf="dashboard.footerLeftPanel" [dashboardSizes]="defaultSizes" [panel]="dashboard.footerLeftPanel"></kervi-dashboard-panel>
 		</div>
-		<div class="col-sm-4 text-center" style="text-align:center">
+		<div nz-col nzSpan="8" style="text-align:center">
 			<kervi-dashboard-panel [inline]="true" *ngIf="dashboard.footerCenterPanel" [dashboardSizes]="defaultSizes" [panel]="dashboard.footerCenterPanel"></kervi-dashboard-panel>
 		</div>
-		<div class="col-sm-4 text-right" style="text-align: right">
+		<div nz-col nzSpan="8"  style="text-align: right">
 			<kervi-dashboard-panel [inline]="true" *ngIf="dashboard.footerRightPanel" [dashboardSizes]="defaultSizes" [panel]="dashboard.footerRightPanel"></kervi-dashboard-panel>
-			<i class="fa fa-expand" title="{{( 'toggle_screen' | translate)}}" (mousedown)="toggleFullScreen()"></i>&nbsp;
+			<button nz-button nzShape="round" (mousedown)="toggleFullScreen()"><i nz-icon [nzType]="inFullScreen ? 'fullscreen' : 'fullscreen-exit'" title="{{( 'toggle_screen' | translate)}}"></i></button>
 		</div>
-	</div>
-</footer>
+	</nz-footer>
+</nz-layout>
+
+<nz-modal 
+	nzWrapClassName="vertical-center-modal"
+	[(nzVisible)]="!mediaHidden"
+	nzTitle="Media"
+	(nzOnCancel)="handleMediaClose()"
+	
+>
+<div style="display:inline-block;width:100%"> <app-media ></app-media></div>	
+
+</nz-modal>
+
+
+

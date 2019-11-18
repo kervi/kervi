@@ -4,17 +4,22 @@ class KerviPlugin(object):
     def __init__(self, name, config, manager):
         from kervi.config.configuration import _Configuration
         self._config = _Configuration()
+        from kervi.config import Configuration
+        self._global_config = Configuration
         plugin_config = {}
         if config:
             plugin_config = config.as_dict()
         self._config._load(config_user=plugin_config, config_base=self.get_default_config())
-        from kervi.config import Configuration
-        self._global_config = Configuration
+        
         self._name = name
         self._manager = manager
 
         from kervi.spine import Spine
         self.spine = Spine()
+
+        from kervi.core.utility.bind_decorators import bind_decorators_to_class
+
+        bind_decorators_to_class(self)
     
     @property
     def manager(self):

@@ -1,0 +1,15 @@
+<nz-badge [nzCount]="messageCount$ | async" [nzOverflowCount]="99">
+    <button *ngIf="(messageCount$ | async)>0" nz-button nzGhost  nzType="default" nzShape="circle" (click)="open()">
+        <i nz-icon nzType="notification" nzTheme="twotone" [nzTwotoneColor]="'#9fd037'"></i>
+    </button>
+</nz-badge>
+
+<nz-drawer
+      [nzClosable]="false"
+      [nzVisible]="visible"
+      nzPlacement="right"
+      nzTitle="Log"
+      (nzOnClose)="close()"
+    >
+    <kervi-user-log [inline]="false"></kervi-user-log>
+</nz-drawer>

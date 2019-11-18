@@ -20,22 +20,35 @@ class PCF8591Driver(I2CGPIODeviceDriver):
         I2CGPIODeviceDriver.__init__(self, address, bus, gpio_id)
         self._dac_enabled = 0x00
         self._listeners = []
+        self._pin_map = {
+            "AIN0": 0,
+            "AIN1": 1, 
+            "AIN2": 2, 
+            "AIN3": 3, 
+            "AOUT": 4
+        }
 
     def _get_channel_type(self, channel):
-        if channel in ["AIN1", "AIN2", "AIN3", "AIN4", "AOUT"]:
+        if channel in [0, 1, 2, 3]:
             return CHANNEL_TYPE_ANALOG_IN
-        elif channel == "AOUT":
+        elif channel == 4:
             return CHANNEL_TYPE_ANALOG_OUT
 
     def _get_channel_names(self):
-        return ["AIN1", "AIN2", "AIN3", "AIN4", "AOUT"]
+        return self._pin_map.keys()
 
+    def _map_pin(self, channel):
+        if isinstance(channel, int):
+            return channel
+        elif str(channel) in self._pin_map.keys():
+            return self._pin_map[str(channel)]
+        else:
+            return int(channel)
+    
     @property
     def device_name(self):
         return "PFC8591"
-
-    
-
+ 
     def get(self, channel):
         """Read single ADC Channel"""
         checked_channel = self._check_channel_no(channel)

@@ -39,7 +39,7 @@ def logger_thread(q):
 
 class KerviLogHandler:
     def __init__(self, config):
-
+        import platform
         
         log_level = config.log.level
             
@@ -102,19 +102,19 @@ class KerviLogHandler:
                 },
                 'console': {
                     'class': 'logging.Formatter',
-                    'format': '\033[92m %(message)s \033[0m',
+                    'format': '\033[92m%(message)s \033[0m',
                 },
                 'console-verbose': {
                     'class': 'logging.Formatter',
-                    'format': '\33[90m  %(message)s \33[0m',
+                    'format': '\33[90m   %(message)s \33[0m',
                 },
                 'console-warning': {
                     'class': 'logging.Formatter',
-                    'format': '\33[93m %(message)s \33[0m',
+                    'format': '\33[93m%(message)s \33[0m',
                 },
                 'console-error': {
                     'class': 'logging.Formatter',
-                    'format': '\033[91m %(levelname)-8s %(processName)-10s %(message)s \033[0m',
+                    'format': '\033[91m%(levelname)-8s %(processName)-10s %(message)s \033[0m',
                 },
             },
             'handlers': {
@@ -161,10 +161,13 @@ class KerviLogHandler:
                 'handlers': ['console', 'console-verbose', 'console-warning', 'console-error', 'file']
             },
         }
-
         logging.config.dictConfig(log_config)
         self._log_queue = Queue()
         self._logging_thread = threading.Thread(target=logger_thread, args=(self._log_queue,))
-        self._logging_thread.start()
+        self._logging_thread.deamon = True
+        if platform.system() == "Windows":
+            self._logging_thread.start()
         #return KerviLog("application")
-    
+
+    def stop(self):
+        self._log_queue.put_nowait(None)

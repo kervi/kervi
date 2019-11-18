@@ -1,0 +1,17 @@
+<nz-timeline >
+    <nz-timeline-item [nzDot]="message.level==1 ? dotTemplate1 :  message.level==2 ? dotTemplate2 : dotTemplate3" *ngFor="let message of messages$ | async">
+            <strong>{{message.sourceName}}</strong><br>
+            <span style="font-size:80%">{{message.timestamp | date: 'HH:mm:ss'}}</span><br>    
+            {{message.topic}}
+            <nz-divider></nz-divider>
+    </nz-timeline-item>
+</nz-timeline>
+<ng-template #dotTemplate1>
+    <i nz-icon type="close-circle" style="font-size: 16px;" [nzTheme]="'twotone'" [nzTwotoneColor]="'#f5222d'"></i>
+</ng-template>
+<ng-template #dotTemplate2>
+    <i nz-icon type="warning" style="font-size: 16px;" [nzTheme]="'twotone'" [nzTwotoneColor]="'#faad14'"></i>
+</ng-template>
+<ng-template #dotTemplate3>
+    <i nz-icon nz-icon type="check-circle" [nzTheme]="'twotone'" [nzTwotoneColor]="'#52c41a'" style="font-size: 16px;"></i>
+</ng-template>

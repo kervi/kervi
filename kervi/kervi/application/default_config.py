@@ -16,7 +16,7 @@ def get_default_config():
         },
         "log" : {
             "levels":["fatal", "error", "warning", "information", "debug"],
-            "level":"info",
+            "level":"verbose",
             "console_level":"verbose",
             "file": "kervi.log",
             "max_file_size": 1000000,
@@ -25,6 +25,7 @@ def get_default_config():
         "modules":[],
         "network" : {
             "ip": nethelper.get_ip_address(),
+            "http_port": nethelper.get_free_port([80, 8080, 8000]),
             "ws_port": nethelper.get_free_port([9000, 9001, 9002]),
             "ipc_root_port": nethelper.get_free_port([9500]),
             "ipc_root_address": nethelper.get_ip_address()
@@ -54,12 +55,17 @@ def get_default_config():
                 "message_bus": {
                     "own_process": False,
                     "managed": True
+                },
+                "io": {
+                    "own_process": True,
+                    "managed": False
                 }
             }
         },
         "plugins":{
             "kervi.plugin.message_bus.zmq": True,
-            "kervi.plugin.authentication.plain": True,
+            "kervi.plugin.io.files": True,
+            "kervi.plugin.authentication.plain": False,
             "kervi.plugin.storage.sqlite_temp": True,
             "kervi.plugin.storage.sqlite": True,
             "kervi.plugin.messaging.email": False,
@@ -93,12 +99,6 @@ def get_default_config():
             "cert_file": "kervi.cert",
             "key_file": "kervi.key"
         },
-        "media":{
-            "folders":{
-                "images":"images",
-                "videos":"videos"
-            }
-        },
         "unit_system": "metric",
         "display":{
             "unit_systems":{
@@ -110,9 +110,9 @@ def get_default_config():
                         "volumne": "l",
                         "weight": "g",
                         "datetime" :{
-                            "time": "HH:mm",
-                            "date": "DD-MM-YYYY",
-                            "datetime": "HH:mm DD-MM-YYYY",
+                            "time": "HH:mm:ss",
+                            "date": "dd-MM-yyyy",
+                            "datetime": "HH:mm dd-MM-yyyy",
                             "chart":{
                                 "millisecond": "h:mm:ss.SSS",
                                 "second": "h:mm:ss",
@@ -224,5 +224,8 @@ Action {action_name} {state}
                 "record": "Record video",
                 "media_folder": "Media folder"
             }
+        },
+        "development":{
+            "debug_threads": False
         }
     }

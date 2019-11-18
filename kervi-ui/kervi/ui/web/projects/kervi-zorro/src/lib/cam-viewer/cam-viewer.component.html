@@ -1,0 +1,43 @@
+<ng-container *ngIf="isBackground && camera!==null">
+	<div #videoViewer id="video-viewer" class="video video-background" style="text-align:center;position:fixed;top:60px;left:0px;height:100%;" [style.height.px]="camHeight" [style.width.px]="camWidth">
+		<div style="position:fixed;z-index:3000" *ngIf="streamObservers.length > 0">
+			<button (click)="changeSource(cameraSource)" >base</button>
+			<button *ngFor="let observer of streamObservers" (click)="changeSource(observer.ui.stream)"> {{ observer.name}}</button>			
+		</div>
+		<span class="camImage" style="top:0px;left:0px;">
+			<kervi-mpeg-viewer (imageLoaded)="imageLoaded()" [height]=100   [cameraSource]="selectedSource" > </kervi-mpeg-viewer>
+		</span>
+		<canvas id="camCanvas" style="position:absolute;top:0px;left:0px;" [style.height.px]="camHeight" [style.width.px]="camWidth"></canvas>
+		<canvas id="poiCanvas" style="position:absolute;top:0px;left:0px;width:100%;height:100%"></canvas>
+		<div class="cam-pad-area" *ngIf="showCamPad" [style.left.px]="camPadLeft" [style.top.px]="camPadTop" style="position:absolute;z-index: 2000">
+      <kervi-controller-pad [XValue]="pan" [YValue]="tilt"> </kervi-controller-pad>
+		</div>
+		<div style="position:absolute;top:30px;left:0px;width:100%;height:50px">
+			<ng-container  *ngFor="let action of camera.actions">
+				<kervi-action title="{{( action.name | translate)}}" *ngIf="action.visible" [action]="action" ></kervi-action>
+			</ng-container>
+		</div>
+	</div>
+</ng-container>
+
+<ng-container *ngIf="!isBackground && camera!==null">
+	<div #videoViewer id="video-viewer" class="video" style="overflow:hidden;position:relative;width:100%">
+		<span class="camImage" style="top:0px;left:0px;height:100%;width:100%">
+			<kervi-mpeg-viewer (imageLoaded)="imageLoaded()" [width]=100  [cameraSource]="cameraSource" > </kervi-mpeg-viewer>
+		</span>
+		<canvas id="camCanvas" style="position:absolute;top:0px;left:0px;width:100%;height:100%"></canvas>
+		<canvas id="poiCanvas" style="position:absolute;top:0px;left:0px;width:100%;height:100%"></canvas>
+		<div class="cam-pad-area" *ngIf="showCamPad" [style.left.px]="camPadLeft" [style.top.px]="camPadTop" style="position:absolute">
+      <kervi-controller-pad [XValue]="pan" [YValue]="tilt"> </kervi-controller-pad>
+		</div>
+	</div>
+	<div>
+		<ng-container  *ngFor="let action of camera.actions">
+			<kervi-action *ngIf="action.ui.visible" title="{{( action.name | translate)}}" [action]="action" ></kervi-action>
+		</ng-container>
+		<!-- <button class="btn btn-primary" (mousedown)="imageViewer.show()" title="{{( 'media_folder' | translate)}}">
+			<i  class='fa fa-folder'></i>
+		</button> -->
+	</div>
+</ng-container>
+<!-- <kervi-image-viewer #imageViewer [camComponent]="this" [cameraSource]="cameraSource"></kervi-image-viewer> -->

@@ -5,13 +5,13 @@ import { IComponent, DashboardLink } from './IComponent.model'
 
 
 export class DashboardSizes{
-    public valueWidth:string ="3rem";
-    public buttonWidth:string = "25px";
-    public buttonHeight:string = "";
-    public switchWidth:string = "25px";
-    public switchHeight:string = "25px";
-    public gaugeWidth:string = "100px";
-    public gaugeHeight:string = "200px";
+    public valueWidth:string ='3rem';
+    public buttonWidth:string = '25px';
+    public buttonHeight:string = '';
+    public switchWidth:string = '25px';
+    public switchHeight:string = '25px';
+    public gaugeWidth:string = '100px';
+    public gaugeHeight:string = '200px';
 }
 
 export class DashboardMessageModel{
@@ -51,22 +51,43 @@ export class DashboardPanelComponent{
 }
 
 export class DashboardPanelParameters{
-    public title:string = null;
-    public width:string = null;
-    public height:string = null;
-    public type:string = null;
+    public title: string = null;
+    public width: string = null;
+    public height: string = null;
+    public type: string = null;
     public userLog: boolean = null;
-    public logLength:number = 5;
-    
-    constructor(messageParameters){
-        this.title=messageParameters.label;
-        this.height=messageParameters.height;
-        this.width=messageParameters.width;
-        this.userLog=messageParameters.userLog;
+    public appHealth: boolean = null;
+    public logLength = 5;
+    public layout = 'row';
+
+    constructor(messageParameters) {
+        this.title = messageParameters.label;
+        this.height = this.calcSize(messageParameters.height);
+        this.width = this.calcSize(messageParameters.width);
+        this.userLog = messageParameters.userLog;
         this.logLength = messageParameters.logLength;
-        
-        if (messageParameters.type)
-            this.type=messageParameters.type;
+        this.appHealth = messageParameters.app_health;
+
+        if (messageParameters.type) {
+            this.type = messageParameters.type;
+        }
+        if (messageParameters.layout) {
+            this.layout = messageParameters.layout;
+        }
+    }
+
+    private calcSize(value){
+        if (value==null)
+            return ''
+        else if (value==='')
+            return ''
+        else if (isNaN(value)){
+            return value;
+        } else
+            if (value>0)
+                return value + '%';
+            else
+                return '';
     }
 }
 
@@ -78,8 +99,9 @@ export class DashboardPanel {
     public dashboard: Dashboard;
     public type:string;
     public subPanels: DashboardPanel[] = [];
+    public hasOnlyGroupPanels:boolean = true;
     
-    constructor (dashboard, messagePanel){
+    constructor (dashboard, messagePanel) {
         this.dashboard=dashboard;
         this.id=messagePanel.id;
         this.name=messagePanel.name;
@@ -91,16 +113,18 @@ export class DashboardPanel {
             }*/
         
         if (messagePanel.panels){
-            //console.log("spa",messagePanel.panels);
+            //console.log('spa',messagePanel.panels);
             for(var subMessagePanel of messagePanel.panels){
                 var panel=new DashboardPanel(this, subMessagePanel);
                 this.subPanels.push(panel);
+                if (panel.type !== 'group')
+                    this.hasOnlyGroupPanels = false;
             }
         }
     }
 
     public reload(source:DashboardPanel){
-        //console.log("rl", this);
+        //console.log('rl', this);
         for(var subPanel of source.subPanels){
             this.reload(subPanel)
         }
@@ -127,7 +151,7 @@ export class DashboardPanel {
             if (!found)
                 deleteComponents.push(component);
         }
-        //console.log("dsc",deleteComponents);
+        //console.log('dsc',deleteComponents);
         for(var component of deleteComponents){
             this.components.splice( this.components.indexOf(component), 1 );
         }
@@ -167,18 +191,18 @@ export class Dashboard implements IComponent{
     public RightPadYPanel: DashboardPanel=null;
     //public background: DashboardBackgroundModel=null;
     public unitSize: number;
-    
+
     //not used in dashboards
     public visible:boolean;
     public ui:any;
     public dashboards:any[] = [];
 
-
-
+    private currentPanel:DashboardPanel = null;
+ 
     constructor(message){
         this.id=message.id;
         this.name=message.name;
-        this.componentType="dashboard";
+        this.componentType='dashboard';
         this.type=message.type;
         this.isDefault=message.isDefault;
         this.template=message.template;
@@ -187,114 +211,97 @@ export class Dashboard implements IComponent{
         this.panels=[];
         this.sysPanels=[];
         if (!this.template){
-            var currentPanel:DashboardPanel = null;
+            
             for (let messagePanel of message.sections){
                 if (!messagePanel){
-                    console.log("dashboard with null panel", this.id);
+                    console.log('dashboard with null panel', this.id);
                     continue;
                 }
                 var panel = new DashboardPanel(this, messagePanel);
                 var sysPanel = true;
-                if (panel.id=="header_center")
+                if (panel.id=='header_center')
                     this.headerPanel=panel;
-                else if (panel.id=="footer_left")
+                else if (panel.id=='footer_left')
                     this.footerLeftPanel=panel;
-                else if (panel.id=="footer_center")
+                else if (panel.id=='footer_center')
                     this.footerCenterPanel=panel;
-                else if (panel.id=="footer_right")
+                else if (panel.id=='footer_right')
                     this.footerRightPanel=panel;
-                else if (panel.id=="header_right")
+                else if (panel.id=='header_right')
                     this.sysPanel=panel;
-                else if (panel.id=="controllers")
+                else if (panel.id=='controllers')
                     this.controllerPanel=panel;
-                else if (panel.id=="background")
+                else if (panel.id=='background')
                     this.backgroundPanel=panel;
-                else if (panel.id=="left_pad_x")
+                else if (panel.id=='left_pad_x')
                     this.LeftPadXPanel=panel;
-                else if (panel.id=="left_pad_y")
+                else if (panel.id=='left_pad_y')
                     this.LeftPadYPanel=panel;
-                else if (panel.id=="right_pad_x")
+                else if (panel.id=='right_pad_x')
                     this.RightPadXPanel=panel;
-                else if (panel.id=="right_pad_y")
+                else if (panel.id=='right_pad_y')
                     this.RightPadYPanel=panel;
                 else{
                     sysPanel=false;
-                    if (panel.type!="group"){
-                        if(currentPanel==null){
-                            currentPanel = new DashboardPanel(
+                    if (panel.type!='group'){
+                        if(this.currentPanel==null){
+                            this.currentPanel = new DashboardPanel(
                             this,
                             {
-                                "id":null,
-                                "name": "",
-                                "type":"group",
-                                "components":[],
-                                "panels":[],
-                                "uiParameters":{
-                                    "title":"",
-                                    "width":0,
-                                    "height":0,
-                                    "userLog":false,
-                                    "logLength":0
+                                'id':null,
+                                'name': '',
+                                'type':'group',
+                                'components':[],
+                                'panels':[],
+                                'uiParameters':{
+                                    'title':'',
+                                    'width':100,
+                                    'height':0,
+                                    'userLog':false,
+                                    'logLength':0
                                 }    
                             });
-                            currentPanel.subPanels.push(panel);
-                            this.panels.push(currentPanel);
+                            this.currentPanel.subPanels.push(panel);
+                            this.panels.push(this.currentPanel);
                         } else {
-                            currentPanel.subPanels.push(panel)
+                            this.currentPanel.subPanels.push(panel)
                         }
                     }   
                     else{
                         this.panels.push(panel);
-                        currentPanel=null;
+                        this.currentPanel=null;
                     }
                 }
                 if (sysPanel)
                     this.sysPanels.push(panel);      
             }
+
+            if (!this.currentPanel){
+                this.currentPanel = new DashboardPanel(
+                    this,
+                    {
+                        'id':null,
+                        'name': '',
+                        'type':'group',
+                        'components':[],
+                        'panels':[],
+                        'uiParameters':{
+                            'title':'',
+                            'width':100,
+                            'height':0,
+                            'userLog':false,
+                            'logLength':0
+                        }    
+                    });
+                    //this.currentPanel.subPanels.push(panel);
+                    this.panels.push(this.currentPanel);
+            }
         }
     }
-
-    /*removePanelRef(deleteComponents:IComponent[], panel:DashboardPanelModel, removeEmpty:boolean){
-        var removeComponentPanels:DashboardPanelComponentModel[] = [];
-        for(var panelComponent of panel.components){
-            for(var deleteComponent of deleteComponents){
-                if (deleteComponent.id == panelComponent.component.id){
-                    console.log("dlc", panelComponent)
-                    removeComponentPanels.push(panelComponent)
-                    
-                }
-            }
-        }
-        for(var component of removeComponentPanels){
-            panel.components.splice(panel.components.indexOf(component))
-        }
-        var removePanels:DashboardPanelModel[] = [];
-        for(var subPanel of panel.subPanels){
-            this.removePanelRef(deleteComponents, subPanel, removeEmpty)
-            if (subPanel.components.length == 0){
-                removePanels.push(subPanel)
-            }
-        }
-        for(var subPanel of removePanels){
-            panel.subPanels.splice(panel.subPanels.indexOf(subPanel))
-        }
-    }*/
-
-    removeReferences(deleteComponents:IComponent[]){
-        // console.log("remove ref", deleteComponents)
-        // for(var panel of this.sysPanels){
-        //     this.removePanelRef(deleteComponents, panel, false)
-        // }
-        // var removePanels:DashboardPanelModel[] = [];
-        // for(var panel of this.panels){
-        //     this.removePanelRef(deleteComponents, panel, true)
-        //     if (panel.components.length == 0)
-        //         removePanels.push(panel)
-        // }
-        // for(var panel of removePanels){
-        //     this.panels.splice(this.panels.indexOf(panel))
-        // }
-    };
+    public isEmpty(){
+        return this.panels.length == 0;
+    }
+    removeReferences(deleteComponents:IComponent[]){};
     updateReferences(){};
     reload(component:IComponent){
         var source = component as Dashboard;
@@ -390,7 +397,7 @@ export class Dashboard implements IComponent{
     }
 
     public addDashboardLink(link:DashboardLink){
-        if (link.dashboardId == "*" || link.dashboardId == this.id || (link.dashboardId=="**default**" && this.isDefault)){
+        if (link.dashboardId == '*' || link.dashboardId == this.id || (link.dashboardId=='**default**' && this.isDefault)){
             var panelFound = false;
             var panel = this.getDashboardPanelById(link.panelId, this.panels);
             if (!panel)
@@ -398,21 +405,21 @@ export class Dashboard implements IComponent{
             if (panel){
                 panel.components.push(new DashboardPanelComponent(link));
             } else {
-                console.log("adh",link);
+                // console.log('adh',link);
                 var messagePanel ={
                     id:link.panelId,
                     name:link.panelName,
-                    type:"panel",
+                    type:'panel',
                     uiParameters:{
-                        "title":"",
-                        "width":0,
-                        "height":0,
-                        "userLog":false,
-                        "logLength":0
+                        'title':'',
+                        'width':0,
+                        'height':0,
+                        'userLog':false,
+                        'logLength':0
                     }
                 }
                 var newPanel = new DashboardPanel(this, messagePanel);
-                this.panels.push(newPanel);
+                this.currentPanel.subPanels.push(newPanel);
                 newPanel.components.push(new DashboardPanelComponent(link));
             }
         }

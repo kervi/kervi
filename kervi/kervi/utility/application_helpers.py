@@ -31,19 +31,22 @@ class _KerviModuleLoader(process._KerviProcess):
             import kervi.hal as hal
             hal._load()
             __import__(self.name, fromlist=[''])
-
+       
         except ImportError:
-            self.spine.log.exception("load module:{0}", self.name)
+            self.spine.log.exception("module not found:{0}", self.name)
+        except:
+            self.spine.log.exception("error load module:{0}", self.name)
+
         self.spine.send_command("startThreads", local_only=True)
         self.spine.trigger_event(
             "moduleLoaded",
-            self.name,
+            self.name
         )
 
     def terminate_process(self):
         pass
 
-    def load_spine(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+    def load_spine(self, process_id, spine_port, root_address = None, ip=None):
         from kervi.plugin.message_bus.bus_manager import BusManager
         self._bus_manager = BusManager()
         self._bus_manager.load(process_id, spine_port, root_address, ip)

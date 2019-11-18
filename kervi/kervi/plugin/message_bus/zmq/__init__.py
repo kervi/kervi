@@ -30,14 +30,14 @@ class ZMQPlugin(KerviBusPlugin):
     def __init__(self, config, manager):
         KerviBusPlugin.__init__(self, "ZMQBus", config, manager)
 
-    def load(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+    def load(self, process_id, spine_port, root_address = None, ip=None):
         from kervi.plugin.message_bus.zmq.zmqbus import ZMQBus
         self._bus = ZMQBus()
         self._bus.set_log(process_id)
         self._bus.reset_bus(process_id, spine_port, ip, root_address)
         self._bus.run()
-        if root_address:
-            self._bus.wait_for_root()
+        #if root_address:
+        #    self._bus.wait_for_root()
         return self
 
 

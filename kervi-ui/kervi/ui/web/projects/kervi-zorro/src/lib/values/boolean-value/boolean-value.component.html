@@ -1,0 +1,19 @@
+<kervi-switchbutton 
+    *ngIf="displayType!='button'"
+    [dashboardSizes]="dashboardSizes" 
+    [inline]="inline" 
+    [value]="value.value" 
+    [linkParameters]="linkParameters"
+    (buttonState)="changeState($event)"
+></kervi-switchbutton>
+<kervi-button 
+    *ngIf="displayType=='button'"    
+    [dashboardSizes]="dashboardSizes" 
+    [value]="value" 
+    [inline]="inline" 
+    [linkParameters]="linkParameters" 
+    (buttonState)="changeState($event)" 
+></kervi-button>
+
+
+

@@ -199,12 +199,12 @@ class KerviWebServerPlugin(WebServerPlugin):
         self._server.terminate = True
         self._server.shutdown()
         if not self._server_thread.join(5):
-            print("")
+            self.spine.log.warn("Web server did not stop timely")
         
     def get_default_config(self):
         return {
-                "ip_address": "0.0.0.0",
-                "ws_port": "9000",
-                "http_port": nethelper.get_free_port([80, 8080, 8081]),
+                "ip_address": self.global_config.network.ip,
+                "ws_port": self.global_config.network.ws_port,
+                "http_port": self.global_config.network.http_port,
                 "http_docs": None,
             }

@@ -32,7 +32,7 @@ class KerviAppDiscovery(threading.Thread):
 
 	def run(self):
 		from kervi.core.utility.kervi_logging import KerviLog
-		KerviLog("discovery").verbose("Listining for discovery requests on port: %s", self._discovery_port)
+		KerviLog("discovery").verbose("Listining for discovery requests on port: %s, app id:%s", self._discovery_port, self._app_id)
 		while not self._terminate:
 			try:
 				data, address = self._sock.recvfrom(4096)
@@ -68,11 +68,12 @@ class KerviAppDiscovery(threading.Thread):
 def find_kervi_app(app_id, discovery_port=9434):
 	result = (None, None)
 	# Create a UDP socket
-	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-	sock.settimeout(2)
 
+	sock.settimeout(2)
+	sock.bind(("0.0.0.0", 44444))
 	use_local = True
 	message = "Are you a kervi app with id: " + app_id
 	message_reply = "I am a kervi app with id:" + app_id
@@ -88,11 +89,11 @@ def find_kervi_app(app_id, discovery_port=9434):
 			sock.sendto(message.encode(), server_address)
 
 			# Receive response
-			#print('waiting to receive')
+			print('waiting to receive')
 			try:
 				data, server = sock.recvfrom(4096)
 				response = json.loads(data.decode("UTF-8"))
-				#print("response", server[0], response)
+				print("response", server[0], response)
 				if response["challenge"] == message_reply:
 					result = (response["ip"], response["port"])
 					#print('Received confirmation')

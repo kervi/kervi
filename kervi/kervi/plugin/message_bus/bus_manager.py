@@ -12,7 +12,7 @@ class BusManager():
         self._current_bus = None
         self._log = KerviLog("BusManager")
 
-    def load(self, process_id, spine_port, root_address = None, ip="127.0.0.1"):
+    def load(self, process_id, spine_port, root_address = None, ip=None):
         self._plugin_manager.load_managed_plugins()
         
         for plugin in self._plugin_manager.plugins:

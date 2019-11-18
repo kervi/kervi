@@ -66,6 +66,10 @@ def _load(hw_platform="auto"):
         else:
             raise ValueError("Invalid hw_platform. Valid values are: " + str.join(hal_modules.keys()))
 
+
+def get_board_name():
+    return _DRIVER.get_board_name()
+
 def get_user_inputs():
     return _DRIVER.get_user_inputs()
 
@@ -111,6 +115,10 @@ class SensorDeviceDriver(object):
     @property
     def dimensions(self):
         return 1
+
+    @property
+    def value_type(self):
+        return "number"
 
     @property
     def dimension_labels(self):

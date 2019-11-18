@@ -39,7 +39,7 @@ class _SetInterrupt():
         return f
 
 #from kervi.actions.action_list import _Actions
-def action(method=None, **kwargs):
+def action(method=None, **kwargs) -> Action:
     """
         Decorator that turns a function or controller method into an kervi action.
         it is possible to call the action in other kervi processes or modules.
@@ -67,10 +67,10 @@ def action(method=None, **kwargs):
     """
     
     def action_wrap(f): 
-        action_id = kwargs.get("action_id", f.__name__)
-        name = kwargs.get("name", action_id)
+        action_id = kwargs.pop("action_id", f.__name__)
+        name = kwargs.pop("name", action_id)
         if not _is_method(f): # not "." in f.__qualname__:
-            action = Action(f, action_id, name)
+            action = Action(f, action_id, name, **kwargs)
             Actions.add(action)
             return action
         else:
@@ -80,7 +80,7 @@ def action(method=None, **kwargs):
                 qual_name = owner_class + "." + f.__name__
 
             if qual_name:    
-                Actions.add_unbound(qual_name, action_id, name)
+                Actions.add_unbound(qual_name, action_id, name, kwargs)
                 setattr(f, "set_interrupt", _SetInterrupt(action_id))
             else:
                 import logging
@@ -91,4 +91,3 @@ def action(method=None, **kwargs):
         return action_wrap(method)
     else:
         return action_wrap
-    

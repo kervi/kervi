@@ -34,6 +34,12 @@
       ],
       "ngx-kervi-components/*": [
         "dist/ngx-kervi-components/*"
+      ],
+      "kervi-zorro": [
+        "dist/kervi-zorro"
+      ],
+      "kervi-zorro/*": [
+        "dist/kervi-zorro/*"
       ]
     }
   }

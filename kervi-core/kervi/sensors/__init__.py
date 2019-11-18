@@ -44,7 +44,7 @@ class Sensor(Controller):
 
     """
     def __init__(self, sensor_id, name, device=None, **kwargs):
-        Controller.__init__(self, sensor_id, name)
+        Controller.__init__(self, sensor_id, name, **kwargs)
         self._device = device
         self._sub_sensors = []
         self._dimensions = 1
@@ -56,7 +56,7 @@ class Sensor(Controller):
         elif device.value_type == "number":
             self._sensor_value = self.outputs.add(sensor_id, name, NumberValue)
         else:
-            raise ValueError("Can not handle device value type: " + str(device.value_type))
+            raise ValueError("Can not handle device value type: " + device.value_type)
         
         if self._device:
             self.value_type = self._device.type
@@ -222,7 +222,7 @@ class Sensor(Controller):
         """
         if not self._active and not self._enabled:
             return
-
+        
         if self._dimensions > 1:
             for dimension in range(0, self._dimensions):
                 value = sensor_value[dimension]
@@ -303,6 +303,10 @@ class Sensor(Controller):
     def delta(self, value):
         self._sensor_value.delta = value
 
+    @property
+    def value(self):
+        return self._sensor_value.value
+    
     @property
     def max(self):
         """

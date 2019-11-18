@@ -16,14 +16,13 @@ import { AppInjector } from '../app-injector.service';
 export class KerviActionComponent {
     @Input() action: Action = null;
     @Input() linkParameters: any = null;
-    @Input() inline:boolean = false;
+    @Input() inline = false;
     @Input() dashboardSizes:DashboardSizes = new DashboardSizes();
     public state: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     protected kerviService:NGXKerviService;
-    
-	public displayType:string="switch";
-    
-    constructor() { 
+
+    public displayType = 'switch';
+    constructor() {
         this.kerviService = AppInjector.get(NGXKerviService);
     }
 
@@ -32,16 +31,17 @@ export class KerviActionComponent {
         if (!this.linkParameters)
             this.linkParameters = this.action.ui;
 
-        if (this.linkParameters.type){
-            this.displayType = this.linkParameters.type
+        if (this.linkParameters.displayType){
+            this.displayType = this.linkParameters.displayType;
         }
-        
+
         if (!this.inline && this.linkParameters.inline){
             this.inline = true;
         }
-    
+
         self.state.next(this.action.running$.value);
         this.action.running$.subscribe(function(v){
+            console.log("ar", self.action.id, v)
             self.state.next(v);
         })
     }

@@ -1,0 +1,18 @@
+<ng-container *ngIf="linkParameters.isInput">
+    
+    <nz-form-control >
+        <nz-slider [nzMin]="value.minValue" [nzMax]="value.maxValue" [nzStep]="1"  [(ngModel)]="value.value"></nz-slider>
+        <nz-input-number id="{{value.id}}" [nzMin]="value.minValue" [nzMax]="value.maxValue" [nzStep]="1" [(ngModel)]="value.value"  ></nz-input-number>
+        
+    </nz-form-control>
+    
+</ng-container>
+<ng-container *ngIf="!linkParameters.isInput">
+
+    <span class="value-value" [style.min-width.rem]="linkParameters.valueSize">
+        <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i>
+        <value-sparkline *ngIf="linkParameters.showSparkline && !linkParameters.isInput" [value]="value"></value-sparkline>
+        {{(value.value$ | async | number:numberFormat)}}
+        <span *ngIf="linkParameters.displayUnit">{{value.unit}}</span>
+    </span>
+</ng-container>

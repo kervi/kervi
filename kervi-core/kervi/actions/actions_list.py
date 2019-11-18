@@ -14,8 +14,8 @@ class Actions(object):
     def add(self, action):
         Actions.__actions[action.action_id] = action
 
-    def add_unbound(self, handler_name, action_id, name):
-        Actions.__unbound_actions[handler_name] = (action_id, name)
+    def add_unbound(self, handler_name, action_id, name, kwargs):
+        Actions.__unbound_actions[handler_name] = (action_id, name, kwargs)
 
     def add_unbound_interrupt(self, interrupt_name, action_id):
         Actions.__unbound_interrupts[interrupt_name] = (action_id)

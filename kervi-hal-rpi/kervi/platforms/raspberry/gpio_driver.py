@@ -43,6 +43,10 @@ class GPIODriver(IGPIODeviceDriver):
     def name(self):
         return "RPI GPIO"
 
+    @property
+    def device_name(self):
+        return "RPI_GPIO"
+
     def _map_pin(self, channel):
         if isinstance(channel, int):
             return channel

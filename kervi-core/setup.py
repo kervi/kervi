@@ -29,6 +29,7 @@ setup(
         'kervi/displays',
         'kervi/hal',
         'kervi/sensors',
+        'kervi/streams',
         'kervi/spine',
         'kervi/user_input',
         'kervi/values'

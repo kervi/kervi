@@ -1,0 +1,18 @@
+<div class="dropdown" *ngIf="parameters.type=='dropdown'">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{selectedText$ | async}}
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <ng-container *ngFor="let option of input.options">
+            <button class="dropdown-item" (mouseup)="select(option.value)"   >{{option.text}}</button>
+        </ng-container>
+    </div>
+</div>
+<div class="btn-group btn-group-toggle" data-toggle="buttons" *ngIf="parameters.type=='buttons'">
+    <ng-container *ngFor="let option of input.options">
+        <label class="btn btn-primary" (mouseup)="select(option.value)" [ngClass]="{'active':(option.selected$ | async)}">
+            <input type="radio" name="options" id="option1"  autocomplete="off" [checked]="(option.selected$ | async)"> 
+            {{option.text}}
+        </label>
+    </ng-container>
+</div>

@@ -4,7 +4,7 @@
 from kervi.sensors import Sensor
 from mockup_spine import MockupSpine
 from mockup_sensor_device import MockupSensorDeviceDriver, MockupMultiDimSensorDeviceDriver
-
+from kervi_config import get_test_config
 
 class MockupSensorThread:
     def __init__(self, sensors):
@@ -24,33 +24,35 @@ def test_single_sensor():
 
     device.value = 10
 
-    sensor = Sensor("test_id", "Test sensor", device, spine=spine)
-
+    sensor = Sensor("test_id", "Test sensor", device, spine=spine, configuration = get_test_config())
+    
+    
     assert sensor.device == device
     assert sensor.value_type == "temperature"
     assert sensor.value_unit == "C"
     
-
+    spine.simulate_app_start()
     sensor_thread = MockupSensorThread(sensor)
     sensor_thread.step()
 
     assert sensor.value == 10
 
-
 def test_multi_sensor():
     spine = MockupSpine()
+
     device = MockupMultiDimSensorDeviceDriver()
 
     device.value1 = 10
     device.value2 = 20
     device.value3 = 30
 
-    sensor = Sensor("test_id", "Test sensor", device, spine=spine)
+    sensor = Sensor("test_id", "Test sensor", device, spine=spine, configuration = get_test_config())
 
     assert sensor.device == device
     assert sensor.value_type == "position"
     assert sensor.value_unit == "degree"
 
+    spine.simulate_app_start()
     sensor_thread = MockupSensorThread(sensor)
     sensor_thread.step()
 

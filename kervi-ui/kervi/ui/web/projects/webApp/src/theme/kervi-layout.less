@@ -1,0 +1,149 @@
+.body{
+    padding-top:50px;
+}
+
+.kervi-sys-panel{
+    text-align: right;
+}
+.kervi-panels {
+    background: @kervi-panels-background;
+    padding: .5%;
+    z-index:900;
+    position:absolute;
+    margin-top:50px;
+    width:100%;
+    height:100%;
+
+    .ant-card{
+        height:100%;
+        min-width: 250px;
+    }
+
+    .kervi-panel-deck{
+        height:100%;
+    }
+}
+
+.kervi-controller-pad{
+    position:absolute;
+    z-index: 900;
+}
+
+.kervi-block-widget{
+    display: block;
+    align-items: center;
+    border-bottom:@kervi-widget-border-bottom;
+    padding-top:4px;
+    padding-bottom: 4px;
+}
+
+kervi-widget:last-child{
+    .kervi-block-widget{
+        border-bottom: 0;
+        padding-bottom:0;
+    }
+}
+
+kervi-widget:first-child{
+    .kervi-block-widget{
+        padding-top: 0;
+    }
+}
+
+kervi-message-button{
+    .ant-badge-count{
+        height:16px;
+        font-size: 9px;
+        line-height: 16px;
+        margin-top:6px;
+    }
+}
+
+
+.kervi-inline-widget{
+    display: inline-block;
+    margin-left:5px;
+}
+
+
+.kervi-value-label{
+    margin-right:5px;
+    display: inline;
+}
+
+value-sparkline{
+    display: inline-block;
+}
+.kervi-app-initializing{
+    display: block !important;
+    top:50%;
+    left:50%;
+    width: 100%;
+    position: absolute;
+    transform: translate3d(-50%,-50%, 0);
+}
+
+.kervi-value-section{
+    text-align: right;
+    white-space: nowrap;
+    display: inline;
+}
+
+.kervi-main-menu{
+    >li {
+        .anticon{
+        font-size: @kervi-main-menu-icon-size;
+        }
+    }
+}
+
+.kervi-chart{
+    color: @kervi-chart-color;
+    line-size:5;
+    
+}
+
+.kervi-sparkline{
+    color: @kervi-sparkline-color;
+    width: 5
+}
+
+.kervi-gauge{
+    color: @kervi-gauge-color;
+    stroke-linecap: butt;
+}
+
+.ant-divider{
+    margin:5px 0;
+}
+
+.ant-card-head{
+    font-weight: bold;
+    min-height: 42px;
+}
+
+
+
+.ant-layout-header {
+    position: fixed;
+    width:100%;
+    height:50px;
+    top:0px;
+    z-index:1010;    
+    border-bottom:@kervi-header-bottom;
+}
+
+.ant-layout-footer {
+    position: fixed;
+    width:100%;
+    height:50px;
+    bottom:0px;
+    z-index:1010; 
+    padding: 10px 50px;
+    border-top: @kervi-footer-top;
+}
+
+.cdk-overlay-container{
+    z-index: 2000;
+}
+
