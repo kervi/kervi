@@ -65,5 +65,3 @@ Your Kervi application is ready at http://192.168.0.120:8080
 ```
 
 Goto the url specified
-
-x
