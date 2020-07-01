@@ -13,6 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "dist/web",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -52,6 +53,12 @@
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -160,7 +167,8 @@
           "configurations": {
             "production": {
               "project": "projects/kervi-js/ng-package.prod.json"
-            }
+            ,              "tsConfig": "projects/kervi-js/tsconfig.lib.prod.json"
+}
           }
         },
         "test": {
@@ -200,7 +208,8 @@
           "configurations": {
             "production": {
               "project": "projects/ngx-kervi/ng-package.prod.json"
-            }
+            ,              "tsConfig": "projects/ngx-kervi/tsconfig.lib.prod.json"
+}
           }
         },
         "test": {
@@ -240,7 +249,8 @@
           "configurations": {
             "production": {
               "project": "projects/ngx-kervi-components/ng-package.prod.json"
-            }
+            ,              "tsConfig": "projects/ngx-kervi-components/tsconfig.lib.prod.json"
+}
           }
         },
         "test": {
@@ -275,6 +285,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "dist/mobileApp",
             "index": "projects/mobileApp/src/index.html",
             "main": "projects/mobileApp/src/main.ts",
@@ -291,6 +302,12 @@
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "projects/mobileApp/src/environments/environment.ts",
@@ -394,6 +411,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "extractCss": true,
             "outputPath": "../../plugin/ui/web/http_docs",
             "index": "projects/webApp/src/index.html",
@@ -420,6 +438,12 @@
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "projects/webApp/src/environments/environment.ts",
@@ -523,6 +547,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "dist/IOApp",
             "index": "projects/IOApp/src/index.html",
             "main": "projects/IOApp/src/main.ts",
@@ -557,6 +582,12 @@
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "fileReplacements": [
                 {
                   "replace": "projects/IOApp/src/environments/environment.ts",
@@ -665,7 +696,8 @@
           "configurations": {
             "production": {
               "project": "projects/kervi-zorro/ng-package.prod.json"
-            }
+            ,              "tsConfig": "projects/kervi-zorro/tsconfig.lib.prod.json"
+}
           }
         },
         "test": {

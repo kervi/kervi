@@ -12,7 +12,7 @@ import { ImgViewerComponent } from '../image-viewer/image-viewer.component';
   styleUrls: ['./media.component.css']
 })
 export class MediaComponent extends KerviDirectoryComponent implements OnInit {
-  @ViewChild('nzTreeComponent', { static: false }) nzTreeComponent: NzTreeComponent;
+  @ViewChild('nzTreeComponent') nzTreeComponent: NzTreeComponent;
   @ViewChild('imageViewer', { static: true }) imageViewer: ImgViewerComponent;
   @Input() files = [
 
