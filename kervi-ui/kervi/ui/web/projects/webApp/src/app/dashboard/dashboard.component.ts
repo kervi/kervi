@@ -8,8 +8,8 @@ declare var window:any;
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent extends KerviDashboardComponent implements OnInit {
-  @ViewChild("leftPad") leftPad:ElementRef;
-  @ViewChild("rightPad") rightPad:ElementRef;
+  @ViewChild("leftPad", { static: false }) leftPad:ElementRef;
+  @ViewChild("rightPad", { static: false }) rightPad:ElementRef;
   private padSize=180;
   private isConnected:false;
   public leftPadTop:number;
