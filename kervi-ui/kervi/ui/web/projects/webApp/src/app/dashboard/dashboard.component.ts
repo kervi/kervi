@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router} from '@angular/router';
 import { KerviDashboardComponent, NGXKerviService, ConnectionState} from 'ngx-kervi'
+import { DashboardPanelComponent } from 'kervi-zorro'
 declare var window:any;
 @Component({
   selector: 'app-dashboard',

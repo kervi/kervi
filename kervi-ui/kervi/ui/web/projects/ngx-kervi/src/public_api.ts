@@ -24,4 +24,5 @@ export  { AppInjector } from './lib/app-injector.service';
 
 export * from './lib/ngx-kervi.component';
 export * from './lib/ngx-kervi.module';
-export * from './lib/pipes/pipes.module';
+export * from './lib/pipes/pipes.module'
+export * from './lib/pipes/textPipe';

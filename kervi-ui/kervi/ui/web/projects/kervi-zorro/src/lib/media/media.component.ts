@@ -7,8 +7,8 @@ import { KerviActionComponent } from 'ngx-kervi';
 
 @Component({
   selector: 'kervi-action',
-  templateUrl: './action.component.html',
-  styleUrls: ['./action.component.scss'],
+  templateUrl: './media.component.html',
+  styleUrls: ['./media.component.scss'],
 })
 
 export class ActionComponent extends KerviActionComponent implements OnInit {

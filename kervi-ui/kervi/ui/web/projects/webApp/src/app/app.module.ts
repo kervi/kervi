@@ -5,6 +5,12 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms'
 
+import { NgxKerviModule } from 'ngx-kervi';
+import { NGXKerviPipesModule } from 'ngx-kervi'
+import { KerviZorroModule  } from 'kervi-zorro'
+import { FlexLayoutModule } from '@angular/flex-layout';
+
+
 import { NgZorroAntdModule, NZ_I18N, NZ_ICONS, en_US } from 'ng-zorro-antd';
 import { IconDefinition } from '@ant-design/icons-angular';
 import * as AllIcons from '@ant-design/icons-angular/icons'
@@ -17,10 +23,6 @@ import { ConnectComponent } from './connect/connect.component';
 import { Routes, RouterModule } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MediaComponent } from './media/media.component' ;
-import { NgxKerviModule } from 'ngx-kervi';
-import { NGXKerviPipesModule } from 'ngx-kervi'
-import { KerviZorroModule  } from 'kervi-zorro'
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { ImgViewerComponent } from './image-viewer/image-viewer.component'
 
 

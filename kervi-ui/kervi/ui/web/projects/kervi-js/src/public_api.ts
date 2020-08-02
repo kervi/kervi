@@ -16,5 +16,5 @@ export { KerviValue, ValueRange, ValueRangeType } from './lib/models/KerviValues
 
 
 export * from './lib/kervi-js.service';
-//export * from './lib/kervi-js.component';
+export * from './lib/kervi-js.component';
 export * from './lib/kervi-js.module';

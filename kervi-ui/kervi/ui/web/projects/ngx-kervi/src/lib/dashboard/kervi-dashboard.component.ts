@@ -9,31 +9,31 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class KerviDashboardComponent {
   protected dashboardId: string = null;
-  protected dashboard: Dashboard = null;
+  public dashboard: Dashboard = null;
   protected kerviService: NGXKerviService;
   protected dashboards: Dashboard[] = null;
   protected dashboardSizes: DashboardSizes = null;
   protected isAppEmpty = true;
-  protected showMenu = false;
-  protected dashboardPanelsHidden = false;
-  protected showPanelController = false;
-  @Input() protected cameraId: string = null;
-  @Input() protected cameraParameters: any = null;
-  protected cameraId$: BehaviorSubject<string> = new BehaviorSubject<string>(null);
+  public showMenu = false;
+  public dashboardPanelsHidden = false;
+  public showPanelController = false;
+  @Input() public cameraId: string = null;
+  @Input() public cameraParameters: any = null;
+  public cameraId$: BehaviorSubject<string> = new BehaviorSubject<string>(null);
   public authenticated: Boolean = false;
   private anonymous: Boolean = true;
 
-  protected showLeftPad: boolean = false;
-  protected leftPadXValue: NumberValue = null;
-  protected leftPadYValue: NumberValue = null;
-  protected autoCenterLeftPad: boolean = false;
+  public showLeftPad: boolean = false;
+  public leftPadXValue: NumberValue = null;
+  public leftPadYValue: NumberValue = null;
+  public autoCenterLeftPad: boolean = false;
 
-  protected showRightPad: boolean = false;
-  protected rightPadXValue: NumberValue = null;
-  protected rightPadYValue: NumberValue = null;
-  protected autoCenterRightPad: boolean = false;
+  public showRightPad: boolean = false;
+  public rightPadXValue: NumberValue = null;
+  public rightPadYValue: NumberValue = null;
+  public autoCenterRightPad: boolean = false;
 
-  private inFullScreen: boolean = false;
+  public inFullScreen: boolean = false;
   constructor() {
     this.kerviService = AppInjector.get(NGXKerviService);
     var self = this;

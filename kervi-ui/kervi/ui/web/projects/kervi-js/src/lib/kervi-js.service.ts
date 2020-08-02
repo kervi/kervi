@@ -57,6 +57,7 @@ export class KerviBaseService {
       if (connected) {
         console.log('kervi service ipc ready (connected)');
         self.spine.addEventHandler('valueChanged', '', function(id, value) {
+          console.log("vc", id, value);
           for (const component of self.components) {
             if (component.id === value.id) {
               const dynamicValue = component as any;

@@ -1,0 +1,4626 @@
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["main"],{
+
+/***/ "../../dist/kervi-js/fesm2015/kervi-js.js":
+/*!***********************************************************************************!*\
+  !*** D:/dev/kervi/kervi/kervi-ui/kervi/ui/web/dist/kervi-js/fesm2015/kervi-js.js ***!
+  \***********************************************************************************/
+/*! exports provided: Action, BooleanValue, ColorValue, ConnectionState, Controller, Dashboard, DashboardBackgroundModel, DashboardLink, DashboardMessageModel, DashboardPanel, DashboardPanelComponent, DashboardPanelParameters, DashboardSizes, DateTimeValue, Directory, File, FileBase, KerviBaseService, KerviEnumOptionModel, KerviJsComponent, KerviJsModule, KerviValue, KerviValueType, NumberValue, SelectValue, Stream, StreamEvent, StringValue, UserLogStateType, ValueRange, ValueRangeType */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Action", function() { return Action; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BooleanValue", function() { return BooleanValue; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ColorValue", function() { return ColorValue; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConnectionState", function() { return ConnectionState; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Controller", function() { return Controller; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Dashboard", function() { return Dashboard; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DashboardBackgroundModel", function() { return DashboardBackgroundModel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DashboardLink", function() { return DashboardLink; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DashboardMessageModel", function() { return DashboardMessageModel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DashboardPanel", function() { return DashboardPanel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DashboardPanelComponent", function() { return DashboardPanelComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DashboardPanelParameters", function() { return DashboardPanelParameters; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DashboardSizes", function() { return DashboardSizes; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DateTimeValue", function() { return DateTimeValue; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Directory", function() { return Directory; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "File", function() { return File; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FileBase", function() { return FileBase; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviBaseService", function() { return KerviBaseService; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviEnumOptionModel", function() { return KerviEnumOptionModel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviJsComponent", function() { return KerviJsComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviJsModule", function() { return KerviJsModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviValue", function() { return KerviValue; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviValueType", function() { return KerviValueType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NumberValue", function() { return NumberValue; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SelectValue", function() { return SelectValue; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Stream", function() { return Stream; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StreamEvent", function() { return StreamEvent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StringValue", function() { return StringValue; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UserLogStateType", function() { return UserLogStateType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ValueRange", function() { return ValueRange; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ValueRangeType", function() { return ValueRangeType; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "../../node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ "../../node_modules/rxjs/_esm2015/index.js");
+
+
+
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+class KerviSpineBase {
+    constructor(constructorOptions) {
+        this.constructorOptions = constructorOptions;
+        this.isConnected = false;
+        this.doAuthenticate = false;
+        this.sessionId = null;
+        this.queryHandlers = [];
+        this.commandHandlers = [];
+        this.eventHandlers = [];
+        this.streamHandlers = [];
+        this.rpcQueue = {};
+        this.ready = false;
+        this.messageId = 0;
+        this.sensors = {};
+        this.controllers = {};
+        this.sensorTypes = [];
+        this.controllerTypes = [];
+        this.visionRegions = [];
+        this.application = null;
+        this.allowAnonymous = true;
+        this.firstOnOpen = true;
+        this.messageCount = 0;
+        this.mpsTime = new Date;
+        this.mps = 0;
+        this.websocket = null;
+        this.options = {
+            userName: 'anonymous',
+            password: null,
+            address: null,
+            onOpen: null,
+            onClose: null,
+            onAuthenticate: null,
+            onAuthenticateFailed: null,
+            onAuthenticateStart: null,
+            onLogOff: null,
+            onMPS: null,
+            autoConnect: true,
+            targetScope: null,
+            protocol: 'ws',
+            apiToken: null
+        };
+        this.addEventHandler = function (eventName, id, callback) {
+        };
+        this.addStreamHandler = function (streamId, streamEvent, callback) {
+        };
+        this.removeStreamHandler = function (streamId, streamEvent, callback) {
+        };
+        console.log('Kervi base spine init', this.options, constructorOptions);
+        this.options = this.extend(this.options, constructorOptions);
+        console.log('kbo', this.options);
+        this.connect();
+        const self = this;
+        setInterval(function () {
+            var hangingNodes = [];
+            for (let id in self.rpcQueue) {
+                var query = self.rpcQueue[id];
+                if (query['callbackTimeout']) {
+                    if (Date.now() - query['ts'] > query['timeout']) {
+                        var callback = query['callbackTimeout'];
+                        hangingNodes.push(id);
+                        callback.call(self.options.targetScope);
+                    }
+                }
+            }
+            for (let id of hangingNodes) {
+                delete self.rpcQueue[id];
+            }
+        }, 1);
+    }
+    extend(...p) {
+        for (let i = 1; i < p.length; i++) {
+            for (let key in p[i]) {
+                if (p[i].hasOwnProperty(key)) {
+                    p[0][key] = p[i][key];
+                }
+            }
+        }
+        return p[0];
+    }
+    addRPCCallback(id, callback, callbackTimeout, timeout) {
+        if (callback) {
+            this.rpcQueue[id] = {
+                'callback': callback,
+                'callbackTimeout': callbackTimeout,
+                'timeout': timeout,
+                'ts': Date.now(),
+            };
+        }
+    }
+    handleRPCResponse(message) {
+        if (message.id in this.rpcQueue) {
+            var callback = this.rpcQueue[message.id]['callback'];
+            if (callback) {
+                delete this.rpcQueue[message.id];
+                callback.call(this.options.targetScope, message.response, message.response);
+            }
+        }
+    }
+    handleEvent(message) {
+        // console.log('ev', message)
+        const eventName = message.event;
+        const id = message.id;
+        let eventPath = eventName;
+        if (id) {
+            eventPath += '/' + id;
+        }
+        let value = null;
+        if (message.args && message.args.length) {
+            value = message.args[0];
+        }
+        for (var n = 0; (n < this.eventHandlers.length); n++) {
+            let h = this.eventHandlers[n];
+            if (h.eventName === eventPath)
+                h.callback.call(value, id, value);
+            else if (h.eventName === eventName)
+                h.callback.call(value, id, value);
+        }
+    }
+    handleStream(message, streamBlob) {
+        const streamTag = message.streamId + '/' + message.streamEvent;
+        for (let n = 0; (n < this.streamHandlers.length); n++) {
+            const h = this.streamHandlers[n];
+            if (h.streamTag === streamTag) {
+                h.callback.call(message.streamId, message.streamId, message.streamEvent, streamBlob);
+            }
+            else if (h.streamTag === message.streamId) {
+                h.callback.call(message.streamId, message.streamId, message.streamEvent, streamBlob);
+            }
+        }
+    }
+    handleCommand(message) {
+        console.log('cmd', this, message);
+        var command = message.command;
+        var args = null;
+        if (message.args && message.args.length) {
+            args = message.args[0];
+        }
+        for (var n = 0; (n < this.commandHandlers.length); n++) {
+            var c = this.commandHandlers[n];
+            if (c.command == command)
+                c.callback.call(this, args);
+        }
+    }
+    connect() {
+    }
+    onOpen(evt) {
+        console.log('Kervi open', this, evt);
+        this.isConnected = true;
+        this.eventHandlers = [];
+        this.streamHandlers = [];
+        this.commandHandlers = [];
+        this.queryHandlers = [];
+        console.log('Kervi spine ready');
+    }
+    onClose(evt) {
+        console.log('Kervi spine on close', evt);
+        this.isConnected = false;
+        const self = this;
+        if (this.options.onClose)
+            this.options.onClose.call(this.options.targetScope, evt);
+        this.firstOnOpen = true;
+        if (this.options.autoConnect) {
+            setTimeout(function () {
+                self.connect();
+            }, 1000);
+        }
+    }
+    authenticate(userName, password) {
+    }
+    logoff() {
+    }
+    onMessage(evt) {
+    }
+    onError(evt) {
+        console.log('Kervi on error', evt);
+    }
+    addCommandHandler(command, callback) {
+    }
+    addQueryHandler(query, callback) {
+    }
+    sendCommand(command, ...p) {
+    }
+    sendQuery(query, ...p) {
+    }
+    triggerEvent(eventName, id) {
+    }
+    streamData(stream_id, event, data) {
+    }
+}
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviWSSpine extends KerviSpineBase {
+    constructor(constructorOptions) {
+        super(constructorOptions);
+        this.constructorOptions = constructorOptions;
+        this.addEventHandler = function (eventName, id, callback) {
+            if (id)
+                this.eventHandlers.push({ 'eventName': eventName + '/' + id, callback: callback });
+            else
+                this.eventHandlers.push({ 'eventName': eventName, callback: callback });
+            var cmd = { id: this.messageId++, 'messageType': 'registerEventHandler', 'event': eventName, 'eventId': id };
+            //console.log('add event handler',cmd);
+            this.websocket.send(JSON.stringify(cmd));
+        };
+        this.addStreamHandler = function (streamId, streamEvents, callback) {
+            if (streamEvents && streamEvents.length > 0) {
+                for (let event of streamEvents) {
+                    this.streamHandlers.push({ 'streamTag': streamId + '/' + event, callback: callback });
+                    const cmd = {
+                        id: this.messageId++,
+                        'messageType': 'registerStreamHandler',
+                        'streamId': streamId,
+                        'streamEvent': event
+                    };
+                    console.log('as', cmd);
+                    this.websocket.send(JSON.stringify(cmd));
+                }
+            }
+            else {
+                this.streamHandlers.push({ 'streamTag': streamId, callback: callback });
+                const cmd = {
+                    id: this.messageId++,
+                    'messageType': 'registerStreamHandler',
+                    'streamId': streamId,
+                    'streamEvent': event
+                };
+                console.log('as', cmd);
+                this.websocket.send(JSON.stringify(cmd));
+            }
+        };
+        this.removeStreamHandler = function (streamId, streamEvents) {
+            if (streamEvents && streamEvents.length > 0) {
+                for (let event of streamEvents) {
+                    //this.streamHandlers.push({'streamTag': streamId + '/' + event, callback: callback});
+                    const cmd = {
+                        id: this.messageId++,
+                        'messageType': 'removeStreamHandler',
+                        'streamId': streamId,
+                        'streamEvent': event
+                    };
+                    console.log('as', cmd);
+                    this.websocket.send(JSON.stringify(cmd));
+                }
+            }
+            else {
+                //this.streamHandlers.push({'streamTag': streamId, callback: callback});
+                const cmd = {
+                    id: this.messageId++,
+                    'messageType': 'removeStreamHandler',
+                    'streamId': streamId,
+                    'streamEvent': event
+                };
+                console.log('as', cmd);
+                this.websocket.send(JSON.stringify(cmd));
+            }
+        };
+        console.log('kervi spine constructor');
+    }
+    connect() {
+        if (this.isConnected) {
+            console.log('Kervi is connected');
+            return;
+        }
+        const self = this;
+        this.websocket = new WebSocket(this.options.protocol + '://' + this.options.address);
+        this.websocket.binaryType = 'arraybuffer';
+        this.websocket.onopen = function (evt) {
+            console.log('kervi spine on open');
+            self.onOpen(evt);
+        };
+        this.websocket.onclose = function (evt) {
+            self.onClose(evt);
+        };
+        this.websocket.onmessage = function (evt) {
+            if (typeof evt.data === 'string') {
+                const message = JSON.parse(evt.data);
+                self.onMessage(message);
+            }
+            else {
+                const jsonLen = new Int32Array(evt.data.slice(0, 4))[0];
+                const jsonBlob = evt.data.slice(4, jsonLen + 4);
+                const streamBlob = evt.data.slice(4 + jsonLen);
+                const utf8decoder = new TextDecoder();
+                const j = utf8decoder.decode(jsonBlob);
+                self.onMessage(JSON.parse(j), streamBlob);
+            }
+        };
+        this.websocket.onerror = function (evt) {
+            self.onError(evt);
+        };
+    }
+    authenticate(userName, password) {
+        this.options.userName = userName;
+        this.options.password = password;
+        const cmd = { id: this.messageId++, 'messageType': 'authenticate', 'userName': userName, 'password': password };
+        console.log('swa', cmd);
+        this.websocket.send(JSON.stringify(cmd));
+    }
+    logoff() {
+        const cmd = { id: this.messageId++, 'messageType': 'logoff', 'session': this.sessionId };
+        this.sessionId = null;
+        this.websocket.send(JSON.stringify(cmd));
+    }
+    onMessage(message, streamBlob = null) {
+        // if (message.messageType !== 'stream') {
+        //     console.log('on m', message);
+        // }
+        const self = this;
+        const now = new Date();
+        const fpsDiff = now.getTime() - this.mpsTime.getTime();
+        const seconds = fpsDiff / 1000;
+        this.messageCount++;
+        if (seconds > 1) {
+            this.mps = Math.round(this.messageCount / seconds);
+            this.messageCount = 0;
+            this.mpsTime = now;
+            if (this.options.onMPS) {
+                this.options.onMPS.call(this.options.targetScope, this.mps);
+            }
+        }
+        if (message.messageType === 'authenticate') {
+            console.log('authenticate');
+            this.doAuthenticate = true;
+            if (this.options.userName)
+                this.authenticate(this.options.userName, this.options.password);
+            else
+                this.options.onAuthenticate.call(this.options.targetScope, message);
+        }
+        else if (message.messageType === 'authentication_failed') {
+            console.log('authentication failed', this.options.userName);
+            if (this.options.userName == 'anonymous') {
+                this.allowAnonymous = false;
+                this.options.userName = null;
+                this.options.password = null;
+                this.sessionId = null;
+                if (self.options.onLogOff) {
+                    self.options.onLogOff.call(self.options.targetScope, message);
+                }
+            }
+            else
+                this.options.onAuthenticateFailed.call(this.options.targetScope, message);
+        }
+        else if (message.messageType === 'session_authenticated') {
+            const date = new Date();
+            date.setTime(date.getTime() + (2 * 60 * 60 * 1000));
+            const expires = '; expires=' + date.toUTCString();
+            this.sessionId = message.session;
+            document.cookie = 'kervisession' + '=' + message.session + expires + '; path=/';
+            setTimeout(function () {
+                console.log('to', self.options);
+                if (self.options.onOpen)
+                    self.options.onOpen.call(self.options.targetScope, self.firstOnOpen, message);
+                self.firstOnOpen = false;
+            }, 100);
+        }
+        else if (message.messageType == 'session_logoff') {
+            if (self.options.onLogOff)
+                self.options.onLogOff.call(self.options.targetScope, message);
+            if (this.allowAnonymous && this.options.userName != 'anonymous') {
+                this.authenticate('anonymous', null);
+            }
+            else {
+                self.options.userName = null;
+                self.options.password = null;
+                self.sessionId = null;
+            }
+        }
+        else if (message.messageType == 'response')
+            this.handleRPCResponse(message);
+        else if (message.messageType == 'event')
+            this.handleEvent(message);
+        else if (message.messageType == 'stream')
+            this.handleStream(message, streamBlob);
+        else if (message.messageType == 'command')
+            this.handleCommand(message);
+        else
+            console.log('Kervi spine message unknown', this.rpcQueue, message);
+    }
+    onError(evt) {
+        console.log('Kervi on error', evt);
+    }
+    addCommandHandler(command, callback) {
+        this.commandHandlers.push({ command: command, callback: callback });
+        var cmd = { id: this.messageId++, 'messageType': 'registerCommandHandler', 'command': command };
+        this.websocket.send(JSON.stringify(cmd));
+    }
+    ;
+    addQueryHandler(query, callback) {
+        this.queryHandlers.push({ query: query, callback: callback });
+        var cmd = { id: this.messageId++, 'messageType': 'registerQueryHandler', 'query': query };
+        this.websocket.send(JSON.stringify(cmd));
+    }
+    ;
+    sendCommand(command, ...p) {
+        console.log('sec', arguments);
+        var args = [];
+        var callback = null;
+        for (var i = 0; (i < p.length); i++) {
+            if (p[i] instanceof Function)
+                callback = p[i];
+            else
+                args.push(p[i]);
+        }
+        var cmd = { id: this.messageId++, 'messageType': 'command', 'command': command, 'args': args };
+        if (callback && callback instanceof Function)
+            this.addRPCCallback(cmd.id.toString(), callback, null, 0);
+        console.log('sendCommand', this, cmd);
+        this.websocket.send(JSON.stringify(cmd));
+    }
+    ;
+    sendQuery(query, ...p) {
+        var args = [];
+        var callback = null;
+        var callbackTimeout = null;
+        var timeout = 10000;
+        for (var i = 0; (i < p.length); i++) {
+            if (p[i] instanceof Function)
+                if (!callback)
+                    callback = p[i];
+                else
+                    callbackTimeout = p[i];
+            else {
+                if (callbackTimeout)
+                    timeout = p[i];
+                else
+                    args.push(p[i]);
+            }
+        }
+        var cmd = { id: this.messageId++, 'messageType': 'query', 'query': query, 'args': args };
+        this.addRPCCallback(cmd.id.toString(), callback, callbackTimeout, timeout);
+        console.log('sendQuery', callback, cmd);
+        this.websocket.send(JSON.stringify(cmd));
+    }
+    ;
+    triggerEvent(eventName, id) {
+        var e = { id: this.messageId++, 'messageType': 'event', 'event': eventName, 'args': arguments };
+        this.websocket.send(JSON.stringify(e));
+    }
+    ;
+}
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviRMQSpine extends KerviSpineBase {
+    constructor(constructorOptions) {
+        super(constructorOptions);
+        this.constructorOptions = constructorOptions;
+        this.exchange = "/exchange/";
+        this.addEventHandler = function (eventName, id, callback) {
+            if (id)
+                this.eventHandlers.push({ "eventName": eventName + "/" + id, callback: callback });
+            else
+                this.eventHandlers.push({ "eventName": eventName, callback: callback });
+            var cmd = { id: this.messageId++, "messageType": "registerEventHandler", "event": eventName, "eventId": id };
+            this.websocket.send(this.exchange, { topic: "registerEventHandler", router_id: this.socketSession }, JSON.stringify(cmd));
+        };
+        console.log("Kervi io spine init y", this.options, constructorOptions);
+    }
+    onMQError(frame) {
+        console.log("MQ error", frame);
+    }
+    connect() {
+        if (this.isConnected) {
+            console.log("Kervi is connected");
+            return;
+        }
+        var self = this;
+        //var mqUrl= this.options.protocol + "://" + this.options.address
+        var mqUrl = "wss://mq.kervi.io:15673/ws";
+        this.websocket = Stomp.client(mqUrl);
+        this.websocket.heartbeat.incoming = 0;
+        self.exchange = "/exchange/" + self.options.apiToken.app_id;
+        console.log("exchange", self.exchange);
+        this.websocket.connect(self.options.apiToken.api_token, "ui", function (frame) {
+            console.log("MQ connect", frame, self.websocket, this, self);
+            self.socketSession = frame.headers.session;
+            self.exchange = "/exchange/" + self.options.apiToken.app_id;
+            self.websocket.subscribe(self.exchange, function (message) {
+                console.log("mq ", message);
+                if (message.headers["topic"])
+                    message.headers["topic"] = message.headers["topic"].replace(new RegExp("\\c", "g"), ":");
+                if (message.command == "CONNECTED") {
+                }
+                else if (message.headers["topic"] == "ping")
+                    self.onPing(message);
+                else
+                    self.onMessage(message);
+            }, {});
+        }, self.onMQError, self.options.apiToken.api_channel);
+    }
+    onPing(message) {
+        console.log("onping", this.options.appId, message);
+        var self = this;
+        if (!this.isConnected && message.headers["connection_id"] == self.options.apiToken.app_id) {
+            this.onOpen(message);
+            this.websocket.send(self.exchange, { topic: "session:new", router_id: message.headers["router_id"], session_id: this.socketSession }, "{}");
+        }
+    }
+    authenticate(userName, password) {
+        this.options.userName = userName;
+        this.options.password = password;
+        if (this.options.onAuthenticateStart)
+            this.options.onAuthenticateStart.call(this.options.targetScope);
+        var cmd = { id: this.messageId++, "messageType": "authenticate", "userName": this.options.userName, "password": this.options.password };
+        this.websocket.send(JSON.stringify(cmd));
+    }
+    logoff() {
+        //this.options.userName = this.allowAnonymous ? "anonymous" : null;
+        //this.options.password = null;
+        var cmd = { id: this.messageId++, "messageType": "logoff", "session": this.sessionId };
+        this.sessionId = null;
+        this.websocket.send(JSON.stringify(cmd));
+    }
+    onMessage(evt) {
+        console.log("on m", evt);
+        var message = JSON.parse(evt.body);
+        var self = this;
+        var topic = evt.headers["topic"];
+        if (topic == "authenticate") {
+            console.log("authenticate");
+            this.doAuthenticate = true;
+            if (this.options.userName)
+                this.authenticate(this.options.userName, this.options.password);
+            else
+                this.options.onAuthenticate.call(this.options.targetScope, evt);
+        }
+        else if (topic == "authentication_failed") {
+            console.log("authentication failed", this.options.userName);
+            if (this.options.userName == "anonymous") {
+                this.allowAnonymous = false;
+                this.options.userName = null;
+                this.options.password = null;
+                this.sessionId = null;
+                console.log("x", self.options);
+                if (self.options.onLogOff) {
+                    console.log("x1");
+                    self.options.onLogOff.call(self.options.targetScope, evt);
+                }
+            }
+            else
+                this.options.onAuthenticateFailed.call(this.options.targetScope, evt);
+        }
+        else if (topic == "session_authenticated") {
+            var date = new Date();
+            date.setTime(date.getTime() + (2 * 60 * 60 * 1000));
+            var expires = "; expires=" + date.toUTCString();
+            this.sessionId = message.session;
+            document.cookie = "kervisession" + "=" + message.session + expires + "; path=/";
+            setTimeout(function () {
+                if (self.options.onOpen)
+                    self.options.onOpen.call(self.options.targetScope, self.firstOnOpen, evt);
+                self.firstOnOpen = false;
+            }, 100);
+        }
+        else if (topic == "session_logoff") {
+            if (self.options.onLogOff)
+                self.options.onLogOff.call(self.options.targetScope, evt);
+            if (this.allowAnonymous && this.options.userName != "anonymous") {
+                this.authenticate("anonymous", null);
+            }
+            else {
+                self.options.userName = null;
+                self.options.password = null;
+                self.sessionId = null;
+            }
+        }
+        else if (evt.headers["type"] == "query_response") {
+            this.handleRPCResponse({ id: evt.headers["query_id"], response: message });
+        }
+        else if (evt.headers["type"] == "event") {
+            console.log("e", evt);
+            var topic_tag = evt.headers["topic"].split(":");
+            this.handleEvent({ event: topic_tag[1], id: topic_tag[2], args: message.args });
+        }
+        else if (message.messageType == "command")
+            this.handleCommand(message);
+        else
+            console.log("Kervi spine message unknown", this.rpcQueue, evt);
+    }
+    onError(evt) {
+        console.log("Kervi on error", evt);
+    }
+    addCommandHandler(command, callback) {
+        this.commandHandlers.push({ command: command, callback: callback });
+        var cmd = { id: this.messageId++, "messageType": "registerCommandHandler", "command": command };
+        //this.websocket.send(JSON.stringify(cmd));
+        this.websocket.send(this.exchange, { topic: "registerCommandHandler", router_id: this.socketSession }, JSON.stringify(cmd));
+    }
+    ;
+    addQueryHandler(query, callback) {
+        this.queryHandlers.push({ query: query, callback: callback });
+        var cmd = { id: this.messageId++, "messageType": "registerQueryHandler", "query": query };
+        this.websocket.send(this.exchange, { topic: "registerQueryHandler", router_id: this.socketSession }, JSON.stringify(cmd));
+    }
+    ;
+    sendCommand(command, ...p) {
+        console.log("sec", arguments);
+        var args = [];
+        var callback = null;
+        for (var i = 0; (i < p.length); i++) {
+            if (p[i] instanceof Function)
+                callback = p[i];
+            else
+                args.push(p[i]);
+        }
+        /*if (p.length>1){
+            var argOffset=1;
+            if ( callback && callback instanceof Function )
+                argOffset+=1;
+            for (var i=argOffset;(i<arguments.length);i++){
+                args.push(arguments[i]);
+            }
+        }*/
+        var cmd = { id: this.messageId++, "args": args, kwargs: {} };
+        if (callback && callback instanceof Function)
+            this.addRPCCallback(cmd.id.toString(), callback, null, 0);
+        console.log("sendCommand", this, cmd);
+        this.websocket.send(this.exchange, { topic: "command:" + command, router_id: this.socketSession }, JSON.stringify(cmd));
+    }
+    ;
+    sendQuery(query, ...p) {
+        var args = [];
+        var callback = null;
+        var callbackTimeout = null;
+        var timeout = 10000;
+        for (var i = 0; (i < p.length); i++) {
+            if (p[i] instanceof Function)
+                if (!callback)
+                    callback = p[i];
+                else
+                    callbackTimeout = p[i];
+            else {
+                if (callbackTimeout)
+                    timeout = p[i];
+                else
+                    args.push(p[i]);
+            }
+        }
+        var cmd = { id: this.messageId++, "messageType": "query", "query": query, "args": args, kwargs: [], qts: 0 };
+        this.addRPCCallback(cmd.id.toString(), callback, callbackTimeout, timeout);
+        console.log("sendQuery", callback, cmd);
+        //this.websocket.send(JSON.stringify(cmd));
+        this.websocket.send(this.exchange, { topic: "query:" + query, qts: 0, query_id: cmd.id.toString(), router_id: this.socketSession, response_address: this.socketSession }, JSON.stringify(cmd));
+    }
+    ;
+    triggerEvent(eventName, id) {
+        var e = { id: this.messageId++, "messageType": "event", "event": eventName, "args": arguments };
+        this.websocket.send(JSON.stringify(e));
+    }
+    ;
+}
+
+class DashboardLink {
+    /*constructor(dashboardId:string, sectionId:string, sectionName:string){
+        this.dashboardId = dashboardId;
+        this.sectionId = sectionId;
+        this.sectionName = sectionName;
+    }*/
+    constructor(component, message) {
+        this.dashboardId = message.dashboardId;
+        this.panelId = message.sectionId;
+        this.panelName = message.sectionName;
+        this.component = component;
+        this.parameters = message.parameters;
+    }
+}
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviValue {
+    constructor() {
+        this.componentType = "KerviValue";
+        this.typeName = null;
+        this.dashboards = [];
+        this.ui = {
+            type: "",
+            orientation: "",
+            visible: true
+        };
+    }
+}
+class KerviValueType extends KerviValue {
+    constructor(message, kerviService) {
+        super();
+        this.kerviService = null;
+        this.kerviService = kerviService;
+        this.value$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](message.value);
+        this.name = message.name;
+        this.isInput = message.isInput;
+        this.ui = message.ui;
+        this.command = message.command;
+        this.id = message.id;
+        this.ui["type"] = message.componentType;
+        this.ui["orientation"] = message.orientation;
+        this.ui["visible"] = message.visible;
+        for (var prop in message.ui) {
+            if (this.ui[prop] != undefined)
+                this.ui[prop] = message.ui[prop];
+        }
+        for (let dashboardLink of message.dashboardLinks) {
+            this.dashboards.push(new DashboardLink(this, dashboardLink));
+        }
+    }
+    get value() {
+        //console.log("gv", this.id, this.value$.value)
+        return this.value$.value;
+    }
+    set value(value) {
+        console.log("sv", this.id);
+        this.value$.next(value);
+        this.kerviService.spine.sendCommand(this.command, value);
+    }
+    set(v, notify = true) {
+        this.value$.next(v);
+        if (notify)
+            this.kerviService.spine.sendCommand(this.command, v);
+    }
+}
+var ValueRangeType;
+(function (ValueRangeType) {
+    ValueRangeType[ValueRangeType["normal"] = 0] = "normal";
+    ValueRangeType[ValueRangeType["warning"] = 1] = "warning";
+    ValueRangeType[ValueRangeType["error"] = 2] = "error";
+})(ValueRangeType || (ValueRangeType = {}));
+;
+class ValueRange {
+    constructor(range) {
+        this.start = null;
+        this.end = null;
+        this.type = null;
+        this.start = range["start"];
+        this.end = range["end"];
+        if (range["type"] == "warning")
+            this.type = ValueRangeType.warning;
+        else if (range["type"] == "error")
+            this.type = ValueRangeType.error;
+        else
+            this.type = ValueRangeType.normal;
+    }
+}
+class KerviEnumOptionModel {
+    constructor(messageOption) {
+        this.selected$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](false);
+        this.value = messageOption.value;
+        this.text = messageOption.text;
+        this.selected$.next(messageOption.selected);
+    }
+    updateReferences() { }
+    ;
+    reload(component) { }
+    ;
+    removeReferences(components) { }
+    ;
+}
+class SelectValue extends KerviValueType {
+    constructor(message, kerviService) {
+        super(message, kerviService);
+        this.options = [];
+        this.lastSelected$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](null);
+        var self = this;
+        this.options = [];
+        for (let option of message.options) {
+            this.options.push(new KerviEnumOptionModel(option));
+        }
+        this.selectOptions(this.value$.value);
+        this.value$.subscribe(function (v) {
+            self.selectOptions(v);
+        });
+    }
+    getDefaultValue() {
+        return [];
+    }
+    selectOptions(selectedOptions) {
+        console.log("soc");
+        if (!selectedOptions)
+            return;
+        for (let option of this.options) {
+            option.selected$.next(false);
+        }
+        for (let selectedOption of selectedOptions) {
+            console.log("so", selectedOption);
+            for (let option of this.options) {
+                console.log("sox", option);
+                if (option.value == selectedOption) {
+                    option.selected$.next(true);
+                    this.lastSelected$.next(option);
+                    console.log("os", option.text, option.selected$.value);
+                    break;
+                }
+            }
+        }
+    }
+}
+class NumberValue extends KerviValueType {
+    constructor(message, kerviService) {
+        super(message, kerviService);
+        this.qtyUnitTo = null;
+        this.sparkline$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"]([]);
+        this.ranges = [];
+        this.unit = message.unit;
+        this.typeName = "Number";
+        this.qtyUnitFrom = message.unit;
+        if (this.unit == "c" && kerviService.application$.value["display"]["unit_system"]["temperature"] == "F") {
+            this.qtyUnitFrom = "tempC";
+            this.qtyUnitTo = "tempF";
+            this.unit = "F";
+        }
+        for (var range of message.ranges) {
+            if (this.qtyUnitTo) {
+                var q = new Qty(range["start"], this.qtyUnitFrom);
+                range["start"] = q.to(this.qtyUnitTo).scalar;
+                var q = new Qty(range["end"], this.qtyUnitFrom);
+                range["end"] = q.to(this.qtyUnitTo).scalar;
+                this.ranges.push(new ValueRange(range));
+            }
+            else
+                this.ranges.push(new ValueRange(range));
+        }
+        if (this.qtyUnitTo && message.maxValue) {
+            var q = new Qty(message.maxValue, this.qtyUnitFrom);
+            this.maxValue = q.to(this.qtyUnitTo).scalar;
+        }
+        else
+            this.maxValue = message.maxValue;
+        if (this.qtyUnitTo && message.minValue) {
+            var q = new Qty(message.minValue, this.qtyUnitFrom);
+            this.minValue = q.to(this.qtyUnitTo).scalar;
+        }
+        else
+            this.minValue = message.minValue;
+        var spl = [];
+        for (var spv of message.sparkline) {
+            if (this.qtyUnitTo) {
+                console.log("spv", spv);
+                var q = new Qty(spv.value, this.qtyUnitFrom);
+                //spv.value = q.to(this.qtyUnitTo).scalar;
+            }
+            spl.push(spv);
+        }
+        this.sparkline$.next(spl);
+        this.set(message.value, false);
+    }
+    getDefaultValue() {
+        return 0;
+    }
+    set(v, notify = true) {
+        var newValue = v;
+        if (this.qtyUnitTo) {
+            var q = new Qty(v, this.qtyUnitFrom);
+            newValue = q.to(this.qtyUnitTo).scalar;
+        }
+        this.value$.next(newValue);
+        if (notify)
+            this.kerviService.spine.sendCommand(this.command, v);
+        var spl = this.sparkline$.value;
+        spl.push(newValue);
+        if (spl.length > 10)
+            spl.shift();
+        this.sparkline$.next(spl);
+    }
+}
+class StringValue extends KerviValueType {
+    getDefaultValue() {
+        return "";
+    }
+    constructor(message, kerviService) {
+        super(message, kerviService);
+        this.typeName = "String";
+    }
+}
+class BooleanValue extends KerviValueType {
+    constructor(message, kerviService) {
+        super(message, kerviService);
+        this.typeName = "Boolean";
+    }
+    getDefaultValue() {
+        return false;
+    }
+}
+class DateTimeValue extends KerviValueType {
+    constructor(message, kerviService) {
+        super(message, kerviService);
+        this.subType = message.inputType;
+        this.typeName = "DateTime";
+    }
+    getDefaultValue() {
+        return new Date();
+    }
+}
+class ColorValue extends KerviValueType {
+    constructor(message, kerviService) {
+        super(message, kerviService);
+        this.typeName = "Color";
+    }
+    getDefaultValue() {
+        return "#ffffff";
+    }
+}
+
+class ComponentRef {
+    constructor(message) {
+        this.id = message.id;
+    }
+}
+
+// Copyright (c) 2016, Tim Wentzlau
+class Controller {
+    constructor(message, kerviService) {
+        this.componentType = "controller";
+        this.ui = {};
+        this.inputs = [];
+        this.outputs = [];
+        this.actions = [];
+        this.inputReferences = [];
+        this.outputReferences = [];
+        this.actionsReferences = [];
+        this.dashboards = [];
+        this.kerviService = kerviService;
+        this.id = message.id;
+        this.name = message.name;
+        this.type = message.type;
+        this.ui = message.ui;
+        this.visible = message.visible;
+        this.parameters = message.parameters;
+        this.template = message.template;
+        for (var ref of message.inputs) {
+            this.inputReferences.push(new ComponentRef(ref));
+        }
+        for (var ref of message.outputs) {
+            this.outputReferences.push(new ComponentRef(ref));
+        }
+        for (var ref of message.actions) {
+            this.actionsReferences.push(new ComponentRef(ref));
+        }
+        for (let dashboardLink of message.dashboardLinks) {
+            this.dashboards.push(new DashboardLink(this, dashboardLink));
+        }
+    }
+    updateReferences() {
+        if (this.inputs.length == 0) {
+            for (var ref of this.inputReferences) {
+                var component = this.kerviService.getComponent(ref.id);
+                if (component)
+                    this.inputs.push(component);
+            }
+        }
+        if (this.outputs.length == 0) {
+            for (var ref of this.outputReferences) {
+                var component = this.kerviService.getComponent(ref.id);
+                if (component)
+                    this.outputs.push(component);
+            }
+        }
+        if (this.actions.length == 0) {
+            for (var ref of this.actionsReferences) {
+                var component = this.kerviService.getComponent(ref.id);
+                if (component)
+                    this.actions.push(component);
+            }
+        }
+    }
+    ;
+    removeReferences(components) { }
+    ;
+    reload(component) { }
+    ;
+}
+
+// Copyright (c) 2016, Tim Wentzlau
+// Licensed under MIT
+class DashboardSizes {
+    constructor() {
+        this.valueWidth = '3rem';
+        this.buttonWidth = '25px';
+        this.buttonHeight = '';
+        this.switchWidth = '25px';
+        this.switchHeight = '25px';
+        this.gaugeWidth = '100px';
+        this.gaugeHeight = '200px';
+    }
+}
+class DashboardMessageModel {
+    constructor(message) {
+        this.timestamp = new Date(message.timestamp * 1000);
+        this.topic = message.topic;
+        this.body = message.body;
+        this.type = message.type;
+        this.sourceId = message.source_id;
+        this.sourceName = message.source_name;
+        this.area = message.area;
+        this.level = message.level;
+    }
+}
+class DashboardPanelComponent {
+    constructor(message) {
+        this.message = message;
+        this.linkId = message.linkId;
+        this.componentId = message.componentId;
+        this.component = message.component;
+        this.parameters = message.parameters;
+    }
+}
+class DashboardPanelParameters {
+    constructor(messageParameters) {
+        this.title = null;
+        this.width = null;
+        this.height = null;
+        this.type = null;
+        this.userLog = null;
+        this.appHealth = null;
+        this.logLength = 5;
+        this.layout = 'row';
+        this.title = messageParameters.label;
+        this.height = this.calcSize(messageParameters.height);
+        this.width = this.calcSize(messageParameters.width);
+        this.userLog = messageParameters.userLog;
+        this.logLength = messageParameters.logLength;
+        this.appHealth = messageParameters.app_health;
+        if (messageParameters.type) {
+            this.type = messageParameters.type;
+        }
+        if (messageParameters.layout) {
+            this.layout = messageParameters.layout;
+        }
+    }
+    calcSize(value) {
+        if (value == null)
+            return '';
+        else if (value === '')
+            return '';
+        else if (isNaN(value)) {
+            return value;
+        }
+        else if (value > 0)
+            return value + '%';
+        else
+            return '';
+    }
+}
+class DashboardPanel {
+    constructor(dashboard, messagePanel) {
+        this.components = [];
+        this.subPanels = [];
+        this.hasOnlyGroupPanels = true;
+        this.dashboard = dashboard;
+        this.id = messagePanel.id;
+        this.name = messagePanel.name;
+        this.type = messagePanel.type;
+        this.parameters = new DashboardPanelParameters(messagePanel.uiParameters);
+        /*if (messagePanel.components)
+            for(var componentRef of messagePanel.components){
+                this.components.push(new DashboardPanelComponentModel(componentRef))
+            }*/
+        if (messagePanel.panels) {
+            //console.log('spa',messagePanel.panels);
+            for (var subMessagePanel of messagePanel.panels) {
+                var panel = new DashboardPanel(this, subMessagePanel);
+                this.subPanels.push(panel);
+                if (panel.type !== 'group')
+                    this.hasOnlyGroupPanels = false;
+            }
+        }
+    }
+    reload(source) {
+        //console.log('rl', this);
+        for (var subPanel of source.subPanels) {
+            this.reload(subPanel);
+        }
+        for (var sourceComponent of source.components) {
+            var found = false;
+            for (var component of this.components) {
+                if (component.componentId == sourceComponent.componentId) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                this.components.push(sourceComponent);
+            }
+        }
+        var deleteComponents = [];
+        for (var component of this.components) {
+            var found = false;
+            for (var sourceComponent of source.components) {
+                if (sourceComponent.componentId == component.componentId) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                deleteComponents.push(component);
+        }
+        //console.log('dsc',deleteComponents);
+        for (var component of deleteComponents) {
+            this.components.splice(this.components.indexOf(component), 1);
+        }
+    }
+}
+class DashboardBackgroundModel {
+    constructor(message) {
+        this.type = message.type;
+        this.cameraId = message.cameraId;
+    }
+}
+class Dashboard {
+    constructor(message) {
+        this.headerPanel = null;
+        this.footerCenterPanel = null;
+        this.footerLeftPanel = null;
+        this.footerRightPanel = null;
+        this.sysPanel = null;
+        this.backgroundPanel = null;
+        this.controllerPanel = null;
+        this.LeftPadXPanel = null;
+        this.LeftPadYPanel = null;
+        this.RightPadXPanel = null;
+        this.RightPadYPanel = null;
+        this.dashboards = [];
+        this.currentPanel = null;
+        this.id = message.id;
+        this.name = message.name;
+        this.componentType = 'dashboard';
+        this.type = message.type;
+        this.isDefault = message.isDefault;
+        this.template = message.template;
+        this.unitSize = message.unitSize;
+        //this.background=new DashboardBackgroundModel(message.background);
+        this.panels = [];
+        this.sysPanels = [];
+        if (!this.template) {
+            for (let messagePanel of message.sections) {
+                if (!messagePanel) {
+                    console.log('dashboard with null panel', this.id);
+                    continue;
+                }
+                var panel = new DashboardPanel(this, messagePanel);
+                var sysPanel = true;
+                if (panel.id == 'header_center')
+                    this.headerPanel = panel;
+                else if (panel.id == 'footer_left')
+                    this.footerLeftPanel = panel;
+                else if (panel.id == 'footer_center')
+                    this.footerCenterPanel = panel;
+                else if (panel.id == 'footer_right')
+                    this.footerRightPanel = panel;
+                else if (panel.id == 'header_right')
+                    this.sysPanel = panel;
+                else if (panel.id == 'controllers')
+                    this.controllerPanel = panel;
+                else if (panel.id == 'background')
+                    this.backgroundPanel = panel;
+                else if (panel.id == 'left_pad_x')
+                    this.LeftPadXPanel = panel;
+                else if (panel.id == 'left_pad_y')
+                    this.LeftPadYPanel = panel;
+                else if (panel.id == 'right_pad_x')
+                    this.RightPadXPanel = panel;
+                else if (panel.id == 'right_pad_y')
+                    this.RightPadYPanel = panel;
+                else {
+                    sysPanel = false;
+                    if (panel.type != 'group') {
+                        if (this.currentPanel == null) {
+                            this.currentPanel = new DashboardPanel(this, {
+                                'id': null,
+                                'name': '',
+                                'type': 'group',
+                                'components': [],
+                                'panels': [],
+                                'uiParameters': {
+                                    'title': '',
+                                    'width': 100,
+                                    'height': 0,
+                                    'userLog': false,
+                                    'logLength': 0
+                                }
+                            });
+                            this.currentPanel.subPanels.push(panel);
+                            this.panels.push(this.currentPanel);
+                        }
+                        else {
+                            this.currentPanel.subPanels.push(panel);
+                        }
+                    }
+                    else {
+                        this.panels.push(panel);
+                        this.currentPanel = null;
+                    }
+                }
+                if (sysPanel)
+                    this.sysPanels.push(panel);
+            }
+            if (!this.currentPanel) {
+                this.currentPanel = new DashboardPanel(this, {
+                    'id': null,
+                    'name': '',
+                    'type': 'group',
+                    'components': [],
+                    'panels': [],
+                    'uiParameters': {
+                        'title': '',
+                        'width': 100,
+                        'height': 0,
+                        'userLog': false,
+                        'logLength': 0
+                    }
+                });
+                //this.currentPanel.subPanels.push(panel);
+                this.panels.push(this.currentPanel);
+            }
+        }
+    }
+    isEmpty() {
+        return this.panels.length == 0;
+    }
+    removeReferences(deleteComponents) { }
+    ;
+    updateReferences() { }
+    ;
+    reload(component) {
+        var source = component;
+        if (!this.backgroundPanel && source.backgroundPanel)
+            this.backgroundPanel = source.backgroundPanel;
+        else if (this.backgroundPanel && !source.backgroundPanel)
+            this.backgroundPanel = null;
+        else if (this.backgroundPanel)
+            this.backgroundPanel.reload(source.backgroundPanel);
+        if (!this.footerLeftPanel && source.footerLeftPanel)
+            this.footerLeftPanel = source.footerLeftPanel;
+        else if (this.footerLeftPanel && !source.footerLeftPanel)
+            this.footerLeftPanel = null;
+        else if (this.footerLeftPanel)
+            this.footerLeftPanel.reload(source.footerLeftPanel);
+        if (!this.footerRightPanel && source.footerRightPanel)
+            this.footerRightPanel = source.footerRightPanel;
+        else if (this.footerRightPanel && !source.footerRightPanel)
+            this.footerRightPanel = null;
+        else if (this.footerRightPanel)
+            this.footerRightPanel.reload(source.footerRightPanel);
+        if (!this.footerCenterPanel && source.footerCenterPanel)
+            this.footerCenterPanel = source.footerCenterPanel;
+        else if (this.footerCenterPanel && !source.footerCenterPanel)
+            this.footerCenterPanel = null;
+        else if (this.footerCenterPanel)
+            this.footerCenterPanel.reload(source.footerCenterPanel);
+        /*if (!this.headerPanel && source.headerPanel)
+            this.headerPanel=source.headerPanel;
+        else if (this.headerPanel && !source.headerPanel)
+            this.headerPanel = null
+        else if (this.headerPanel)
+            this.headerPanel.reload(source.headerPanel)*/
+        if (!this.sysPanel && source.sysPanel)
+            this.sysPanel = source.sysPanel;
+        else if (this.sysPanel && !source.sysPanel)
+            this.sysPanel = null;
+        else if (this.sysPanel)
+            this.sysPanel.reload(source.sysPanel);
+        if (!this.LeftPadXPanel && source.LeftPadXPanel)
+            this.LeftPadXPanel = source.LeftPadXPanel;
+        else if (this.LeftPadXPanel && !source.LeftPadXPanel)
+            this.LeftPadXPanel = null;
+        else if (this.LeftPadXPanel)
+            this.LeftPadXPanel.reload(source.LeftPadXPanel);
+        if (!this.LeftPadYPanel && source.LeftPadYPanel)
+            this.LeftPadYPanel = source.LeftPadYPanel;
+        else if (this.LeftPadYPanel && !source.LeftPadYPanel)
+            this.LeftPadYPanel = null;
+        else if (this.LeftPadYPanel)
+            this.LeftPadYPanel.reload(source.LeftPadYPanel);
+        if (!this.RightPadXPanel && source.RightPadXPanel)
+            this.RightPadXPanel = source.RightPadXPanel;
+        else if (this.RightPadXPanel && !source.RightPadXPanel)
+            this.RightPadXPanel = null;
+        else if (this.RightPadXPanel)
+            this.RightPadXPanel.reload(source.RightPadXPanel);
+        if (!this.RightPadYPanel && source.RightPadYPanel)
+            this.RightPadYPanel = source.RightPadYPanel;
+        else if (this.RightPadYPanel && !source.RightPadYPanel)
+            this.RightPadYPanel = null;
+        else if (this.RightPadYPanel)
+            this.RightPadYPanel.reload(source.RightPadYPanel);
+        if (!this.controllerPanel && source.controllerPanel)
+            this.controllerPanel = source.controllerPanel;
+        else if (this.controllerPanel && !source.controllerPanel)
+            this.controllerPanel = null;
+        else if (this.controllerPanel)
+            this.controllerPanel.reload(source.controllerPanel);
+    }
+    ;
+    getDashboardPanelById(id, panels) {
+        for (let panel of panels) {
+            if (panel.id == id)
+                return panel;
+            else {
+                var res = this.getDashboardPanelById(id, panel.subPanels);
+                if (res)
+                    return res;
+            }
+        }
+        return null;
+    }
+    addDashboardLink(link) {
+        if (link.dashboardId == '*' || link.dashboardId == this.id || (link.dashboardId == '**default**' && this.isDefault)) {
+            var panelFound = false;
+            var panel = this.getDashboardPanelById(link.panelId, this.panels);
+            if (!panel)
+                panel = this.getDashboardPanelById(link.panelId, this.sysPanels);
+            if (panel) {
+                panel.components.push(new DashboardPanelComponent(link));
+            }
+            else {
+                // console.log('adh',link);
+                var messagePanel = {
+                    id: link.panelId,
+                    name: link.panelName,
+                    type: 'panel',
+                    uiParameters: {
+                        'title': '',
+                        'width': 0,
+                        'height': 0,
+                        'userLog': false,
+                        'logLength': 0
+                    }
+                };
+                var newPanel = new DashboardPanel(this, messagePanel);
+                this.currentPanel.subPanels.push(newPanel);
+                newPanel.components.push(new DashboardPanelComponent(link));
+            }
+        }
+    }
+}
+
+// Copyright (c) 2016, Tim Wentzlau
+class Action {
+    constructor(message, kerviService) {
+        this.kerviService = null;
+        this.id = null;
+        this.name = null;
+        this.componentType = 'action';
+        this.runCommand = '';
+        this.interruptCommand = '';
+        this.ui = {
+            type: '',
+            orientation: '',
+            visible: true
+        };
+        this.dashboards = [];
+        this.running$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](false);
+        this.kerviService = kerviService;
+        this.id = message.id;
+        this.name = message.name;
+        this.ui = message.ui;
+        this.ui.visible = message.visible;
+        this.ui.type = message.type;
+        this.runCommand = message.runCommand;
+        this.interruptCommand = message.interruptCommand;
+        this.running$.next(message.running);
+        for (let dashboardLink of message.dashboardLinks) {
+            this.dashboards.push(new DashboardLink(this, dashboardLink));
+        }
+    }
+    run(parameters) {
+        //if (!this.running$.value){
+        if (parameters && parameters.length > 0)
+            this.kerviService.spine.sendCommand(this.runCommand, ...parameters);
+        else
+            this.kerviService.spine.sendCommand(this.runCommand);
+        //}
+    }
+    interrupt(parameters) {
+        if (parameters && parameters.length > 0)
+            this.kerviService.spine.sendCommand(this.interruptCommand, ...parameters);
+        else
+            this.kerviService.spine.sendCommand(this.interruptCommand);
+    }
+}
+
+class ComponentFactory {
+    static createComponents(message, kerviService) {
+        const foundComponents = this.createComponentsRec(message, kerviService);
+        this.linkToDashboards(foundComponents[0], foundComponents[1]);
+        return foundComponents[0];
+    }
+    static createComponentsRec(message, kerviService) {
+        let result = [];
+        let dashboards = [];
+        if (Array.isArray(message)) {
+            for (let i = 0; (i < message.length); i++) {
+                const subComponents = this.createComponentsRec(message[i], kerviService);
+                result = result.concat(subComponents[0]);
+                dashboards = dashboards.concat(subComponents[1]);
+            }
+        }
+        else {
+            let component = null;
+            const subComponents = [];
+            if (message.componentType === 'KerviAction') {
+                component = new Action(message, kerviService);
+            }
+            else if (message.componentType === 'dashboard') {
+                component = new Dashboard(message);
+                dashboards.push(component);
+            }
+            else if (message.componentType === 'controller') {
+                component = new Controller(message, kerviService);
+            }
+            else if (message.componentType === 'boolean-value') {
+                component = new BooleanValue(message, kerviService);
+            }
+            else if (message.componentType === 'number-value') {
+                component = new NumberValue(message, kerviService);
+            }
+            else if (message.componentType === 'string-value') {
+                component = new StringValue(message, kerviService);
+            }
+            else if (message.componentType === 'enum-value') {
+                component = new SelectValue(message, kerviService);
+            }
+            else if (message.componentType === 'datetime-value') {
+                component = new DateTimeValue(message, kerviService);
+            }
+            else if (message.componentType === 'color-value') {
+                component = new ColorValue(message, kerviService);
+            }
+            if (component) {
+                result.push(component);
+            }
+            if (subComponents) {
+                for (let subComponent of subComponents) {
+                    result.push(subComponent);
+                }
+            }
+        }
+        return [result, dashboards];
+    }
+    static FixControllerReferences(components) {
+        for (let component of components) {
+            const controller = component;
+            if (controller && controller.componentType === 'controller') {
+                controller.updateReferences();
+            }
+        }
+    }
+    static linkToDashboards(components, dashboards) {
+        console.log('ltd', components, dashboards);
+        for (let component of components) {
+            if (!(component instanceof Dashboard)) {
+                for (let link of component.dashboards) {
+                    for (let dashboard of dashboards) {
+                        dashboard.addDashboardLink(link);
+                    }
+                }
+            }
+        }
+    }
+}
+
+class FileBase {
+    constructor() {
+        this.isFile = true;
+    }
+}
+class File extends FileBase {
+}
+class Directory extends FileBase {
+    constructor(path) {
+        super();
+        this.files$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"]([]);
+        this.path = path;
+    }
+    updateFiles(files) {
+        let result = [];
+        for (let file of files) {
+            if (file.is_file) {
+                const fileEntry = new File();
+                fileEntry.name = file.name;
+                const p = this.path !== '/' ? this.path : '';
+                fileEntry.path = p + '/' + file.name;
+                result.push(fileEntry);
+            }
+            else {
+                const p = this.path !== '/' ? this.path : '';
+                const directory = new Directory(p + '/' + file.name);
+                directory.name = file.name;
+                directory.isFile = false;
+                result.push(directory);
+            }
+        }
+        this.files$.next(result);
+    }
+}
+
+class StreamEvent {
+    constructor(streamId, streamEvent, data) {
+        this.streamId = streamId;
+        this.event = streamEvent;
+        this.data = data;
+    }
+}
+class Stream {
+    constructor(streamId, events, kerviService) {
+        this.streamId = streamId;
+        this.events = events;
+        this.kerviService = kerviService;
+        this.events$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](null);
+        const self = this;
+        kerviService.spine.addStreamHandler(streamId, events, function (e_streamId, e_streamEvent, e_data) {
+            const event = new StreamEvent(e_streamId, e_streamEvent, e_data);
+            let notify = false;
+            if (events === null || events.length === 0 || events.indexOf(e_streamEvent) >= 0) {
+                notify = true;
+            }
+            if (notify) {
+                self.events$.next(event);
+            }
+        });
+    }
+    close() {
+        this.kerviService.spine.removeStreamHandler(this.streamId, this.events, null);
+    }
+}
+
+// Copyright (c) 2016, Tim Wentzlau
+var ConnectionState;
+(function (ConnectionState) {
+    ConnectionState[ConnectionState["disconnected"] = 0] = "disconnected";
+    ConnectionState[ConnectionState["loading"] = 1] = "loading";
+    ConnectionState[ConnectionState["authenticate"] = 2] = "authenticate";
+    ConnectionState[ConnectionState["connected"] = 3] = "connected";
+})(ConnectionState || (ConnectionState = {}));
+var UserLogStateType;
+(function (UserLogStateType) {
+    UserLogStateType[UserLogStateType["normal"] = 0] = "normal";
+    UserLogStateType[UserLogStateType["warning"] = 1] = "warning";
+    UserLogStateType[UserLogStateType["error"] = 2] = "error";
+})(UserLogStateType || (UserLogStateType = {}));
+class KerviBaseService {
+    constructor() {
+        this.spine = null;
+        this.lastAppPingTime = null;
+        this.lastPingDiff = 0;
+        this.appPingDiff$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](0);
+        this.appPingDelay$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](0);
+        this.mps$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](0);
+        this.appInfo = null;
+        this.texts = null;
+        this.components = [];
+        this.components$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"]([]);
+        this.connectionState$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](ConnectionState.disconnected);
+        this.doAuthenticate = false;
+        this.componentsChanged$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](false);
+        this.logMessages = [];
+        this.logMessages$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"]([]);
+        this.lastLogMessage$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](null);
+        this.LogMessageCount$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](0);
+        this.LogMessageState$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](UserLogStateType.normal);
+        this.streams = {};
+        this.IPCReady$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](false);
+        this.authPromise = null;
+        console.log('kervi service constructor');
+        const self = this;
+        this.application$ = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](null);
+        this.IPCReady$.subscribe(function (connected) {
+            if (connected) {
+                console.log('kervi service ipc ready (connected)');
+                self.spine.addEventHandler('valueChanged', '', function (id, value) {
+                    for (const component of self.components) {
+                        if (component.id === value.id) {
+                            const dynamicValue = component;
+                            dynamicValue.valueTS = new Date(this.timestamp);
+                            dynamicValue.set(value.value, false);
+                        }
+                    }
+                });
+                self.spine.addEventHandler('appPing', null, function (id, data) {
+                    // console.log('appPing', self.lastAppPingTime, id, data);
+                    if (self.lastAppPingTime === null) {
+                        self.lastAppPingTime = new Date();
+                    }
+                    else {
+                        const now = new Date();
+                        const pingDiff = now.getTime() - self.lastAppPingTime.getTime() - 1000;
+                        const pingDelay = now.getTime() - data.ts * 1000;
+                        self.appPingDelay$.next(pingDelay);
+                        self.lastAppPingTime = now;
+                        if (pingDiff !== self.lastPingDiff) {
+                            self.lastPingDiff = pingDiff;
+                            self.appPingDiff$.next(self.lastPingDiff);
+                        }
+                    }
+                });
+                self.spine.addEventHandler('actionStarted', '', function (id) {
+                    console.log('as', id);
+                    for (const component of self.components) {
+                        if (component.id === id) {
+                            const action = component;
+                            action.running$.next(true);
+                        }
+                    }
+                });
+                self.spine.addEventHandler('actionDone', '', function (id) {
+                    console.log('ad', id);
+                    for (const component of self.components) {
+                        if (component.id === id) {
+                            const action = component;
+                            action.running$.next(false);
+                        }
+                    }
+                });
+                self.spine.addEventHandler('userLogMessage', null, function (v) {
+                    const messages = self.logMessages$.value;
+                    const newMessage = new DashboardMessageModel(this);
+                    messages.unshift(newMessage);
+                    if (messages.length > 10) {
+                        messages.pop();
+                    }
+                    let hasErrors = 0;
+                    let hasWarnings = 0;
+                    for (const message of messages) {
+                        if (message.level === 1) {
+                            hasErrors++;
+                        }
+                        if (message.level === 2) {
+                            hasWarnings++;
+                        }
+                    }
+                    if (hasErrors) {
+                        self.LogMessageState$.next(UserLogStateType.error);
+                    }
+                    else if (hasWarnings) {
+                        self.LogMessageState$.next(UserLogStateType.warning);
+                    }
+                    else {
+                        self.LogMessageState$.next(UserLogStateType.normal);
+                    }
+                    self.LogMessageCount$.next(messages.length);
+                    self.lastLogMessage$.next(newMessage);
+                    self.logMessages$.next(messages);
+                });
+            }
+        });
+    }
+    GetDirectory(path) {
+        const promise = new Promise((resolve, reject) => {
+            const directory = new Directory(path);
+            this.spine.sendQuery('files_get_dir', path, function (directoryFiles) {
+                directory.updateFiles(directoryFiles);
+                resolve(directory);
+            });
+        });
+        return promise;
+    }
+    GetThumbnail(path) {
+        const promise = new Promise((resolve, reject) => {
+            this.spine.sendQuery('files_get_thumbnail', path, function (thumbnail) {
+                resolve(thumbnail);
+            });
+        });
+        return promise;
+    }
+    GetFile(path) {
+        const promise = new Promise((resolve, reject) => {
+            this.spine.sendQuery('files_get_file', path, function (file) {
+                resolve(file);
+            });
+        });
+        return promise;
+    }
+    GetStream(streamId, events = []) {
+        return new Stream(streamId, events, this);
+    }
+    text(key, defaultValue = '') {
+        if (this.texts && key in this.texts) {
+            return this.texts[key];
+        }
+        else {
+            return defaultValue;
+        }
+    }
+    getLogMessages$() {
+        return this.logMessages$.asObservable();
+    }
+    getLastLogMessage$() {
+        return this.lastLogMessage$.asObservable();
+    }
+    getLogState$() {
+        return this.LogMessageState$.asObservable();
+    }
+    getLogMessageCount$() {
+        return this.LogMessageCount$.asObservable();
+    }
+    isAppEmpty() {
+        const defaultDashboard = this.getDefaultDashboard();
+        if (defaultDashboard) {
+            return defaultDashboard.isEmpty();
+        }
+        return true;
+    }
+    getComponent(id, componentType = null) {
+        for (const component of this.components) {
+            if (component.id === id && (componentType == null || component.componentType === componentType)) {
+                return component;
+            }
+        }
+        return null;
+    }
+    getComponentsByType(type) {
+        const result = [];
+        for (const component of this.components) {
+            if (component.componentType === type) {
+                result.push(component);
+            }
+        }
+        return result;
+    }
+    getDefaultDashboard() {
+        const dashboards = this.getComponentsByType('dashboard');
+        for (const dashboard of dashboards) {
+            if (dashboard.isDefault) {
+                return dashboard;
+            }
+        }
+        if (dashboards.length > 0) {
+            return dashboards[0];
+        }
+        return null;
+    }
+    connect() {
+        let address = null;
+        let protocol = 'ws';
+        try {
+            if (kerviSocketAddress) {
+                address = kerviSocketAddress;
+            }
+            if (socketProtocol) {
+                protocol = socketProtocol;
+            }
+        }
+        catch (e) {
+            // for testing with ng serve
+            const httpProtocol = location.protocol;
+            if (httpProtocol === 'https') {
+                protocol = 'wss';
+            }
+            const httpHost = window.location.hostname;
+            address = httpHost + ':9000';
+        }
+        console.log('ks', address);
+        this.spine = new KerviWSSpine({
+            address: address,
+            protocol: protocol,
+            onOpen: this.onOpen,
+            onClose: this.onClose,
+            onAuthenticate: this.onAuthenticate,
+            onAuthenticateFailed: this.onAuthenticateFailed,
+            onLogOff: this.onLogoff,
+            onAuthenticateStart: this.onAuthenticateStart,
+            onMPS: this.onMPS,
+            targetScope: this
+        });
+    }
+    connectMQ() {
+        console.log('ks', sessionStorage.getItem('mqc'));
+        if (sessionStorage.getItem('mqc')) {
+            this.spine = new KerviRMQSpine({
+                onOpen: this.onOpen,
+                onClose: this.onClose,
+                onAuthenticate: this.onAuthenticate,
+                onAuthenticateFailed: this.onAuthenticateFailed,
+                onLogOff: this.onLogoff,
+                onAuthenticateStart: this.onAuthenticateStart,
+                targetScope: this,
+                apiToken: JSON.parse(sessionStorage.getItem('mqc'))
+            });
+        }
+        else {
+            console.log('qmc not found in storage');
+        }
+    }
+    isAnonymous() {
+        return this.spine.options.userName === 'anonymous';
+    }
+    authenticate(userName, password) {
+        console.log('sa', userName, password);
+        this.authPromise = new Promise((resolve, reject) => {
+            this._resolveSelf = resolve;
+            this._rejectSelf = reject;
+        });
+        this.spine.authenticate(userName, password);
+        return this.authPromise;
+    }
+    logoff() {
+        this.spine.logoff();
+    }
+    onAuthenticateStart() {
+    }
+    onAuthenticate() {
+        this.doAuthenticate = true;
+        this.reset();
+        this._resolveSelf('ok');
+    }
+    onAuthenticateFailed() {
+        this._rejectSelf('error');
+    }
+    onLogoff() {
+        this.doAuthenticate = true;
+        if (this.spine.firstOnOpen) {
+            this.IPCReady$.next(true);
+        }
+        this.reset();
+    }
+    reset() {
+        this.components = [];
+        this.components$.next(this.components);
+        const messages = [];
+        this.LogMessageState$.next(UserLogStateType.normal);
+        this.LogMessageCount$.next(messages.length);
+        this.logMessages$.next(messages);
+        if (this.IPCReady$.value) {
+            this.connectionState$.next(ConnectionState.authenticate);
+        }
+        else {
+            this.connectionState$.next(ConnectionState.disconnected);
+        }
+    }
+    getComponentInfo(retryCount, module_load) {
+        const self = this;
+        this.spine.sendQuery('GetApplicationInfo', function (appInfo) {
+            console.log('app info', appInfo);
+            this.spine.sendQuery('getComponentInfo', function (message) {
+                console.log('component info', message);
+                self.application$.next(appInfo);
+                self.texts = appInfo.display.texts;
+                self.components = ComponentFactory.createComponents(message, self);
+                ComponentFactory.FixControllerReferences(self.getComponentsByType('controller'));
+                self.components$.next(self.components);
+                self.connectionState$.next(ConnectionState.connected);
+                if (module_load) {
+                    self.componentsChanged$.next(true);
+                }
+                console.log('components', self.components);
+            }, function () {
+                console.error('get component info timeout');
+                if (retryCount > 0) {
+                    self.getComponentInfo(retryCount - 1, module_load);
+                }
+            });
+        });
+    }
+    onOpen(first) {
+        console.log('kervi service on open', this.spine.firstOnOpen, first, this);
+        const self = this;
+        this.connectionState$.next(ConnectionState.loading);
+        this.doAuthenticate = this.spine.doAuthenticate;
+        this.getComponentInfo(2, false);
+        if (self.spine.firstOnOpen) {
+            this.IPCReady$.next(true);
+            this.spine.addEventHandler('moduleStarted', '', function () {
+                console.log('module loaded', self.components);
+                setTimeout(function () {
+                    self.getComponentInfo(2, true);
+                }, 2000);
+            });
+            this.spine.addEventHandler('moduleStopped', '', function () {
+                console.log('module unloaded');
+                setTimeout(function () {
+                    console.log('module unloaded, refresh');
+                    self.getComponentInfo(2, true);
+                }, 5000);
+            });
+        }
+    }
+    onClose() {
+        this.reset();
+        console.log('ks on close');
+        this.IPCReady$.next(false);
+    }
+    onMPS(mps) {
+        this.mps$.next(mps);
+    }
+    onHeartbeat() {
+    }
+    onConnect() {
+    }
+}
+KerviBaseService.ɵfac = function KerviBaseService_Factory(t) { return new (t || KerviBaseService)(); };
+KerviBaseService.ɵprov = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjectable"])({ token: KerviBaseService, factory: KerviBaseService.ɵfac });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviBaseService, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"]
+    }], function () { return []; }, null); })();
+
+class KerviJsComponent {
+    constructor() { }
+    ngOnInit() {
+    }
+}
+KerviJsComponent.ɵfac = function KerviJsComponent_Factory(t) { return new (t || KerviJsComponent)(); };
+KerviJsComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviJsComponent, selectors: [["lib-kervi-js"]], decls: 2, vars: 0, template: function KerviJsComponent_Template(rf, ctx) { if (rf & 1) {
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"])(0, "p");
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"])(1, " kervi-js works! ");
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"])();
+    } }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviJsComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'lib-kervi-js',
+                template: `
+    <p>
+      kervi-js works!
+    </p>
+  `,
+                styles: []
+            }]
+    }], function () { return []; }, null); })();
+
+class KerviJsModule {
+}
+KerviJsModule.ɵmod = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineNgModule"])({ type: KerviJsModule });
+KerviJsModule.ɵinj = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjector"])({ factory: function KerviJsModule_Factory(t) { return new (t || KerviJsModule)(); }, imports: [[]] });
+(function () { (typeof ngJitMode === "undefined" || ngJitMode) && Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsetNgModuleScope"])(KerviJsModule, { declarations: [KerviJsComponent], exports: [KerviJsComponent] }); })();
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviJsModule, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"],
+        args: [{
+                imports: [],
+                declarations: [KerviJsComponent],
+                exports: [KerviJsComponent]
+            }]
+    }], null, null); })();
+
+/*
+ * Public API Surface of kervi-js
+ */
+
+/**
+ * Generated bundle index. Do not edit.
+ */
+
+
+//# sourceMappingURL=kervi-js.js.map
+
+
+/***/ }),
+
+/***/ "../../dist/ngx-kervi/fesm2015/ngx-kervi.js":
+/*!*************************************************************************************!*\
+  !*** D:/dev/kervi/kervi/kervi-ui/kervi/ui/web/dist/ngx-kervi/fesm2015/ngx-kervi.js ***!
+  \*************************************************************************************/
+/*! exports provided: ConnectionState, DashboardSizes, AppInjector, KerviActionComponent, KerviAppHealthComponent, KerviBooleanComponent, KerviCameraComponent, KerviColorComponent, KerviControllerPadComponent, KerviDashboardComponent, KerviDashboardPanelComponent, KerviDateTimeComponent, KerviDirectoryComponent, KerviNumberComponent, KerviStringComponent, KerviTemplateService, KerviUserLogComponent, KerviWidgetComponent, NGXKerviPipesModule, NGXKerviService, NgxKerviComponent, NgxKerviModule, TranslatePipe */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppInjector", function() { return AppInjector; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviActionComponent", function() { return KerviActionComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviAppHealthComponent", function() { return KerviAppHealthComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviBooleanComponent", function() { return KerviBooleanComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviCameraComponent", function() { return KerviCameraComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviColorComponent", function() { return KerviColorComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviControllerPadComponent", function() { return KerviControllerPadComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviDashboardComponent", function() { return KerviDashboardComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviDashboardPanelComponent", function() { return KerviDashboardPanelComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviDateTimeComponent", function() { return KerviDateTimeComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviDirectoryComponent", function() { return KerviDirectoryComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviNumberComponent", function() { return KerviNumberComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviStringComponent", function() { return KerviStringComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviTemplateService", function() { return KerviTemplateService; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviUserLogComponent", function() { return KerviUserLogComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KerviWidgetComponent", function() { return KerviWidgetComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NGXKerviPipesModule", function() { return NGXKerviPipesModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NGXKerviService", function() { return NGXKerviService; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NgxKerviComponent", function() { return NgxKerviComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NgxKerviModule", function() { return NgxKerviModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TranslatePipe", function() { return TranslatePipe; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "../../node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var kervi_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! kervi-js */ "../../dist/kervi-js/fesm2015/kervi-js.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ConnectionState", function() { return kervi_js__WEBPACK_IMPORTED_MODULE_1__["ConnectionState"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "DashboardSizes", function() { return kervi_js__WEBPACK_IMPORTED_MODULE_1__["DashboardSizes"]; });
+
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ "../../node_modules/rxjs/_esm2015/index.js");
+
+
+
+
+
+class NGXKerviService extends kervi_js__WEBPACK_IMPORTED_MODULE_1__["KerviBaseService"] {
+}
+NGXKerviService.ɵfac = function NGXKerviService_Factory(t) { return ɵNGXKerviService_BaseFactory(t || NGXKerviService); };
+NGXKerviService.ɵprov = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjectable"])({ token: NGXKerviService, factory: NGXKerviService.ɵfac });
+const ɵNGXKerviService_BaseFactory = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetInheritedFactory"])(NGXKerviService);
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(NGXKerviService, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"]
+    }], null, null); })();
+
+class KerviTemplateService {
+    constructor() {
+        this.remUnit = 20;
+        console.log("kervi service constructor");
+        //console.log("ctemplate");
+        this.remUnit = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    convertRemToPixels(rem) {
+        return rem * this.remUnit;
+    }
+    getSizeValue(value) {
+        if (value == null)
+            return "100%";
+        else if (value === "")
+            return "100%";
+        else if (isNaN(value)) {
+            return value;
+        }
+        else if (value > 0)
+            return value + "%";
+        else
+            return "100%";
+    }
+    getPixels(value, containerSize) {
+        //console.log("gps", value, isNaN(value));
+        if (isNaN(value)) {
+            if (value.lastIndexOf("px") > -1) {
+                var px = parseFloat(value);
+                return px;
+            }
+            else if (value.lastIndexOf("rem") > -1) {
+                var rem = parseFloat(value);
+                var px = this.convertRemToPixels(rem);
+                console.log("remx", rem, px);
+                return px;
+            }
+            else if (value.lastIndexOf("%") > -1) {
+                var percentage = parseFloat(value) / 100.0;
+                return containerSize * percentage;
+            }
+        }
+        else
+            return value;
+    }
+    getStyleRuleValue(style, selector, sheet) {
+        var sheets = sheet != null ? [sheet] : document.styleSheets;
+        for (var i = 0, l = sheets.length; i < l; i++) {
+            var sheet = sheets[i];
+            if (!sheet.cssRules) {
+                continue;
+            }
+            for (var j = 0, k = sheet.cssRules.length; j < k; j++) {
+                var rule = sheet.cssRules[j];
+                if (rule.selectorText && rule.selectorText.split(',').indexOf(selector) !== -1) {
+                    return rule.style[style];
+                }
+            }
+        }
+        return null;
+    }
+    makeId() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        for (var i = 0; i < 5; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        return text;
+    }
+    getColor(colorName, cssClass) {
+        var styleValue = this.getStyleRuleValue(colorName, cssClass, null);
+        //console.log("sv", cssClass,styleValue);
+        return styleValue;
+    }
+}
+KerviTemplateService.ɵfac = function KerviTemplateService_Factory(t) { return new (t || KerviTemplateService)(); };
+KerviTemplateService.ɵprov = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjectable"])({ token: KerviTemplateService, factory: KerviTemplateService.ɵfac });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviTemplateService, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"]
+    }], function () { return []; }, null); })();
+
+let AppInjector;
+function setAppInjector(injector) {
+    if (AppInjector) {
+        // Should not happen
+        console.error('Programming error: AppInjector was already set');
+    }
+    else {
+        AppInjector = injector;
+    }
+}
+
+class KerviDashboardComponent {
+    constructor() {
+        this.dashboardId = null;
+        this.dashboard = null;
+        this.dashboards = null;
+        this.dashboardSizes = null;
+        this.isAppEmpty = true;
+        this.showMenu = false;
+        this.dashboardPanelsHidden = false;
+        this.showPanelController = false;
+        this.cameraId = null;
+        this.cameraParameters = null;
+        this.cameraId$ = new rxjs__WEBPACK_IMPORTED_MODULE_2__["BehaviorSubject"](null);
+        this.authenticated = false;
+        this.anonymous = true;
+        this.showLeftPad = false;
+        this.leftPadXValue = null;
+        this.leftPadYValue = null;
+        this.autoCenterLeftPad = false;
+        this.showRightPad = false;
+        this.rightPadXValue = null;
+        this.rightPadYValue = null;
+        this.autoCenterRightPad = false;
+        this.inFullScreen = false;
+        this.kerviService = AppInjector.get(NGXKerviService);
+        var self = this;
+        this.kerviService.componentsChanged$.subscribe(function () {
+            self.loadDashboard(self.dashboardId);
+        });
+    }
+    logoff(event) {
+        this.kerviService.logoff();
+        event.stopPropagation();
+    }
+    loadDashboard(dashboardId) {
+        this.dashboardId = dashboardId;
+        this.dashboard = this.kerviService.getComponent(dashboardId, 'dashboard');
+        this.anonymous = this.kerviService.isAnonymous();
+        this.isAppEmpty = this.kerviService.isAppEmpty();
+        this.authenticated = this.kerviService.doAuthenticate;
+        if (this.dashboard) {
+            this.dashboards = this.kerviService.getComponentsByType('dashboard');
+            this.showMenu = (this.dashboards.length > 1 || this.kerviService.doAuthenticate);
+            this.showPanelController = false;
+            this.cameraId = null;
+            this.cameraParameters = null;
+            this.showLeftPad = false;
+            this.showRightPad = false;
+            this.dashboardPanelsHidden = false;
+            if (this.dashboard.backgroundPanel) {
+                if (this.dashboard.backgroundPanel.components.length > 0) {
+                    this.dashboardPanelsHidden = true;
+                    this.showPanelController = true;
+                    this.cameraId = this.dashboard.backgroundPanel.components[0].component.id;
+                    this.cameraId$.next(this.cameraId);
+                    this.cameraParameters = this.dashboard.backgroundPanel.components[0].parameters;
+                    console.log("db set cam", this.cameraId, this.cameraParameters);
+                }
+            }
+            if (this.dashboard.LeftPadXPanel && this.dashboard.LeftPadXPanel.components.length || this.dashboard.LeftPadYPanel && this.dashboard.LeftPadYPanel.components.length) {
+                this.showLeftPad = true;
+                if (this.dashboard.LeftPadXPanel.components.length) {
+                    this.leftPadXValue = this.dashboard.LeftPadXPanel.components[0].component;
+                    if (this.dashboard.LeftPadXPanel.components[0].parameters.padAutoCenter)
+                        this.autoCenterLeftPad = true;
+                }
+                if (this.dashboard.LeftPadYPanel.components.length) {
+                    this.leftPadYValue = this.dashboard.LeftPadYPanel.components[0].component;
+                    if (this.dashboard.LeftPadXPanel.components[0].parameters.padAutoCenter)
+                        this.autoCenterLeftPad = true;
+                }
+            }
+            if (this.dashboard.RightPadXPanel && this.dashboard.RightPadXPanel.components.length || this.dashboard.RightPadYPanel && this.dashboard.RightPadYPanel.components.length) {
+                this.showRightPad = true;
+                if (this.dashboard.RightPadXPanel.components.length) {
+                    this.rightPadXValue = this.dashboard.RightPadXPanel.components[0].component;
+                    if (this.dashboard.LeftPadXPanel.components[0].parameters.padAutoCenter)
+                        this.autoCenterRightPad = true;
+                }
+                if (this.dashboard.RightPadYPanel.components.length) {
+                    this.rightPadYValue = this.dashboard.RightPadYPanel.components[0].component;
+                    if (this.dashboard.RightPadXPanel.components[0].parameters.padAutoCenter)
+                        this.autoCenterRightPad = true;
+                }
+            }
+            console.log("load db", dashboardId, this.dashboard, this);
+        }
+    }
+    toggleFullScreen() {
+        console.log("fs", this.inFullScreen);
+        var doc;
+        doc = document;
+        if ((doc.fullScreenElement && doc.fullScreenElement !== null)) 
+        /*(!doc.mozFullScreen && !document.webkitIsFullScreen))*/ {
+            this.inFullScreen = true;
+            if (doc.documentElement.requestFullScreen) {
+                doc.documentElement.requestFullScreen();
+            }
+            else if (doc.documentElement.mozRequestFullScreen) {
+                doc.documentElement.mozRequestFullScreen();
+            } // } else if (document.documentElement.webkitRequestFullScreen) {  
+            //   doc.documentElement.webkitRequestFullScreen();  
+            // }  
+        }
+        else {
+            this.inFullScreen = false;
+            if (doc.cancelFullScreen) {
+                doc.cancelFullScreen();
+            }
+            else if (doc.mozCancelFullScreen) {
+                doc.mozCancelFullScreen();
+            } // } else if (document.webkitCancelFullScreen) {  
+            //   doc.webkitCancelFullScreen();  
+            // }  
+        }
+    }
+}
+KerviDashboardComponent.ɵfac = function KerviDashboardComponent_Factory(t) { return new (t || KerviDashboardComponent)(); };
+KerviDashboardComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviDashboardComponent, selectors: [["kervi-dashboard"]], inputs: { cameraId: "cameraId", cameraParameters: "cameraParameters" }, decls: 0, vars: 0, template: function KerviDashboardComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviDashboardComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-dashboard',
+                template: ''
+            }]
+    }], function () { return []; }, { cameraId: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], cameraParameters: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+class KerviDashboardPanelComponent {
+    constructor() {
+        this.panel = null;
+        this.inline = false;
+        this.inGroup = false;
+        this.bodyOnly = false;
+        this.width = "";
+        this.showHeader = false;
+        this.expanded = false;
+        this.title = null;
+        this.bodyComponents = [];
+        this.headerComponents = [];
+        this.footerComponents = [];
+        //messages: DashboardMessageModel[] = [];
+        //panelComponents:IComponent[] = []
+        this.templateService = null;
+        this.kerviService = null;
+        this.templateService = AppInjector.get(KerviTemplateService);
+        this.kerviService = AppInjector.get(NGXKerviService);
+    }
+    calcWidth(panel, inGroup) {
+        if (panel.type == "group") {
+            if (panel.parameters.width == null || panel.parameters.width == "0")
+                return "100%";
+            else
+                return this.templateService.getSizeValue(panel.parameters.width);
+        }
+        else
+            return inGroup ? "" : this.templateService.getSizeValue(panel.parameters.width);
+    }
+    showPanelHeader(panel) {
+        var hasHeaderComponents = false;
+        for (let component of this.panel.components) {
+            if (component.parameters.linkToHeader)
+                hasHeaderComponents = true;
+        }
+        return (panel.parameters.title != null && panel.parameters.title.length > 0) || hasHeaderComponents;
+    }
+    ngOnInitPanel() {
+        var self = this;
+        this.title = this.panel.parameters.title;
+        for (let component of this.panel.components) {
+            if (component.parameters.linkToHeader)
+                this.headerComponents.push(component);
+            else
+                this.bodyComponents.push(component);
+        }
+        this.showHeader = (this.panel.parameters.title != null && this.panel.parameters.title.length > 0) || (this.headerComponents.length > 0);
+        if (this.panel.type == "group") {
+            if (this.panel.parameters.width == null || this.panel.parameters.width == "0" || this.panel.parameters.width == "")
+                this.width = "100%";
+            else
+                this.width = this.templateService.getSizeValue(this.panel.parameters.width);
+        }
+        else
+            //this.width = this.inGroup ? "100%" : this.templateService.getSizeValue(this.panel.parameters.width);
+            this.width = this.templateService.getSizeValue(this.panel.parameters.width);
+    }
+}
+KerviDashboardPanelComponent.ɵfac = function KerviDashboardPanelComponent_Factory(t) { return new (t || KerviDashboardPanelComponent)(); };
+KerviDashboardPanelComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviDashboardPanelComponent, selectors: [["kervi-dashboard-panel-base"]], inputs: { dashboardSizes: "dashboardSizes", panel: "panel", inline: "inline", inGroup: "inGroup", bodyOnly: "bodyOnly" }, decls: 0, vars: 0, template: function KerviDashboardPanelComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviDashboardPanelComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-dashboard-panel-base',
+                template: ''
+            }]
+    }], function () { return []; }, { dashboardSizes: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], panel: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], inline: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], inGroup: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], bodyOnly: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+class KerviControllerPadComponent {
+    constructor() { }
+    ngOnInit() {
+    }
+}
+KerviControllerPadComponent.ɵfac = function KerviControllerPadComponent_Factory(t) { return new (t || KerviControllerPadComponent)(); };
+KerviControllerPadComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviControllerPadComponent, selectors: [["kervi-controller-pad-base"]], inputs: { dashboardSizes: "dashboardSizes" }, decls: 0, vars: 0, template: function KerviControllerPadComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviControllerPadComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-controller-pad-base',
+                template: ''
+            }]
+    }], function () { return []; }, { dashboardSizes: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviWidgetComponent {
+    constructor() {
+        this.component = null;
+        this.dashboardSizes = new kervi_js__WEBPACK_IMPORTED_MODULE_1__["DashboardSizes"]();
+        this.widgetType = "value";
+        //console.log("cnio",this);
+        this.kerviService = AppInjector.get(NGXKerviService);
+    }
+    set componentId(v) {
+        this.component = this.kerviService.getComponent(this.componentId);
+    }
+    ngOnInitWidget() {
+        if (!this.linkParameters)
+            this.linkParameters = this.component.ui;
+        if (!this.inline && this.linkParameters.inline) {
+            this.inline = true;
+        }
+        //console.log("widget", this.component, this.linkParameters);
+        if (this.component.componentType == "controller") {
+            var controller = this.component;
+            console.log("widget ctrl", controller);
+            if (controller.type == "camera")
+                this.widgetType = "camera";
+        }
+        else if (this.linkParameters.type) {
+            if (this.linkParameters.type.indexOf("gauge") > -1) {
+                this.widgetType = "gauge";
+            }
+            else if (this.linkParameters.type == "chart") {
+                this.widgetType = "chart";
+            }
+        }
+    }
+}
+KerviWidgetComponent.ɵfac = function KerviWidgetComponent_Factory(t) { return new (t || KerviWidgetComponent)(); };
+KerviWidgetComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviWidgetComponent, selectors: [["kervi-widget-base"]], inputs: { componentId: "componentId", component: "component", dashboardPanel: "dashboardPanel", linkParameters: "linkParameters", dashboardSizes: "dashboardSizes", inline: "inline" }, decls: 0, vars: 0, template: function KerviWidgetComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviWidgetComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-widget-base',
+                template: ''
+            }]
+    }], function () { return []; }, { componentId: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], component: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], dashboardPanel: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], linkParameters: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], dashboardSizes: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], inline: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviValueComponent {
+    constructor() {
+        this.value = null;
+        this.dashboardSizes = new kervi_js__WEBPACK_IMPORTED_MODULE_1__["DashboardSizes"]();
+        this.kerviService = AppInjector.get(NGXKerviService);
+    }
+    set valueId(v) {
+        this.value = this.kerviService.getComponent(this.valueId);
+    }
+    ngOnInitValue() {
+        if (!this.linkParameters)
+            this.linkParameters = this.value.ui;
+    }
+}
+KerviValueComponent.ɵfac = function KerviValueComponent_Factory(t) { return new (t || KerviValueComponent)(); };
+KerviValueComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviValueComponent, selectors: [["kervi-value-base"]], inputs: { valueId: "valueId", value: "value", linkParameters: "linkParameters", dashboardSizes: "dashboardSizes", inline: "inline" }, decls: 0, vars: 0, template: function KerviValueComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviValueComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-value-base',
+                template: ''
+            }]
+    }], function () { return []; }, { valueId: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], value: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], linkParameters: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], dashboardSizes: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], inline: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviNumberComponent extends KerviValueComponent {
+    constructor() {
+        super();
+        this.numberFormat = "1.2-2";
+        this.displayValue = 0;
+        this.displayUnit = "";
+        this.displayType = "";
+        this.currentIcon = null;
+    }
+    setKerviValue(value) {
+        this.value.set(value);
+    }
+    ngOnInitNumber() {
+        this.ngOnInitValue();
+        var self = this;
+        this.numberFormat = this.linkParameters.minIntegerDigits + "." + this.linkParameters.minFractionDigits + "-" + this.linkParameters.maxFractionDigits;
+        if (!this.linkParameters.valueIcon)
+            this.currentIcon = null;
+        else if (typeof (this.linkParameters.valueIcon) == "string")
+            this.currentIcon = this.linkParameters.valueIcon;
+        else {
+            this.value.value$.subscribe(function (v) {
+                for (let iconSection of self.linkParameters.valueIcon) {
+                    if (v >= iconSection.range[0] && v <= iconSection.range[1]) {
+                        self.currentIcon = iconSection.icon;
+                        break;
+                    }
+                }
+            });
+        }
+        if (!this.inline && this.linkParameters.inline) {
+            this.inline = true;
+        }
+        else if (!this.inline && this.linkParameters.size > 0) {
+            this.inline = true;
+        }
+    }
+}
+KerviNumberComponent.ɵfac = function KerviNumberComponent_Factory(t) { return new (t || KerviNumberComponent)(); };
+KerviNumberComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviNumberComponent, selectors: [["kervi-value-number-base"]], features: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵInheritDefinitionFeature"]], decls: 0, vars: 0, template: function KerviNumberComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviNumberComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-value-number-base',
+                template: ''
+            }]
+    }], function () { return []; }, null); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviBooleanComponent extends KerviValueComponent {
+    constructor() {
+        super();
+        this.displayType = "switch";
+    }
+    setKerviValue(value) {
+        this.value.set(value);
+    }
+    ngOnInitBoolean() {
+        this.ngOnInitValue();
+        var self = this;
+        if (this.linkParameters.type) {
+            this.displayType = this.linkParameters.type;
+        }
+        if (!this.inline && this.linkParameters.inline) {
+            this.inline = true;
+        }
+        else if (!this.inline && this.linkParameters.size > 0) {
+            this.inline = true;
+        }
+    }
+}
+KerviBooleanComponent.ɵfac = function KerviBooleanComponent_Factory(t) { return new (t || KerviBooleanComponent)(); };
+KerviBooleanComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviBooleanComponent, selectors: [["kervi-value-boolean-base"]], features: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵInheritDefinitionFeature"]], decls: 0, vars: 0, template: function KerviBooleanComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviBooleanComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-value-boolean-base',
+                template: ''
+            }]
+    }], function () { return []; }, null); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviActionComponent {
+    constructor() {
+        this.action = null;
+        this.linkParameters = null;
+        this.inline = false;
+        this.dashboardSizes = new kervi_js__WEBPACK_IMPORTED_MODULE_1__["DashboardSizes"]();
+        this.state = new rxjs__WEBPACK_IMPORTED_MODULE_2__["BehaviorSubject"](false);
+        this.displayType = 'switch';
+        this.kerviService = AppInjector.get(NGXKerviService);
+    }
+    ngOnInitAction() {
+        var self = this;
+        if (!this.linkParameters)
+            this.linkParameters = this.action.ui;
+        if (this.linkParameters.displayType) {
+            this.displayType = this.linkParameters.displayType;
+        }
+        if (!this.inline && this.linkParameters.inline) {
+            this.inline = true;
+        }
+        self.state.next(this.action.running$.value);
+        this.action.running$.subscribe(function (v) {
+            console.log("ar", self.action.id, v);
+            self.state.next(v);
+        });
+    }
+    setActionState(value) {
+        if (value)
+            this.action.run(this.linkParameters.actionParameters);
+        else
+            this.action.interrupt(this.linkParameters.interruptParameters);
+    }
+}
+KerviActionComponent.ɵfac = function KerviActionComponent_Factory(t) { return new (t || KerviActionComponent)(); };
+KerviActionComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviActionComponent, selectors: [["kervi-action-base"]], inputs: { action: "action", linkParameters: "linkParameters", inline: "inline", dashboardSizes: "dashboardSizes" }, decls: 0, vars: 0, template: function KerviActionComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviActionComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-action-base',
+                template: '',
+                styleUrls: [],
+            }]
+    }], function () { return []; }, { action: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], linkParameters: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], inline: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], dashboardSizes: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviCameraComponent {
+    constructor() {
+        this.streamObservers = [];
+        this.linkParameters = null;
+        this.inline = false;
+        this.dashboardSizes = new kervi_js__WEBPACK_IMPORTED_MODULE_1__["DashboardSizes"]();
+        this.isBackground = false;
+        const self = this;
+        this.kerviService = AppInjector.get(NGXKerviService);
+    }
+    set cameraId(id) {
+        console.log('setcamid', id);
+        this.camera = this.kerviService.getComponent(id);
+    }
+    set camera(v) {
+        console.log('setcam', v);
+        this.cam = v;
+        if (v) {
+            for (let i of v.outputs) {
+                if (i.id.endsWith('.pan')) {
+                    this.pan = i;
+                }
+                else if (i.id.endsWith('.tilt')) {
+                    this.tilt = i;
+                }
+            }
+            this.cameraType = v.ui.type;
+            if (this.cameraType === 'frame') {
+                if (v.ui.source) {
+                    this.cameraSource = this.cam.id;
+                }
+                this.cameraSource = this.cam.id;
+            }
+            this.updateStreamObservers();
+        }
+    }
+    get camera() { return this.cam; }
+    updateStreamObservers() {
+        const streamObservers = [];
+        const controllers = this.kerviService.getComponentsByType('controller');
+        for (let controller of controllers) {
+            if (controller.type === 'stream_observer') {
+                if (controller.ui.sourceStream === this.cameraSource) {
+                    streamObservers.push(controller);
+                }
+            }
+        }
+        this.streamObservers = streamObservers;
+        if (this.selectedSource !== this.cameraSource) {
+            this.selectedSource = this.cameraSource;
+        }
+    }
+    setPan(v) {
+        this.pan.set(v);
+    }
+    setTilt(v) {
+        this.tilt.set(v);
+    }
+    ngOnInitCamera() {
+        console.log('ngi cam', this.camera.id);
+        const self = this;
+        if (!this.linkParameters) {
+            this.linkParameters = this.camera.ui;
+        }
+        if (!this.inline && this.linkParameters.inline) {
+            this.inline = true;
+        }
+        this.kerviService.componentsChanged$.subscribe(function () {
+            self.updateStreamObservers();
+        });
+        this.updateStreamObservers();
+        this.selectedSource = this.cameraSource;
+    }
+    changeSource(source) {
+        console.log('cs', source);
+        this.selectedSource = source;
+    }
+}
+KerviCameraComponent.ɵfac = function KerviCameraComponent_Factory(t) { return new (t || KerviCameraComponent)(); };
+KerviCameraComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviCameraComponent, selectors: [["kervi-camera-base"]], inputs: { streamObservers: "streamObservers", selectedSource: "selectedSource", cameraId: "cameraId", camera: "camera", linkParameters: "linkParameters", inline: "inline", dashboardSizes: "dashboardSizes", isBackground: "isBackground" }, decls: 0, vars: 0, template: function KerviCameraComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviCameraComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-camera-base',
+                template: '',
+                styleUrls: [],
+            }]
+    }], function () { return []; }, { streamObservers: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], selectedSource: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], cameraId: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], camera: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], linkParameters: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], inline: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], dashboardSizes: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], isBackground: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviColorComponent extends KerviValueComponent {
+    constructor() {
+        super();
+        this.displayType = "button";
+    }
+    setKerviValue(value) {
+        this.value.set(value);
+    }
+    ngOnInitColor() {
+        this.ngOnInitValue();
+        var self = this;
+        if (this.linkParameters.type) {
+            this.displayType = this.linkParameters.type;
+        }
+        if (!this.inline && this.linkParameters.inline) {
+            this.inline = true;
+        }
+        else if (!this.inline && this.linkParameters.size > 0) {
+            this.inline = true;
+        }
+    }
+}
+KerviColorComponent.ɵfac = function KerviColorComponent_Factory(t) { return new (t || KerviColorComponent)(); };
+KerviColorComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviColorComponent, selectors: [["kervi-value-color-base"]], features: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵInheritDefinitionFeature"]], decls: 0, vars: 0, template: function KerviColorComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviColorComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-value-color-base',
+                template: ''
+            }]
+    }], function () { return []; }, null); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviDateTimeComponent extends KerviValueComponent {
+    constructor() {
+        super();
+        this.displayType = "datetime";
+    }
+    setKerviValue(value) {
+        this.value.set(value);
+    }
+    ngOnInitDateTime() {
+        this.ngOnInitValue();
+        var self = this;
+        if (this.linkParameters.type) {
+            this.displayType = this.linkParameters.type;
+        }
+        if (!this.inline && this.linkParameters.inline) {
+            this.inline = true;
+        }
+        if (self.linkParameters.type == "time")
+            this.dateTimeFormat = this.kerviService.application$.value.display.unit_system.datetime.time;
+        else if (self.linkParameters.type == "date")
+            this.dateTimeFormat = self.kerviService.application$.value.display.unit_system.datetime.date;
+        else
+            this.dateTimeFormat = this.kerviService.application$.value.display.unit_system.datetime.datetime;
+    }
+}
+KerviDateTimeComponent.ɵfac = function KerviDateTimeComponent_Factory(t) { return new (t || KerviDateTimeComponent)(); };
+KerviDateTimeComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviDateTimeComponent, selectors: [["kervi-value-datetime-base"]], features: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵInheritDefinitionFeature"]], decls: 0, vars: 0, template: function KerviDateTimeComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviDateTimeComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-value-datetime-base',
+                template: ''
+            }]
+    }], function () { return []; }, null); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviStringComponent extends KerviValueComponent {
+    constructor() {
+        super();
+        this.displayType = "";
+    }
+    setKerviValue(value) {
+        this.value.set(value);
+    }
+    ngOnInitString() {
+        this.ngOnInitValue();
+        var self = this;
+        if (this.linkParameters.type) {
+            this.displayType = this.linkParameters.type;
+        }
+        if (!this.inline && this.linkParameters.inline) {
+            this.inline = true;
+        }
+    }
+}
+KerviStringComponent.ɵfac = function KerviStringComponent_Factory(t) { return new (t || KerviStringComponent)(); };
+KerviStringComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviStringComponent, selectors: [["kervi-value-string-base"]], features: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵInheritDefinitionFeature"]], decls: 0, vars: 0, template: function KerviStringComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviStringComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-value-string-base',
+                template: ''
+            }]
+    }], function () { return []; }, null); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviUserLogComponent {
+    constructor() {
+        this.logLength = 10;
+        this.linkParameters = null;
+        this.inline = false;
+        this.dashboardSizes = new kervi_js__WEBPACK_IMPORTED_MODULE_1__["DashboardSizes"]();
+        this.lastMessage$ = null;
+        this.messages$ = null;
+        this.messageCount$ = null;
+        this.logState$ = null;
+        this.messageCount = 0;
+        this.UserLogState = kervi_js__WEBPACK_IMPORTED_MODULE_1__["UserLogStateType"].normal;
+        this.kerviService = AppInjector.get(NGXKerviService);
+        this.messages$ = this.kerviService.getLogMessages$();
+        this.lastMessage$ = this.kerviService.getLastLogMessage$();
+        this.messageCount$ = this.kerviService.getLogMessageCount$();
+        this.logState$ = this.kerviService.getLogState$();
+        this.messageCount$.subscribe(function (v) {
+            this.messageCount = v;
+        });
+    }
+    ngOnInitUserLog() {
+    }
+}
+KerviUserLogComponent.ɵfac = function KerviUserLogComponent_Factory(t) { return new (t || KerviUserLogComponent)(); };
+KerviUserLogComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviUserLogComponent, selectors: [["kervi-user-log-base"]], inputs: { logLength: "logLength", linkParameters: "linkParameters", inline: "inline", dashboardSizes: "dashboardSizes" }, decls: 0, vars: 0, template: function KerviUserLogComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviUserLogComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-user-log-base',
+                template: '',
+                styleUrls: [],
+            }]
+    }], function () { return []; }, { logLength: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], linkParameters: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], inline: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], dashboardSizes: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+class KerviDirectoryComponent {
+    constructor() {
+        this.path = '/';
+        this.directory = null;
+        this.kerviService = AppInjector.get(NGXKerviService);
+    }
+    loadDirectory() {
+        //this.directory = this.kerviService.GetDirectory(this.path);
+    }
+}
+KerviDirectoryComponent.ɵfac = function KerviDirectoryComponent_Factory(t) { return new (t || KerviDirectoryComponent)(); };
+KerviDirectoryComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviDirectoryComponent, selectors: [["kervi-directory"]], decls: 0, vars: 0, template: function KerviDirectoryComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviDirectoryComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-directory',
+                template: ''
+            }]
+    }], function () { return []; }, null); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class KerviAppHealthComponent {
+    constructor() {
+        this.linkParameters = null;
+        this.inline = false;
+        this.dashboardSizes = new kervi_js__WEBPACK_IMPORTED_MODULE_1__["DashboardSizes"]();
+        this.mps = 0;
+        this.pingDiff = 0;
+        this.pingDelay = 0;
+        this.kerviService = AppInjector.get(NGXKerviService);
+    }
+    ngOnInitAppHealth() {
+        const self = this;
+        this.kerviService.mps$.subscribe(function (mps) {
+            self.mps = mps;
+        });
+        this.kerviService.appPingDiff$.subscribe(function (diff) {
+            self.pingDiff = diff;
+        });
+        this.kerviService.appPingDelay$.subscribe(function (diff) {
+            self.pingDelay = diff;
+        });
+    }
+}
+KerviAppHealthComponent.ɵfac = function KerviAppHealthComponent_Factory(t) { return new (t || KerviAppHealthComponent)(); };
+KerviAppHealthComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: KerviAppHealthComponent, selectors: [["kervi-app-health-base"]], inputs: { linkParameters: "linkParameters", inline: "inline", dashboardSizes: "dashboardSizes", mps: "mps", pingDiff: "pingDiff", pingDelay: "pingDelay" }, decls: 0, vars: 0, template: function KerviAppHealthComponent_Template(rf, ctx) { }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(KerviAppHealthComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'kervi-app-health-base',
+                template: '',
+                styleUrls: [],
+            }]
+    }], function () { return []; }, { linkParameters: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], inline: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], dashboardSizes: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], mps: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], pingDiff: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], pingDelay: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+class NgxKerviComponent {
+    constructor() { }
+    ngOnInit() {
+    }
+}
+NgxKerviComponent.ɵfac = function NgxKerviComponent_Factory(t) { return new (t || NgxKerviComponent)(); };
+NgxKerviComponent.ɵcmp = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"])({ type: NgxKerviComponent, selectors: [["lib-ngx-kervi"]], decls: 2, vars: 0, template: function NgxKerviComponent_Template(rf, ctx) { if (rf & 1) {
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"])(0, "p");
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"])(1, " ngx-kervi works! ");
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"])();
+    } }, encapsulation: 2 });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(NgxKerviComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'lib-ngx-kervi',
+                template: `
+    <p>
+      ngx-kervi works!
+    </p>
+  `,
+                styles: []
+            }]
+    }], function () { return []; }, null); })();
+
+class TranslatePipe {
+    constructor(kerviService) {
+        this.kerviService = kerviService;
+    }
+    transform(value, args) {
+        return this.kerviService.text(value, value);
+    }
+}
+TranslatePipe.ɵfac = function TranslatePipe_Factory(t) { return new (t || TranslatePipe)(Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"])(NGXKerviService)); };
+TranslatePipe.ɵpipe = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefinePipe"])({ name: "translate", type: TranslatePipe, pure: true });
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(TranslatePipe, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Pipe"],
+        args: [{
+                name: 'translate'
+            }]
+    }], function () { return [{ type: NGXKerviService }]; }, null); })();
+
+// Copyright (c) 2016, Tim Wentzlau
+class NGXKerviPipesModule {
+}
+NGXKerviPipesModule.ɵmod = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineNgModule"])({ type: NGXKerviPipesModule });
+NGXKerviPipesModule.ɵinj = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjector"])({ factory: function NGXKerviPipesModule_Factory(t) { return new (t || NGXKerviPipesModule)(); }, providers: [], imports: [[]] });
+(function () { (typeof ngJitMode === "undefined" || ngJitMode) && Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsetNgModuleScope"])(NGXKerviPipesModule, { declarations: [TranslatePipe], exports: [TranslatePipe] }); })();
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(NGXKerviPipesModule, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"],
+        args: [{
+                imports: [],
+                exports: [
+                    TranslatePipe
+                ],
+                providers: [],
+                declarations: [
+                    TranslatePipe
+                ]
+            }]
+    }], null, null); })();
+
+class NgxKerviModule {
+    constructor(injector) {
+        this.injector = injector;
+        setAppInjector(injector);
+    }
+}
+NgxKerviModule.ɵmod = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineNgModule"])({ type: NgxKerviModule });
+NgxKerviModule.ɵinj = Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjector"])({ factory: function NgxKerviModule_Factory(t) { return new (t || NgxKerviModule)(Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"])(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injector"])); }, providers: [NGXKerviService, KerviTemplateService], imports: [[],
+        NGXKerviPipesModule] });
+(function () { (typeof ngJitMode === "undefined" || ngJitMode) && Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsetNgModuleScope"])(NgxKerviModule, { declarations: [NgxKerviComponent,
+        KerviDashboardComponent,
+        KerviDashboardPanelComponent,
+        KerviControllerPadComponent,
+        KerviNumberComponent,
+        KerviStringComponent,
+        KerviBooleanComponent,
+        KerviColorComponent,
+        KerviDateTimeComponent,
+        KerviActionComponent,
+        KerviValueComponent,
+        KerviWidgetComponent,
+        KerviCameraComponent,
+        KerviUserLogComponent,
+        KerviDirectoryComponent,
+        KerviAppHealthComponent], exports: [NgxKerviComponent,
+        KerviDashboardComponent,
+        KerviDashboardPanelComponent,
+        KerviControllerPadComponent,
+        KerviNumberComponent,
+        KerviWidgetComponent,
+        KerviStringComponent,
+        KerviBooleanComponent,
+        KerviColorComponent,
+        KerviDateTimeComponent,
+        KerviActionComponent,
+        KerviCameraComponent,
+        KerviUserLogComponent,
+        KerviActionComponent,
+        KerviAppHealthComponent,
+        NGXKerviPipesModule] }); })();
+/*@__PURE__*/ (function () { Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"])(NgxKerviModule, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"],
+        args: [{
+                imports: [],
+                declarations: [
+                    NgxKerviComponent,
+                    KerviDashboardComponent,
+                    KerviDashboardPanelComponent,
+                    KerviControllerPadComponent,
+                    KerviNumberComponent,
+                    KerviStringComponent,
+                    KerviBooleanComponent,
+                    KerviColorComponent,
+                    KerviDateTimeComponent,
+                    KerviActionComponent,
+                    KerviValueComponent,
+                    KerviWidgetComponent,
+                    KerviCameraComponent,
+                    KerviUserLogComponent,
+                    KerviDirectoryComponent,
+                    KerviAppHealthComponent
+                ],
+                providers: [NGXKerviService, KerviTemplateService],
+                exports: [
+                    NgxKerviComponent,
+                    KerviDashboardComponent,
+                    KerviDashboardPanelComponent,
+                    KerviControllerPadComponent,
+                    KerviNumberComponent,
+                    KerviWidgetComponent,
+                    KerviStringComponent,
+                    KerviBooleanComponent,
+                    KerviColorComponent,
+                    KerviDateTimeComponent,
+                    KerviActionComponent,
+                    KerviCameraComponent,
+                    KerviUserLogComponent,
+                    KerviActionComponent,
+                    KerviAppHealthComponent,
+                    NGXKerviPipesModule
+                ]
+            }]
+    }], function () { return [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Injector"] }]; }, null); })();
+
+/*
+ * Public API Surface of ngx-kervi
+ */
+
+/**
+ * Generated bundle index. Do not edit.
+ */
+
+
+//# sourceMappingURL=ngx-kervi.js.map
+
+
+/***/ }),
+
+/***/ "./$$_lazy_route_resource lazy recursive":
+/*!******************************************************!*\
+  !*** ./$$_lazy_route_resource lazy namespace object ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function webpackEmptyAsyncContext(req) {
+	// Here Promise.resolve().then() is used instead of new Promise() to prevent
+	// uncaught exception popping up in devtools
+	return Promise.resolve().then(function() {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	});
+}
+webpackEmptyAsyncContext.keys = function() { return []; };
+webpackEmptyAsyncContext.resolve = webpackEmptyAsyncContext;
+module.exports = webpackEmptyAsyncContext;
+webpackEmptyAsyncContext.id = "./$$_lazy_route_resource lazy recursive";
+
+/***/ }),
+
+/***/ "./src/app/app.component.ts":
+/*!**********************************!*\
+  !*** ./src/app/app.component.ts ***!
+  \**********************************/
+/*! exports provided: AppComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppComponent", function() { return AppComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "../../node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var ngx_kervi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ngx-kervi */ "../../dist/ngx-kervi/fesm2015/ngx-kervi.js");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "../../node_modules/@angular/router/__ivy_ngcc__/fesm2015/router.js");
+
+
+
+
+
+
+
+class AppComponent {
+    constructor(kerviService, router, route) {
+        this.kerviService = kerviService;
+        this.router = router;
+        this.route = route;
+        this.currentPage = null;
+        var self = this;
+    }
+    ngOnInit() {
+        var self = this;
+        this.kerviService.connectionState$.subscribe(function (connectedState) {
+            console.log("connected service state", connectedState, self);
+            if (connectedState == ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["ConnectionState"].disconnected) {
+                self.router.navigate(['/connect']);
+            }
+            if (connectedState == ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["ConnectionState"].loading) {
+            }
+            if (connectedState == ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["ConnectionState"].authenticate) {
+                self.router.navigate(['/authenticate']);
+            }
+            if (connectedState == ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["ConnectionState"].connected) {
+                if (self.currentPage)
+                    self.router.navigate([self.currentPage]);
+                else {
+                    var defaultDashboard = self.kerviService.getDefaultDashboard();
+                    self.router.navigate(['/' + defaultDashboard.componentType + '/' + defaultDashboard.id]);
+                }
+            }
+        });
+        setTimeout(function () {
+            self.kerviService.connect();
+        }, 0);
+    }
+}
+AppComponent.ɵfac = function AppComponent_Factory(t) { return new (t || AppComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["NGXKerviService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"])); };
+AppComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: AppComponent, selectors: [["app-root"]], decls: 1, vars: 0, template: function AppComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "router-outlet");
+    } }, directives: [_angular_router__WEBPACK_IMPORTED_MODULE_2__["RouterOutlet"]], styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJwcm9qZWN0cy93ZWJBcHAvc3JjL2FwcC9hcHAuY29tcG9uZW50LmNzcyJ9 */"] });
+/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](AppComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'app-root',
+                templateUrl: './app.component.html',
+                styleUrls: ['./app.component.css']
+            }]
+    }], function () { return [{ type: ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["NGXKerviService"] }, { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"] }, { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"] }]; }, null); })();
+
+
+/***/ }),
+
+/***/ "./src/app/app.module.ts":
+/*!*******************************!*\
+  !*** ./src/app/app.module.ts ***!
+  \*******************************/
+/*! exports provided: AppModule */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppModule", function() { return AppModule; });
+/* harmony import */ var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/platform-browser */ "../../node_modules/@angular/platform-browser/__ivy_ngcc__/fesm2015/platform-browser.js");
+/* harmony import */ var _angular_platform_browser_animations__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/platform-browser/animations */ "../../node_modules/@angular/platform-browser/__ivy_ngcc__/fesm2015/animations.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/core */ "../../node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var _angular_forms__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/forms */ "../../node_modules/@angular/forms/__ivy_ngcc__/fesm2015/forms.js");
+/* harmony import */ var ng_zorro_antd__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ng-zorro-antd */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd.js");
+/* harmony import */ var _ant_design_icons_angular_icons__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ant-design/icons-angular/icons */ "../../node_modules/@ant-design/icons-angular/__ivy_ngcc__/fesm2015/ant-design-icons-angular-icons.js");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/common */ "../../node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
+/* harmony import */ var _angular_common_locales_en__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/common/locales/en */ "../../node_modules/@angular/common/locales/en.js");
+/* harmony import */ var _angular_common_locales_en__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_angular_common_locales_en__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./app.component */ "./src/app/app.component.ts");
+/* harmony import */ var _login_login_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./login/login.component */ "./src/app/login/login.component.ts");
+/* harmony import */ var _connect_connect_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./connect/connect.component */ "./src/app/connect/connect.component.ts");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @angular/router */ "../../node_modules/@angular/router/__ivy_ngcc__/fesm2015/router.js");
+/* harmony import */ var _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./dashboard/dashboard.component */ "./src/app/dashboard/dashboard.component.ts");
+/* harmony import */ var _media_media_component__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./media/media.component */ "./src/app/media/media.component.ts");
+/* harmony import */ var ngx_kervi__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ngx-kervi */ "../../dist/ngx-kervi/fesm2015/ngx-kervi.js");
+/* harmony import */ var _angular_flex_layout__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @angular/flex-layout */ "../../node_modules/@angular/flex-layout/__ivy_ngcc__/esm2015/flex-layout.js");
+/* harmony import */ var _image_viewer_image_viewer_component__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./image-viewer/image-viewer.component */ "./src/app/image-viewer/image-viewer.component.ts");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Object(_angular_common__WEBPACK_IMPORTED_MODULE_6__["registerLocaleData"])(_angular_common_locales_en__WEBPACK_IMPORTED_MODULE_7___default.a);
+const antDesignIcons = _ant_design_icons_angular_icons__WEBPACK_IMPORTED_MODULE_5__;
+const icons = Object.keys(antDesignIcons).map(key => antDesignIcons[key]);
+const ROUTES = [
+    { path: 'connect', component: _connect_connect_component__WEBPACK_IMPORTED_MODULE_10__["ConnectComponent"] },
+    { path: 'authenticate', component: _login_login_component__WEBPACK_IMPORTED_MODULE_9__["LoginComponent"] },
+    { path: 'dashboard/:name', component: _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_12__["DashboardComponent"] },
+    { path: 'media', component: _media_media_component__WEBPACK_IMPORTED_MODULE_13__["MediaComponent"] },
+    {
+        path: '',
+        redirectTo: '',
+        pathMatch: 'full'
+    }
+];
+class AppModule {
+}
+AppModule.ɵmod = _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵdefineNgModule"]({ type: AppModule, bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_8__["AppComponent"]] });
+AppModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵdefineInjector"]({ factory: function AppModule_Factory(t) { return new (t || AppModule)(); }, providers: [
+        { provide: ng_zorro_antd__WEBPACK_IMPORTED_MODULE_4__["NZ_I18N"], useValue: ng_zorro_antd__WEBPACK_IMPORTED_MODULE_4__["en_US"] },
+        { provide: ng_zorro_antd__WEBPACK_IMPORTED_MODULE_4__["NZ_ICONS"], useValue: icons }
+    ], imports: [[
+            _angular_forms__WEBPACK_IMPORTED_MODULE_3__["FormsModule"],
+            _angular_forms__WEBPACK_IMPORTED_MODULE_3__["ReactiveFormsModule"],
+            _angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__["BrowserModule"],
+            _angular_platform_browser_animations__WEBPACK_IMPORTED_MODULE_1__["BrowserAnimationsModule"],
+            ngx_kervi__WEBPACK_IMPORTED_MODULE_14__["NgxKerviModule"],
+            ngx_kervi__WEBPACK_IMPORTED_MODULE_14__["NGXKerviPipesModule"],
+            //KerviZorroModule,
+            _angular_flex_layout__WEBPACK_IMPORTED_MODULE_15__["FlexLayoutModule"],
+            ng_zorro_antd__WEBPACK_IMPORTED_MODULE_4__["NgZorroAntdModule"],
+            //NgxKerviComponentsModule,
+            _angular_router__WEBPACK_IMPORTED_MODULE_11__["RouterModule"].forRoot(ROUTES)
+        ]] });
+(function () { (typeof ngJitMode === "undefined" || ngJitMode) && _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵsetNgModuleScope"](AppModule, { declarations: [_app_component__WEBPACK_IMPORTED_MODULE_8__["AppComponent"],
+        _login_login_component__WEBPACK_IMPORTED_MODULE_9__["LoginComponent"],
+        _connect_connect_component__WEBPACK_IMPORTED_MODULE_10__["ConnectComponent"],
+        _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_12__["DashboardComponent"],
+        _media_media_component__WEBPACK_IMPORTED_MODULE_13__["MediaComponent"],
+        _image_viewer_image_viewer_component__WEBPACK_IMPORTED_MODULE_16__["ImgViewerComponent"]], imports: [_angular_forms__WEBPACK_IMPORTED_MODULE_3__["FormsModule"],
+        _angular_forms__WEBPACK_IMPORTED_MODULE_3__["ReactiveFormsModule"],
+        _angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__["BrowserModule"],
+        _angular_platform_browser_animations__WEBPACK_IMPORTED_MODULE_1__["BrowserAnimationsModule"],
+        ngx_kervi__WEBPACK_IMPORTED_MODULE_14__["NgxKerviModule"],
+        ngx_kervi__WEBPACK_IMPORTED_MODULE_14__["NGXKerviPipesModule"],
+        //KerviZorroModule,
+        _angular_flex_layout__WEBPACK_IMPORTED_MODULE_15__["FlexLayoutModule"],
+        ng_zorro_antd__WEBPACK_IMPORTED_MODULE_4__["NgZorroAntdModule"], _angular_router__WEBPACK_IMPORTED_MODULE_11__["RouterModule"]] }); })();
+/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵsetClassMetadata"](AppModule, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_2__["NgModule"],
+        args: [{
+                declarations: [
+                    _app_component__WEBPACK_IMPORTED_MODULE_8__["AppComponent"],
+                    _login_login_component__WEBPACK_IMPORTED_MODULE_9__["LoginComponent"],
+                    _connect_connect_component__WEBPACK_IMPORTED_MODULE_10__["ConnectComponent"],
+                    _dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_12__["DashboardComponent"],
+                    _media_media_component__WEBPACK_IMPORTED_MODULE_13__["MediaComponent"],
+                    _image_viewer_image_viewer_component__WEBPACK_IMPORTED_MODULE_16__["ImgViewerComponent"]
+                ],
+                imports: [
+                    _angular_forms__WEBPACK_IMPORTED_MODULE_3__["FormsModule"],
+                    _angular_forms__WEBPACK_IMPORTED_MODULE_3__["ReactiveFormsModule"],
+                    _angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__["BrowserModule"],
+                    _angular_platform_browser_animations__WEBPACK_IMPORTED_MODULE_1__["BrowserAnimationsModule"],
+                    ngx_kervi__WEBPACK_IMPORTED_MODULE_14__["NgxKerviModule"],
+                    ngx_kervi__WEBPACK_IMPORTED_MODULE_14__["NGXKerviPipesModule"],
+                    //KerviZorroModule,
+                    _angular_flex_layout__WEBPACK_IMPORTED_MODULE_15__["FlexLayoutModule"],
+                    ng_zorro_antd__WEBPACK_IMPORTED_MODULE_4__["NgZorroAntdModule"],
+                    //NgxKerviComponentsModule,
+                    _angular_router__WEBPACK_IMPORTED_MODULE_11__["RouterModule"].forRoot(ROUTES)
+                ],
+                providers: [
+                    { provide: ng_zorro_antd__WEBPACK_IMPORTED_MODULE_4__["NZ_I18N"], useValue: ng_zorro_antd__WEBPACK_IMPORTED_MODULE_4__["en_US"] },
+                    { provide: ng_zorro_antd__WEBPACK_IMPORTED_MODULE_4__["NZ_ICONS"], useValue: icons }
+                ],
+                bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_8__["AppComponent"]]
+            }]
+    }], null, null); })();
+
+
+/***/ }),
+
+/***/ "./src/app/connect/connect.component.ts":
+/*!**********************************************!*\
+  !*** ./src/app/connect/connect.component.ts ***!
+  \**********************************************/
+/*! exports provided: ConnectComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConnectComponent", function() { return ConnectComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "../../node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var ngx_kervi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ngx-kervi */ "../../dist/ngx-kervi/fesm2015/ngx-kervi.js");
+/* harmony import */ var ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ng-zorro-antd/layout */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-layout.js");
+/* harmony import */ var ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ng-zorro-antd/grid */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-grid.js");
+/* harmony import */ var ng_zorro_antd_steps__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ng-zorro-antd/steps */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-steps.js");
+
+
+
+
+
+
+
+
+class ConnectComponent {
+    constructor(kerviService) {
+        this.kerviService = kerviService;
+        this.current = 1;
+    }
+    ngOnInit() {
+        var self = this;
+        this.kerviService.connectionState$.subscribe(function (connectedState) {
+            console.log("connected service state", connectedState, self);
+            if (connectedState == ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["ConnectionState"].disconnected) {
+                self.current = 1;
+            }
+            if (connectedState == ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["ConnectionState"].loading) {
+                self.current = 2;
+            }
+        });
+    }
+}
+ConnectComponent.ɵfac = function ConnectComponent_Factory(t) { return new (t || ConnectComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["NGXKerviService"])); };
+ConnectComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ConnectComponent, selectors: [["app-connect"]], decls: 8, vars: 1, consts: [[1, "kervi-app-initializing"], ["nz-row", ""], ["nz-col", "", "nzSpan", "12", "nzOffset", "9"], ["nzDirection", "vertical", 3, "nzCurrent"], ["nzTitle", "Initializing", "nzDescription", "\u00A0", "nzIcon", "setting"], ["nzTitle", "Connecting", "nzDescription", "\u00A0", "nzIcon", "wifi"], ["nzTitle", "Loading dashboards", "nzDescription", "\u00A0", "nzIcon", "download"]], template: function ConnectComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "nz-layout");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "nz-content", 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "div", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "div", 2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](4, "nz-steps", 3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](5, "nz-step", 4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](6, "nz-step", 5);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](7, "nz-step", 6);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    } if (rf & 2) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzCurrent", ctx.current);
+    } }, directives: [ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_2__["NzLayoutComponent"], ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_2__["NzContentComponent"], ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_3__["NzRowDirective"], ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_3__["NzColDirective"], ng_zorro_antd_steps__WEBPACK_IMPORTED_MODULE_4__["NzStepsComponent"], ng_zorro_antd_steps__WEBPACK_IMPORTED_MODULE_4__["NzStepComponent"]], styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJwcm9qZWN0cy93ZWJBcHAvc3JjL2FwcC9jb25uZWN0L2Nvbm5lY3QuY29tcG9uZW50LmNzcyJ9 */"] });
+/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](ConnectComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'app-connect',
+                templateUrl: './connect.component.html',
+                styleUrls: ['./connect.component.css']
+            }]
+    }], function () { return [{ type: ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["NGXKerviService"] }]; }, null); })();
+
+
+/***/ }),
+
+/***/ "./src/app/dashboard/dashboard.component.ts":
+/*!**************************************************!*\
+  !*** ./src/app/dashboard/dashboard.component.ts ***!
+  \**************************************************/
+/*! exports provided: DashboardComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DashboardComponent", function() { return DashboardComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "../../node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/router */ "../../node_modules/@angular/router/__ivy_ngcc__/fesm2015/router.js");
+/* harmony import */ var ngx_kervi__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ngx-kervi */ "../../dist/ngx-kervi/fesm2015/ngx-kervi.js");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/common */ "../../node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
+/* harmony import */ var ng_zorro_antd_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ng-zorro-antd/modal */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-modal.js");
+/* harmony import */ var _media_media_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../media/media.component */ "./src/app/media/media.component.ts");
+/* harmony import */ var ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ng-zorro-antd/layout */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-layout.js");
+/* harmony import */ var ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ng-zorro-antd/grid */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-grid.js");
+/* harmony import */ var ng_zorro_antd_menu__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ng-zorro-antd/menu */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-menu.js");
+/* harmony import */ var ng_zorro_antd_core_transition_patch__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ng-zorro-antd/core/transition-patch */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-core-transition-patch.js");
+/* harmony import */ var ng_zorro_antd_icon__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ng-zorro-antd/icon */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-icon.js");
+/* harmony import */ var ng_zorro_antd_divider__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ng-zorro-antd/divider */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-divider.js");
+/* harmony import */ var ng_zorro_antd_alert__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ng-zorro-antd/alert */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-alert.js");
+/* harmony import */ var _angular_flex_layout_flex__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @angular/flex-layout/flex */ "../../node_modules/@angular/flex-layout/__ivy_ngcc__/esm2015/flex.js");
+/* harmony import */ var ng_zorro_antd_button__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ng-zorro-antd/button */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-button.js");
+/* harmony import */ var ng_zorro_antd_core_wave__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ng-zorro-antd/core/wave */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-core-wave.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const _c0 = ["leftPad"];
+const _c1 = ["rightPad"];
+const _c2 = function (a1) { return ["/dashboard", a1]; };
+function DashboardComponent_nz_layout_0_nz_header_1_li_4_ng_container_5_li_1_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "li", 17);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const dashboard_r16 = ctx.$implicit;
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("routerLink", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpureFunction1"](2, _c2, dashboard_r16.id));
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](dashboard_r16.name);
+} }
+function DashboardComponent_nz_layout_0_nz_header_1_li_4_ng_container_5_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementContainerStart"](0);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](1, DashboardComponent_nz_layout_0_nz_header_1_li_4_ng_container_5_li_1_Template, 2, 4, "li", 16);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementContainerEnd"]();
+} if (rf & 2) {
+    const ctx_r11 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](4);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngForOf", ctx_r11.dashboards);
+} }
+function DashboardComponent_nz_layout_0_nz_header_1_li_4_li_6_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "li");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "nz-divider");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} }
+function DashboardComponent_nz_layout_0_nz_header_1_li_4_li_7_Template(rf, ctx) { if (rf & 1) {
+    const _r18 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "li", 18);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function DashboardComponent_nz_layout_0_nz_header_1_li_4_li_7_Template_li_click_0_listener($event) { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r18); const ctx_r17 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](4); return ctx_r17.logoff($event); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 19);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipe"](3, "translate");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"](" ", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipeBind1"](3, 1, "login"), "");
+} }
+function DashboardComponent_nz_layout_0_nz_header_1_li_4_li_8_Template(rf, ctx) { if (rf & 1) {
+    const _r20 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "li", 18);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function DashboardComponent_nz_layout_0_nz_header_1_li_4_li_8_Template_li_click_0_listener($event) { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r20); const ctx_r19 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](4); return ctx_r19.logoff($event); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 20);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipe"](3, "translate");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipeBind1"](3, 1, "logout"));
+} }
+function DashboardComponent_nz_layout_0_nz_header_1_li_4_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "li", 12);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "span", 13);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](2, "i", 14);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](4, "ul");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](5, DashboardComponent_nz_layout_0_nz_header_1_li_4_ng_container_5_Template, 2, 1, "ng-container", 0);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](6, DashboardComponent_nz_layout_0_nz_header_1_li_4_li_6_Template, 2, 0, "li", 0);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](7, DashboardComponent_nz_layout_0_nz_header_1_li_4_li_7_Template, 4, 3, "li", 15);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](8, DashboardComponent_nz_layout_0_nz_header_1_li_4_li_8_Template, 4, 3, "li", 15);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r8 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzTwotoneColor", "#9fd037");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"](" ", ctx_r8.dashboard.name, "");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r8.dashboards.length > 1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r8.authenticated && ctx_r8.dashboards.length > 1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r8.authenticated && ctx_r8.anonymous);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r8.authenticated && !ctx_r8.anonymous);
+} }
+function DashboardComponent_nz_layout_0_nz_header_1_li_5_Template(rf, ctx) { if (rf & 1) {
+    const _r22 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "li", 21);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "a", 22);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function DashboardComponent_nz_layout_0_nz_header_1_li_5_Template_a_click_1_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r22); const ctx_r21 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](3); return ctx_r21.dashboardPanelsHidden = !ctx_r21.dashboardPanelsHidden; });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](2, "i", 23);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzTwotoneColor", "#9fd037");
+} }
+function DashboardComponent_nz_layout_0_nz_header_1_div_6_Template(rf, ctx) { if (rf & 1) {
+    const _r24 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 24);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "kervi-dashboard-panel", 25);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](2, " \u00A0");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "a", 22);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function DashboardComponent_nz_layout_0_nz_header_1_div_6_Template_a_click_3_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r24); const ctx_r23 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](3); return ctx_r23.mediaHidden = !ctx_r23.mediaHidden; });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](4, "i", 26);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](5, "kervi-message-button");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r10 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("dashboardSizes", ctx_r10.dashboardSizes)("inline", true)("panel", ctx_r10.dashboard.sysPanel);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzTwotoneColor", "#9fd037");
+} }
+function DashboardComponent_nz_layout_0_nz_header_1_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "nz-header");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 6);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "div", 7);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "ul", 8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](4, DashboardComponent_nz_layout_0_nz_header_1_li_4_Template, 9, 6, "li", 9);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](5, DashboardComponent_nz_layout_0_nz_header_1_li_5_Template, 3, 1, "li", 10);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](6, DashboardComponent_nz_layout_0_nz_header_1_div_6_Template, 6, 4, "div", 11);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r1 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](4);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r1.showMenu);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r1.showPanelController);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r1.dashboard && ctx_r1.dashboard.sysPanel);
+} }
+function DashboardComponent_nz_layout_0_ng_container_3_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementContainerStart"](0);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 6);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "div", 27);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](3, "nz-alert", 28);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipe"](4, "translate");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipe"](5, "translate");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementContainerEnd"]();
+} if (rf & 2) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzMessage", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipeBind1"](4, 2, "hello_world"))("nzDescription", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipeBind1"](5, 4, "empty_app"));
+} }
+function DashboardComponent_nz_layout_0_kervi_cam_viewer_4_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "kervi-cam-viewer", 29);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipe"](1, "async");
+} if (rf & 2) {
+    const ctx_r3 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("isBackground", true)("cameraId", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipeBind1"](1, 3, ctx_r3.cameraId$))("linkParameters", ctx_r3.cameraParameters);
+} }
+function DashboardComponent_nz_layout_0_div_5_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 30, 31);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](2, "kervi-controller-pad", 32);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r4 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵstyleProp"]("left", ctx_r4.leftPadLeft, "px")("top", ctx_r4.leftPadTop, "px");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("autoCenter", ctx_r4.autoCenterLeftPad)("XValue", ctx_r4.leftPadXValue)("YValue", ctx_r4.leftPadYValue);
+} }
+function DashboardComponent_nz_layout_0_div_6_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 30, 33);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](2, "kervi-controller-pad", 32);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r5 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵstyleProp"]("left", ctx_r5.rightPadLeft, "px")("top", ctx_r5.rightPadTop, "px");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("autoCenter", ctx_r5.autoCenterRightPad)("XValue", ctx_r5.rightPadXValue)("YValue", ctx_r5.rightPadYValue);
+} }
+function DashboardComponent_nz_layout_0_div_7_ng_container_1_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementContainerStart"](0);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "kervi-dashboard-panel", 36);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementContainerEnd"]();
+} if (rf & 2) {
+    const panel_r28 = ctx.$implicit;
+    const ctx_r27 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("fxFlex", panel_r28.parameters.width)("dashboardSizes", ctx_r27.defaultSizes)("panel", panel_r28);
+} }
+function DashboardComponent_nz_layout_0_div_7_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 34);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](1, DashboardComponent_nz_layout_0_div_7_ng_container_1_Template, 2, 3, "ng-container", 35);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r6 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngForOf", ctx_r6.dashboard.panels);
+} }
+function DashboardComponent_nz_layout_0_nz_footer_8_kervi_dashboard_panel_2_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "kervi-dashboard-panel", 43);
+} if (rf & 2) {
+    const ctx_r29 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("inline", true)("dashboardSizes", ctx_r29.defaultSizes)("panel", ctx_r29.dashboard.footerLeftPanel);
+} }
+function DashboardComponent_nz_layout_0_nz_footer_8_kervi_dashboard_panel_4_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "kervi-dashboard-panel", 43);
+} if (rf & 2) {
+    const ctx_r30 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("inline", true)("dashboardSizes", ctx_r30.defaultSizes)("panel", ctx_r30.dashboard.footerCenterPanel);
+} }
+function DashboardComponent_nz_layout_0_nz_footer_8_kervi_dashboard_panel_6_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "kervi-dashboard-panel", 43);
+} if (rf & 2) {
+    const ctx_r31 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("inline", true)("dashboardSizes", ctx_r31.defaultSizes)("panel", ctx_r31.dashboard.footerRightPanel);
+} }
+function DashboardComponent_nz_layout_0_nz_footer_8_Template(rf, ctx) { if (rf & 1) {
+    const _r33 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "nz-footer");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 37);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](2, DashboardComponent_nz_layout_0_nz_footer_8_kervi_dashboard_panel_2_Template, 1, 3, "kervi-dashboard-panel", 38);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "div", 39);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](4, DashboardComponent_nz_layout_0_nz_footer_8_kervi_dashboard_panel_4_Template, 1, 3, "kervi-dashboard-panel", 38);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](5, "div", 40);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](6, DashboardComponent_nz_layout_0_nz_footer_8_kervi_dashboard_panel_6_Template, 1, 3, "kervi-dashboard-panel", 38);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](7, "button", 41);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("mousedown", function DashboardComponent_nz_layout_0_nz_footer_8_Template_button_mousedown_7_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r33); const ctx_r32 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2); return ctx_r32.toggleFullScreen(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](8, "i", 42);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipe"](9, "translate");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r7 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r7.dashboard.footerLeftPanel);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r7.dashboard.footerCenterPanel);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r7.dashboard.footerRightPanel);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpropertyInterpolate"]("title", _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵpipeBind1"](9, 5, "toggle_screen"));
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzType", ctx_r7.inFullScreen ? "fullscreen" : "fullscreen-exit");
+} }
+function DashboardComponent_nz_layout_0_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "nz-layout");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](1, DashboardComponent_nz_layout_0_nz_header_1_Template, 7, 3, "nz-header", 0);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "nz-content");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](3, DashboardComponent_nz_layout_0_ng_container_3_Template, 6, 6, "ng-container", 0);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](4, DashboardComponent_nz_layout_0_kervi_cam_viewer_4_Template, 2, 5, "kervi-cam-viewer", 3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](5, DashboardComponent_nz_layout_0_div_5_Template, 3, 7, "div", 4);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](6, DashboardComponent_nz_layout_0_div_6_Template, 3, 7, "div", 4);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](7, DashboardComponent_nz_layout_0_div_7_Template, 2, 1, "div", 5);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](8, DashboardComponent_nz_layout_0_nz_footer_8_Template, 10, 7, "nz-footer", 0);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r0 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx_r0.isAppEmpty);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.isAppEmpty);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.cameraId);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.showLeftPad);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.showRightPad);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx_r0.dashboardPanelsHidden);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", !ctx_r0.isAppEmpty);
+} }
+class DashboardComponent extends ngx_kervi__WEBPACK_IMPORTED_MODULE_2__["KerviDashboardComponent"] {
+    constructor(router, activatedRoute) {
+        super();
+        this.router = router;
+        this.activatedRoute = activatedRoute;
+        this.padSize = 180;
+        this.cameraIdx = "";
+        this.mediaHidden = true;
+    }
+    ngOnInit() {
+        var self = this;
+        this.cameraId$.subscribe(function (camId) {
+            console.log("db cid", camId);
+            this.cameraIdx = camId;
+        });
+        this.kerviService.componentsChanged$.subscribe(function () {
+            console.log("adb changed");
+            const id = self.dashboardId;
+            //self.loadDashboard("0");
+            self.loadDashboard(id);
+        });
+        this.activatedRoute.params.subscribe(params => {
+            var dashboardId = params['name'];
+            console.log("dbi", dashboardId);
+            this.loadDashboard(dashboardId);
+            console.log("rid", dashboardId);
+            setTimeout(() => {
+                var h = window.innerHeight;
+                var w = window.innerWidth;
+                self.leftPadTop = h / 2 - self.padSize / 2;
+                self.leftPadLeft = w / 4 - self.padSize / 2;
+                self.rightPadTop = h / 2 - self.padSize / 2;
+                self.rightPadLeft = w - w / 4 - self.padSize / 2;
+            }, 0);
+        });
+    }
+    handleMediaClose() {
+        console.log('click ok');
+        this.mediaHidden = true;
+    }
+}
+DashboardComponent.ɵfac = function DashboardComponent_Factory(t) { return new (t || DashboardComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_1__["ActivatedRoute"])); };
+DashboardComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: DashboardComponent, selectors: [["app-dashboard"]], viewQuery: function DashboardComponent_Query(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵviewQuery"](_c0, true);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵviewQuery"](_c1, true);
+    } if (rf & 2) {
+        var _t;
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵloadQuery"]()) && (ctx.leftPad = _t.first);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵloadQuery"]()) && (ctx.rightPad = _t.first);
+    } }, features: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵInheritDefinitionFeature"]], decls: 4, vars: 2, consts: [[4, "ngIf"], ["nzWrapClassName", "vertical-center-modal", "nzTitle", "Media", 3, "nzVisible", "nzVisibleChange", "nzOnCancel"], [2, "display", "inline-block", "width", "100%"], [3, "isBackground", "cameraId", "linkParameters", 4, "ngIf"], ["class", "kervi-controller-pad", 3, "left", "top", 4, "ngIf"], ["class", "kervi-panels", "fxLayout", " column", "fxLayout.xs", "column", "fxLayoutGap", "0.5%", "fxLayoutAlign", "", "style", "", 4, "ngIf"], ["nz-row", ""], ["nz-col", "", "nzSpan", "6"], ["nz-menu", "", "nzMode", "horizontal", 1, "kervi-main-menu"], ["nz-submenu", "", 4, "ngIf"], ["nz-menu-item", "", 4, "ngIf"], ["class", "kervi-sys-panel", "nz-col", "", "nzSpan", "18", 4, "ngIf"], ["nz-submenu", ""], ["title", ""], ["nz-icon", "", "nzTheme", "twotone", "type", "dashboard", 3, "nzTwotoneColor"], ["nz-menu-item", "", "href", "javascript: return false;", 3, "click", 4, "ngIf"], ["nz-menu-item", "", 3, "routerLink", 4, "ngFor", "ngForOf"], ["nz-menu-item", "", 3, "routerLink"], ["nz-menu-item", "", "href", "javascript: return false;", 3, "click"], ["nz-icon", "", "type", "login"], ["nz-icon", "", "type", "logout"], ["nz-menu-item", ""], [3, "click"], ["nz-icon", "", "type", "sliders", "nzTheme", "twotone", 3, "nzTwotoneColor"], ["nz-col", "", "nzSpan", "18", 1, "kervi-sys-panel"], [3, "dashboardSizes", "inline", "panel"], ["nz-icon", "", "nzType", "folder-open", "nzTheme", "twotone", 3, "nzTwotoneColor"], ["nz-col", "", "nzSpan", "12", "nzOffset", "6"], ["nzType", "error", "nzShowIcon", "", 3, "nzMessage", "nzDescription"], [3, "isBackground", "cameraId", "linkParameters"], [1, "kervi-controller-pad"], ["leftPad", ""], [3, "autoCenter", "XValue", "YValue"], ["rightPad", ""], ["fxLayout", " column", "fxLayout.xs", "column", "fxLayoutGap", "0.5%", "fxLayoutAlign", "", 1, "kervi-panels"], [4, "ngFor", "ngForOf"], ["fxFlex.xs", "100%", 3, "fxFlex", "dashboardSizes", "panel"], ["nz-col", "", "nzSpan", "8", 2, "text-align", "left"], [3, "inline", "dashboardSizes", "panel", 4, "ngIf"], ["nz-col", "", "nzSpan", "8", 2, "text-align", "center"], ["nz-col", "", "nzSpan", "8", 2, "text-align", "right"], ["nz-button", "", "nzShape", "round", 3, "mousedown"], ["nz-icon", "", 3, "nzType", "title"], [3, "inline", "dashboardSizes", "panel"]], template: function DashboardComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](0, DashboardComponent_nz_layout_0_Template, 9, 7, "nz-layout", 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "nz-modal", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("nzVisibleChange", function DashboardComponent_Template_nz_modal_nzVisibleChange_1_listener($event) { return !(ctx.mediaHidden = $event); })("nzOnCancel", function DashboardComponent_Template_nz_modal_nzOnCancel_1_listener() { return ctx.handleMediaClose(); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "div", 2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](3, "app-media");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    } if (rf & 2) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.dashboard);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzVisible", !ctx.mediaHidden);
+    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_3__["NgIf"], ng_zorro_antd_modal__WEBPACK_IMPORTED_MODULE_4__["NzModalComponent"], _media_media_component__WEBPACK_IMPORTED_MODULE_5__["MediaComponent"], ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_6__["NzLayoutComponent"], ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_6__["NzContentComponent"], ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_6__["NzHeaderComponent"], ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_7__["NzRowDirective"], ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_7__["NzColDirective"], ng_zorro_antd_menu__WEBPACK_IMPORTED_MODULE_8__["NzMenuDirective"], ng_zorro_antd_core_transition_patch__WEBPACK_IMPORTED_MODULE_9__["ɵNzTransitionPatchDirective"], ng_zorro_antd_menu__WEBPACK_IMPORTED_MODULE_8__["NzSubMenuComponent"], ng_zorro_antd_icon__WEBPACK_IMPORTED_MODULE_10__["NzIconDirective"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["NgForOf"], ng_zorro_antd_menu__WEBPACK_IMPORTED_MODULE_8__["NzMenuItemDirective"], _angular_router__WEBPACK_IMPORTED_MODULE_1__["RouterLink"], ng_zorro_antd_divider__WEBPACK_IMPORTED_MODULE_11__["NzDividerComponent"], ng_zorro_antd_alert__WEBPACK_IMPORTED_MODULE_12__["NzAlertComponent"], _angular_flex_layout_flex__WEBPACK_IMPORTED_MODULE_13__["DefaultLayoutDirective"], _angular_flex_layout_flex__WEBPACK_IMPORTED_MODULE_13__["DefaultLayoutGapDirective"], _angular_flex_layout_flex__WEBPACK_IMPORTED_MODULE_13__["DefaultLayoutAlignDirective"], _angular_flex_layout_flex__WEBPACK_IMPORTED_MODULE_13__["DefaultFlexDirective"], ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_6__["NzFooterComponent"], ng_zorro_antd_button__WEBPACK_IMPORTED_MODULE_14__["NzButtonComponent"], ng_zorro_antd_core_wave__WEBPACK_IMPORTED_MODULE_15__["NzWaveDirective"]], pipes: [ngx_kervi__WEBPACK_IMPORTED_MODULE_2__["TranslatePipe"], _angular_common__WEBPACK_IMPORTED_MODULE_3__["AsyncPipe"]], styles: [".dashboard-panels-hidden[_ngcontent-%COMP%]{\r\n    display: none;\r\n}\r\n\r\n  .vertical-center-modal {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    z-index:4000;\r\n    \r\n    height:90%;\r\n    \r\n  }\r\n\r\n  .vertical-center-modal .ant-modal {\r\n    top: 0;\r\n  }\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInByb2plY3RzL3dlYkFwcC9zcmMvYXBwL2Rhc2hib2FyZC9kYXNoYm9hcmQuY29tcG9uZW50LmNzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtJQUNJLGFBQWE7QUFDakI7O0FBRUE7SUFDSSxhQUFhO0lBQ2IsbUJBQW1CO0lBQ25CLHVCQUF1QjtJQUN2QixZQUFZO0lBQ1osZUFBZTtJQUNmLFVBQVU7O0VBRVo7O0FBRUE7SUFDRSxNQUFNO0VBQ1IiLCJmaWxlIjoicHJvamVjdHMvd2ViQXBwL3NyYy9hcHAvZGFzaGJvYXJkL2Rhc2hib2FyZC5jb21wb25lbnQuY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLmRhc2hib2FyZC1wYW5lbHMtaGlkZGVue1xyXG4gICAgZGlzcGxheTogbm9uZTtcclxufVxyXG5cclxuOjpuZy1kZWVwIC52ZXJ0aWNhbC1jZW50ZXItbW9kYWwge1xyXG4gICAgZGlzcGxheTogZmxleDtcclxuICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7XHJcbiAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcclxuICAgIHotaW5kZXg6NDAwMDtcclxuICAgIC8qIHdpZHRoOjkwJTsgKi9cclxuICAgIGhlaWdodDo5MCU7XHJcbiAgICBcclxuICB9XHJcblxyXG4gIDo6bmctZGVlcCAudmVydGljYWwtY2VudGVyLW1vZGFsIC5hbnQtbW9kYWwge1xyXG4gICAgdG9wOiAwO1xyXG4gIH0iXX0= */"] });
+/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](DashboardComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'app-dashboard',
+                templateUrl: './dashboard.component.html',
+                styleUrls: ['./dashboard.component.css']
+            }]
+    }], function () { return [{ type: _angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"] }, { type: _angular_router__WEBPACK_IMPORTED_MODULE_1__["ActivatedRoute"] }]; }, { leftPad: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"],
+            args: ["leftPad"]
+        }], rightPad: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"],
+            args: ["rightPad"]
+        }] }); })();
+
+
+/***/ }),
+
+/***/ "./src/app/image-viewer/image-viewer.component.ts":
+/*!********************************************************!*\
+  !*** ./src/app/image-viewer/image-viewer.component.ts ***!
+  \********************************************************/
+/*! exports provided: ImgViewerComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ImgViewerComponent", function() { return ImgViewerComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "../../node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common */ "../../node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
+/* harmony import */ var iv_viewer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! iv-viewer */ "../../node_modules/iv-viewer/lib/index.js");
+/* harmony import */ var iv_viewer__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(iv_viewer__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _image_viewer_config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./image-viewer.config */ "./src/app/image-viewer/image-viewer.config.ts");
+/* harmony import */ var ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ng-zorro-antd/grid */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-grid.js");
+/* harmony import */ var ng_zorro_antd_core_transition_patch__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ng-zorro-antd/core/transition-patch */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-core-transition-patch.js");
+/* harmony import */ var ng_zorro_antd_icon__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ng-zorro-antd/icon */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-icon.js");
+/* harmony import */ var ng_zorro_antd_tooltip__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ng-zorro-antd/tooltip */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-tooltip.js");
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+//based on https://github.com/LZHD/ng-picture-viewer
+//Copyright 2019 Tim Wentzlau
+// Licensed under MIT
+
+
+
+
+
+
+
+
+
+
+
+
+function ImgViewerComponent_div_7_span_1_Template(rf, ctx) { if (rf & 1) {
+    const _r12 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "span", 14);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ImgViewerComponent_div_7_span_1_Template_span_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r12); const ctx_r11 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2); return ctx_r11.zoomInImg(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 15);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r4 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzTitle", ctx_r4.imageViewerType.zoomInToolTip);
+} }
+function ImgViewerComponent_div_7_span_2_Template(rf, ctx) { if (rf & 1) {
+    const _r14 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "span", 14);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ImgViewerComponent_div_7_span_2_Template_span_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r14); const ctx_r13 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2); return ctx_r13.zoomOutImg(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 16);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r5 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzTitle", ctx_r5.imageViewerType.zoomOutToolTip);
+} }
+function ImgViewerComponent_div_7_span_3_Template(rf, ctx) { if (rf & 1) {
+    const _r16 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "span", 14);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ImgViewerComponent_div_7_span_3_Template_span_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r16); const ctx_r15 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2); return ctx_r15.rotateImg(false); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 17);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r6 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzTitle", ctx_r6.imageViewerType.rotateLeftToolTip);
+} }
+function ImgViewerComponent_div_7_span_4_Template(rf, ctx) { if (rf & 1) {
+    const _r18 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "span", 14);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ImgViewerComponent_div_7_span_4_Template_span_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r18); const ctx_r17 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2); return ctx_r17.rotateImg(true); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 18);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r7 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzTitle", ctx_r7.imageViewerType.rotateRightToolTip);
+} }
+function ImgViewerComponent_div_7_span_5_Template(rf, ctx) { if (rf & 1) {
+    const _r20 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "span", 14);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ImgViewerComponent_div_7_span_5_Template_span_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r20); const ctx_r19 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2); return ctx_r19.showImg(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 19);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r8 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzTitle", ctx_r8.imageViewerType.resetToolTip);
+} }
+function ImgViewerComponent_div_7_span_6_Template(rf, ctx) { if (rf & 1) {
+    const _r22 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "span", 14);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ImgViewerComponent_div_7_span_6_Template_span_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r22); const ctx_r21 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2); return ctx_r21.fullscreenImg(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 20);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r9 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzTitle", ctx_r9.imageViewerType.fullScreenToolTip);
+} }
+function ImgViewerComponent_div_7_span_7_Template(rf, ctx) { if (rf & 1) {
+    const _r24 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "span", 14);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ImgViewerComponent_div_7_span_7_Template_span_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r24); const ctx_r23 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2); return ctx_r23.downloadImg(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 21);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r10 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzTitle", ctx_r10.imageViewerType.downloadToolTip);
+} }
+function ImgViewerComponent_div_7_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 12);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](1, ImgViewerComponent_div_7_span_1_Template, 2, 1, "span", 13);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](2, ImgViewerComponent_div_7_span_2_Template, 2, 1, "span", 13);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](3, ImgViewerComponent_div_7_span_3_Template, 2, 1, "span", 13);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](4, ImgViewerComponent_div_7_span_4_Template, 2, 1, "span", 13);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](5, ImgViewerComponent_div_7_span_5_Template, 2, 1, "span", 13);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](6, ImgViewerComponent_div_7_span_6_Template, 2, 1, "span", 13);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](7, ImgViewerComponent_div_7_span_7_Template, 2, 1, "span", 13);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r0 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.zoom);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.zoom);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.rotate);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.rotate);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.reset);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.fullscreen);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx_r0.download);
+} }
+function ImgViewerComponent_span_10_Template(rf, ctx) { if (rf & 1) {
+    const _r26 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "span", 22);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ImgViewerComponent_span_10_Template_span_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r26); const ctx_r25 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r25.prevImg(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 23);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} }
+function ImgViewerComponent_span_11_Template(rf, ctx) { if (rf & 1) {
+    const _r28 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "span", 24);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ImgViewerComponent_span_11_Template_span_click_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r28); const ctx_r27 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r27.nextImg(); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "i", 25);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} }
+function ImgViewerComponent_div_12_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 26);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const ctx_r3 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate2"](" ", ctx_r3.currentImgIndex, " / ", ctx_r3.imgTotal, " ");
+} }
+class ImgViewerComponent {
+    constructor(el, renderer, doc, config) {
+        this.el = el;
+        this.renderer = renderer;
+        this.doc = doc;
+        this.config = config;
+        this.images = [];
+        this.showOperate = true;
+        this.zoom = true;
+        this.rotate = true;
+        this.reset = true;
+        this.fullscreen = true;
+        this.download = true;
+        this.defaultName = 'download';
+        this.prevChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        this.nextChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        this.closeViewer = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        this.ROTATE_ANGLE = 90;
+        this.currentImgIndex = 1;
+        this.imgTotal = 0;
+        this.zoomValue = 100;
+        this.isVertical = false;
+        this.imgRotate = 0;
+        this.element = this.el.nativeElement;
+        this.imgViewerConfig = new _image_viewer_config__WEBPACK_IMPORTED_MODULE_3__["ImgViewerConfig"]();
+        this.ivViewerType = this.imgViewerConfig.ivViewerType;
+        this.imageViewerType = this.imgViewerConfig.imageViewerType;
+        if (this.config && this.config.ivViewerType) {
+            this.ivViewerType = Object.assign(this.ivViewerType, this.config.ivViewerType);
+        }
+        if (this.config && this.config.imageViewerType) {
+            this.imageViewerType = Object.assign(this.imageViewerType, this.config.imageViewerType);
+        }
+    }
+    ngOnInit() {
+        this.imgTotal = this.images.length;
+    }
+    ngAfterViewInit() {
+        this.initImgViewer();
+    }
+    zoomInImg() {
+        this.zoomValue += 10;
+        this.imageViewer$.zoom(this.zoomValue);
+    }
+    zoomOutImg() {
+        if (this.zoomValue === 100) {
+            return;
+        }
+        this.zoomValue -= 10;
+        if (this.zoomValue < 0) {
+            this.zoomValue = 0;
+        }
+        this.imageViewer$.zoom(this.zoomValue);
+    }
+    rotateImg(isClockwise) {
+        this.beforeRotateImg().then((time) => {
+            if (isClockwise) {
+                this.imgRotate += this.ROTATE_ANGLE;
+            }
+            else {
+                this.imgRotate -= this.ROTATE_ANGLE;
+            }
+            this.isVertical = !this.isVertical;
+            time <= 0 ? this.addImgRotate() : setTimeout(() => this.addImgRotate(), time);
+        });
+    }
+    fullscreenImg() {
+        this.beforeRotateImg().then((time) => {
+            if (time <= 0) {
+                this.fullScreenViewer$.show(this.images[this.currentImgIndex - 1]);
+                this.addImgRotate(false);
+            }
+            else {
+                setTimeout(() => {
+                    this.fullScreenViewer$.show(this.images[this.currentImgIndex - 1]);
+                    this.addImgRotate(false);
+                }, time);
+            }
+        });
+    }
+    downloadImg() {
+        const download = this.renderer.createElement('a');
+        this.renderer.setAttribute(download, 'download', `${this.defaultName}-${this.currentImgIndex}`);
+        this.renderer.setAttribute(download, 'display', 'none');
+        this.renderer.setAttribute(download, 'href', this.images[this.currentImgIndex - 1]);
+        this.renderer.setAttribute(download, 'target', '_blank');
+        this.renderer.appendChild(this.element, download);
+        download.click();
+        this.renderer.removeChild(this.renderer, download);
+    }
+    prevImg() {
+        this.isVertical = false;
+        this.currentImgIndex--;
+        if (this.currentImgIndex <= 0) {
+            this.currentImgIndex = this.imgTotal;
+        }
+        //this.showImg();
+        this.prevChange.emit(this.currentImgIndex);
+    }
+    nextImg() {
+        this.isVertical = false;
+        this.currentImgIndex++;
+        if (this.currentImgIndex > this.imgTotal) {
+            this.currentImgIndex = 1;
+        }
+        //this.showImg();
+        this.nextChange.emit(this.currentImgIndex);
+    }
+    closeImageViewer() {
+        this.closeViewer.emit();
+    }
+    initImgViewer() {
+        this.imageViewer$ = new iv_viewer__WEBPACK_IMPORTED_MODULE_2___default.a(this.element.querySelector('.img-viewer-panel-body-content'), this.ivViewerType);
+        this.fullScreenViewer$ = new iv_viewer__WEBPACK_IMPORTED_MODULE_2__["FullScreenViewer"](this.ivViewerType);
+        //this.showImg();
+    }
+    addImgRotate(isAnimation = true) {
+        let scale = '';
+        if (this.isVertical && this.isImgOverVertical()) {
+            scale = `scale(${this.getScale()})`;
+        }
+        const rotate = `rotate(${this.imgRotate}deg)`;
+        if (isAnimation) {
+            this.addTransition('iv-snap-image');
+            this.addTransition('iv-small-image');
+        }
+        this.setImgRotate('iv-snap-image', rotate, scale);
+        this.setImgRotate('iv-small-image', rotate, scale);
+        setTimeout(() => {
+            if (isAnimation) {
+                this.removeAnimation('iv-snap-image');
+                this.removeAnimation('iv-small-image');
+            }
+        }, 500);
+    }
+    beforeRotateImg() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.zoomValue = 100;
+            const time = this.imageViewer$._state.zoomValue - this.zoomValue;
+            yield this.imageViewer$.resetZoom();
+            yield this.imageViewer$.refresh();
+            return time === 0 ? 0 : 500;
+        });
+    }
+    beforeShowImg() {
+        this.imgRotate = 0;
+        this.isVertical = false;
+        const currentImg = this.element.querySelector('.iv-small-image');
+        if (!!currentImg) {
+            this.renderer.removeChild(this.element, currentImg);
+        }
+        this.setStyle('iv-loader', 'visibility', 'auto');
+        this.setStyle('options-image-viewer', 'visibility', 'inherit');
+    }
+    showImg() {
+        this.beforeShowImg();
+        this.imageViewer$.load(this.images[0]);
+    }
+    isImgOverVertical() {
+        const imgViewerHeight = this.element.clientHeight;
+        const currentImgWidth = this.element.querySelector('.iv-small-image').clientWidth;
+        return imgViewerHeight < currentImgWidth + 10;
+    }
+    getScale() {
+        const imgViewerHeight = this.element.querySelector('.img-viewer-panel-body-content').clientHeight;
+        const currentImgWidth = this.element.querySelector('.iv-small-image').clientWidth;
+        const differenceWidth = currentImgWidth - imgViewerHeight;
+        if (differenceWidth >= 250 && differenceWidth < 300) {
+            return differenceWidth / imgViewerHeight - 0.1;
+        }
+        else if (differenceWidth >= 300 && differenceWidth < 400) {
+            return differenceWidth / imgViewerHeight - 0.15;
+        }
+        else if (differenceWidth >= 400) {
+            return differenceWidth / imgViewerHeight - 0.32;
+        }
+        else if (differenceWidth < 0) {
+            return 1;
+        }
+        return 0.6;
+    }
+    addTransition(node) {
+        this.setStyle(node, 'transition', '0.5s linear');
+    }
+    removeAnimation(node) {
+        this.setStyle(node, 'transition', 'auto');
+    }
+    setImgRotate(node, roate, scale) {
+        this.setStyle(node, 'transform', `${roate} ${scale}`);
+    }
+    setStyle(node, name, value) {
+        const elements = this.doc.querySelectorAll(`.${node}`);
+        elements.forEach(ele => this.renderer.setStyle(ele, name, value));
+    }
+    ngOnDestroy() {
+        if (!!this.imageViewer$) {
+            this.imageViewer$ = this.imageViewer$.destroy();
+        }
+        if (!!this.fullScreenViewer$) {
+            this.fullScreenViewer$ = this.fullScreenViewer$.destroy();
+        }
+    }
+}
+ImgViewerComponent.ɵfac = function ImgViewerComponent_Factory(t) { return new (t || ImgViewerComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__["ElementRef"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__["Renderer2"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_image_viewer_config__WEBPACK_IMPORTED_MODULE_3__["ImgViewerConfig"], 8)); };
+ImgViewerComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: ImgViewerComponent, selectors: [["nz-picture-viewer"]], inputs: { imgViewerClass: "imgViewerClass", images: "images", showOperate: "showOperate", zoom: "zoom", rotate: "rotate", reset: "reset", fullscreen: "fullscreen", download: "download", defaultName: "defaultName" }, outputs: { prevChange: "prevChange", nextChange: "nextChange", closeViewer: "closeViewer" }, decls: 13, vars: 9, consts: [[1, "img-viewer-panel"], [1, "img-viewer-panel-header"], ["nz-row", ""], ["nz-col", "", "nzSpan", "3"], ["nz-icon", "", "nzType", "rollback", "nzTheme", "outline", 3, "click"], ["nz-col", "", "nzSpan", "21"], ["class", "img-viewer-panel-header-operation", 4, "ngIf"], [1, "img-viewer-panel-body"], [1, "img-viewer-panel-body-content"], ["class", "img-viewer-panel-body-prev", 3, "click", 4, "ngIf"], ["class", "img-viewer-panel-body-next", 3, "click", 4, "ngIf"], ["class", "img-viewer-panel-footer", 4, "ngIf"], [1, "img-viewer-panel-header-operation"], ["nz-tooltip", "", "nzPlacement", "bottom", 3, "nzTitle", "click", 4, "ngIf"], ["nz-tooltip", "", "nzPlacement", "bottom", 3, "nzTitle", "click"], ["nz-icon", "", "nzType", "zoom-in"], ["nz-icon", "", "nzType", "zoom-out"], ["nz-icon", "", "nzType", "undo"], ["nz-icon", "", "nzType", "redo"], ["nz-icon", "", "nzType", "sync"], ["nz-icon", "", "nzType", "fullscreen"], ["nz-icon", "", "nzType", "download"], [1, "img-viewer-panel-body-prev", 3, "click"], ["nz-icon", "", "nzType", "left"], [1, "img-viewer-panel-body-next", 3, "click"], ["nz-icon", "", "nzType", "right"], [1, "img-viewer-panel-footer"]], template: function ImgViewerComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "div", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "div", 2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](4, "div", 3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](5, "i", 4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ImgViewerComponent_Template_i_click_5_listener() { return ctx.closeImageViewer(); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](6, "div", 5);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](7, ImgViewerComponent_div_7_Template, 8, 7, "div", 6);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](8, "div", 7);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](9, "div", 8);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](10, ImgViewerComponent_span_10_Template, 2, 0, "span", 9);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](11, ImgViewerComponent_span_11_Template, 2, 0, "span", 10);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](12, ImgViewerComponent_div_12_Template, 2, 2, "div", 11);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    } if (rf & 2) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵclassMapInterpolate1"]("img-viewer ", ctx.imgViewerClass, "");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](7);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.showOperate);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵclassProp"]("img-viewer-panel-body-has-footer", ctx.images.length > 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.imgTotal > 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.imgTotal > 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.imgTotal > 1);
+    } }, directives: [ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_4__["NzRowDirective"], ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_4__["NzColDirective"], ng_zorro_antd_core_transition_patch__WEBPACK_IMPORTED_MODULE_5__["ɵNzTransitionPatchDirective"], ng_zorro_antd_icon__WEBPACK_IMPORTED_MODULE_6__["NzIconDirective"], _angular_common__WEBPACK_IMPORTED_MODULE_1__["NgIf"], ng_zorro_antd_tooltip__WEBPACK_IMPORTED_MODULE_7__["NzTooltipDirective"]], styles: [".img-viewer[_ngcontent-%COMP%] {\n  position: relative;\n  line-height: 1.5;\n  font-family: Consolas, Menlo, Courier, monospace;\n  text-align: left;\n  color: rgba(0, 0, 0, 0.65);\n  width: 100%;\n  height: 450px;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel[_ngcontent-%COMP%] {\n  width: 100%;\n  height: 100%;\n  font-size: 12px;\n  border: 1px solid none;\n  display: inline-block;\n  border-radius: 4px;\n  vertical-align: middle;\n  position: relative;\n  padding-top: 50px;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-header[_ngcontent-%COMP%] {\n  padding: 8px 12px;\n  height: 50px;\n  border-radius: 4px 4px 0 0;\n  border-bottom: 1px solid none;\n  overflow: hidden;\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  font-size: 24px;\n  line-height: 33px;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-header-pdf[_ngcontent-%COMP%] {\n  position: absolute;\n  left: 12px;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-header-operation[_ngcontent-%COMP%] {\n  position: absolute;\n  right: 12px;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-header-operation[_ngcontent-%COMP%]   span[_ngcontent-%COMP%] {\n  margin: 0 3px;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body[_ngcontent-%COMP%] {\n  height: 100%;\n  font-size: 12px;\n  position: relative;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body[_ngcontent-%COMP%]   .switch[_ngcontent-%COMP%], .img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body[_ngcontent-%COMP%]   .img-viewer-panel-body-next[_ngcontent-%COMP%], .img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body[_ngcontent-%COMP%]   .img-viewer-panel-body-prev[_ngcontent-%COMP%] {\n  position: absolute;\n  top: 50%;\n  transform: translate(0, -50%);\n  font-size: 24px;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body[_ngcontent-%COMP%]   .switch[_ngcontent-%COMP%]:hover, .img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body[_ngcontent-%COMP%]   .img-viewer-panel-body-next[_ngcontent-%COMP%]:hover, .img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body[_ngcontent-%COMP%]   .img-viewer-panel-body-prev[_ngcontent-%COMP%]:hover {\n  color: #cccccc;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body-prev[_ngcontent-%COMP%] {\n  left: 12px;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body-next[_ngcontent-%COMP%] {\n  right: 12px;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body-content[_ngcontent-%COMP%] {\n  padding: 0;\n  overflow: hidden;\n  height: 100%;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-body-has-footer[_ngcontent-%COMP%] {\n  padding-bottom: 50px;\n}\n.img-viewer[_ngcontent-%COMP%]   .img-viewer-panel-footer[_ngcontent-%COMP%] {\n  height: 50px;\n  border-radius: 0 0 4px 4px;\n  border-top: 1px solid none;\n  overflow: hidden;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  font-size: 16px;\n  text-align: center;\n  line-height: 50px;\n  background-color: #cacaca;\n}\n[_nghost-%COMP%]     .iv-loader {\n  border-top: 1.1em solid rgba(0, 0, 0, 0.7);\n  border-right: 1.1em solid rgba(36, 239, 43, 0.7);\n  border-bottom: 1.1em solid rgba(254, 202, 55, 0.7);\n  border-left: 1.1em solid rgba(254, 207, 219, 0.7);\n}\n[_nghost-%COMP%]     .iv-snap-view {\n  display: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInByb2plY3RzL3dlYkFwcC9zcmMvYXBwL2ltYWdlLXZpZXdlci9pbWFnZS12aWV3ZXIuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBTUE7RUFDRSxrQkFBQTtFQUNBLGdCQUFBO0VBQ0EsZ0RBQUE7RUFDQSxnQkFBQTtFQUNBLDBCQVRNO0VBVU4sV0FBQTtFQUNBLGFBQUE7QUFMRjtBQU9FO0VBQ0UsV0FaRztFQWFILFlBYkc7RUFjSCxlQWpCRztFQWtCSCxzQkFBQTtFQUNBLHFCQUFBO0VBQ0Esa0JBQUE7RUFDQSxzQkFBQTtFQUNBLGtCQUFBO0VBQ0EsaUJBQUE7QUFMSjtBQU9JO0VBQ0UsaUJBQUE7RUFDQSxZQUFBO0VBQ0EsMEJBQUE7RUFDQSw2QkFBQTtFQUNBLGdCQUFBO0VBQ0Esa0JBQUE7RUFDQSxNQUFBO0VBQ0EsT0FBQTtFQUNBLFdBL0JDO0VBZ0NELGVBQUE7RUFDQSxpQkFBQTtBQUxOO0FBT007RUFDRSxrQkFBQTtFQUNBLFVBQUE7QUFMUjtBQVFNO0VBQ0Usa0JBQUE7RUFDQSxXQUFBO0FBTlI7QUFRUTtFQUNFLGFBQUE7QUFOVjtBQVdJO0VBQ0UsWUFBQTtFQUNBLGVBdkRDO0VBd0RELGtCQUFBO0FBVE47QUFXTTtFQUNFLGtCQUFBO0VBQ0EsUUFBQTtFQUNBLDZCQUFBO0VBQ0EsZUFBQTtBQVRSO0FBV1E7RUFDRSxjQUFBO0FBVFY7QUFhTTtFQUVFLFVBQUE7QUFaUjtBQWVNO0VBRUUsV0FBQTtBQWRSO0FBaUJNO0VBQ0UsVUFBQTtFQUNBLGdCQUFBO0VBQ0EsWUFBQTtBQWZSO0FBa0JNO0VBQ0Usb0JBQUE7QUFoQlI7QUFvQkk7RUFDRSxZQUFBO0VBQ0EsMEJBQUE7RUFDQSwwQkFBQTtFQUNBLGdCQUFBO0VBQ0Esa0JBQUE7RUFDQSxTQUFBO0VBQ0EsT0FBQTtFQUNBLFdBQUE7RUFDQSxlQUFBO0VBQ0Esa0JBQUE7RUFDQSxpQkFBQTtFQUNBLHlCQUFBO0FBbEJOO0FBdUJBO0VBQ0UsMENBQUE7RUFDQSxnREFBQTtFQUNBLGtEQUFBO0VBQ0EsaURBQUE7QUFwQkY7QUF1QkE7RUFDRSxhQUFBO0FBcEJGIiwiZmlsZSI6InByb2plY3RzL3dlYkFwcC9zcmMvYXBwL2ltYWdlLXZpZXdlci9pbWFnZS12aWV3ZXIuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIkcHJlZml4OiAnaW1nLXZpZXdlcic7XHJcbiRzaXplOiAxMnB4O1xyXG4kY29sb3I6IHJnYmEoMCwgMCwgMCwgLjY1KTtcclxuJGJvcmRlckNvbG9yOiBub25lO1xyXG4kZnVsbDogMTAwJTtcclxuXHJcbi4jeyRwcmVmaXh9IHtcclxuICBwb3NpdGlvbjogcmVsYXRpdmU7XHJcbiAgbGluZS1oZWlnaHQ6IDEuNTtcclxuICBmb250LWZhbWlseTogQ29uc29sYXMsIE1lbmxvLCBDb3VyaWVyLCBtb25vc3BhY2U7XHJcbiAgdGV4dC1hbGlnbjogbGVmdDtcclxuICBjb2xvcjogJGNvbG9yO1xyXG4gIHdpZHRoOiAxMDAlO1xyXG4gIGhlaWdodDogNDUwcHg7XHJcblxyXG4gIC4jeyRwcmVmaXh9LXBhbmVsIHtcclxuICAgIHdpZHRoOiAkZnVsbDtcclxuICAgIGhlaWdodDogJGZ1bGw7XHJcbiAgICBmb250LXNpemU6ICRzaXplO1xyXG4gICAgYm9yZGVyOiAxcHggc29saWQgJGJvcmRlckNvbG9yO1xyXG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xyXG4gICAgYm9yZGVyLXJhZGl1czogNHB4O1xyXG4gICAgdmVydGljYWwtYWxpZ246IG1pZGRsZTtcclxuICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcclxuICAgIHBhZGRpbmctdG9wOiA1MHB4O1xyXG5cclxuICAgICYtaGVhZGVyIHtcclxuICAgICAgcGFkZGluZzogOHB4IDEycHg7XHJcbiAgICAgIGhlaWdodDogNTBweDtcclxuICAgICAgYm9yZGVyLXJhZGl1czogNHB4IDRweCAwIDA7XHJcbiAgICAgIGJvcmRlci1ib3R0b206IDFweCBzb2xpZCAkYm9yZGVyQ29sb3I7XHJcbiAgICAgIG92ZXJmbG93OiBoaWRkZW47XHJcbiAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcclxuICAgICAgdG9wOiAwO1xyXG4gICAgICBsZWZ0OiAwO1xyXG4gICAgICB3aWR0aDogJGZ1bGw7XHJcbiAgICAgIGZvbnQtc2l6ZTogMjRweDtcclxuICAgICAgbGluZS1oZWlnaHQ6IDMzcHg7XHJcblxyXG4gICAgICAmLXBkZiB7XHJcbiAgICAgICAgcG9zaXRpb246IGFic29sdXRlO1xyXG4gICAgICAgIGxlZnQ6IDEycHg7XHJcbiAgICAgIH1cclxuXHJcbiAgICAgICYtb3BlcmF0aW9uIHtcclxuICAgICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XHJcbiAgICAgICAgcmlnaHQ6IDEycHg7XHJcblxyXG4gICAgICAgIHNwYW4ge1xyXG4gICAgICAgICAgbWFyZ2luOiAwIDNweDtcclxuICAgICAgICB9XHJcbiAgICAgIH1cclxuICAgIH1cclxuXHJcbiAgICAmLWJvZHkge1xyXG4gICAgICBoZWlnaHQ6IDEwMCU7XHJcbiAgICAgIGZvbnQtc2l6ZTogJHNpemU7XHJcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcclxuXHJcbiAgICAgIC5zd2l0Y2gge1xyXG4gICAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcclxuICAgICAgICB0b3A6IDUwJTtcclxuICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgwLCAtNTAlKTtcclxuICAgICAgICBmb250LXNpemU6IDI0cHg7XHJcblxyXG4gICAgICAgICY6aG92ZXIge1xyXG4gICAgICAgICAgY29sb3I6ICNjY2NjY2M7XHJcbiAgICAgICAgfVxyXG4gICAgICB9XHJcblxyXG4gICAgICAmLXByZXYge1xyXG4gICAgICAgIEBleHRlbmQgLnN3aXRjaDtcclxuICAgICAgICBsZWZ0OiAxMnB4O1xyXG4gICAgICB9XHJcblxyXG4gICAgICAmLW5leHQge1xyXG4gICAgICAgIEBleHRlbmQgLnN3aXRjaDtcclxuICAgICAgICByaWdodDogMTJweDtcclxuICAgICAgfVxyXG5cclxuICAgICAgJi1jb250ZW50IHtcclxuICAgICAgICBwYWRkaW5nOiAwO1xyXG4gICAgICAgIG92ZXJmbG93OiBoaWRkZW47XHJcbiAgICAgICAgaGVpZ2h0OiAxMDAlO1xyXG4gICAgICB9XHJcblxyXG4gICAgICAmLWhhcy1mb290ZXIge1xyXG4gICAgICAgIHBhZGRpbmctYm90dG9tOiA1MHB4O1xyXG4gICAgICB9XHJcbiAgICB9XHJcblxyXG4gICAgJi1mb290ZXIge1xyXG4gICAgICBoZWlnaHQ6IDUwcHg7XHJcbiAgICAgIGJvcmRlci1yYWRpdXM6IDAgMCA0cHggNHB4O1xyXG4gICAgICBib3JkZXItdG9wOiAxcHggc29saWQgJGJvcmRlckNvbG9yO1xyXG4gICAgICBvdmVyZmxvdzogaGlkZGVuO1xyXG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XHJcbiAgICAgIGJvdHRvbTogMDtcclxuICAgICAgbGVmdDogMDtcclxuICAgICAgd2lkdGg6IDEwMCU7XHJcbiAgICAgIGZvbnQtc2l6ZTogMTZweDtcclxuICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xyXG4gICAgICBsaW5lLWhlaWdodDogNTBweDtcclxuICAgICAgYmFja2dyb3VuZC1jb2xvcjogI2NhY2FjYTtcclxuICAgIH1cclxuICB9XHJcbn1cclxuXHJcbjpob3N0IDo6bmctZGVlcCAuaXYtbG9hZGVyIHtcclxuICBib3JkZXItdG9wOiAxLjFlbSBzb2xpZCByZ2JhKDAsIDAsIDAsIDAuNyk7XHJcbiAgYm9yZGVyLXJpZ2h0OiAxLjFlbSBzb2xpZCByZ2JhKDM2LCAyMzksIDQzLCAwLjcpO1xyXG4gIGJvcmRlci1ib3R0b206IDEuMWVtIHNvbGlkIHJnYmEoMjU0LCAyMDIsIDU1LCAwLjcpO1xyXG4gIGJvcmRlci1sZWZ0OiAxLjFlbSBzb2xpZCByZ2JhKDI1NCwgMjA3LCAyMTksIDAuNyk7XHJcbn1cclxuXHJcbjpob3N0IDo6bmctZGVlcCAuaXYtc25hcC12aWV3e1xyXG4gIGRpc3BsYXk6IG5vbmU7XHJcbn0iXX0= */"] });
+/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](ImgViewerComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'nz-picture-viewer',
+                templateUrl: './image-viewer.component.html',
+                styleUrls: ['./image-viewer.component.scss']
+            }]
+    }], function () { return [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ElementRef"] }, { type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Renderer2"] }, { type: Document, decorators: [{
+                type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Inject"],
+                args: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["DOCUMENT"]]
+            }] }, { type: _image_viewer_config__WEBPACK_IMPORTED_MODULE_3__["ImgViewerConfig"], decorators: [{
+                type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Optional"]
+            }] }]; }, { imgViewerClass: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], images: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], showOperate: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], zoom: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], rotate: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], reset: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], fullscreen: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], download: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], defaultName: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], prevChange: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"]
+        }], nextChange: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"]
+        }], closeViewer: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"]
+        }] }); })();
+
+
+/***/ }),
+
+/***/ "./src/app/image-viewer/image-viewer.config.ts":
+/*!*****************************************************!*\
+  !*** ./src/app/image-viewer/image-viewer.config.ts ***!
+  \*****************************************************/
+/*! exports provided: ImgViewerConfig */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ImgViewerConfig", function() { return ImgViewerConfig; });
+class ImgViewerConfig {
+    constructor() {
+        this.ivViewerType = {
+            zoomValue: 100,
+            maxZoom: 500,
+            snapView: false,
+            refreshOnResize: true,
+            zoomOnMouseWheel: true,
+        };
+        this.imageViewerType = {
+            zoomInToolTip: 'Zoom in',
+            zoomOutToolTip: 'Zoom put',
+            rotateLeftToolTip: 'Rotate left',
+            rotateRightToolTip: 'Rotate right',
+            resetToolTip: 'Reset tools',
+            fullScreenToolTip: 'Full screen',
+            downloadToolTip: 'Download',
+        };
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/app/login/login.component.ts":
+/*!******************************************!*\
+  !*** ./src/app/login/login.component.ts ***!
+  \******************************************/
+/*! exports provided: LoginComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LoginComponent", function() { return LoginComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "../../node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var _angular_forms__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/forms */ "../../node_modules/@angular/forms/__ivy_ngcc__/fesm2015/forms.js");
+/* harmony import */ var ngx_kervi__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ngx-kervi */ "../../dist/ngx-kervi/fesm2015/ngx-kervi.js");
+/* harmony import */ var ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ng-zorro-antd/layout */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-layout.js");
+/* harmony import */ var ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ng-zorro-antd/grid */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-grid.js");
+/* harmony import */ var ng_zorro_antd_form__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ng-zorro-antd/form */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-form.js");
+/* harmony import */ var ng_zorro_antd_input__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ng-zorro-antd/input */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-input.js");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/common */ "../../node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
+/* harmony import */ var ng_zorro_antd_button__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ng-zorro-antd/button */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-button.js");
+/* harmony import */ var ng_zorro_antd_core_wave__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ng-zorro-antd/core/wave */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-core-wave.js");
+/* harmony import */ var ng_zorro_antd_core_transition_patch__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ng-zorro-antd/core/transition-patch */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-core-transition-patch.js");
+/* harmony import */ var ng_zorro_antd_icon__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ng-zorro-antd/icon */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-icon.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function LoginComponent_nz_form_explain_9_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "nz-form-explain");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1, "Please input your username!");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} }
+function LoginComponent_nz_form_explain_14_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "nz-form-explain");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1, "Please input your Password!");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} }
+function LoginComponent_nz_form_explain_19_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "nz-form-explain");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1, "Invalid user name or password");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} }
+function LoginComponent_ng_template_20_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "i", 11);
+} }
+function LoginComponent_ng_template_22_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "i", 12);
+} }
+class LoginComponent {
+    constructor(fb, kerviService) {
+        this.kerviService = kerviService;
+        this.invalidCredentials = false;
+        var self = this;
+        this.loginForm = fb.group({
+            'userName': ['', _angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].required],
+            'password': ['', _angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].required]
+        });
+        this.userName = this.loginForm.controls['userName'];
+        this.password = this.loginForm.controls['password'];
+    }
+    submitForm() {
+        var self = this;
+        if (this.loginForm.valid) {
+            console.log("fv");
+            this.kerviService.authenticate(this.userName.value, this.password.value)
+                .then(function () {
+                console.log("login ok");
+            }).catch(function () {
+                console.log("login error");
+                self.invalidCredentials = true;
+            });
+        }
+        else {
+            console.log("fve");
+            //   // for (const i in this.loginForm.controls) {
+            //   //   this.loginForm.controls[i].markAsDirty();
+            //   //   this.loginForm.controls[i].updateValueAndValidity();
+            //   // }
+        }
+    }
+    ngOnInit() {
+    }
+}
+LoginComponent.ɵfac = function LoginComponent_Factory(t) { return new (t || LoginComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormBuilder"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](ngx_kervi__WEBPACK_IMPORTED_MODULE_2__["NGXKerviService"])); };
+LoginComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: LoginComponent, selectors: [["app-login"]], decls: 24, vars: 7, consts: [[1, "kervi-app-initializing"], ["nz-row", ""], ["nz-col", "", "nzSpan", "12", "nzOffset", "6"], ["nz-form", "", 3, "formGroup", "ngSubmit"], [3, "nzPrefix"], ["formControlName", "userName", "nz-input", "", "placeholder", "Username"], [4, "ngIf"], ["formControlName", "password", "nz-input", "", "type", "password", "placeholder", "Password"], ["nz-button", "", "nzType", "primary", 3, "disabled"], ["prefixUser", ""], ["prefixLock", ""], ["nz-icon", "", "type", "user"], ["nz-icon", "", "type", "lock"]], template: function LoginComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "nz-layout");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "nz-content", 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "div", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "div", 2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](4, "form", 3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("ngSubmit", function LoginComponent_Template_form_ngSubmit_4_listener() { return ctx.submitForm(); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](5, "nz-form-item");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](6, "nz-form-control");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](7, "nz-input-group", 4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](8, "input", 5);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](9, LoginComponent_nz_form_explain_9_Template, 2, 0, "nz-form-explain", 6);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](10, "nz-form-item");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](11, "nz-form-control");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](12, "nz-input-group", 4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](13, "input", 7);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](14, LoginComponent_nz_form_explain_14_Template, 2, 0, "nz-form-explain", 6);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](15, "nz-form-item");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](16, "nz-form-control");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](17, "button", 8);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](18, "Log in");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](19, LoginComponent_nz_form_explain_19_Template, 2, 0, "nz-form-explain", 6);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](20, LoginComponent_ng_template_20_Template, 1, 0, "ng-template", null, 9, _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplateRefExtractor"]);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](22, LoginComponent_ng_template_22_Template, 1, 0, "ng-template", null, 10, _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplateRefExtractor"]);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    } if (rf & 2) {
+        const _r3 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵreference"](21);
+        const _r5 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵreference"](23);
+        var tmp_2_0 = null;
+        const currVal_2 = ((tmp_2_0 = ctx.loginForm.get("userName")) == null ? null : tmp_2_0.dirty) && ((tmp_2_0 = ctx.loginForm.get("userName")) == null ? null : tmp_2_0.errors);
+        var tmp_4_0 = null;
+        const currVal_4 = ((tmp_4_0 = ctx.loginForm.get("password")) == null ? null : tmp_4_0.dirty) && ((tmp_4_0 = ctx.loginForm.get("password")) == null ? null : tmp_4_0.errors);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("formGroup", ctx.loginForm);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzPrefix", _r3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", currVal_2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzPrefix", _r5);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", currVal_4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("disabled", !ctx.loginForm.valid);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.invalidCredentials);
+    } }, directives: [ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_3__["NzLayoutComponent"], ng_zorro_antd_layout__WEBPACK_IMPORTED_MODULE_3__["NzContentComponent"], ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_4__["NzRowDirective"], ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_4__["NzColDirective"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["ɵangular_packages_forms_forms_y"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["NgControlStatusGroup"], ng_zorro_antd_form__WEBPACK_IMPORTED_MODULE_5__["NzFormDirective"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormGroupDirective"], ng_zorro_antd_form__WEBPACK_IMPORTED_MODULE_5__["NzFormItemComponent"], ng_zorro_antd_form__WEBPACK_IMPORTED_MODULE_5__["NzFormControlComponent"], ng_zorro_antd_input__WEBPACK_IMPORTED_MODULE_6__["NzInputGroupComponent"], ng_zorro_antd_input__WEBPACK_IMPORTED_MODULE_6__["NzInputGroupWhitSuffixOrPrefixDirective"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["DefaultValueAccessor"], ng_zorro_antd_input__WEBPACK_IMPORTED_MODULE_6__["NzInputDirective"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["NgControlStatus"], _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormControlName"], _angular_common__WEBPACK_IMPORTED_MODULE_7__["NgIf"], ng_zorro_antd_button__WEBPACK_IMPORTED_MODULE_8__["NzButtonComponent"], ng_zorro_antd_core_wave__WEBPACK_IMPORTED_MODULE_9__["NzWaveDirective"], ng_zorro_antd_core_transition_patch__WEBPACK_IMPORTED_MODULE_10__["ɵNzTransitionPatchDirective"], ng_zorro_antd_icon__WEBPACK_IMPORTED_MODULE_11__["NzIconDirective"]], styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJwcm9qZWN0cy93ZWJBcHAvc3JjL2FwcC9sb2dpbi9sb2dpbi5jb21wb25lbnQuY3NzIn0= */"] });
+/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](LoginComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'app-login',
+                templateUrl: './login.component.html',
+                styleUrls: ['./login.component.css']
+            }]
+    }], function () { return [{ type: _angular_forms__WEBPACK_IMPORTED_MODULE_1__["FormBuilder"] }, { type: ngx_kervi__WEBPACK_IMPORTED_MODULE_2__["NGXKerviService"] }]; }, null); })();
+
+
+/***/ }),
+
+/***/ "./src/app/media/media.component.ts":
+/*!******************************************!*\
+  !*** ./src/app/media/media.component.ts ***!
+  \******************************************/
+/*! exports provided: MediaComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MediaComponent", function() { return MediaComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "../../node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var ngx_kervi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ngx-kervi */ "../../dist/ngx-kervi/fesm2015/ngx-kervi.js");
+/* harmony import */ var ng_zorro_antd__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ng-zorro-antd */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd.js");
+/* harmony import */ var _image_viewer_image_viewer_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../image-viewer/image-viewer.component */ "./src/app/image-viewer/image-viewer.component.ts");
+/* harmony import */ var ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ng-zorro-antd/grid */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-grid.js");
+/* harmony import */ var ng_zorro_antd_tree__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ng-zorro-antd/tree */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-tree.js");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/common */ "../../node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
+/* harmony import */ var ng_zorro_antd_empty__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ng-zorro-antd/empty */ "../../node_modules/ng-zorro-antd/__ivy_ngcc__/fesm2015/ng-zorro-antd-empty.js");
+// Copyright (c) 2019, Tim Wentzlau
+// Licensed under MIT
+
+
+
+
+
+
+
+
+
+
+const _c0 = ["nzTreeComponent"];
+const _c1 = ["imageViewer"];
+function MediaComponent_nz_empty_7_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](0, "nz-empty", 8);
+} }
+function MediaComponent_div_8_Template(rf, ctx) { if (rf & 1) {
+    const _r5 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 9);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("dblclick", function MediaComponent_div_8_Template_div_dblclick_0_listener() { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵrestoreView"](_r5); const file_r3 = ctx.$implicit; const ctx_r4 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"](); return ctx_r4.showImage(file_r3.key); });
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "img", 10);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const file_r3 = ctx.$implicit;
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵattribute"]("src", "data:image/png;base64," + file_r3.thumb, _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsanitizeUrl"]);
+} }
+class MediaComponent extends ngx_kervi__WEBPACK_IMPORTED_MODULE_1__["KerviDirectoryComponent"] {
+    constructor() {
+        super();
+        this.files = [];
+        this.showImageViewer = false;
+        this.directoryFiles = {};
+        this.nodes = [
+            { title: 'root', key: '/' }
+        ];
+        this.defaultExpandedKeys = [];
+    }
+    ngOnInit() {
+    }
+    nzEvent(event) {
+        console.log('trev', event);
+        const node = event.node;
+        if (event.eventName === 'click') {
+            this.files = [];
+            this.kerviService.GetDirectory(node.key).then(d => {
+                const files = d.files$.getValue();
+                for (const file of files) {
+                    if (file.isFile) {
+                        this.kerviService.GetThumbnail(file.path).then(t => {
+                            this.files.push({ title: file.name, key: file.path, thumb: t });
+                        });
+                    }
+                }
+            });
+        }
+        if (event.eventName === 'expand') {
+            if (node && node.getChildren().length === 0 && node.isExpanded) {
+                this.kerviService.GetDirectory(node.key).then(d => {
+                    const files = d.files$.getValue();
+                    const dirs = [];
+                    for (const file of files) {
+                        if (!file.isFile) {
+                            dirs.push({ title: file.name, key: file.path, isLeaf: false });
+                        }
+                    }
+                    node.addChildren(dirs);
+                });
+            }
+        }
+    }
+    showImage(filePath) {
+        this.showImageViewer = true;
+        this.imageViewer.imgTotal = this.files.length;
+        this.kerviService.GetFile(filePath).then(f => {
+            this.imageViewer.images = ['data:image/png;base64,' + f];
+            this.imageViewer.showImg();
+        });
+    }
+    nextImage(event) {
+        console.log("ni", event);
+        const filePath = this.files[this.imageViewer.currentImgIndex - 1].key;
+        this.kerviService.GetFile(filePath).then(f => {
+            this.imageViewer.images = ['data:image/png;base64,' + f];
+            this.imageViewer.showImg();
+        });
+    }
+    closeViewer() {
+        this.showImageViewer = false;
+    }
+}
+MediaComponent.ɵfac = function MediaComponent_Factory(t) { return new (t || MediaComponent)(); };
+MediaComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: MediaComponent, selectors: [["app-media"]], viewQuery: function MediaComponent_Query(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵviewQuery"](_c0, true);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵstaticViewQuery"](_c1, true);
+    } if (rf & 2) {
+        var _t;
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵloadQuery"]()) && (ctx.nzTreeComponent = _t.first);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵloadQuery"]()) && (ctx.imageViewer = _t.first);
+    } }, inputs: { files: "files", nodes: "nodes" }, features: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵInheritDefinitionFeature"]], decls: 9, vars: 6, consts: [[3, "hidden"], [3, "closeViewer", "prevChange", "nextChange"], ["imageViewer", ""], ["nz-col", "", "nzSpan", "8", 2, "max-height", "80%", "overflow-y", "auto"], ["nzAsyncData", "", 3, "nzData", "nzExpandedKeys", "nzClick", "nzExpandChange"], ["nz-col", "", "nzSpan", "16", 2, "min-height", "40px", "max-height", "300px", "overflow-y", "auto", "border-left", "1px solid black"], ["nzNotFoundContent", "No files in folder", 4, "ngIf"], ["style", "display: inline-block;margin-left:5px; margin-bottom:5px;", "nzHoverable", "", 3, "dblclick", 4, "ngFor", "ngForOf"], ["nzNotFoundContent", "No files in folder"], ["nzHoverable", "", 2, "display", "inline-block", "margin-left", "5px", "margin-bottom", "5px", 3, "dblclick"], ["alt", "example"]], template: function MediaComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "nz-picture-viewer", 1, 2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("closeViewer", function MediaComponent_Template_nz_picture_viewer_closeViewer_1_listener() { return ctx.closeViewer(); })("prevChange", function MediaComponent_Template_nz_picture_viewer_prevChange_1_listener($event) { return ctx.nextImage($event); })("nextChange", function MediaComponent_Template_nz_picture_viewer_nextChange_1_listener($event) { return ctx.nextImage($event); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "div", 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](4, "div", 3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](5, "nz-tree", 4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("nzClick", function MediaComponent_Template_nz_tree_nzClick_5_listener($event) { return ctx.nzEvent($event); })("nzExpandChange", function MediaComponent_Template_nz_tree_nzExpandChange_5_listener($event) { return ctx.nzEvent($event); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](6, "div", 5);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](7, MediaComponent_nz_empty_7_Template, 1, 0, "nz-empty", 6);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](8, MediaComponent_div_8_Template, 2, 1, "div", 7);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    } if (rf & 2) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("hidden", !ctx.showImageViewer);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](3);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("hidden", ctx.showImageViewer);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("nzData", ctx.nodes)("nzExpandedKeys", ctx.defaultExpandedKeys);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.files.length == 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngForOf", ctx.files);
+    } }, directives: [_image_viewer_image_viewer_component__WEBPACK_IMPORTED_MODULE_3__["ImgViewerComponent"], ng_zorro_antd_grid__WEBPACK_IMPORTED_MODULE_4__["NzColDirective"], ng_zorro_antd_tree__WEBPACK_IMPORTED_MODULE_5__["NzTreeComponent"], _angular_common__WEBPACK_IMPORTED_MODULE_6__["NgIf"], _angular_common__WEBPACK_IMPORTED_MODULE_6__["NgForOf"], ng_zorro_antd_empty__WEBPACK_IMPORTED_MODULE_7__["NzEmptyComponent"]], styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJwcm9qZWN0cy93ZWJBcHAvc3JjL2FwcC9tZWRpYS9tZWRpYS5jb21wb25lbnQuY3NzIn0= */"] });
+/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](MediaComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'app-media',
+                templateUrl: './media.component.html',
+                styleUrls: ['./media.component.css']
+            }]
+    }], function () { return []; }, { nzTreeComponent: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"],
+            args: ['nzTreeComponent']
+        }], imageViewer: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["ViewChild"],
+            args: ['imageViewer', { static: true }]
+        }], files: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }], nodes: [{
+            type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"]
+        }] }); })();
+
+
+/***/ }),
+
+/***/ "./src/environments/environment.ts":
+/*!*****************************************!*\
+  !*** ./src/environments/environment.ts ***!
+  \*****************************************/
+/*! exports provided: environment */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "environment", function() { return environment; });
+// This file can be replaced during build by using the `fileReplacements` array.
+// `ng build ---prod` replaces `environment.ts` with `environment.prod.ts`.
+// The list of file replacements can be found in `angular.json`.
+const environment = {
+    production: false
+};
+/*
+ * In development mode, to ignore zone related error stack frames such as
+ * `zone.run`, `zoneDelegate.invokeTask` for easier debugging, you can
+ * import the following file, but please comment it out in production mode
+ * because it will have performance impact when throw error
+ */
+// import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+
+
+/***/ }),
+
+/***/ "./src/main.ts":
+/*!*********************!*\
+  !*** ./src/main.ts ***!
+  \*********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "../../node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./environments/environment */ "./src/environments/environment.ts");
+/* harmony import */ var _app_app_module__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./app/app.module */ "./src/app/app.module.ts");
+/* harmony import */ var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/platform-browser */ "../../node_modules/@angular/platform-browser/__ivy_ngcc__/fesm2015/platform-browser.js");
+
+
+
+
+if (_environments_environment__WEBPACK_IMPORTED_MODULE_1__["environment"].production) {
+    Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["enableProdMode"])();
+}
+_angular_platform_browser__WEBPACK_IMPORTED_MODULE_3__["platformBrowser"]().bootstrapModule(_app_app_module__WEBPACK_IMPORTED_MODULE_2__["AppModule"])
+    .catch(err => console.log(err));
+
+
+/***/ }),
+
+/***/ 0:
+/*!***************************!*\
+  !*** multi ./src/main.ts ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! D:\dev\kervi\kervi\kervi-ui\kervi\ui\web\projects\webApp\src\main.ts */"./src/main.ts");
+
+
+/***/ })
+
+},[[0,"runtime","vendor"]]]);
+//# sourceMappingURL=main-es2015.js.map

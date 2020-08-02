@@ -18,7 +18,7 @@ import { KerviWidgetComponent } from './dashboard/kervi-widget.component';
 import { KerviUserLogComponent } from './user-log/user-log.component';
 import { KerviDirectoryComponent } from './files/kervi-directory.component';
 import { KerviAppHealthComponent } from './dashboard/app-health.component';
-
+import {  NGXKerviPipesModule } from '../lib/pipes/pipes.module'
 @NgModule({
   imports: [
   ],
@@ -56,7 +56,8 @@ import { KerviAppHealthComponent } from './dashboard/app-health.component';
     KerviCameraComponent,
     KerviUserLogComponent,
     KerviActionComponent,
-    KerviAppHealthComponent
+    KerviAppHealthComponent,
+    NGXKerviPipesModule
   ]
 })
 export class NgxKerviModule {

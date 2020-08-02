@@ -691,7 +691,7 @@
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
             "tsConfig": "projects/kervi-zorro/tsconfig.lib.json",
-            "project": "projects/kervi-zorro/ng-package.json"
+            "project": "projects/kervi-zorro/ng-package.json",
           },
           "configurations": {
             "production": {

@@ -121,7 +121,7 @@ export class  KerviSpineBase {
         for(var n = 0; (n < this.eventHandlers.length); n++)
         {
             let h = this.eventHandlers[n];
-            if (h.eventName === eventPath)
+            if (h.eventName === eventPath) 
                 h.callback.call(value,id,value);
             else if (h.eventName === eventName)
                 h.callback.call(value,id,value);
