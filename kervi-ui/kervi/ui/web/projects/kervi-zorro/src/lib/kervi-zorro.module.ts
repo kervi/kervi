@@ -7,6 +7,7 @@ import { WidgetComponent } from './widget/widget.component';
 import {  ValuesModule } from './values/values.module';
 
 import { ControllerPadComponent } from './controller-pad/controller-pad.component';
+import { NipplePadComponent } from './nipple-pad/nipple-pad.component';
 import { CamViewerComponent } from './cam-viewer/cam-viewer.component';
 import { ActionComponent } from './action/action.component';
 import { UIComponentsModule} from './ui-components/ui-components.module';
@@ -24,7 +25,6 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     NgZorroAntdModule,
     FlexLayoutModule,
     UIComponentsModule
-    
   ],
   declarations: [
     DashboardPanelComponent,
@@ -35,7 +35,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     UserLogComponent,
     UserMessageButtonComponent,
     UserMessagesComponent,
-    AppHealthComponent
+    AppHealthComponent,
+    NipplePadComponent
   ],
   exports: [
     DashboardPanelComponent,
@@ -44,7 +45,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     UserLogComponent,
     UserMessageButtonComponent,
     UserMessagesComponent,
-    AppHealthComponent
+    AppHealthComponent,
+    NipplePadComponent
   ]
 })
 export class KerviZorroModule { }

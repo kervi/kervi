@@ -183,6 +183,7 @@ class _SpineProtocol(WebSocketServerProtocol):
         WebSocketServerProtocol.__init__(self)
         self.handlers = {"command":[], "query":[], "event":[], "stream":[]}
         self.authenticated = False
+        self.isConnected = False
         self.session = None
         self.user = None
         self._authorization = Authorization()
@@ -190,9 +191,9 @@ class _SpineProtocol(WebSocketServerProtocol):
     @classmethod
     def broadcast_message(cls, connection, data, is_binary=False):
         #for c in set(cls.connections):
-        cls.loop.call_soon_threadsafe(cls.sendMessage, connection, data, is_binary)
+        if connection.isConnected:
+            cls.loop.call_soon_threadsafe(cls.sendMessage, connection, data, is_binary)
         
-
     def add_command_handler(self, command):
         found = False
         for command_handler in self.handlers["command"]:
@@ -242,6 +243,8 @@ class _SpineProtocol(WebSocketServerProtocol):
             self.handlers["stream"].remove(found_handler)
 
     def send_response(self, id, response, state="ok", message=""):
+        if not self.isConnected:
+            return
         res = {
             "id":id,
             "messageType":"response",
@@ -252,7 +255,14 @@ class _SpineProtocol(WebSocketServerProtocol):
         jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
         self.sendMessage(jsonres, False)
 
+    
+    def onClose(self, wasClean, code, reason):
+        print("onClose", wasClean, code, reason)
+        self.isConnected = False
+        self.handlers = {"command":[], "query":[], "event":[], "stream":[]}
+    
     def onConnect(self, request):
+        self.isConnected = True
         pass
     
     def onOpen(self):

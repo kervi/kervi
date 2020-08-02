@@ -14,3 +14,4 @@ export * from './lib/log/messages/messages.component';
 export * from './lib/log/user-log/user-log.component';
 
 export { DashboardPanelComponent } from './lib/dashboard-panel/dashboard-panel.component';
+export { NipplePadComponent } from './lib/nipple-pad/nipple-pad.component'

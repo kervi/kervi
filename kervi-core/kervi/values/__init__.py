@@ -244,7 +244,7 @@ class NumberValue(KerviValue):
             elif len(self._sparkline) >= 10:
                 self._sparkline.pop(0)
             self._sparkline += [{"timestamp":timestamp, "value":new_value}]
-            self._last_reading = time.clock()
+            self._last_reading = time.process_time()
 
             
             val = {
@@ -579,7 +579,7 @@ class EnumValue(KerviValue):
             self.settings.store_value("value", self.value)
 
         #timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-        self._last_reading = time.clock()
+        self._last_reading = time.process_time()
 
         #val = {"value_id":self.component_id, "value":new_value, "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
         

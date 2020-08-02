@@ -7,13 +7,13 @@
           </div>
         <div nz-col nzSpan="21">
           <div *ngIf="showOperate" class="img-viewer-panel-header-operation">
-            <span nz-tooltip nzPlacement="bottom" [nzTitle]="imageViewerType.zoomInToolTip" *ngIf="zoom" (click)="zoomInImg()"><i nz-icon nzType="zoom-in"></i></span>
-            <span nz-tooltip nzPlacement="bottom" [nzTitle]="imageViewerType.zoomOutToolTip" *ngIf="zoom" (click)="zoomOutImg()"><i nz-icon nzType="zoom-out"></i></span>
-            <span nz-tooltip nzPlacement="bottom" [nzTitle]="imageViewerType.rotateLeftToolTip" *ngIf="rotate" (click)="rotateImg(false)"><i nz-icon nzType="undo"></i></span>
-            <span nz-tooltip nzPlacement="bottom" [nzTitle]="imageViewerType.rotateRightToolTip" *ngIf="rotate" (click)="rotateImg(true)"><i nz-icon nzType="redo"></i></span>
-            <span nz-tooltip nzPlacement="bottom" [nzTitle]="imageViewerType.resetToolTip" *ngIf="reset" (click)="showImg()"><i nz-icon nzType="sync"></i></span>
-            <span nz-tooltip nzPlacement="bottom" [nzTitle]="imageViewerType.fullScreenToolTip" *ngIf="fullscreen" (click)="fullscreenImg()"><i nz-icon nzType="fullscreen"></i></span>
-            <span nz-tooltip nzPlacement="bottom" [nzTitle]="imageViewerType.downloadToolTip" *ngIf="download" (click)="downloadImg()"><i nz-icon nzType="download"></i></span>
+            <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="imageViewerType.zoomInToolTip" *ngIf="zoom" (click)="zoomInImg()"><i nz-icon nzType="zoom-in"></i></span>
+            <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="imageViewerType.zoomOutToolTip" *ngIf="zoom" (click)="zoomOutImg()"><i nz-icon nzType="zoom-out"></i></span>
+            <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="imageViewerType.rotateLeftToolTip" *ngIf="rotate" (click)="rotateImg(false)"><i nz-icon nzType="undo"></i></span>
+            <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="imageViewerType.rotateRightToolTip" *ngIf="rotate" (click)="rotateImg(true)"><i nz-icon nzType="redo"></i></span>
+            <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="imageViewerType.resetToolTip" *ngIf="reset" (click)="showImg()"><i nz-icon nzType="sync"></i></span>
+            <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="imageViewerType.fullScreenToolTip" *ngIf="fullscreen" (click)="fullscreenImg()"><i nz-icon nzType="fullscreen"></i></span>
+            <span nz-tooltip nzTooltipPlacement="bottom" [nzTooltipTitle]="imageViewerType.downloadToolTip" *ngIf="download" (click)="downloadImg()"><i nz-icon nzType="download"></i></span>
           </div>
       </div>
       </div>

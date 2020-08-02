@@ -53,11 +53,11 @@
 			</div>
 		</ng-container>
 		<kervi-cam-viewer *ngIf="cameraId" [isBackground]="true" [cameraId]="(cameraId$| async)" [linkParameters]="cameraParameters"></kervi-cam-viewer>
-		<div #leftPad class="kervi-controller-pad" *ngIf="showLeftPad" [style.left.px]="leftPadLeft" [style.top.px]="leftPadTop" >
-			<kervi-controller-pad [autoCenter]="autoCenterLeftPad" [XValue]="leftPadXValue" [YValue]="leftPadYValue"></kervi-controller-pad>
+		<div #leftPad class="kervi-controller-pad" *ngIf="showLeftPad" [style.left.px]="0" [style.top.px]="65" [style.bottom.px]="65" [style.right.%]="66" >
+			<kervi-nipple-pad [autoCenter]="autoCenterLeftPad" [XValue]="leftPadXValue" [YValue]="leftPadYValue" style="width: 100%; height: 100%;"></kervi-nipple-pad>
 		</div>
-		<div #rightPad class="kervi-controller-pad" *ngIf="showRightPad" [style.left.px]="rightPadLeft" [style.top.px]="rightPadTop" >
-			<kervi-controller-pad [autoCenter]="autoCenterRightPad" [XValue]="rightPadXValue" [YValue]="rightPadYValue"></kervi-controller-pad>
+		<div #rightPad class="kervi-controller-pad" *ngIf="showRightPad" [style.left.%]="66" [style.top.px]="65" [style.bottom.px]="65" [style.right.px]="0" >
+			<kervi-nipple-pad [autoCenter]="autoCenterRightPad" [XValue]="rightPadXValue" [YValue]="rightPadYValue" style="width: 100%; height: 100%;"></kervi-nipple-pad>
 		</div>
 
 		<div class="kervi-panels" fxLayout=" column" fxLayout.xs="column" fxLayoutGap="0.5%" fxLayoutAlign=""  *ngIf="!dashboardPanelsHidden" style="">
