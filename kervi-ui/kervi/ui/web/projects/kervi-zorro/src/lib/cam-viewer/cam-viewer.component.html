@@ -9,8 +9,8 @@
 		</span>
 		<canvas id="camCanvas" style="position:absolute;top:0px;left:0px;" [style.height.px]="camHeight" [style.width.px]="camWidth"></canvas>
 		<canvas id="poiCanvas" style="position:absolute;top:0px;left:0px;width:100%;height:100%"></canvas>
-		<div class="cam-pad-area" *ngIf="showCamPad" [style.left.px]="camPadLeft" [style.top.px]="camPadTop" style="position:absolute;z-index: 2000">
-      <kervi-controller-pad [XValue]="pan" [YValue]="tilt"> </kervi-controller-pad>
+		<div class="cam-pad-area" *ngIf="showCamPad" [style.left.%]="33" [style.top.px]="0" [style.bottom.px]="0" [style.right.%]="33" style="position:absolute;z-index: 2000">
+			<kervi-nipple-pad [XValue]="pan" [YValue]="tilt"> </kervi-nipple-pad>
 		</div>
 		<div style="position:absolute;top:30px;left:0px;width:100%;height:50px">
 			<ng-container  *ngFor="let action of camera.actions">
@@ -27,8 +27,8 @@
 		</span>
 		<canvas id="camCanvas" style="position:absolute;top:0px;left:0px;width:100%;height:100%"></canvas>
 		<canvas id="poiCanvas" style="position:absolute;top:0px;left:0px;width:100%;height:100%"></canvas>
-		<div class="cam-pad-area" *ngIf="showCamPad" [style.left.px]="camPadLeft" [style.top.px]="camPadTop" style="position:absolute">
-      <kervi-controller-pad [XValue]="pan" [YValue]="tilt"> </kervi-controller-pad>
+		<div class="cam-pad-area" *ngIf="showCamPad" [style.left.px]="0" [style.top.px]="0" [style.bottom.px]="0" [style.right.px]="0" style="position:absolute">
+     		<kervi-nipple-pad [XValue]="pan" [YValue]="tilt" [mode]="'static'"> </kervi-nipple-pad>
 		</div>
 	</div>
 	<div>
