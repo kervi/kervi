@@ -25,10 +25,12 @@ setup(
     """,
     packages=[
         "kervi/platforms/windows",
+        "kervi/platforms/windows/pygrabber"
     ],
     install_requires=[
         'psutil',
-        'inputs'
+        'inputs',
+        'comtypes'
     ],
 
 )

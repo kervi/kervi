@@ -22,8 +22,14 @@ def get_user_inputs():
     return inputs.devices
 
 def detect_devices():
+    from kervi.platforms.windows.pygrabber.PyGrabber import PyGrabber
+    grabber = PyGrabber(None)
+    cams = grabber.get_devices()
+         
+    
     import inputs
     input_devices = {}
+
     for device in inputs.devices:
         type = None
         if isinstance(device, inputs.Keyboard):
@@ -50,5 +56,6 @@ def detect_devices():
             "name": platform.system(),
             "model": platform.release(),
         }],
-        "inputs": input_devices
+        "inputs": input_devices,
+        "cams": cams
     }
