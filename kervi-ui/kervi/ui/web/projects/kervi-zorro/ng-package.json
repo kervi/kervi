@@ -3,6 +3,10 @@
   "dest": "../../dist/kervi-zorro",
   "deleteDestPath": false,
   "lib": {
-    "entryFile": "src/public_api.ts"
+    "entryFile": "src/public_api.ts",
+    "umdModuleIds": {
+      "kervi-js": "kervi-js",
+      "ngx-kervi": "ngx-kervi"
+    }
   }
 }
