@@ -1,8 +1,9 @@
 <ng-container *ngIf="widgetType=='value'">
     <div fxLayout="row" *ngIf="!inline" class="kervi-block-widget"> 
         <div fxFlex="60" class="kervi-value-label">
-            <span   *ngIf="linkParameters.labelIcon" class="pi pi-{{linkParameters.labelIcon}}"></span>
-            <span   *ngIf="linkParameters.label">{{linkParameters.label}}</span>
+            <!-- <i nz-icon nzType="bulb" nzTheme="outline"></i> -->
+            <i nz-icon  *ngIf="linkParameters.labelIcon" [nzType]="linkParameters.labelIcon"></i>
+            <span  *ngIf="linkParameters.label">{{linkParameters.label}}</span>
         </div>
         
         <div fxFlex class="kervi-value-section">
@@ -14,7 +15,7 @@
 
     <div *ngIf="inline" class="kervi-inline-widget">
         <div class="kervi-value-label"> 
-            <span style="display:inline"  *ngIf="linkParameters.labelIcon" class="fa fa-{{linkParameters.labelIcon}}"></span>
+            <i nz-icon style="display:inline"  *ngIf="linkParameters.labelIcon" [nzType]="linkParameters.labelIcon"></i>
             <span style="display:inline"  *ngIf="linkParameters.label"  >{{linkParameters.label}}</span>
         </div>
         <div class="kervi-value-section">

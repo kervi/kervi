@@ -77,24 +77,48 @@ export class KerviChartComponent implements OnInit {
 
       title: {
           text: this.linkParameters.chartTitle,
-          align: 'left'
+          align: 'left',
+          style: {
+            color: this.color("color",".kervi-chart-axis")//"#6c757d ",
+          }
         },
       markers: {
           size: 0
         },
       xaxis: {
           type: 'datetime',
+          labels: {
+            
+            style: {
+              colors: this.color("color",".kervi-chart-axis")//"#6c757d ",
+            }
+          },
+          axisBorder: {
+            show: true,
+            color: this.color("color",".kervi-chart-axis"),
+            height: 1,
+            width: '100%',
+            offsetX: 0,
+            offsetY: 0
+        }
           //range: 1552983230 - 300,
       },
       yaxis: {
           max: this.value.maxValue,
-          min:this.value.minValue
+          min:this.value.minValue,
+          labels: {
+            
+            style: {
+              colors: this.color("color",".kervi-chart-axis"),
+            }
+          },
         },
       legend: {
           show: false
       },
       grid: {
         show: this.linkParameters.chartGrid,
+        borderColor: this.color("color",".kervi-chart-grid"),
         xaxis: {
           lines: {
             show: true,
@@ -108,7 +132,7 @@ export class KerviChartComponent implements OnInit {
           }
         }
       },
-      colors: [this.color("color",".kervi-chart")],// ['#9fd037'],
+      colors: [this.color("color",".kervi-chart-line")],// ['#9fd037'],
       series: this.series
     }
   

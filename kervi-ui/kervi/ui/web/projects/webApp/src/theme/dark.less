@@ -38,15 +38,15 @@
 // ---
 
 // Background color for `<body>`
-@body-background: #eaeff2;
+@body-background: #3e4d56;
 // Base background color for most components
-@component-background: #f5f8f9;
+@component-background: #3a4346;
 @font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
   'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif,
   'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 @code-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-@heading-color: #2d353c;
-@text-color: #2d353c;
+@heading-color: #6c757d;
+@text-color: #b6babd;
 @text-color-secondary: fade(@black, 45%);
 @text-color-inverse: @white;
 @icon-color-hover: fade(@black, 75%);
@@ -104,7 +104,7 @@
 
 // Border color
 @border-color-base: #dce2e7;//hsv(0, 0, 85%); // base border outline a component
-@border-color-split: hsv(0, 0, 91%); // split border inside a component
+@border-color-split: #6e7a7d; //hsv(0, 0, 91%); // split border inside a component
 @border-color-inverse: @white;
 @border-width-base: 1px; // width of the border for a component
 @border-style-base: solid; // style of a components border
@@ -228,8 +228,8 @@
 
 // Layout
 @layout-body-background: #f0f2f5;
-@layout-header-background: #f5f8f9;
-@layout-footer-background: @layout-body-background;
+@layout-header-background: #3a4346;
+@layout-footer-background: #3a4346;// @layout-body-background;
 @layout-header-height: 42px;
 @layout-header-padding: 0 50px;
 @layout-footer-padding: 24px 50px;
@@ -417,14 +417,14 @@
 
 // Card
 // ---
-@card-head-color: #2d353c;
-@card-head-background: #f5f8f9;
+@card-head-color: #e9edf1;
+@card-head-background: #ffffff14;
 @card-head-padding: 8px;
 @card-inner-head-padding: 12px;
 @card-padding-base: 24px;
 @card-padding-wider: 32px;
 @card-actions-background: #fff;
-@card-background: #cfd8dc;
+@card-background: #27343a;
 @card-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
 @card-radius: @border-radius-sm;
 
@@ -590,7 +590,13 @@
 @kervi-widget-border-bottom:1px solid @border-color-split;
 @kervi-main-menu-icon-size: 24px;
 
-@kervi-chart-color: @primary-color;
+@kervi-chart-line-color: @primary-color;
+@kervi-chart-axis-color: @text-color;
+
+@kervi-gauge-color: @primary-color;
+@kervi-gauge-background-color: @text-color;
+@kervi-gauge-text-color: @text-color;
+
 
 @kervi-sparkline-color: @primary-color;
 

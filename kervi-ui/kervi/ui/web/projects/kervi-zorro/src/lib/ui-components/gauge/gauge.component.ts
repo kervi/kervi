@@ -51,18 +51,22 @@ export class GaugeComponent implements OnInit {
           dataLabels: {
             name: {
               show: true,
-              color: "#2d353c",
+              color: this.color("color",".kervi-gauge-text"),
               fontSize:"14px"
             },
             value: {
               fontSize: "24px",
+              color: this.color("color",".kervi-gauge-text"),
               show: true
             }
           }
         } 
       },
-      colors: [this.color("color",".kervi-chart")],// ['#9fd037'],
+      colors: [this.color("color",".kervi-gauge")],// ['#9fd037'],
       series: this.series,
+      stroke: {
+        lineCap: "round"
+      },
       labels: [this.value.name],
 
     }
