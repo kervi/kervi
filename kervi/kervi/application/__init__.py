@@ -314,7 +314,8 @@ class Application(object):
         self._webserver_info = webserver_info
         ready_message = "Reach your application at http://" + self._webserver_info["ip"] + ":" + str(self._webserver_info["port"])
         self.spine.log.info(ready_message)
-        self._websocket_event.wait()
+        #self._websocket_event.wait()
+        time.sleep(2)
         self.spine.send_command("startWebSocket")
 
     def _websocket_ready(self, scope, info):

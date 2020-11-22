@@ -257,7 +257,6 @@ class _SpineProtocol(WebSocketServerProtocol):
 
     
     def onClose(self, wasClean, code, reason):
-        print("onClose", wasClean, code, reason)
         self.isConnected = False
         self.handlers = {"command":[], "query":[], "event":[], "stream":[]}
     
@@ -414,6 +413,7 @@ class SocketSpine:
 
     def start_socket(self):
         try:
+            self._spine.log.verbose("starting websocket: {0} {1} ", self._config.network.ip, self._config.network.ws_port)
             self.loop.run_until_complete(self.coro)
             time.sleep(2)
             self._started = True

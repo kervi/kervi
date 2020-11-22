@@ -15,6 +15,7 @@ class WebSocketIPCPlugin(KerviPlugin):
         )
         
     def _start_socket(self):
+        print("sc")
         self._socket_spine.start_socket()
 
     def process_step(self):
