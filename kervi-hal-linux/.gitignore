@@ -1,0 +1,3 @@
+*.pyc
+dist
+kervi_hal_linux.egg-info/

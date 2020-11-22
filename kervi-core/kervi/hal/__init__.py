@@ -21,7 +21,7 @@ def _load(hw_platform="auto"):
     if not _DRIVER:
         hal_modules = {
             "windows": "kervi.platforms.windows",
-            #"linux": "kervi.platforms.linux",
+            "linux": "kervi.platforms.linux",
             #"darwin": "kervi.platforms.linux",
             "linux(rpi)": "kervi.platforms.raspberry",
             "generic": "kervi.platforms.generic",
