@@ -6,10 +6,10 @@
 
 </nz-switch>
 <ng-template #checkedTemplate>
-    <i *ngIf="linkParameters.onIcon"  nz-icon [type]="linkParameters.onIcon"></i>
+    <i *ngIf="linkParameters.onIcon"  nz-icon [nzType]="linkParameters.onIcon"></i>
     <span >{{ linkParameters.onText }}</span>
 </ng-template>
 <ng-template #unCheckedTemplate>
-    <i *ngIf="linkParameters.offIcon"  nz-icon [type]="linkParameters.offIcon"></i>
+    <i *ngIf="linkParameters.offIcon"  nz-icon [nzType]="linkParameters.offIcon"></i>
     <span >{{ linkParameters.offText }}</span>
 </ng-template>

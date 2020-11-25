@@ -1,6 +1,11 @@
 <ng-template #buttonContentTemplate>
-    <i *ngIf="linkParameters.buttonIcon" nz-icon [type]="linkParameters.buttonIcon"></i>
-    {{ linkParameters.buttonText }}
+    <i *ngIf="!linkParameters.buttonIcon && linkParameters.onIcon && value.value" nz-icon [nzType]="linkParameters.onIcon"></i>
+    <i *ngIf="!linkParameters.buttonIcon && linkParameters.offIcon && !value.value" nz-icon [nzType]="linkParameters.offIcon"></i>
+    <i *ngIf="linkParameters.buttonIcon" nz-icon [nzType]="linkParameters.buttonIcon"></i>
+    <span *ngIf="linkParameters.buttonText">{{ linkParameters.buttonText }}</span>
+    <span *ngIf="!linkParameters.buttonText && linkParameters.onText && value.value">{{ linkParameters.onText }}</span>
+    <span *ngIf="!linkParameters.buttonText && linkParameters.offText && !value.value">{{ linkParameters.offText }}</span>
+
 </ng-template>
 <button
     *ngIf = "linkParameters.confirm"
