@@ -1,7 +1,7 @@
 <ng-container *ngIf="linkParameters.isInput">
     
     <nz-form-control >
-        <nz-slider [nzMin]="value.minValue" [nzMax]="value.maxValue" [nzStep]="1"  [(ngModel)]="value.value"></nz-slider>
+        <span (mousedown)="sliderMouseDown()" (mouseup)="sliderMouseUp()"><nz-slider [nzMin]="value.minValue" [nzMax]="value.maxValue" [nzStep]="1"  [(ngModel)]="value.value" ></nz-slider></span>
         <nz-input-number id="{{value.id}}" [nzMin]="value.minValue" [nzMax]="value.maxValue" [nzStep]="1" [(ngModel)]="value.value"  ></nz-input-number>
         
     </nz-form-control>

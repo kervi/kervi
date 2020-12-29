@@ -638,13 +638,15 @@ class ColorValue(KerviValue):
             raise ValueError("invalid color value:" + str(new_value))
 
     def _set_value(self, new_value):
-        if isinstance(new_value, str) and new_value[0]=="#":
-            #self._set_value(new_value)
+        if new_value == None:
+            pass
+        elif isinstance(new_value, str) and len(new_value) == 0:
+            pass
+        elif isinstance(new_value, str) and len(new_value)>0 and new_value[0]=="#":
             KerviValue._set_value(self, new_value)
         elif isinstance(new_value, list) and len(new_value)==3:
             value = '#%02x%02x%02x' % (new_value[0], new_value[1], new_value[2])
             KerviValue._set_value(self, value)
-            #self._set_value(value)
         elif isinstance(new_value, tuple) and len(new_value):
             value = '#%02x%02x%02x' % new_value
             KerviValue._set_value(self, value)

@@ -165,7 +165,7 @@ class KerviValue(KerviComponent):
     def _load_persisted(self):
         if self._persist_value:
             value = self.settings.retrieve_value("value", self._default_value)
-            self._set_value(value, False)
+            self._set_value(value)
 
     def link_to(self, source, transformation=None):
         """

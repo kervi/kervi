@@ -313,7 +313,8 @@ class _SpineProtocol(WebSocketServerProtocol):
                         "session":session,
                     }
                 jsonres = json.dumps(res, ensure_ascii=False).encode('utf8')
-                self.sendMessage(jsonres, False)
+                if self.isConnected:
+                    self.sendMessage(jsonres, False)
             elif obj["messageType"] == "logoff":
                 self.authenticated = False
                 self.session = None

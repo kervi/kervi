@@ -16,4 +16,12 @@ export class NumberComponent extends KerviNumberComponent implements OnInit {
 	ngOnInit() {
 		this.ngOnInitNumber();
 	}
+	sliderMouseDown(){
+		console.log("md");
+
+	}
+
+	sliderMouseUp(){
+		console.log("mu");
+	}
 }

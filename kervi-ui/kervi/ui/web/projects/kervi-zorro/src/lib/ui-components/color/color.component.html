@@ -1,3 +1,10 @@
 <div style="max-width:90px" class="input-group">
-    <div  [attr.background.value]="colorValue" class="form-control color"></div>
+    <input 
+    [value]="colorValue"
+    [(colorPicker)]="colorValue"
+    [style.background]="colorValue"
+    [cpOKButton]="true"
+    [cpSaveClickOutside]="false"
+    [cpAlphaChannel]="'disabled'"
+    (colorPickerChange)="onChangeColor($event)"/>
 </div>
