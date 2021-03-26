@@ -30,7 +30,8 @@ setup(
     install_requires=[
         'psutil',
         'inputs',
-        'comtypes'
+        'comtypes',
+        'numpy'
     ],
 
 )

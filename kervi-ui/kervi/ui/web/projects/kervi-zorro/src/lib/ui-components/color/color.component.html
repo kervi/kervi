@@ -1,5 +1,5 @@
-<div style="max-width:90px" class="input-group">
-    <input 
+<nz-form-control >
+    <input nz-input
     [value]="colorValue"
     [(colorPicker)]="colorValue"
     [style.background]="colorValue"
@@ -7,4 +7,4 @@
     [cpSaveClickOutside]="false"
     [cpAlphaChannel]="'disabled'"
     (colorPickerChange)="onChangeColor($event)"/>
-</div>
+</nz-form-control>

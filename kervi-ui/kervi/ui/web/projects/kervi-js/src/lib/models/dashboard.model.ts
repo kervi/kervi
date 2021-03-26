@@ -299,7 +299,10 @@ export class Dashboard implements IComponent{
         }
     }
     public isEmpty(){
-        return this.panels.length == 0;
+        if (this.panels.length == 1 && this.panels[0].components.length === 0 && this.panels[0].subPanels.length === 0) {
+            return true;
+        }
+        return false;
     }
     removeReferences(deleteComponents:IComponent[]){};
     updateReferences(){};

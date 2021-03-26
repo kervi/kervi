@@ -13,14 +13,10 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class ColorComponent implements OnInit {
     public colorValue:string;
-    @Input() set color(v:string){
-        console.log("cc", v, this.picker);
-        
+    @Input() set color(v:string) {
         if (v){
             this.colorValue = v;
         }
-    
-            
   };
   @Output() colorChange = new EventEmitter()
   @Input() linkParameters:any;
@@ -56,5 +52,4 @@ export class ColorComponent implements OnInit {
         self.colorChange.emit(color);
     }, 200);
   }
-
 }

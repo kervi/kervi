@@ -13,7 +13,7 @@ export class KerviDashboardComponent {
   protected kerviService: NGXKerviService;
   protected dashboards: Dashboard[] = null;
   protected dashboardSizes: DashboardSizes = null;
-  protected isAppEmpty = true;
+  public isAppEmpty = true;
   public showMenu = false;
   public dashboardPanelsHidden = false;
   public showPanelController = false;
@@ -105,7 +105,32 @@ export class KerviDashboardComponent {
   }
 
   toggleFullScreen() {
-    console.log("fs", this.inFullScreen);
+    var doc: any;
+    doc = document;
+    var el = doc.body;
+
+    // Supports most browsers and their versions.
+    var requestMethod = el.requestFullScreen || el.webkitRequestFullScreen 
+    || el.mozRequestFullScreen || el.msRequestFullScreen;
+
+
+    if ((doc.fullscreenElement && doc.fullScreenElement !== null))   {
+      console.log("in full screen");
+      doc.exitFullscreen();
+      this.inFullScreen = false;
+    } else if (requestMethod) {
+
+      // Native full screen.
+      requestMethod.call(el);
+      this.inFullScreen = true;
+    }
+  }
+
+  toggleFullScreenx() {
+    var doc:any;
+    doc = document;
+    
+    console.log("fs", this.inFullScreen, doc.documentElement.requestFullScreen);
     var doc:any;
     doc = document;
     if ((doc.fullScreenElement && doc.fullScreenElement !== null))     
