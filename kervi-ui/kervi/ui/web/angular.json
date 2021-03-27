@@ -68,7 +68,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -159,7 +158,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
+          "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
             "tsConfig": "projects/kervi-js/tsconfig.lib.json",
             "project": "projects/kervi-js/ng-package.json"
@@ -200,7 +199,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
+          "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
             "tsConfig": "projects/ngx-kervi/tsconfig.lib.json",
             "project": "projects/ngx-kervi/ng-package.json"
@@ -241,7 +240,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
+          "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
             "tsConfig": "projects/ngx-kervi-components/tsconfig.lib.json",
             "project": "projects/ngx-kervi-components/ng-package.json"
@@ -317,7 +316,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -412,7 +410,6 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "aot": true,
-            "extractCss": true,
             "outputPath": "../../plugin/ui/web/http_docs",
             "index": "projects/webApp/src/index.html",
             "main": "projects/webApp/src/main.ts",
@@ -424,7 +421,6 @@
             ],
             "styles": [
               "projects/webApp/src/theme/dark.less"
-              
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js",
@@ -453,7 +449,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -597,7 +592,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -688,7 +682,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
+          "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
             "tsConfig": "projects/kervi-zorro/tsconfig.lib.json",
             "project": "projects/kervi-zorro/ng-package.json",

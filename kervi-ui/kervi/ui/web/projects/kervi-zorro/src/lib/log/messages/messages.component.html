@@ -2,9 +2,9 @@
     <div class="ant-notification-notice-content">
         <div class="ant-notification-notice-with-icon">
             <span class="ant-notification-notice-icon">
-                <i *ngIf="message.level==3" nz-icon type="check-circle" [nzTheme]="'twotone'" [nzTwotoneColor]="'#52c41a'"></i>
-                <i *ngIf="message.level==2" nz-icon type="warning" [nzTheme]="'twotone'" [nzTwotoneColor]="'#faad14'"></i>
-                <i *ngIf="message.level==1" nz-icon type="close-circle" [nzTheme]="'twotone'" [nzTwotoneColor]="'#f5222d'"></i>
+                <i *ngIf="message.level==3" nz-icon nzType="check-circle" [nzTheme]="'twotone'" [nzTwotoneColor]="'#52c41a'"></i>
+                <i *ngIf="message.level==2" nz-icon nzType="warning" [nzTheme]="'twotone'" [nzTwotoneColor]="'#faad14'"></i>
+                <i *ngIf="message.level==1" nz-icon nzType="close-circle" [nzTheme]="'twotone'" [nzTwotoneColor]="'#f5222d'"></i>
             </span>
             <div class="ant-notification-notice-message">{{message.sourceName}}</div>
             <div class="ant-notification-notice-description">

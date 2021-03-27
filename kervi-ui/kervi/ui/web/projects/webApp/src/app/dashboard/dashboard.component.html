@@ -5,7 +5,7 @@
 				<ul nz-menu  nzMode="horizontal" class="kervi-main-menu">
 					<li nz-submenu  *ngIf="showMenu">
 						
-						<span title><i nz-icon nzTheme="twotone" type="dashboard" [nzTwotoneColor]="'#9fd037'"></i> {{dashboard.name}}</span>
+						<span title><i nz-icon nzTheme="twotone" nzType="dashboard" [nzTwotoneColor]="'#9fd037'"></i> {{dashboard.name}}</span>
 						<ul>
 							<ng-container *ngIf="dashboards.length > 1">
 								<li nz-menu-item *ngFor="let dashboard of dashboards" [routerLink]="['/dashboard', dashboard.id]">{{dashboard.name}}</li>
@@ -13,13 +13,13 @@
 							<li *ngIf="authenticated && dashboards.length > 1">
 								<nz-divider></nz-divider>
 							</li>
-							<li nz-menu-item *ngIf="authenticated && anonymous" href="javascript: return false;" (click)="logoff($event)" ><i nz-icon type="login"></i> {{('login' | translate)}}</li>
-							<li nz-menu-item *ngIf="authenticated && !anonymous" href="javascript: return false;" (click)="logoff($event)"><i nz-icon type="logout"></i>{{('logout' | translate)}}</li>
+							<li nz-menu-item *ngIf="authenticated && anonymous" (click)="logoff($event)"> <i nz-icon nzType="login" nzTheme="outline"></i>  {{('login' | translate)}}</li>
+							<li nz-menu-item *ngIf="authenticated && !anonymous" (click)="logoff($event)"> <i nz-icon nzType="logout"></i> {{('logout' | translate)}}</li>
 						</ul>
 					</li>
 					<li nz-menu-item *ngIf="showPanelController">
 						<a  (click)="dashboardPanelsHidden = !dashboardPanelsHidden;">
-							<i nz-icon type="sliders" nzTheme="twotone" [nzTwotoneColor]="'#9fd037'"></i>
+							<i nz-icon nzType="sliders" nzTheme="twotone" [nzTwotoneColor]="'#9fd037'"></i>
 						</a>
 					</li>
 				</ul>
