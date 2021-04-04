@@ -6692,9 +6692,6 @@ _:-ms-fullscreen .ant-picker-range-wrapper .ant-picker-year-panel .ant-picker-ce
 .ant-picker-input > input:-ms-input-placeholder {
   color: #bfbfbf;
 }
-.ant-picker-input > input::-ms-input-placeholder {
-  color: #bfbfbf;
-}
 .ant-picker-input > input::placeholder {
   color: #bfbfbf;
 }
@@ -13071,9 +13068,6 @@ nz-empty {
 .ant-input-affix-wrapper:-ms-input-placeholder {
   color: #bfbfbf;
 }
-.ant-input-affix-wrapper::-ms-input-placeholder {
-  color: #bfbfbf;
-}
 .ant-input-affix-wrapper::placeholder {
   color: #bfbfbf;
 }
@@ -13239,9 +13233,6 @@ textarea.ant-input-affix-wrapper {
   opacity: 1;
 }
 .ant-input:-ms-input-placeholder {
-  color: #bfbfbf;
-}
-.ant-input::-ms-input-placeholder {
   color: #bfbfbf;
 }
 .ant-input::placeholder {
@@ -13731,9 +13722,6 @@ textarea.nz-textarea-autosize-measuring {
 .ant-input-number:-ms-input-placeholder {
   color: #bfbfbf;
 }
-.ant-input-number::-ms-input-placeholder {
-  color: #bfbfbf;
-}
 .ant-input-number::placeholder {
   color: #bfbfbf;
 }
@@ -13915,9 +13903,6 @@ textarea.ant-input-number {
   opacity: 1;
 }
 .ant-input-number-input:-ms-input-placeholder {
-  color: #bfbfbf;
-}
-.ant-input-number-input::-ms-input-placeholder {
   color: #bfbfbf;
 }
 .ant-input-number-input::placeholder {
@@ -16183,9 +16168,6 @@ nz-list-item-extra {
 .ant-mention-wrapper .ant-mention-editor:-ms-input-placeholder {
   color: #bfbfbf;
 }
-.ant-mention-wrapper .ant-mention-editor::-ms-input-placeholder {
-  color: #bfbfbf;
-}
 .ant-mention-wrapper .ant-mention-editor::placeholder {
   color: #bfbfbf;
 }
@@ -17363,9 +17345,6 @@ nz-page-header-footer {
   opacity: 1;
 }
 .ant-pagination-options-quick-jumper input:-ms-input-placeholder {
-  color: #bfbfbf;
-}
-.ant-pagination-options-quick-jumper input::-ms-input-placeholder {
   color: #bfbfbf;
 }
 .ant-pagination-options-quick-jumper input::placeholder {
@@ -21771,8 +21750,7 @@ cdk-virtual-scroll-viewport.ant-table-body {
   left: 0;
 }
 :root .ant-tabs-tab-prev {
-  -webkit-filter: none;
-          filter: none;
+  filter: none;
 }
 .ant-tabs-nav-wrap {
   margin-bottom: -1px;
@@ -25272,7 +25250,7 @@ nz-space-item {
   padding: 0.5%;
   z-index: 900;
   position: absolute;
-  margin-top: 10px;
+  margin-top: 50px;
   width: 100%;
   height: 100%;
 }
@@ -25392,5 +25370,12 @@ value-sparkline {
 }
 .ant-timeline-item-head {
   background-color: inherit;
+}
+.ant-menu {
+  background-color: inherit !important;
+}
+.ant-menu-submenu-popup {
+  background: #3a4346;
+  padding: 5px;
 }
 
