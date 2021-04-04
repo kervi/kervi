@@ -87,6 +87,7 @@ setup(
         'autobahn',
         'pyzmq>=18.1.0',
         'pillow',
+        watchdog,
         'kervi-hal-win==' + VERSION,
         'kervi-hal-rpi==' + VERSION
     ],

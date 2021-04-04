@@ -3,13 +3,15 @@ import queue
 import datetime
 import time
 from kervi.vision.camera import FrameCameraDeviceDriver
-from kervi.platforms.windows.pygrabber.PyGrabber import *
 from PIL import Image, ImageDraw
+from io import BytesIO
 
 class CameraDriver(FrameCameraDeviceDriver):
     def __init__(self, source):
         FrameCameraDeviceDriver.__init__(self)
         self.queue = queue.Queue()
+        
+        from kervi.platforms.windows.pygrabber.PyGrabber import PyGrabber        
         self.grabber = PyGrabber(self.on_image_received)
         self._cam_idx = -1
         devices = self.grabber.get_devices()

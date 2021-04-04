@@ -17,7 +17,6 @@ HAL_DRIVER_ID = None
 
 def _load(hw_platform="auto"):
     global GPIO, _DRIVER, HAL_DRIVER_ID
-
     if not _DRIVER:
         hal_modules = {
             "windows": "kervi.platforms.windows",
@@ -48,6 +47,9 @@ def _load(hw_platform="auto"):
                             elif line.startswith('Hardware') and line.endswith('BCM2837'):
                                 system = "linux(rpi)"
                                 break
+                            elif line.startswith('Hardware') and line.endswith('BCM2711'):
+                                system = "linux(rpi)"
+                                break
                 except:
                     pass
             if not system in hal_modules.keys():
@@ -65,8 +67,6 @@ def _load(hw_platform="auto"):
             return module_name
         else:
             raise ValueError("Invalid hw_platform. Valid values are: " + str.join(hal_modules.keys()))
-
-
 def get_board_name():
     return _DRIVER.get_board_name()
 

@@ -1,5 +1,5 @@
-import distutils
 from setuptools import setup
+import distutils
 import sys
 
 try:
