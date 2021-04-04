@@ -2,6 +2,7 @@
 pip3 install pyzmq==22.0.3
 pip3 install pillow
 pip3 install autobahn
+pip3 install watchdog
 
 pip3 install --no-dependencies -e ./kervi
 pip3 install -e ./kervi-core

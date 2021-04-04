@@ -2,6 +2,7 @@
 pip install pyzmq==22.0.3
 pip install pillow
 pip install autobahn
+pip install watchdog 
 
 pip install --no-dependencies -e ./kervi
 pip install -e ./kervi-ui
