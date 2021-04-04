@@ -19,14 +19,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import time
 import kervi.core.utility.process as process
-
+import threading
 
 class _KerviModuleLoader(process._KerviProcess):
     """ Private class that starts a separate process that loads a module in the Kervi application """
     def init_process(self, **kwargs):
         self.spine.log.verbose("load: %s", self.name)
-
+        self.relaunch = False
+        self.reloaded = kwargs.get("reloaded", False)
         try:
             import kervi.hal as hal
             hal._load()
@@ -43,12 +45,21 @@ class _KerviModuleLoader(process._KerviProcess):
             self.name
         )
 
+        if self.reloaded:
+            self.spine.trigger_event(
+                "moduleStarted",
+                self.name
+            )
+
     def terminate_process(self):
-        pass
+        self._bus_manager.stop()
+        #for thread in threading.enumerate():
+        #        print("running thread",thread.name)
+        if self.relaunch:
+            process._start_process(self.scope, self.name, self.config, self.port, _KerviModuleLoader, True, self._log_queue, reloaded=True)
 
     def load_spine(self, process_id, spine_port, root_address = None, ip=None):
         from kervi.plugin.message_bus.bus_manager import BusManager
         self._bus_manager = BusManager()
         self._bus_manager.load(process_id, spine_port, root_address, ip)
         return self._bus_manager.bus
-

@@ -3,11 +3,9 @@
 
 """ Handles multiprocessing functionality in Kervi """
 import json
-from multiprocessing import Process #, Array, Value, Manager, freeze_support
+from multiprocessing import Process
 import time
 import kervi.spine as spine
-#from kervi.utility.process_spine import _ProcessSpine
-#import sys
 import kervi.core.utility.kervi_logging as k_logging
 import logging
 import os
@@ -19,6 +17,7 @@ class _KerviProcess(object):
         self._is_connected = False
         self.port = ipcPort
         self.config = config
+        self.scope = scope
         self._log_queue = log_queue
         self._pid = os.getpid()
         self.spine = self.load_spine(name, ipcPort, "tcp://" + config.network.ipc_root_address + ":" + str(config.network.ipc_root_port), config.network.ip)
@@ -90,6 +89,8 @@ def _launch(scope, name, process_class, config_data, ipc_port, root_close, log_q
         pass
     if process:
         process._terminate_process()
+    del process
+    
 
 def _start_process(scope, name, config, port_idx, process_class, root_close=True, log_queue=None, **kwargs):
     config_data = config.to_json()

@@ -25,6 +25,7 @@ import platform
 if platform.system() == "Windows":
     os.system('color')
 import time
+from datetime import datetime
 import threading
 import logging
 from kervi.core.utility.kervi_logging import KerviLog
@@ -118,6 +119,7 @@ class Application(object):
         self._websocket_event = threading.Event()
         self._in_stop = False
         self._discovery_thread = None
+        self._last_file_modified_event = None
         config_files = []
         self._webserver_info = None
         opts, args = getopt.getopt(sys.argv[1:], "c", ["config_file=", "as-service", "install-service", "uninstall-service", "start-service", "stop-service", "restart-service", "status-service", "detect-devices"])
@@ -127,8 +129,8 @@ class Application(object):
                     config_files += [arg]
                 else:
                     print("Specified config file not found:", arg)
-        script_path = os.path.abspath(inspect.stack()[1][1])
-        script_name = os.path.basename(script_path)
+        self.script_path = os.path.abspath(inspect.stack()[1][1])
+        script_name = os.path.basename(self.script_path)
         script_name, script_ext = os.path.splitext(script_name)
         
         config_files += [script_name +".config.json"]
@@ -182,7 +184,7 @@ class Application(object):
                     service_commands,
                     self.config.application.name,
                     self.config.application.id,
-                    script_path
+                    self.script_path
                 )
             exit()
 
@@ -227,7 +229,7 @@ class Application(object):
         self.spine.register_event_handler("processReady", self._process_ready, scope="app-" + self.config.application.id)
         self.spine.register_event_handler("WebAppReady", self._webapp_ready, scope="app-" + self.config.application.id)
         self.spine.register_event_handler("websocketReady", self._websocket_ready, scope="app-" + self.config.application.id)
-        self._module_processes = []
+        self._module_processes = {}
         self._process_info = []
         self._process_info_lock = threading.Lock()
 
@@ -344,7 +346,7 @@ class Application(object):
         import kervi.core.utility.process as process
         import kervi.utility.application_helpers as app_helpers
 
-
+        
         #if self._as_service:
         signal.signal(signal.SIGINT, handler_stop_signals)
         signal.signal(signal.SIGTERM, handler_stop_signals)
@@ -369,8 +371,9 @@ class Application(object):
             self._process_info_lock.release()
 
             module_port += 1
-            self._module_processes += [
-                process._start_process(
+            self._module_processes[module] = { 
+                "port": module_port,
+                "process": process._start_process(
                     "app-" + self.config.application.id,
                     module,
                     self.config,
@@ -378,7 +381,9 @@ class Application(object):
                     app_helpers._KerviModuleLoader,
                     log_queue = self._log_queue
                 )
-            ]
+            }
+            
+            
 
         #print("wait for ready")
         try:
@@ -427,8 +432,61 @@ class Application(object):
         except:
             pass
 
+    
+    def on_created(self, event):
+        #print(f"hey, {event.src_path} has been created!")
+        pass
+    
+    def on_deleted(self, event):
+        #print(f"what the f**k! Someone deleted {event.src_path}!")
+        pass
+
+    def on_modified(self, event):
+        if event.src_path.endswith(".py"):
+            now = time.time()
+            if not self._last_file_modified_event or now - self._last_file_modified_event  > 1: 
+                self._last_file_modified_event = now
+                self._logger.verbose("%s has been modified", event.src_path)
+                for module_name in self._module_processes.keys():
+                    if event.src_path.find(module_name)>-1:
+                        module = self._module_processes[module_name]
+                        module["process"].terminate()
+
+                        import kervi.core.utility.process as process
+                        import kervi.utility.application_helpers as app_helpers
+                        module["process"] = process._start_process(
+                            "app-" + self.config.application.id,
+                            module_name,
+                            self.config,
+                            nethelper.get_free_port([module["port"]]),
+                            app_helpers._KerviModuleLoader,
+                            log_queue = self._log_queue,
+                            reloaded=True
+                        )
+                #self.spine.trigger_event("PythonFileChanged", event.src_path)
+        
+
+    def on_moved(self, event):
+        print(f"ok ok ok, someone moved {event.src_path} to {event.dest_path}")
+
     def run(self):
         """Run the application loop. The application will continue until termination with ctrl-c"""
+        import time
+        from watchdog.observers import Observer
+        from watchdog.events import PatternMatchingEventHandler
+        patterns = ["*.py"]
+        ignore_patterns = ""
+        ignore_directories = False
+        case_sensitive = True
+        my_event_handler = PatternMatchingEventHandler(patterns, ignore_patterns, ignore_directories, case_sensitive)
+        my_event_handler.on_created = self.on_created
+        my_event_handler.on_deleted = self.on_deleted
+        my_event_handler.on_modified = self.on_modified
+        my_event_handler.on_moved = self.on_moved
+        my_observer = Observer()
+        my_observer.schedule(my_event_handler, os.path.dirname(self.script_path), recursive=True)
+        my_observer.start()
+        
         thread.start_new_thread(self._input_thread, (self.char_list,))
         if not self.started:
             self._start()
@@ -440,7 +498,7 @@ class Application(object):
 
         except KeyboardInterrupt:
             pass
-
+        my_observer.stop()
         self.stop()
 
     def _xrun(self):
