@@ -67,128 +67,157 @@ class DCMotorControllerBase(Controller):
         raise NotImplementedError
 
 class _StepperRunThread(KerviThread):
-    def __init__(self, motor, speed):
+    def __init__(self, motor):
         KerviThread.__init__(self)
         self.motor = motor
-        self.enabled = False
-        self.speed = speed
+        self.thread_enabled = False
+        self.step_delay = 1
+        self.direction = 1
+        self.step_type = 1
+        self.steps = 1
+        self.continuous = False 
 
     def _step(self):
-        if self.enabled:
-            if self.speed > 0:
-                self.motor.step(1)
-            elif self.speed < 0:
-                self.motor.step(-1)
-            else:
-                self.motor.release()
+        if self.thread_enabled:
+            if self.steps > 0:
+                self.motor._step(self.direction, self.step_delay, self.step_type)
+                if not self.continuous:
+                    self.steps -= 1
+                    if self.steps == 0:
+                        self.thread_enabled = False
+                        self.motor._device._step(self.motor._motor, [False, False, False, False])
+        else:
+            time.sleep(.1)
 
 class StepperMotor(object):
-    SINGLE = 1
-    DOUBLE = 2
-    INTERLEAVE = 3
-    MICROSTEP = 4
-    MICROSTEPS = 8
-
-    FORWARD = 1
+    FULL_STEP = 2
+    HALF_STEP = 1
+    WAVE_DRIVE = 0
 
     def __init__(self, device, motor):
         self._device = device
         self._motor = motor
-        self._step_style = self.SINGLE
-        self.stepping_counter = 0
-        self.current_step = 0
-        self.stepper_thread = None
-        self._max_rpm = 60
-        self._steps = 200
-        self._min_interval = 60.0 / (self._max_rpm * self._steps)
-        self._step_interval = self._min_interval
-    @property
-    def max_rpm(self):
-        return self._steps
+        self._step_style = self.HALF_STEP
+        self._stepping_counter = 0
+        self._current_step = 0
+        self._stepper_thread = None
 
-    @max_rpm.setter
-    def max_rpm(self, value):
-        self._max_rpm = value
-
-    @property
-    def steps(self):
-        return self._steps
-
-    @steps.setter
-    def steps(self, value):
-        self._steps = value
-
-    @property
-    def min_interval(self):
-        return self._min_interval
-
-    @property
-    def step_style(self):
-        return self._step_style
-
-    @step_style.setter
-    def step_style(self, value):
-        self._step_style = value
-
-    @property
-    def step_interval(self):
-        self.stepping_counter = 0
-        return self._step_interval
-
-    @step_interval.setter
-    def step_interval(self, value):
-        self._step_interval = value
-
-    def _step(self, direction, style=None):
-        self._device._step(self._motor, direction, style)
-
-    def _release(self):
-        self._device._release(self._motor)
-
-    def set_speed(self, speed):
-        if not self.stepper_thread:
-            interval = (100/speed) * self.min_interval
-            self.step_interval = interval
-
-            self.stepper_thread = _StepperRunThread(self, speed)
-
-    def release(self):
-        self._release()
-
-    def step(self, steps, step_style=None):
-        s_per_s = self._step_interval
-        lateststep = 0
-
-        if steps > 0:
-            direction = 1
-        else:
-            direction = 0
-
-        steps = abs(steps)
-
-        if not step_style:
-            step_style = self.step_style
-
-        if step_style == self.INTERLEAVE:
-            s_per_s = s_per_s / 2.0
-        if step_style == self.MICROSTEP:
-            s_per_s /= self.MICROSTEPS
-            steps *= self.MICROSTEPS
-
+        self._min_step_delay = 0.01
         
-        for s in range(steps):
-            lateststep = self._step(direction, step_style)
-            time.sleep(s_per_s)
+        self._position = NumberValue(
+            "stepper position " +str(motor),
+            input_id="stepper_position_" + str(motor),
+            parent=self._device,
+            index=motor
+        )
+        self._position.add_observer(self)
 
-        if step_style == self.MICROSTEP:
-            # this is an edge case, if we are in between full steps, lets just keep going
-            # so we end on a full step
-            while (lateststep != 0) and (lateststep != self.MICROSTEPS):
-                lateststep = self._step(direction, step_style)
-                time.sleep(s_per_s)
+        self._speed = NumberValue(
+            "stepper speed " +str(motor),
+            input_id="stepper_speed_" + str(motor),
+            parent=self._device,
+            index=motor
+        )
+        self._speed.add_observer(self)
+        
+        self._map = [
+        [
+            [True, False, False, False],
+            [True, True, False, False],
+            [False, True, False, False],
+            [False, True, True, False],
+            [False, False, True, False],
+            [False, False, True, True],
+            [False, False, False, True],
+            [True, False, False, True]
+        ],
+        [
+            [True, False, False, False],
+            [False, True, False, False],
+            [False, False, True, False],
+            [False, False, False, True],
+            [True, False, False, False],
+            [False, True, False, False],
+            [False, False, True, False],
+            [False, False, False, True]    
+        ],
+        [
+            [True, True, False, False],
+            [False, True, True, False],
+            [False, False, True, True],
+            [True, False, False, True],
+            [True, True, False, False],
+            [False, True, True, False],
+            [False, False, True, True],
+            [True, False, False, True]    
+        ]]
+    
+    @property
+    def speed(self):
+        return self._speed
+    
+    @property
+    def position(self):
+        return self._position
 
-class StepperMotorControllerBase(object):
+    def kervi_value_changed(self, input, value):
+        if input == self._speed:
+            print("vcs", value)
+        if input == self._position:
+            print("vcp", value)
+        pass
+    
+    def _step(self, steps, step_delay, step_type = 1):
+        map_index = step_type
+        if steps > 0:
+            while steps > 0:
+                if self._current_step < 7:
+                    self._current_step += 1
+                else:
+                    self._current_step = 0
+                self._device._step(self._motor, self._map[map_index][self._current_step])
+                time.sleep(step_delay)
+                steps -= 1
+        else:
+            while steps < 0:
+                if self._current_step > 0:
+                    self._current_step -= 1
+                else:
+                    self._current_step = 7
+                self._device._step(self._motor, self._map[map_index][self._current_step])
+                time.sleep(step_delay)
+                steps += 1
+    
+
+    def step(self, steps, step_delay, step_type = 1, step_async = False):
+        self._current_step= -1
+        if not step_async:
+            
+            self._step(steps, step_delay, step_type)
+            self._device._step(self._motor, [False, False, False, False])
+        else:
+            if not self._stepper_thread:
+                self._stepper_thread = _StepperRunThread(self)
+                self._stepper_thread.step_delay = step_delay
+                self._stepper_thread.direction = 1 if steps > 0 else -1
+                self._stepper_thread.steps = abs(steps)
+                self._stepper_thread.thread_enabled = True
+                self._stepper_thread.start()
+            else:
+                self._stepper_thread.direction = 1 if steps > 0 else -1
+                self._stepper_thread.step_delay = step_delay
+                self._stepper_thread.steps = abs(steps)
+                self._stepper_thread.thread_enabled = True
+    
+    def stop(self):
+        if self._stepper_thread:
+            self._stepper_thread.thread_enabled = False
+            self._device._step(self._motor, [False, False, False, False])
+        
+
+class StepperMotorControllerBase(Controller):
     def __init__(self, controller_id, device_name, num_motors):
+        Controller.__init__(self, controller_id, device_name + "-Stepper motors")
         self._num_motors = num_motors
         self._device_name = device_name
 
@@ -206,11 +235,8 @@ class StepperMotorControllerBase(object):
 
     @property
     def num_motors(self):
-        """Number of DC motors this motor controller can handle"""
+        """Number of stepper motors this motor controller can handle"""
         return self._num_motors
-
-    def _step(self, motor, style):
-        raise NotImplementedError
 
     def _release(self, motor):
         raise NotImplementedError
