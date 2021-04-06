@@ -7,7 +7,7 @@ class _DCMotorController(DCMotorControllerBase):
         self._motors = [(ena, in1, in2), (enb, in3, in4)]
         for motor in self._motors:
             en, in1, in2 = motor
-            en.define_as_pwm()
+            if en: en.define_as_pwm()
             in1.define_as_output()
             in2.define_as_output()
 
@@ -39,11 +39,41 @@ class _DCMotorController(DCMotorControllerBase):
             in2.set(True)
 
 
+class _StepperMotorController(StepperMotorControllerBase):
+    def __init__(self, controller_id, in1, in2, in3, in4):
+        StepperMotorControllerBase.__init__(self, controller_id, "LN298", 1)
+        self._current_step = -1
+        self.in1 = in1
+        self.in2 = in2
+        self.in3 = in3
+        self.in4 = in4
+        self.in1.define_as_output()
+        self.in2.define_as_output()
+        self.in3.define_as_output()
+        self.in4.define_as_output()
+        self.in1.enable_change_events = False
+        self.in2.enable_change_events = False
+        self.in3.enable_change_events = False
+        self.in4.enable_change_events = False
+        self.in1.allow_persist = False
+        self.in2.allow_persist = False
+        self.in3.allow_persist = False
+        self.in4.allow_persist = False
+        
+
+    def _step(self, motor, coil_map):
+        self.in1.value = coil_map[0]
+        self.in2.value = coil_map[1]
+        self.in3.value = coil_map[2]
+        self.in4.value = coil_map[3]
+        pass
+
 class LN298DeviceDriver(MotorControllerBoard):
     def __init__(self, ena, in1, in2, enb, in3, in4, board_id="LN298", board_name="LN298"):
         MotorControllerBoard.__init__(
             self,
             board_id,
             board_name,
-            dc_controller=_DCMotorController(board_id+".dc_motors", ena, in1, in2, enb, in3, in4)
+            dc_controller =_DCMotorController(board_id + ".dc_motors", ena, in1, in2, enb, in3, in4),
+            stepper_controller = _StepperMotorController(board_id + "._stepper_motors", in1, in2, in3, in4) 
         )

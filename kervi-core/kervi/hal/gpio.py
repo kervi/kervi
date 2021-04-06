@@ -44,7 +44,7 @@ class LogicIOChannel(BooleanValue):
     def set(self, value):
         if self.is_input:
             self._device.set(self._channel, value)
-
+        
     def _input_changed(self,v):
         self.value = self._device.get(self._channel)
 

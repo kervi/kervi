@@ -458,7 +458,7 @@ class Application(object):
                             "app-" + self.config.application.id,
                             module_name,
                             self.config,
-                            nethelper.get_free_port([module["port"]]),
+                            nethelper.get_free_port(),
                             app_helpers._KerviModuleLoader,
                             log_queue = self._log_queue,
                             reloaded=True

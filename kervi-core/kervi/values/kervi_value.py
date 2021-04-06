@@ -37,6 +37,7 @@ class KerviValue(KerviComponent):
         self._display_value = None
         self._unit = ""
         self._display_unit = None
+        self._enable_change_events = True
         
         self._sparkline = []
         self._observers = []
@@ -143,6 +144,14 @@ class KerviValue(KerviComponent):
             self._load_persisted()
         else:
             self._persist_value = do_persist
+
+    @property
+    def enable_change_events(self):
+        return self._enable_change_events
+
+    @enable_change_events.setter
+    def enable_change_events(self, value):
+        self._enable_change_events = value
 
     def every(self, interval=1):
         """
@@ -293,20 +302,22 @@ class KerviValue(KerviComponent):
             if self._persist_value and allow_persist:
                 self.settings.store_value("value", self.value)
 
-            val = {
-                "id":self.component_id,
-                "value":nvalue,
-                "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
-                "display_value": self.display_value,
-                "display_unit": self.display_unit
-            }
-            self.spine.trigger_event(
-                "valueChanged",
-                self.component_id,
-                val,
-                self._log_values,
-                groups=self.user_groups
-            )
+            if self._enable_change_events:
+                val = {
+                    "id":self.component_id,
+                    "value":nvalue,
+                    "timestamp":datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+                    "display_value": self.display_value,
+                    "display_unit": self.display_unit
+                }
+                
+                self.spine.trigger_event(
+                    "valueChanged",
+                    self.component_id,
+                    val,
+                    self._log_values,
+                    groups=self.user_groups
+                )
 
     def kervi_value_changed(self, source, value):
         self._set_value(value, False)
