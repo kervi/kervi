@@ -28,7 +28,7 @@
     "bootstrap-slider": "^10.6.0",
     "bootstrap-switch": "^3.3.4",
     "bootstrap-toggle": "^2.2.2",
-    "chart.js": "^2.7.3",
+    "chart.js": "^2.9.4",
     "chartjs-plugin-zoom": "^0.6.6",
     "convert-units": "^2.3.4",
     "core-js": "^2.5.4",
