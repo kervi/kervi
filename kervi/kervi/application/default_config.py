@@ -30,6 +30,12 @@ def get_default_config():
             "ipc_root_port": nethelper.get_free_port([9500]),
             "ipc_root_address": nethelper.get_ip_address()
         },
+        "location": {
+            # greenwich
+            "longitude": 51.5,
+            "latitude": 0.0,
+            "time_zone": 0
+        },
         "plugin_manager":{
             "plugin_types":{
                 "default": {
