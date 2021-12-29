@@ -4,7 +4,7 @@
         <!-- <ui-slider [value]="(value.value$ | async)" (sliderChanged)="setKerviValue($event)" [minValue]="value.minValue" [maxValue]="value.maxValue" [linkParameters]="linkParameters"></ui-slider> -->
     </div>
     <div class="value-value" *ngIf="!linkParameters.isInput" [style.min-width.rem]="linkParameters.valueSize">
-        <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i>
+        <kervi-icon icon="currentIcon"></kervi-icon>
 		<value-sparkline *ngIf="linkParameters.showSparkline && !linkParameters.isInput" [value]="value"></value-sparkline>
         {{(value.value$ | async | number:numberFormat)}}
         <span *ngIf="linkParameters.displayUnit">{{value.unit}}</span>

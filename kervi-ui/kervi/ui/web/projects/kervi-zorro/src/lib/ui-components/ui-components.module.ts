@@ -17,6 +17,7 @@ import { FormsModule } from '@angular/forms';
 import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { ColorPickerModule } from 'ngx-color-picker';
     FormsModule,
     NgZorroAntdModule,
     NgApexchartsModule,
-    ColorPickerModule 
+    ColorPickerModule,
+    MatIconModule
   ],
   providers: [],
   bootstrap: []

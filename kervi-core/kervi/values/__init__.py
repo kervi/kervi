@@ -179,14 +179,14 @@ class NumberValue(KerviValue):
 
     @property
     def display_value(self):
-        if self._q_display and self._q_unit:
-            dv = self._value * self._q_unit
-            return round(dv.to(self._q_display).magnitude, 3)
+        # if self._q_display and self._q_unit:
+        #     dv = self._value * self._q_unit
+        #     return round(dv.to(self._q_display).magnitude, 3)
+        # else:
+        if self._value:
+            return round(self._value, 3)
         else:
-            if self._value:
-                return round(self._value, 3)
-            else:
-                return 0.0
+            return 0.0
     
     def _get_info(self, **kwargs):
         return {

@@ -10,7 +10,7 @@
 <ng-container *ngIf="!linkParameters.isInput">
 
     <span class="value-value" [style.min-width.rem]="linkParameters.valueSize">
-        <i *ngIf="currentIcon" class="fa fa-{{currentIcon}}"></i>
+       qq <kervi-icon icon="currentIcon"></kervi-icon>
         <value-sparkline *ngIf="linkParameters.showSparkline && !linkParameters.isInput" [value]="value"></value-sparkline>
         {{(value.value$ | async | number:numberFormat)}}
         <span *ngIf="linkParameters.displayUnit">{{value.unit}}</span>

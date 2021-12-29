@@ -2,7 +2,7 @@
     <div fxLayout="row" *ngIf="!inline" class="kervi-block-widget"> 
         <div fxFlex="60" class="kervi-value-label">
             <!-- <i nz-icon nzType="bulb" nzTheme="outline"></i> -->
-            <i nz-icon  *ngIf="linkParameters.labelIcon" [nzType]="linkParameters.labelIcon"></i>
+            <kervi-icon [icon]="linkParameters.labelIcon" ></kervi-icon>
             <span  *ngIf="linkParameters.label">{{linkParameters.label}}</span>
         </div>
         
@@ -15,7 +15,8 @@
 
     <div *ngIf="inline" class="kervi-inline-widget">
         <div class="kervi-value-label"> 
-            <i nz-icon style="display:inline"  *ngIf="linkParameters.labelIcon" [nzType]="linkParameters.labelIcon"></i>
+            <kervi-icon [icon]="linkParameters.labelIcon" inline="true"></kervi-icon>
+            <!-- <i nz-icon style="display:inline"  *ngIf="linkParameters.labelIcon" [nzType]="linkParameters.labelIcon"></i> -->
             <span style="display:inline"  *ngIf="linkParameters.label"  >{{linkParameters.label}}</span>
         </div>
         <div class="kervi-value-section">

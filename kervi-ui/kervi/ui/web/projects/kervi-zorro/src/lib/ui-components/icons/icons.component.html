@@ -1,1 +1,2 @@
-<i class="pi pi-{{icon}}"></i>
+<i nz-icon [style]="inlineValue" *ngIf="icon && iconType=='zorro'" nzTheme="outline" [nzType]="icon"></i>
+<mat-icon style="font-size:14px;{{inlineValue}}" *ngIf="icon && iconType=='mdi'" aria-label="Example home icon">{{ icon }}</mat-icon>
